@@ -402,7 +402,7 @@ for (const p of products) {
       if (raw) {
         const fname = basename(raw);
         copyFileSync(r(raw), resolve(outDir, fname)); // serve raw md for <noscript>
-        rawLinks[docKey][lang] = fname;
+        rawLinks[docKey][lang] = `/${p.id}/${fname}`; // absolute — avoids relative-link compounding under the index.html fallback
       }
     }
   }
