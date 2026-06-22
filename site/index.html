@@ -29,7 +29,7 @@
   /* nav */
   .nav{position:sticky;top:0;z-index:40;background:rgba(244,241,234,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #E4DDCE}
   .nav-in{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 40px}
-  .brand{display:flex;align-items:center;gap:14px}
+  .brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;cursor:pointer}
   .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.01em}
   .nav-right{display:flex;align-items:center;gap:26px}
   .nav-link{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#736d5f;text-decoration:none}
@@ -89,7 +89,7 @@
   .toast-in{display:flex;align-items:center;gap:12px;background:#1B1A17;color:#F4F1EA;padding:14px 20px;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:500}
   /* keyboard focus ring (accent green, paper-bg AA-visible) */
   a,button{outline:none}
-  .nav-link:focus-visible,.langtoggle button:focus-visible,.row-btn:focus-visible,.store:focus-visible,.legal-links a:focus-visible,.footer-in a:focus-visible{outline:2px solid #0B6E26;outline-offset:3px;border-radius:6px}
+  .brand:focus-visible,.nav-link:focus-visible,.langtoggle button:focus-visible,.row-btn:focus-visible,.store:focus-visible,.legal-links a:focus-visible,.footer-in a:focus-visible{outline:2px solid #0B6E26;outline-offset:3px;border-radius:6px}
   @media (max-width:720px){
     .nav-in,.hero,.products{padding-left:22px;padding-right:22px}
     .hero{padding-top:64px}
@@ -127,7 +127,7 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-in">
-    <div class="brand">
+    <a class="brand" href="/" aria-label="family-pie — на главную">
       <svg class="pielogo" width="36" height="36" viewBox="0 0 48 48" style="display:block">
         <path class="seg" d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#0E8A30"></path>
         <path class="seg" d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A"></path>
@@ -144,7 +144,7 @@
         <line x1="24" y1="24" x2="4.95" y2="13" stroke="#F4F1EA" stroke-width="2.4"></line>
       </svg>
       <span class="brand-name">family-pie</span>
-    </div>
+    </a>
     <div class="nav-right">
       <a href="#products" class="nav-link" data-i18n="products">Продукты</a>
       <div class="langtoggle" role="group" aria-label="Language">
@@ -185,7 +185,7 @@
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-in">
-    <span>© 2026 family-pie · <span data-i18n="studioEyebrow">Студия приложений</span></span>
+    <span>© 2026 <a href="/">family-pie</a> · <span data-i18n="studioEyebrow">Студия приложений</span></span>
     <a href="mailto:hello@family-pie.ru">hello@family-pie.ru</a>
   </div>
 </footer>
