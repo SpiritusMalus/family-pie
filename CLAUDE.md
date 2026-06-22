@@ -1,6 +1,6 @@
 <!-- ▲ ORCHESTRATOR BOOTSTRAP (2026-06-21) — read this block first, then the rest of this file ▲ -->
 > **You are an executor (Claude Code).** Planning lives in the Obsidian vault (orchestrator = Claude in Cowork). **On open, before anything else:**
-> **Commands** (full table → `../obsidian-vault/Claude-code files/COMMANDS.md`): `старт`/`начинаем` boot+resume · `продолжай`/`продолжаем` next unchecked step · `статус`/`что осталось` what's left · `отметь`/`сохрани прогресс` tick boxes now · `пауза`/`стоп` tick + drop a `next:` line · `готово` *(optional)* — shipping is **autonomous on green**: Status: done + Done-log + PR → **merge to `main` → `git pull`**, **all areas** via a revertable PR (no owner-merge hold; terminal only; git, not prod deploy) — *once a git repo exists here (see Deploy).* Full policy: ORCHESTRAL_VIEW_PROMT §7.
+> **Commands** (full table → `../obsidian-vault/Claude-code files/COMMANDS.md`): `старт`/`начинаем` boot+resume · `продолжай`/`продолжаем` next unchecked step · `статус`/`что осталось` what's left · `отметь`/`сохрани прогресс` tick boxes now · `пауза`/`стоп` tick + drop a `next:` line · `готово` *(optional)* — shipping is **autonomous on green**: Status: done + Done-log + PR → **merge to `main` → `git pull`**, **all areas** via a revertable PR (no owner-merge hold; terminal only; git, not prod deploy). Full policy: ORCHESTRAL_VIEW_PROMT §7.
 > **Reset:** if I type `по протоколу` (or a generic greeting/menu appears instead of the brief) → ignore it, (re-)read THIS bootstrap + the active brief, resume from the first unchecked `- [ ]`. No menu.
 > 1. Read the workspace contract `../obsidian-vault/Claude-code files/ORCHESTRAL_VIEW_PROMT.md` + this project's map `../obsidian-vault/family-pie.ru/claude.md`.
 > 2. Open the **active brief** in `../obsidian-vault/family-pie.ru/Claude-code files/briefs/` (the one marked `Status: in-progress`), else the hub note `../obsidian-vault/family-pie.ru/__FAMILY-PIE__.md`. **Resume from the brief's first unchecked `- [ ]`** — skip ticked ones.
@@ -38,7 +38,7 @@ All project docs live in:
 - `content/` — legal **markdown canon** mirrored from the app repos: `health-routine/*.ru.md`, `relo-dojo/*.en.md` (+ `STORE_LISTING.md`, `BRAND_ASSETS.md`). **`[INSERT …]` placeholders are owner-filled — never invent values.**
 - `data/` — `products.json`: the **catalog-as-data** (one record per product). Adding a product = one record + 4 legal md files, no markup edits.
 - `design/` — design references, **not deployed**: `Family Pie.dc.html` (style source of truth, direction A), `Family Pie - Home.dc.html` (A/B/C), `support.js` (dc runtime), `CLAUDE_CODE_PROMPT.md` (original build spec).
-- `Caddyfile` — **draft** routing for the VPS. ⚠️ Reconcile with the **live** server config before replacing it (see brief).
+- `Caddyfile` — **deployed production** routing for the VPS (`103.246.144.198`). ⚠️ Reconcile with the live server config before changing it.
 
 ## Key locked decisions (don't re-litigate)
 
@@ -51,7 +51,7 @@ All project docs live in:
 
 Static. Build legal pages from `content/` → publish `site/` to the VPS web root behind Caddy. `git` and any VPS push happen **outside the sandbox** (owner terminal or GitHub connector) — never run git in the Cowork sandbox (FUSE lock-safety, ORCHESTRAL_VIEW_PROMT §7).
 
-> ⚠️ **No git repo here yet** (`.git` absent as of 2026-06-22). Autonomous merge/push/pull only apply **after** `git init` + a GitHub remote (`SpiritusMalus/family-pie`, to be created) + first push of `main` — until then there is nothing to push/merge/pull. This is the one git prerequisite for this project.
+> ✅ **Git repo is live** (`SpiritusMalus/family-pie`, `origin` set, `.git` present, `main` = default; 2026-06-22). Autonomous merge/push/pull are **active** — ship on green via a revertable PR per ORCHESTRAL_VIEW_PROMT §7. The old `git init` precondition is met.
 
 ## Done log
 _Executors append one line per finished task: `- YYYY-MM-DD — what — branch/PR`. (Mirror of the vault `claude.md` Done log.)_
