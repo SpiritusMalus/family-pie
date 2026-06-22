@@ -1,8 +1,8 @@
 # Privacy Policy — HealthRoutine
 
-**Effective date:** [INSERT DATE]
-**Operator ("we"):** [INSERT LEGAL NAME / SOLE PROPRIETOR] ("HealthRoutine")
-**Contact:** [INSERT CONTACT EMAIL]
+**Effective date:** June 22, 2026
+**Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("HealthRoutine")
+**Contact:** support@family-pie.ru
 
 > Draft for publication in the app stores and on the website. The factual descriptions
 > below match how the app actually works; the bracketed fields and the governing-law
@@ -47,7 +47,7 @@ devices. In that case the operator's server stores only the **unreadable ciphert
 your backup plus service metadata (see "What data is processed"); the operator does not
 have the key to open it. This feature is **off by default** and is enabled only by you;
 before it is enabled in production, the review from the "Governing law" section must be
-completed (host and jurisdiction — the `[INSERT]` field).
+completed (when enabled, the server is located in the Russian Federation).
 
 ## What data is processed
 
@@ -98,11 +98,7 @@ Processing on the device is carried out in your interests and under your control
 Cross-border transfer for AI recognition is carried out **only on the basis of your
 separate consent**, which you give in the app before the first transmission and can
 revoke in settings. Backup and sync are also carried out **under your control and with
-your consent** and are off by default. The cross-border implications of sync depend on
-the **[INSERT: chosen host / jurisdiction]** and must be resolved by a legal review
-before sync is enabled in production. [INSERT: references to Roskomnadzor (RKN)
-notifications — on processing (Art. 22) and on cross-border transfer — to be completed
-by the operator.]
+your consent** and are off by default. When sync is enabled, the encrypted snapshot is stored on the operator's server in the **Russian Federation**. The processing is recorded in the Roskomnadzor operator register (entry 77-26-554244, notification 82677/77 of 25 May 2026); a notification of cross-border transfer to the USA for AI recognition has been filed with Roskomnadzor.
 
 ## Transfer to third parties
 
@@ -114,7 +110,7 @@ recognition" section. In addition:
   Google Drive, etc.) — as an encrypted file; such transfer is governed by the terms of
   the provider you chose, and the operator is not involved and cannot read the file's
   content.
-- **Sync, if you enable it,** transmits to the operator on host **[INSERT: host]** only
+- **Sync, if you enable it,** transmits to the operator on a server **in the Russian Federation** only
   the **unreadable ciphertext** and metadata (without decrypted records).
 
 We do not sell personal data and do not transfer it for advertising. Data may be
@@ -126,7 +122,7 @@ Records are stored on the device until you delete them or delete the app. You de
 **backup** yourself — by deleting the file in your cloud. With **sync** enabled, deleting
 the account/snapshot removes the ciphertext stored by the operator. Requests to the AI
 service are processed ephemerally: content is not stored on the operator's server and is
-not logged. [INSERT: if applicable — the AI provider's retention terms / DPA.]
+not logged. The AI provider's (Google LLC, USA) retention is governed by the Gemini API terms and Google's data processing agreement (DPA).
 
 ## Your rights
 
@@ -136,11 +132,11 @@ you do not need a request to the operator — you already hold the full encrypte
 of all your data as a backup file. Since the operator does not store your records in
 plaintext (readable form), a separate request to it for access/correction/deletion of
 their content is not required; when sync is enabled, the stored ciphertext is deleted by
-deleting the account/snapshot. For other questions: [INSERT CONTACT EMAIL].
+deleting the account/snapshot. For other questions: support@family-pie.ru.
 
 ## Children
 
-The app is not intended for children under [13 / 16 — choose per your markets]. We do
+The app is not intended for children under 16. We do
 not knowingly collect data from children under this age.
 
 ## Security
@@ -159,5 +155,4 @@ changes, consent is requested again in the app.
 
 ## Contact
 
-[INSERT LEGAL NAME] — [INSERT CONTACT EMAIL] — [INSERT POSTAL ADDRESS, if required by the
-store/market]
+Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 — support@family-pie.ru

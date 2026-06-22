@@ -1,8 +1,8 @@
 # Terms of Use — HealthRoutine
 
-**Effective date:** [INSERT DATE]
-**Operator ("we"):** [INSERT LEGAL NAME / SOLE PROPRIETOR] ("HealthRoutine")
-**Contact:** [INSERT CONTACT EMAIL]
+**Effective date:** June 22, 2026
+**Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("HealthRoutine")
+**Contact:** support@family-pie.ru
 
 > Draft for publication in the app stores and on the website. Complete the bracketed
 > fields and the governing-law section, and have the document reviewed by a lawyer
@@ -70,14 +70,13 @@ accuracy of AI recognition.
 ## 9. Limitation of liability
 
 To the maximum extent permitted by law, the operator is not liable for indirect,
-incidental, or consequential damages, or for loss of data. [INSERT: any limitations
-specific to the jurisdiction.] Nothing limits liability that cannot be limited by law.
+incidental, or consequential damages, or for loss of data. Nothing limits liability that cannot be limited by law.
 
 ## 10. Governing law and disputes
 
-These Terms are governed by the law of [INSERT JURISDICTION]. Disputes are resolved in
-[INSERT VENUE], unless otherwise provided by the mandatory rules of your legislation.
+These Terms are governed by the law of the Russian Federation. Disputes are resolved in
+the courts of the Russian Federation, unless otherwise provided by the mandatory rules of your legislation.
 
 ## 11. Contact
 
-[INSERT LEGAL NAME] — [INSERT CONTACT EMAIL]
+Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 — support@family-pie.ru

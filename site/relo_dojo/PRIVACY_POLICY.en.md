@@ -1,8 +1,8 @@
 # Privacy Policy — Relo Dojo
 
-**Effective date:** [INSERT DATE]
-**Operator ("we", "us"):** [INSERT LEGAL NAME / SOLE PROPRIETOR] ("Relo Dojo")
-**Contact:** [INSERT CONTACT EMAIL]
+**Effective date:** June 22, 2026
+**Operator ("we", "us"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("Relo Dojo")
+**Contact:** support@family-pie.ru
 
 > Draft prepared for the app stores. The factual descriptions below match how the app actually
 > works; the bracketed fields and the governing-law section must be completed by the operator, and
@@ -76,7 +76,7 @@ Because this provider processes your text in the United States, using these AI f
   on-server model where available.
 - **Withdrawing consent:** you can withdraw at any time by deleting your account in the app's
   Settings (which stops all further processing of your data) or by contacting us at
-  [INSERT CONTACT EMAIL]. Withdrawal does not affect processing already carried out.
+  support@family-pie.ru. Withdrawal does not affect processing already carried out.
 
 ## How we use your data
 
@@ -120,12 +120,12 @@ period, except where we must retain it to comply with law.
 
 Depending on where you live, you may have the right to access, correct, export, or delete your data,
 and to object to or restrict certain processing. To exercise these rights, or to delete your account
-and data, contact us at [INSERT CONTACT EMAIL]. You can also stop notifications at any time in your
+and data, contact us at support@family-pie.ru. You can also stop notifications at any time in your
 device settings.
 
 ## Children
 
-Relo Dojo is not directed to children under [13 / 16 — choose per your markets]. We do not
+Relo Dojo is not directed to children under 16. We do not
 knowingly collect data from children under that age. If you believe a child has provided us data,
 contact us and we will delete it.
 
@@ -143,8 +143,7 @@ our primary database, which is hosted **in the Russian Federation**. The **text 
 features** is, with your separate consent, transferred to **Google LLC in the United States** for
 processing as described in "Cross-border transfer of your text" above; that is the only routine
 transfer of your data outside Russia. Where additional safeguards are required for the markets we
-serve, we put them in place. [Operator: confirm the RF hosting region/provider and, if you serve
-EU/UK users, your transfer mechanism.]
+serve, we put them in place.
 
 ## Changes
 
@@ -153,4 +152,4 @@ provide a notice in the app.
 
 ## Contact
 
-[INSERT LEGAL NAME] — [INSERT CONTACT EMAIL] — [INSERT POSTAL ADDRESS IF REQUIRED BY YOUR STORE/MARKET]
+Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 — support@family-pie.ru

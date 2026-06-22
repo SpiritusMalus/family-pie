@@ -1,8 +1,8 @@
 # Terms of Use — Relo Dojo
 
-**Effective date:** [INSERT DATE]
-**Operator ("we", "us"):** [INSERT LEGAL NAME / SOLE PROPRIETOR] ("Relo Dojo")
-**Contact:** [INSERT CONTACT EMAIL]
+**Effective date:** June 22, 2026
+**Operator ("we", "us"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("Relo Dojo")
+**Contact:** support@family-pie.ru
 
 > Draft prepared for the app stores. Complete the bracketed fields and the governing-law section, and
 > have a qualified lawyer review before publication. This is not legal advice.
@@ -18,7 +18,7 @@ cosmetic items). The App is provided for personal, non-commercial educational us
 
 ## 2. Eligibility & accounts
 
-You must be at least [13 / 16 — choose per your markets] years old, or the minimum age of digital
+You must be at least 16 years old, or the minimum age of digital
 consent in your country, to use the App. You are responsible for the accuracy of your registration
 details and for keeping your password confidential. You are responsible for activity under your
 account. Notify us promptly of any unauthorized use.
@@ -85,16 +85,14 @@ feedback will be accurate.
 ## 12. Limitation of liability
 
 To the maximum extent permitted by law, the operator will not be liable for indirect, incidental,
-special, or consequential damages, or for loss of data, progress, or virtual items. [Operator: add any
-jurisdiction-specific liability cap, e.g. limited to amounts you paid in the prior 12 months, where
-permitted.] Nothing limits liability that cannot be limited by law.
+special, or consequential damages, or for loss of data, progress, or virtual items. Nothing limits liability that cannot be limited by law.
 
 ## 13. Governing law & disputes
 
-These Terms are governed by the laws of [INSERT JURISDICTION], without regard to conflict-of-laws
-rules. Disputes will be resolved in the courts of [INSERT VENUE], unless mandatory local law gives you
+These Terms are governed by the laws of the Russian Federation, without regard to conflict-of-laws
+rules. Disputes will be resolved in the courts of the Russian Federation, unless mandatory local law gives you
 other rights.
 
 ## 14. Contact
 
-[INSERT LEGAL NAME] — [INSERT CONTACT EMAIL]
+Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 — support@family-pie.ru
