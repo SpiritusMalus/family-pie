@@ -1,27 +1,21 @@
-# family-pie.ru — Caddy routing (RECONCILED with live, 2026-06-22)
+# family-pie.ru — production Caddy config (deployed 2026-06-22).
 # =============================================================================
-# Captured from the live VPS (103.246.144.198, NL) on 2026-06-22 via ssh root@.
-# Caddy v2.11.4. The CURRENT live config is preserved verbatim at the bottom of
-# this file ("===== LIVE (as captured) ====="). This top block is the INTENDED
-# consolidated target for the studio host — apply it ADDITIVELY (brief step 8):
-# back up, add alongside, `caddy validate`, reload (not restart), smoke-test.
+# Static studio landing + central public legal host, ADDITIVE to the existing
+# VPS (103.246.144.198, NL; Caddy v2.11.4). The previous /etc/caddy/Caddyfile is
+# backed up on the server (Caddyfile.bak.<ts>) before each change.
 #
-# Resolved [CONFIRM] markers (were unknown in the draft):
-#   - internal food-proxy port  = 8787  (node, healthroutine-food.service)
-#   - live web-root             = /var/www/legal   (serves HR legal.html today)
-#   - studio web-root (new)     = /var/www/family-pie/site   (deploy target for
-#     this repo's site/; additive — created alongside, /var/www/legal stays up
-#     until step 8e retires the old HR-legal source)
-#
-# Live today on this VPS (verified 2026-06-22):
-#   - food.family-pie.ru                  -> reverse_proxy 127.0.0.1:8787 (gzip)
-#   - family-pie.ru/health_routine/legal  -> /var/www/legal/health_routine/legal.html
-#   - family-pie.ru/privacy /terms        -> rewrite to HR legal.html (single-project alias)
-#   - family-pie.ru/ (apex fallback)      -> respond "family-pie.ru" 200
-#   - /relo_dojo/* route                  -> reserved, not yet serving
-# Intended change vs live: apex / now serves the studio landing (site/index.html)
-# instead of the 200 text fallback; legal folds into site/<repo>/.
+#   - food-proxy port = 8787 (healthroutine-food.service, node) — unchanged
+#   - studio web-root = /var/www/family-pie/site (this repo's site/)
+#   - apex /            -> studio landing (was a 200 text fallback)
+#   - /<app>/legal|terms|privacy -> built legal pages under site/<app>/
+#   - apex /privacy /terms -> back-compat alias to the new health_routine pages
 # =============================================================================
+
+# HealthRoutine food proxy — separate service (node, systemd). Unchanged.
+food.family-pie.ru {
+	reverse_proxy 127.0.0.1:8787
+	encode gzip
+}
 
 family-pie.ru {
 	encode zstd gzip
@@ -33,52 +27,23 @@ family-pie.ru {
 		Referrer-Policy "strict-origin-when-cross-origin"
 	}
 
-	# Per-product legal lives under repo-name paths, built into site/<repo>/.
-	# Deep-links /privacy /terms inside each product page are relative to the
-	# product folder; the legacy apex /privacy /terms aliases (HR-only) are
-	# dropped once HR's in-app links point at /health_routine/privacy|terms.
-	try_files {path} {path}/ {path}.html /index.html
-	file_server
-}
+	# Back-compat: the HealthRoutine app historically linked the apex /privacy and
+	# /terms. Serve the new health_routine pages at those URLs so existing in-app
+	# links keep working. Drop this once HR links point at /health_routine/{privacy,terms}.
+	@hr_privacy path /privacy
+	handle @hr_privacy {
+		rewrite * /health_routine/privacy.html
+		file_server
+	}
+	@hr_terms path /terms
+	handle @hr_terms {
+		rewrite * /health_routine/terms.html
+		file_server
+	}
 
-# www -> apex (optional; confirm a www A/CNAME record exists before enabling)
-www.family-pie.ru {
-	redir https://family-pie.ru{uri} permanent
+	# Clean URLs: /<app>/legal|terms|privacy -> <app>/<doc>.html ; apex -> landing.
+	handle {
+		try_files {path} {path}/ {path}.html /index.html
+		file_server
+	}
 }
-
-# HealthRoutine food proxy — separate service (healthroutine-food.service, node).
-# Owned by HealthRoutine; documented here for the full routing picture.
-food.family-pie.ru {
-	reverse_proxy 127.0.0.1:8787
-	encode gzip
-}
-
-# =============================================================================
-# ===== LIVE (as captured 2026-06-22 from /etc/caddy/Caddyfile) — DO NOT WIPE ==
-# Kept verbatim so the additive deploy can diff against exactly what runs now.
-# =============================================================================
-# food.family-pie.ru {
-# 	reverse_proxy 127.0.0.1:8787
-# 	encode gzip
-# }
-#
-# family-pie.ru {
-# 	encode gzip
-# 	root * /var/www/legal
-#
-# 	@hr path /health_routine /health_routine/*
-# 	handle @hr {
-# 		try_files {path} /health_routine/legal.html
-# 		file_server
-# 	}
-#
-# 	@aliases path /privacy /terms
-# 	handle @aliases {
-# 		rewrite * /health_routine/legal.html
-# 		file_server
-# 	}
-#
-# 	handle {
-# 		respond "family-pie.ru" 200
-# 	}
-# }
