@@ -64,6 +64,8 @@
   .pending h2{font-family:'Space Grotesk',sans-serif;font-size:22px;color:var(--ink);margin-bottom:10px}
   .foot{max-width:1080px;margin:0 auto;padding:30px 40px;border-top:1px solid var(--line);font-family:'Space Mono',monospace;font-size:12px;color:var(--subtle);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   .foot a{color:var(--ink)}
+  a,button{outline:none}
+  .tab:focus-visible,.toc a:focus-visible,.langtoggle button:focus-visible,.home:focus-visible,.foot a:focus-visible{outline:2px solid var(--accent-text);outline-offset:3px;border-radius:6px}
   @media (max-width:860px){
     .topbar-in,.wrap,.foot{padding-left:22px;padding-right:22px}
     .wrap{grid-template-columns:1fr;gap:0}
@@ -79,6 +81,10 @@
     .wrap{display:block;padding:0}
     mark.ph{background:none;font-weight:700}
   }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .tab,.toc a{transition:none}
+  }
 </style>
 </head>
 <body>
@@ -91,8 +97,8 @@
     </div>
     <span class="spacer"></span>
     <div class="langtoggle" role="group" aria-label="Language">
-      <button data-lang="ru">RU</button>
-      <button data-lang="en">EN</button>
+      <button data-lang="ru" aria-pressed="false">RU</button>
+      <button data-lang="en" aria-pressed="true">EN</button>
     </div>
   </div>
 </header>
@@ -231,7 +237,7 @@
       t.setAttribute('aria-selected', on?'true':'false');
       t.textContent = TAB_LABEL[lang][t.getAttribute('data-tab')];
     });
-    document.querySelectorAll('.langtoggle button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-lang')===lang); });
+    document.querySelectorAll('.langtoggle button').forEach(function(b){ var on=b.getAttribute('data-lang')===lang; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
     document.documentElement.lang = lang;
     if (updateUrl){
       try { history.replaceState(null, '', '/'+PRODUCT_ID+'/'+DOC_PATH[doc]); } catch(e){}
@@ -254,7 +260,8 @@
     var a = e.target.closest && e.target.closest('.toc a'); if (!a) return;
     e.preventDefault();
     var el = document.getElementById(a.getAttribute('href').slice(1));
-    if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+    var smooth = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (el) el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block:'start' });
   });
 
   render(false);
