@@ -1,0 +1,110 @@
+{
+  "_comment": "Catalog-as-data — single source of truth for the landing + legal pages. Derived from handoff/index.html (i18n dict) + CLAUDE_CODE_PROMPT.md spec. The landing currently hardcodes these rows; the active brief wires index.html to render from this file. Adding a product = one record here + its legal markdown in content/<contentDir>/.",
+  "ui": {
+    "ru": {
+      "products": "Продукты",
+      "studioEyebrow": "Студия приложений",
+      "studioTag": "Спокойные приложения для повседневной жизни.",
+      "studioIntro": "Небольшая независимая студия. Делаем приватные, неспешные приложения, которыми пользуешься каждый день — без рекламы и лишнего шума.",
+      "soon": "Скоро",
+      "download": "Скачать",
+      "terms": "Оферта",
+      "privacy": "Конфиденциальность",
+      "roadmap": "Здесь появятся новые продукты",
+      "open": "открыть +",
+      "close": "— свернуть"
+    },
+    "en": {
+      "products": "Products",
+      "studioEyebrow": "App studio",
+      "studioTag": "Calm apps for everyday life.",
+      "studioIntro": "A small independent studio. We make private, unhurried apps you reach for every day — no ads, no noise.",
+      "soon": "Soon",
+      "download": "Download",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "roadmap": "More products land here",
+      "open": "open +",
+      "close": "— close"
+    }
+  },
+  "products": [
+    {
+      "id": "relo_dojo",
+      "order": 1,
+      "name": "Relo Dojo",
+      "contentDir": "relo-dojo",
+      "iconId": "dojo",
+      "accent": "#0E8A30",
+      "accentText": "#0B6E26",
+      "accentSecondary": "#E3A52C",
+      "badgeBg": "#e9f5ec",
+      "chipLead": "XP",
+      "appLanguage": "en",
+      "tag": {
+        "ru": "Английский для IT-релокации",
+        "en": "English for IT relocation"
+      },
+      "features": {
+        "ru": ["стрики", "пояса", "5 минут в день"],
+        "en": ["streaks", "belts", "5 min a day"]
+      },
+      "desc": {
+        "ru": "Геймифицированная практика английского для айтишников, которые переезжают за рубеж: пять честных минут в день, упражнения под вашу роль и цели, XP, стрики и пояса от белого до чёрного. Подготовка к интервью, жизнь после переезда и английский на работе.",
+        "en": "Gamified English for developers moving abroad: five honest minutes a day, exercises built from your own role and goals, XP, streaks and belts from white to black. Interview prep, life after the move, and everyday workplace English."
+      },
+      "stores": {
+        "appStore": { "status": "soon", "url": null },
+        "googlePlay": { "status": "soon", "url": null }
+      },
+      "legal": {
+        "originalLang": "en",
+        "translationPending": null,
+        "terms": { "en": "content/relo-dojo/TERMS_OF_USE.en.md", "ru": "content/relo-dojo/TERMS_OF_USE.ru.md" },
+        "privacy": { "en": "content/relo-dojo/PRIVACY_POLICY.en.md", "ru": "content/relo-dojo/PRIVACY_POLICY.ru.md" }
+      },
+      "extras": {
+        "storeListing": "content/relo-dojo/STORE_LISTING.md",
+        "brandAssets": "content/relo-dojo/BRAND_ASSETS.md"
+      },
+      "sourceRepo": "SpiritusMalus/relo_dojo"
+    },
+    {
+      "id": "health_routine",
+      "order": 2,
+      "name": "Health Routine",
+      "contentDir": "health-routine",
+      "iconId": "heart",
+      "accent": "#D8513A",
+      "accentText": "#B8442E",
+      "badgeBg": "#fbeae5",
+      "appLanguage": "ru",
+      "tag": {
+        "ru": "Забота о себе каждый день",
+        "en": "Everyday self-care"
+      },
+      "features": {
+        "ru": ["без рекламы", "E2E-шифрование", "без регистрации"],
+        "en": ["no ads", "E2E encryption", "no signup"]
+      },
+      "desc": {
+        "ru": "Спокойный дневник самочувствия: настроение и мысли по методу КПТ, вес, шаги и питание. Без рекламы и регистрации — данные шифруются сквозным шифрованием и остаются на вашем устройстве.",
+        "en": "A calm self-care journal: mood and thoughts (CBT), weight, steps and meals. No ads, no signup — your data is end-to-end encrypted and stays on your device."
+      },
+      "stores": {
+        "appStore": { "status": "soon", "url": null },
+        "googlePlay": { "status": "soon", "url": null }
+      },
+      "legal": {
+        "originalLang": "ru",
+        "translationPending": null,
+        "terms": { "ru": "content/health-routine/TERMS_OF_USE.ru.md", "en": "content/health-routine/TERMS_OF_USE.en.md" },
+        "privacy": { "ru": "content/health-routine/PRIVACY_POLICY.ru.md", "en": "content/health-routine/PRIVACY_POLICY.en.md" }
+      },
+      "extras": {
+        "existingWebLegal": "SpiritusMalus/HealthRoutine:web-legal/legal.html"
+      },
+      "sourceRepo": "SpiritusMalus/HealthRoutine"
+    }
+  ]
+}

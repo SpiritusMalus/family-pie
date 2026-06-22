@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{margin:0;padding:0}
+    .fp-pie-seg{transition:opacity .35s ease}
+  </style>
+</helmet>
+
+<div style="width:max-content;min-width:100%;min-height:100vh;box-sizing:border-box;padding:48px;background:#e7e5df;font-family:'Manrope',sans-serif">
+
+  <div style="margin-bottom:40px;max-width:760px">
+    <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#9b9488;margin-bottom:10px">family-pie.ru · 3 направления главной страницы</div>
+    <div style="font-family:'Space Grotesk';font-size:15px;line-height:1.5;color:#6b655c">Зонтичная страница студии: спокойный нейтральный контейнер, в котором каждый продукт сохраняет свой акцент. Кликните по продукту — раскроется визитка со сторами и юр-ссылками. Переключатель RU/EN — общий для всех трёх.</div>
+  </div>
+
+  <div style="display:flex;gap:44px;align-items:flex-start">
+
+    <!-- ============ DIRECTION A — PAPER / EDITORIAL ============ -->
+    <div style="flex:none;width:1080px">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8d8678;margin-bottom:12px">A · Бумага / редакторский</div>
+      <div style="background:#F4F1EA;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden;color:#1B1A17">
+
+        <!-- nav -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:34px 56px;border-bottom:1px solid #E1DACB">
+          <div style="display:flex;align-items:center;gap:14px">
+            <svg width="34" height="34" viewBox="0 0 48 48" style="display:block">
+              <path d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#0E8A30" class="fp-pie-seg"></path>
+              <path d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A" class="fp-pie-seg"></path>
+              <path d="M24,24 L43.05,35 A22,22 0 0 1 24,46 Z" fill="#E2DACB" class="fp-pie-seg"></path>
+              <path d="M24,24 L24,46 A22,22 0 0 1 4.95,35 Z" fill="#E8E1D3" class="fp-pie-seg"></path>
+              <path d="M24,24 L4.95,35 A22,22 0 0 1 4.95,13 Z" fill="#E2DACB" class="fp-pie-seg"></path>
+              <path d="M24,24 L4.95,13 A22,22 0 0 1 24,2 Z" fill="#E8E1D3" class="fp-pie-seg"></path>
+              <circle cx="24" cy="24" r="22" fill="none" stroke="#F4F1EA" stroke-width="2.5"></circle>
+              <line x1="24" y1="24" x2="24" y2="2" stroke="#F4F1EA" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="43.05" y2="13" stroke="#F4F1EA" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="43.05" y2="35" stroke="#F4F1EA" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="24" y2="46" stroke="#F4F1EA" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="4.95" y2="35" stroke="#F4F1EA" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="4.95" y2="13" stroke="#F4F1EA" stroke-width="2.5"></line>
+            </svg>
+            <span style="font-family:'Space Grotesk';font-weight:700;font-size:19px;letter-spacing:-.01em">family-pie</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:24px">
+            <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8d8678">{{ L.products }}</span>
+            <div style="display:flex;border:1px solid #1B1A17;border-radius:999px;overflow:hidden;font-family:'Space Mono',monospace;font-size:12px">
+              <button onClick="{{ setRu }}" style="{{ aRuStyle }}">RU</button>
+              <button onClick="{{ setEn }}" style="{{ aEnStyle }}">EN</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- hero -->
+        <div style="padding:72px 56px 40px">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#0E8A30;margin-bottom:22px">{{ L.studioEyebrow }}</div>
+          <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:54px;line-height:1.06;letter-spacing:-.02em;max-width:780px;text-wrap:balance">{{ L.studioTag }}</h1>
+          <p style="font-size:18px;line-height:1.6;color:#6b655c;max-width:560px;margin-top:24px">{{ L.studioIntro }}</p>
+        </div>
+
+        <!-- products list -->
+        <div style="padding:24px 56px 64px">
+          <!-- DOJO row -->
+          <div style="border-top:1px solid #E1DACB">
+            <button onClick="{{ toggles.aDojo }}" style="width:100%;display:flex;align-items:flex-start;gap:28px;padding:34px 4px;background:none;border:none;cursor:pointer;text-align:left">
+              <span style="font-family:'Space Mono',monospace;font-size:14px;color:#0E8A30;padding-top:10px">01</span>
+              <span style="width:14px;height:14px;border-radius:4px;background:#0E8A30;margin-top:12px;flex:none"></span>
+              <span style="flex:1">
+                <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.01em">Relo Dojo</span>
+                <span style="display:block;font-size:16px;color:#6b655c;margin-top:6px">{{ L.dojo.tag }}</span>
+              </span>
+              <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8d8678;padding-top:12px">{{ aDojoLabel }}</span>
+            </button>
+            <sc-if value="{{ aDojoOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:0 4px 40px 70px;display:flex;gap:48px;flex-wrap:wrap">
+                <p style="flex:1;min-width:340px;font-size:16px;line-height:1.65;color:#3a382f;max-width:520px">{{ L.dojo.desc }}</p>
+                <div style="flex:none;width:300px">
+                  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+                    <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border:1px solid #1B1A17;border-radius:12px;opacity:.55">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="#1B1A17"><path d="M17.05 12.04c-.03-2.07 1.69-3.06 1.77-3.11-.97-1.41-2.47-1.6-3-1.62-1.27-.13-2.49.75-3.14.75-.65 0-1.65-.73-2.71-.71-1.39.02-2.68.81-3.39 2.05-1.45 2.51-.37 6.22 1.04 8.26.69 1 1.51 2.12 2.58 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.61.67 2.71.65 1.12-.02 1.83-1.02 2.51-2.02.79-1.15 1.12-2.27 1.14-2.33-.03-.01-2.19-.84-2.21-3.32zM14.97 6.5c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.52.92.07 1.86-.47 2.43-1.16z"></path></svg>
+                      <span style="font-family:'Space Grotesk';font-size:14px;font-weight:600">{{ L.soon }} · App Store</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border:1px solid #1B1A17;border-radius:12px;opacity:.55">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#1B1A17"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l13.5-8.5c.6-.4.6-1.3 0-1.7L5.6 2.6C4.9 2.2 4 2.7 4 3.5z"></path></svg>
+                      <span style="font-family:'Space Grotesk';font-size:14px;font-weight:600">{{ L.soon }} · Google Play</span>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:20px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em">
+                    <a href="#" style="color:#1B1A17;text-decoration:underline;text-underline-offset:3px">{{ L.terms }}</a>
+                    <a href="#" style="color:#1B1A17;text-decoration:underline;text-underline-offset:3px">{{ L.privacy }}</a>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <!-- HEALTH row -->
+          <div style="border-top:1px solid #E1DACB;border-bottom:1px solid #E1DACB">
+            <button onClick="{{ toggles.aHealth }}" style="width:100%;display:flex;align-items:flex-start;gap:28px;padding:34px 4px;background:none;border:none;cursor:pointer;text-align:left">
+              <span style="font-family:'Space Mono',monospace;font-size:14px;color:#D8513A;padding-top:10px">02</span>
+              <span style="width:14px;height:14px;border-radius:4px;background:#D8513A;margin-top:12px;flex:none"></span>
+              <span style="flex:1">
+                <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.01em">Health Routine</span>
+                <span style="display:block;font-size:16px;color:#6b655c;margin-top:6px">{{ L.health.tag }}</span>
+              </span>
+              <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8d8678;padding-top:12px">{{ aHealthLabel }}</span>
+            </button>
+            <sc-if value="{{ aHealthOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:0 4px 40px 70px;display:flex;gap:48px;flex-wrap:wrap">
+                <p style="flex:1;min-width:340px;font-size:16px;line-height:1.65;color:#3a382f;max-width:520px">{{ L.health.desc }}</p>
+                <div style="flex:none;width:300px">
+                  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+                    <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border:1px solid #1B1A17;border-radius:12px;opacity:.55">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="#1B1A17"><path d="M17.05 12.04c-.03-2.07 1.69-3.06 1.77-3.11-.97-1.41-2.47-1.6-3-1.62-1.27-.13-2.49.75-3.14.75-.65 0-1.65-.73-2.71-.71-1.39.02-2.68.81-3.39 2.05-1.45 2.51-.37 6.22 1.04 8.26.69 1 1.51 2.12 2.58 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.61.67 2.71.65 1.12-.02 1.83-1.02 2.51-2.02.79-1.15 1.12-2.27 1.14-2.33-.03-.01-2.19-.84-2.21-3.32zM14.97 6.5c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.52.92.07 1.86-.47 2.43-1.16z"></path></svg>
+                      <span style="font-family:'Space Grotesk';font-size:14px;font-weight:600">{{ L.soon }} · App Store</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border:1px solid #1B1A17;border-radius:12px;opacity:.55">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="#1B1A17"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l13.5-8.5c.6-.4.6-1.3 0-1.7L5.6 2.6C4.9 2.2 4 2.7 4 3.5z"></path></svg>
+                      <span style="font-family:'Space Grotesk';font-size:14px;font-weight:600">{{ L.soon }} · Google Play</span>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:20px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em">
+                    <a href="#" style="color:#1B1A17;text-decoration:underline;text-underline-offset:3px">{{ L.privacy }}</a>
+                    <a href="#" style="color:#1B1A17;text-decoration:underline;text-underline-offset:3px">{{ L.terms }}</a>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#b3ac9e;padding:26px 4px 0;display:flex;align-items:center;gap:12px">
+            <span style="width:14px;height:14px;border-radius:4px;border:1px dashed #c7bfae"></span>{{ L.roadmap }}
+          </div>
+        </div>
+
+        <div style="padding:26px 56px;border-top:1px solid #E1DACB;display:flex;justify-content:space-between;align-items:center;font-family:'Space Mono',monospace;font-size:12px;color:#8d8678">
+          <span>© 2026 family-pie</span><span>hello@family-pie.ru</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ DIRECTION B — WARM SOFT CARDS ============ -->
+    <div style="flex:none;width:1080px">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8d8678;margin-bottom:12px">B · Тёплый / мягкие карточки</div>
+      <div style="background:#EFE7DC;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden;color:#2A2018">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:30px 52px">
+          <div style="display:flex;align-items:center;gap:13px">
+            <svg width="34" height="34" viewBox="0 0 48 48" style="display:block">
+              <path d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#0E8A30"></path>
+              <path d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A"></path>
+              <path d="M24,24 L43.05,35 A22,22 0 0 1 24,46 Z" fill="#E3D7C6"></path>
+              <path d="M24,24 L24,46 A22,22 0 0 1 4.95,35 Z" fill="#EADFCF"></path>
+              <path d="M24,24 L4.95,35 A22,22 0 0 1 4.95,13 Z" fill="#E3D7C6"></path>
+              <path d="M24,24 L4.95,13 A22,22 0 0 1 24,2 Z" fill="#EADFCF"></path>
+              <circle cx="24" cy="24" r="22" fill="none" stroke="#EFE7DC" stroke-width="3"></circle>
+              <line x1="24" y1="24" x2="24" y2="2" stroke="#EFE7DC" stroke-width="3"></line>
+              <line x1="24" y1="24" x2="43.05" y2="13" stroke="#EFE7DC" stroke-width="3"></line>
+              <line x1="24" y1="24" x2="43.05" y2="35" stroke="#EFE7DC" stroke-width="3"></line>
+              <line x1="24" y1="24" x2="24" y2="46" stroke="#EFE7DC" stroke-width="3"></line>
+              <line x1="24" y1="24" x2="4.95" y2="35" stroke="#EFE7DC" stroke-width="3"></line>
+              <line x1="24" y1="24" x2="4.95" y2="13" stroke="#EFE7DC" stroke-width="3"></line>
+            </svg>
+            <span style="font-family:'Space Grotesk';font-weight:700;font-size:19px;letter-spacing:-.01em">family-pie</span>
+          </div>
+          <div style="display:flex;border:1px solid #d8c9b6;background:#fff;border-radius:999px;overflow:hidden;font-family:'Space Mono',monospace;font-size:12px">
+            <button onClick="{{ setRu }}" style="{{ bRuStyle }}">RU</button>
+            <button onClick="{{ setEn }}" style="{{ bEnStyle }}">EN</button>
+          </div>
+        </div>
+
+        <div style="padding:56px 52px 40px;text-align:center">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#b07a4a;margin-bottom:20px">{{ L.studioEyebrow }}</div>
+          <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:46px;line-height:1.1;letter-spacing:-.02em;max-width:680px;margin:0 auto;text-wrap:balance">{{ L.studioTag }}</h1>
+          <p style="font-size:17px;line-height:1.6;color:#80695a;max-width:520px;margin:22px auto 0">{{ L.studioIntro }}</p>
+        </div>
+
+        <div style="padding:16px 52px 60px;display:flex;flex-direction:column;gap:20px">
+          <!-- DOJO card -->
+          <div style="background:#fff;border-radius:22px;box-shadow:0 6px 24px rgba(120,90,50,.08);overflow:hidden;border:1px solid #efe2d2">
+            <button onClick="{{ toggles.bDojo }}" style="width:100%;display:flex;align-items:center;gap:20px;padding:26px 30px;background:none;border:none;cursor:pointer;text-align:left">
+              <span style="width:52px;height:52px;border-radius:15px;background:#0E8A30;display:flex;align-items:center;justify-content:center;flex:none">
+                <svg width="26" height="26" viewBox="0 0 48 48"><path d="M8 38 L24 12 L40 38 Z" fill="none" stroke="#fff" stroke-width="3.2" stroke-linejoin="round"></path><path d="M14 30 H34" stroke="#E3A52C" stroke-width="3.2" stroke-linecap="round"></path></svg>
+              </span>
+              <span style="flex:1">
+                <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:23px">Relo Dojo</span>
+                <span style="display:block;font-size:15px;color:#80695a;margin-top:3px">{{ L.dojo.tag }}</span>
+              </span>
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#0E8A30;background:#eaf6ec;padding:6px 12px;border-radius:999px">{{ L.dojo.cat }}</span>
+              <span style="font-size:22px;color:#b8a48f;transition:transform .3s;transform:{{ bDojoChevron }}">⌄</span>
+            </button>
+            <sc-if value="{{ bDojoOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:0 30px 30px 102px">
+                <p style="font-size:15.5px;line-height:1.65;color:#4a3d33;max-width:560px;margin-bottom:22px">{{ L.dojo.desc }}</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                  <div style="display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:12px;background:#f4ede4;color:#2A2018;opacity:.7">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#2A2018"><path d="M17.05 12.04c-.03-2.07 1.69-3.06 1.77-3.11-.97-1.41-2.47-1.6-3-1.62-1.27-.13-2.49.75-3.14.75-.65 0-1.65-.73-2.71-.71-1.39.02-2.68.81-3.39 2.05-1.45 2.51-.37 6.22 1.04 8.26.69 1 1.51 2.12 2.58 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.61.67 2.71.65 1.12-.02 1.83-1.02 2.51-2.02.79-1.15 1.12-2.27 1.14-2.33-.03-.01-2.19-.84-2.21-3.32zM14.97 6.5c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.52.92.07 1.86-.47 2.43-1.16z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · App Store</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:12px;background:#f4ede4;color:#2A2018;opacity:.7">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#2A2018"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l13.5-8.5c.6-.4.6-1.3 0-1.7L5.6 2.6C4.9 2.2 4 2.7 4 3.5z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · Google Play</span>
+                  </div>
+                  <span style="flex:1"></span>
+                  <a href="#" style="font-size:13px;color:#80695a;text-decoration:underline;text-underline-offset:3px">{{ L.terms }}</a>
+                  <a href="#" style="font-size:13px;color:#80695a;text-decoration:underline;text-underline-offset:3px">{{ L.privacy }}</a>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <!-- HEALTH card -->
+          <div style="background:#fff;border-radius:22px;box-shadow:0 6px 24px rgba(120,90,50,.08);overflow:hidden;border:1px solid #efe2d2">
+            <button onClick="{{ toggles.bHealth }}" style="width:100%;display:flex;align-items:center;gap:20px;padding:26px 30px;background:none;border:none;cursor:pointer;text-align:left">
+              <span style="width:52px;height:52px;border-radius:15px;background:#D8513A;display:flex;align-items:center;justify-content:center;flex:none">
+                <svg width="26" height="26" viewBox="0 0 48 48"><path d="M24 39 C10 30 8 20 14 15 C19 11 24 16 24 16 C24 16 29 11 34 15 C40 20 38 30 24 39 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"></path></svg>
+              </span>
+              <span style="flex:1">
+                <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:23px">Health Routine</span>
+                <span style="display:block;font-size:15px;color:#80695a;margin-top:3px">{{ L.health.tag }}</span>
+              </span>
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#D8513A;background:#fbeae5;padding:6px 12px;border-radius:999px">{{ L.health.cat }}</span>
+              <span style="font-size:22px;color:#b8a48f;transition:transform .3s;transform:{{ bHealthChevron }}">⌄</span>
+            </button>
+            <sc-if value="{{ bHealthOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:0 30px 30px 102px">
+                <p style="font-size:15.5px;line-height:1.65;color:#4a3d33;max-width:560px;margin-bottom:22px">{{ L.health.desc }}</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                  <div style="display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:12px;background:#f4ede4;color:#2A2018;opacity:.7">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#2A2018"><path d="M17.05 12.04c-.03-2.07 1.69-3.06 1.77-3.11-.97-1.41-2.47-1.6-3-1.62-1.27-.13-2.49.75-3.14.75-.65 0-1.65-.73-2.71-.71-1.39.02-2.68.81-3.39 2.05-1.45 2.51-.37 6.22 1.04 8.26.69 1 1.51 2.12 2.58 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.61.67 2.71.65 1.12-.02 1.83-1.02 2.51-2.02.79-1.15 1.12-2.27 1.14-2.33-.03-.01-2.19-.84-2.21-3.32zM14.97 6.5c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.52.92.07 1.86-.47 2.43-1.16z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · App Store</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:12px;background:#f4ede4;color:#2A2018;opacity:.7">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#2A2018"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l13.5-8.5c.6-.4.6-1.3 0-1.7L5.6 2.6C4.9 2.2 4 2.7 4 3.5z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · Google Play</span>
+                  </div>
+                  <span style="flex:1"></span>
+                  <a href="#" style="font-size:13px;color:#80695a;text-decoration:underline;text-underline-offset:3px">{{ L.privacy }}</a>
+                  <a href="#" style="font-size:13px;color:#80695a;text-decoration:underline;text-underline-offset:3px">{{ L.terms }}</a>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <!-- roadmap placeholder -->
+          <div style="border:1.5px dashed #d8c9b6;border-radius:22px;padding:22px 30px;display:flex;align-items:center;gap:16px;color:#a8967f">
+            <span style="width:52px;height:52px;border-radius:15px;border:1.5px dashed #d8c9b6;flex:none"></span>
+            <span style="font-size:15px">{{ L.roadmap }}</span>
+          </div>
+        </div>
+
+        <div style="padding:26px 52px;display:flex;justify-content:space-between;align-items:center;font-family:'Space Mono',monospace;font-size:12px;color:#a8967f;border-top:1px solid #e3d7c6">
+          <span>© 2026 family-pie</span><span>hello@family-pie.ru</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ DIRECTION C — DARK SHOWCASE ============ -->
+    <div style="flex:none;width:1080px">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8d8678;margin-bottom:12px">C · Тёмная витрина продуктов</div>
+      <div style="background:#0D0D0F;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.18);overflow:hidden;color:#F2F0EC">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:32px 54px;border-bottom:1px solid #1f1f24">
+          <div style="display:flex;align-items:center;gap:13px">
+            <svg width="34" height="34" viewBox="0 0 48 48" style="display:block">
+              <path d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#16A24A"></path>
+              <path d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#F0664A"></path>
+              <path d="M24,24 L43.05,35 A22,22 0 0 1 24,46 Z" fill="#26262C"></path>
+              <path d="M24,24 L24,46 A22,22 0 0 1 4.95,35 Z" fill="#1F1F24"></path>
+              <path d="M24,24 L4.95,35 A22,22 0 0 1 4.95,13 Z" fill="#26262C"></path>
+              <path d="M24,24 L4.95,13 A22,22 0 0 1 24,2 Z" fill="#1F1F24"></path>
+              <circle cx="24" cy="24" r="22" fill="none" stroke="#0D0D0F" stroke-width="2.5"></circle>
+              <line x1="24" y1="24" x2="24" y2="2" stroke="#0D0D0F" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="43.05" y2="13" stroke="#0D0D0F" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="43.05" y2="35" stroke="#0D0D0F" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="24" y2="46" stroke="#0D0D0F" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="4.95" y2="35" stroke="#0D0D0F" stroke-width="2.5"></line>
+              <line x1="24" y1="24" x2="4.95" y2="13" stroke="#0D0D0F" stroke-width="2.5"></line>
+            </svg>
+            <span style="font-family:'Space Grotesk';font-weight:700;font-size:19px;letter-spacing:-.01em">family-pie</span>
+          </div>
+          <div style="display:flex;border:1px solid #34343c;border-radius:999px;overflow:hidden;font-family:'Space Mono',monospace;font-size:12px">
+            <button onClick="{{ setRu }}" style="{{ cRuStyle }}">RU</button>
+            <button onClick="{{ setEn }}" style="{{ cEnStyle }}">EN</button>
+          </div>
+        </div>
+
+        <div style="padding:74px 54px 48px">
+          <div style="font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#6f6f7a;margin-bottom:22px">{{ L.studioEyebrow }}</div>
+          <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:56px;line-height:1.05;letter-spacing:-.025em;max-width:800px;text-wrap:balance">{{ L.studioTag }}</h1>
+          <p style="font-size:18px;line-height:1.6;color:#9a9aa4;max-width:540px;margin-top:24px">{{ L.studioIntro }}</p>
+        </div>
+
+        <div style="padding:8px 54px 64px;display:flex;flex-direction:column;gap:16px">
+          <!-- DOJO -->
+          <div style="border-radius:20px;overflow:hidden;border:1px solid {{ cDojoBorder }};background:{{ cDojoBg }};transition:all .35s">
+            <button onClick="{{ toggles.cDojo }}" style="width:100%;display:flex;align-items:center;gap:20px;padding:28px 32px;background:none;border:none;cursor:pointer;text-align:left">
+              <span style="width:54px;height:54px;border-radius:16px;background:#0E8A30;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 24px rgba(22,162,74,.4)">
+                <svg width="28" height="28" viewBox="0 0 48 48"><path d="M8 38 L24 12 L40 38 Z" fill="none" stroke="#fff" stroke-width="3.2" stroke-linejoin="round"></path><path d="M14 30 H34" stroke="#E3A52C" stroke-width="3.2" stroke-linecap="round"></path></svg>
+              </span>
+              <span style="flex:1">
+                <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:25px;letter-spacing:-.01em">Relo Dojo</span>
+                <span style="display:block;font-size:15px;color:#9a9aa4;margin-top:4px">{{ L.dojo.tag }}</span>
+              </span>
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5fd083;border:1px solid #2c4d38;padding:6px 12px;border-radius:999px">{{ L.dojo.cat }}</span>
+            </button>
+            <sc-if value="{{ cDojoOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:0 32px 32px 106px">
+                <p style="font-size:16px;line-height:1.65;color:#c4c4cc;max-width:580px;margin-bottom:24px">{{ L.dojo.desc }}</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                  <div style="display:flex;align-items:center;gap:9px;padding:11px 17px;border-radius:12px;border:1px solid #34343c;color:#9a9aa4">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#c4c4cc"><path d="M17.05 12.04c-.03-2.07 1.69-3.06 1.77-3.11-.97-1.41-2.47-1.6-3-1.62-1.27-.13-2.49.75-3.14.75-.65 0-1.65-.73-2.71-.71-1.39.02-2.68.81-3.39 2.05-1.45 2.51-.37 6.22 1.04 8.26.69 1 1.51 2.12 2.58 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.61.67 2.71.65 1.12-.02 1.83-1.02 2.51-2.02.79-1.15 1.12-2.27 1.14-2.33-.03-.01-2.19-.84-2.21-3.32zM14.97 6.5c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.52.92.07 1.86-.47 2.43-1.16z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · App Store</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:11px 17px;border-radius:12px;border:1px solid #34343c;color:#9a9aa4">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#c4c4cc"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l13.5-8.5c.6-.4.6-1.3 0-1.7L5.6 2.6C4.9 2.2 4 2.7 4 3.5z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · Google Play</span>
+                  </div>
+                  <span style="flex:1"></span>
+                  <a href="#" style="font-family:'Space Mono',monospace;font-size:12px;color:#8a8a92;text-decoration:underline;text-underline-offset:3px">{{ L.terms }}</a>
+                  <a href="#" style="font-family:'Space Mono',monospace;font-size:12px;color:#8a8a92;text-decoration:underline;text-underline-offset:3px">{{ L.privacy }}</a>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <!-- HEALTH -->
+          <div style="border-radius:20px;overflow:hidden;border:1px solid {{ cHealthBorder }};background:{{ cHealthBg }};transition:all .35s">
+            <button onClick="{{ toggles.cHealth }}" style="width:100%;display:flex;align-items:center;gap:20px;padding:28px 32px;background:none;border:none;cursor:pointer;text-align:left">
+              <span style="width:54px;height:54px;border-radius:16px;background:#D8513A;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 0 24px rgba(216,81,58,.4)">
+                <svg width="28" height="28" viewBox="0 0 48 48"><path d="M24 39 C10 30 8 20 14 15 C19 11 24 16 24 16 C24 16 29 11 34 15 C40 20 38 30 24 39 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"></path></svg>
+              </span>
+              <span style="flex:1">
+                <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:25px;letter-spacing:-.01em">Health Routine</span>
+                <span style="display:block;font-size:15px;color:#9a9aa4;margin-top:4px">{{ L.health.tag }}</span>
+              </span>
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#f0987f;border:1px solid #4d322c;padding:6px 12px;border-radius:999px">{{ L.health.cat }}</span>
+            </button>
+            <sc-if value="{{ cHealthOpen }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:0 32px 32px 106px">
+                <p style="font-size:16px;line-height:1.65;color:#c4c4cc;max-width:580px;margin-bottom:24px">{{ L.health.desc }}</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                  <div style="display:flex;align-items:center;gap:9px;padding:11px 17px;border-radius:12px;border:1px solid #34343c;color:#9a9aa4">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#c4c4cc"><path d="M17.05 12.04c-.03-2.07 1.69-3.06 1.77-3.11-.97-1.41-2.47-1.6-3-1.62-1.27-.13-2.49.75-3.14.75-.65 0-1.65-.73-2.71-.71-1.39.02-2.68.81-3.39 2.05-1.45 2.51-.37 6.22 1.04 8.26.69 1 1.51 2.12 2.58 2.08 1.04-.04 1.43-.67 2.69-.67 1.25 0 1.61.67 2.71.65 1.12-.02 1.83-1.02 2.51-2.02.79-1.15 1.12-2.27 1.14-2.33-.03-.01-2.19-.84-2.21-3.32zM14.97 6.5c.57-.69.96-1.65.85-2.6-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.52.92.07 1.86-.47 2.43-1.16z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · App Store</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:11px 17px;border-radius:12px;border:1px solid #34343c;color:#9a9aa4">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#c4c4cc"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l13.5-8.5c.6-.4.6-1.3 0-1.7L5.6 2.6C4.9 2.2 4 2.7 4 3.5z"></path></svg>
+                    <span style="font-family:'Space Grotesk';font-size:13.5px;font-weight:600">{{ L.soon }} · Google Play</span>
+                  </div>
+                  <span style="flex:1"></span>
+                  <a href="#" style="font-family:'Space Mono',monospace;font-size:12px;color:#8a8a92;text-decoration:underline;text-underline-offset:3px">{{ L.privacy }}</a>
+                  <a href="#" style="font-family:'Space Mono',monospace;font-size:12px;color:#8a8a92;text-decoration:underline;text-underline-offset:3px">{{ L.terms }}</a>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="border:1.5px dashed #2a2a30;border-radius:20px;padding:24px 32px;display:flex;align-items:center;gap:18px;color:#6f6f7a">
+            <span style="width:54px;height:54px;border-radius:16px;border:1.5px dashed #34343c;flex:none"></span>
+            <span style="font-size:15px">{{ L.roadmap }}</span>
+          </div>
+        </div>
+
+        <div style="padding:26px 54px;border-top:1px solid #1f1f24;display:flex;justify-content:space-between;align-items:center;font-family:'Space Mono',monospace;font-size:12px;color:#6f6f7a">
+          <span>© 2026 family-pie</span><span>hello@family-pie.ru</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { lang: 'ru', open: { a: 'dojo', b: 'health', c: 'dojo' } };
+
+  setLang(l) { this.setState({ lang: l }); }
+  toggle(frame, id) {
+    this.setState(s => ({ open: { ...s.open, [frame]: s.open[frame] === id ? null : id } }));
+  }
+
+  renderVals() {
+    const dict = {
+      ru: {
+        studioEyebrow: 'Студия приложений',
+        studioTag: 'Спокойные приложения для повседневной жизни.',
+        studioIntro: 'Небольшая независимая студия. Делаем приватные, неспешные приложения, которыми пользуешься каждый день — без рекламы и лишнего шума.',
+        products: 'Продукты',
+        soon: 'Скоро',
+        terms: 'Оферта',
+        privacy: 'Конфиденциальность',
+        roadmap: 'Здесь появятся новые продукты',
+        dojo: {
+          cat: 'Языки',
+          tag: 'Английский для IT-релокации',
+          desc: 'Геймифицированная практика английского для айтишников, которые переезжают за рубеж: пять честных минут в день, упражнения под вашу роль и цели, XP, стрики и пояса от белого до чёрного. Подготовка к интервью, жизнь после переезда и английский на работе.'
+        },
+        health: {
+          cat: 'Здоровье',
+          tag: 'Забота о себе каждый день',
+          desc: 'Спокойный дневник самочувствия: настроение и мысли по методу КПТ, вес, шаги и питание. Без рекламы и регистрации — данные шифруются сквозным шифрованием и остаются на вашем устройстве.'
+        }
+      },
+      en: {
+        studioEyebrow: 'App studio',
+        studioTag: 'Calm apps for everyday life.',
+        studioIntro: 'A small independent studio. We make private, unhurried apps you reach for every day — no ads, no noise.',
+        products: 'Products',
+        soon: 'Soon',
+        terms: 'Terms',
+        privacy: 'Privacy',
+        roadmap: 'More products land here',
+        dojo: {
+          cat: 'Languages',
+          tag: 'English for IT relocation',
+          desc: 'Gamified English for developers moving abroad: five honest minutes a day, exercises built from your own role and goals, XP, streaks and belts from white to black. Interview prep, life after the move, and everyday workplace English.'
+        },
+        health: {
+          cat: 'Health',
+          tag: 'Everyday self-care',
+          desc: 'A calm self-care journal: mood and thoughts (CBT), weight, steps and meals. No ads, no signup — your data is end-to-end encrypted and stays on your device.'
+        }
+      }
+    };
+    const lang = this.state.lang;
+    const L = dict[lang];
+    const o = this.state.open;
+
+    const pill = (active, side) => {
+      const base = 'font-family:inherit;font-size:12px;letter-spacing:.08em;padding:7px 15px;border:none;cursor:pointer;';
+      return base + (active
+        ? 'background:#1B1A17;color:#fff;'
+        : 'background:transparent;color:inherit;');
+    };
+    const pillDark = (active) => 'font-family:inherit;font-size:12px;letter-spacing:.08em;padding:7px 15px;border:none;cursor:pointer;' + (active ? 'background:#F2F0EC;color:#0D0D0F;' : 'background:transparent;color:#9a9aa4;');
+    const pillWarm = (active) => 'font-family:inherit;font-size:12px;letter-spacing:.08em;padding:7px 15px;border:none;cursor:pointer;' + (active ? 'background:#2A2018;color:#fff;' : 'background:transparent;color:#80695a;');
+
+    const isRu = lang === 'ru', isEn = lang === 'en';
+
+    return {
+      L, lang,
+      setRu: () => this.setLang('ru'),
+      setEn: () => this.setLang('en'),
+      // A pills
+      aRuStyle: pill(isRu), aEnStyle: pill(isEn),
+      // B pills
+      bRuStyle: pillWarm(isRu), bEnStyle: pillWarm(isEn),
+      // C pills
+      cRuStyle: pillDark(isRu), cEnStyle: pillDark(isEn),
+      toggles: {
+        aDojo: () => this.toggle('a', 'dojo'),
+        aHealth: () => this.toggle('a', 'health'),
+        bDojo: () => this.toggle('b', 'dojo'),
+        bHealth: () => this.toggle('b', 'health'),
+        cDojo: () => this.toggle('c', 'dojo'),
+        cHealth: () => this.toggle('c', 'health'),
+      },
+      aDojoOpen: o.a === 'dojo', aHealthOpen: o.a === 'health',
+      bDojoOpen: o.b === 'dojo', bHealthOpen: o.b === 'health',
+      cDojoOpen: o.c === 'dojo', cHealthOpen: o.c === 'health',
+      aDojoLabel: o.a === 'dojo' ? '— ' + (lang === 'ru' ? 'свернуть' : 'close') : (lang === 'ru' ? 'открыть +' : 'open +'),
+      aHealthLabel: o.a === 'health' ? '— ' + (lang === 'ru' ? 'свернуть' : 'close') : (lang === 'ru' ? 'открыть +' : 'open +'),
+      bDojoChevron: o.b === 'dojo' ? 'rotate(180deg)' : 'rotate(0deg)',
+      bHealthChevron: o.b === 'health' ? 'rotate(180deg)' : 'rotate(0deg)',
+      cDojoBg: o.c === 'dojo' ? '#121a14' : '#131316',
+      cDojoBorder: o.c === 'dojo' ? '#1f6b35' : '#1f1f24',
+      cHealthBg: o.c === 'health' ? '#1a1210' : '#131316',
+      cHealthBorder: o.c === 'health' ? '#6b2c25' : '#1f1f24',
+    };
+  }
+}
+</script>
+</body>
+</html>

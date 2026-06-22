@@ -1,0 +1,18 @@
+# OS noise
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# editors / agent tooling (local-only: launch configs, permission allowlists, VPS IP)
+.vscode/
+.idea/
+.claude/
+
+# node (only if a tooling step is added later; the site itself ships no deps)
+node_modules/
+dist/
+.cache/
+
+# secrets — none expected in this static repo, but never commit them
+.env
+.env.*
