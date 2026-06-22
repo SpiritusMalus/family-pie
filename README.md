@@ -16,7 +16,7 @@ content/              legal markdown canon (mirrors the app repos)
   relo-dojo/          PRIVACY_POLICY.en.md, TERMS_OF_USE.en.md, STORE_LISTING.md, BRAND_ASSETS.md
 data/products.json    catalog-as-data — one record per product
 design/               design references (NOT deployed): .dc.html + dc runtime + build spec
-Caddyfile             draft VPS routing (reconcile with live before use)
+Caddyfile             deployed production routing (VPS 103.246.144.198; reconcile before changing live)
 ```
 
 ## URLs
@@ -35,7 +35,7 @@ No markup edits — the landing and legal pages render from the data.
 
 ## Deploy
 
-Static. Generate legal pages from `content/`, then publish `site/` to the VPS web root. Caddy handles TLS. Git / VPS pushes happen outside the Cowork sandbox (owner terminal or GitHub connector).
+Static, and already live in production: Caddy serves `site/` over TLS on the VPS (`103.246.144.198`, NL) per the `Caddyfile` above. To update: regenerate legal pages from `content/`, then publish `site/` to the VPS web root. Git / VPS pushes happen outside the Cowork sandbox (owner terminal or GitHub connector).
 
 ## ⚠️ Owner TODO before publishing (legal placeholders)
 
