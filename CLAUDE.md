@@ -55,3 +55,4 @@ Static. Build legal pages from `content/` → publish `site/` to the VPS web roo
 
 ## Done log
 _Executors append one line per finished task: `- YYYY-MM-DD — what — branch/PR`. (Mirror of the vault `claude.md` Done log.)_
+- 2026-06-22 — a11y + robustness polish from the AI-slop/UX audit (TASK-2026-06-22-aislop-ux-fixes, all 7 steps): landing on-paper text → AA (quiet mono labels `#736d5f` 4.56:1; accent-as-text → `accentText` `#0B6E26`/`#B8442E`, fills unchanged); real `<noscript>` product rows; `prefers-reduced-motion` (both files); toast `aria-live` + langtoggle `aria-pressed` + `:focus-visible`; 🔔→SVG bell; pre-launch side-label wording; regenerated 6 legal pages. Verified green (11 routes 200, no console errors, interactions OK, 38 `[INSERT…]` intact). — branch `claude/intelligent-kowalevski-0e87b1` / [PR #1](https://github.com/SpiritusMalus/family-pie/pull/1) merged to `main` (`7de3e5b`). Prod deploy pending owner.
