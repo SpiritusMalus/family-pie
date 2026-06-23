@@ -34,14 +34,14 @@ grep -rn "INSERT" content/ site/      # should return 0 lines when complete
 - [ ] **`[INSERT JURISDICTION]`** — governing law (Terms, "Governing law & disputes").
 - [ ] **`[INSERT VENUE]`** — court/venue for disputes (same section).
 - [ ] Relo Dojo Terms §12 — **`[Operator: add any jurisdiction-specific liability cap …]`**: add a liability cap if your jurisdiction allows, or delete the note.
-- [ ] Health Routine Terms §9 — **`[INSERT: any limitations specific to the jurisdiction.]`**: same decision for HealthRoutine.
+- [ ] Driftora Terms §9 — **`[INSERT: any limitations specific to the jurisdiction.]`**: same decision for Driftora.
 
 ## Relo Dojo — Privacy Policy
 
 - [ ] **`[INSERT POSTAL ADDRESS IF REQUIRED BY YOUR STORE/MARKET]`** (EN) / **`[INSERT POSTAL ADDRESS, …]`** (RU) — postal address, if your store/market requires one.
 - [ ] **`[Operator: confirm the RF hosting region/provider …, transfer mechanism]`** ("International transfers") — confirm the RF hosting region/provider and, if you serve EU/UK users, your transfer mechanism.
 
-## Health Routine — Privacy Policy
+## Driftora — Privacy Policy
 
 - [ ] **`[INSERT]`** ("Where data is stored", sync paragraph) — the sync **host & jurisdiction** that must pass review before sync ships.
 - [ ] **`[INSERT: chosen host / jurisdiction]`** ("Legal bases (152-FZ)") — the chosen sync host / jurisdiction.

@@ -43,7 +43,7 @@ All project docs live in:
 ## Key locked decisions (don't re-litigate)
 
 - **URL scheme = repo names**: `family-pie.ru/driftora/…` (health app, rebranded from `health_routine` — legacy path 301-redirects), `family-pie.ru/relo_dojo/…`. Apex `/` = studio landing.
-- **Role** = studio landing **+ central public legal host**. The HealthRoutine `web-legal/legal.html` content migrates here; each app keeps its **in-app** legal copy (`lib/legal/documents.ts` etc.) and that stays in sync with the canon in `content/`.
+- **Role** = studio landing **+ central public legal host**. The Driftora (repo `SpiritusMalus/HealthRoutine`) `web-legal/legal.html` content migrates here; each app keeps its **in-app** legal copy (`lib/legal/documents.ts` etc.) and that stays in sync with the canon in `content/`.
 - **Static on Caddy**, same VPS (`103.246.144.198`, NL). No new infra.
 - **Legal text = canon in the owning app repo** (`SpiritusMalus/HealthRoutine`, `SpiritusMalus/relo_dojo`); `content/` here mirrors it for the public web. If text changes in an app → update `content/` here + regenerate the page.
 
