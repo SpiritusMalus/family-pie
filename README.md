@@ -16,7 +16,8 @@ content/              legal markdown canon (mirrors the app repos)
   relo-dojo/          PRIVACY_POLICY.en.md, TERMS_OF_USE.en.md, STORE_LISTING.md, BRAND_ASSETS.md
 data/products.json    catalog-as-data — one record per product
 design/               design references (NOT deployed): .dc.html + dc runtime + build spec
-Caddyfile             deployed production routing (VPS 103.246.144.198; reconcile before changing live)
+Caddyfile             production routing (VPS 103.246.144.198) — auto-deployed to /etc/caddy by CI
+tools/vps/            CI Caddyfile-deploy wrapper + one-time VPS setup (see tools/vps/README.md)
 ```
 
 ## URLs
@@ -37,9 +38,9 @@ No markup edits — the landing and legal pages render from the data.
 
 Static, and live in production: Caddy serves `site/` over TLS on the VPS (`103.246.144.198`, NL) per the `Caddyfile` above.
 
-**Deployment is automated (CI/CD).** Every push to `main` that touches `site/`, `content/`, `data/`, or the legal builder triggers [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): it rebuilds the legal pages from `content/`, then `rsync`s `site/` to the VPS web root over SSH and smoke-checks the live routes. **Prod always equals `main`** — no manual step, no laptop dependency. You can also run it on demand via the Actions tab (**Run workflow**).
+**Deployment is automated (CI/CD).** Every push to `main` that touches `site/`, `content/`, `data/`, the legal builder, **or the `Caddyfile`** triggers [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): it rebuilds the legal pages from `content/`, `rsync`s `site/` to the VPS web root, ships the `Caddyfile` to `/etc/caddy` + reloads Caddy, then smoke-checks the live routes. **Prod always equals `main`** — no manual step, no laptop dependency. You can also run it on demand via the Actions tab (**Run workflow**).
 
-Mechanics: the workflow authenticates as an unprivileged `deploy` user that owns `/var/www/family-pie/site`; the SSH private key + host live in GitHub repo **Secrets** (`DEPLOY_SSH_KEY`, `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_TARGET`) — never in the repo or on a laptop. The rsync is an exact mirror (`--delete`) scoped to the web root, so the food proxy (`/opt`) and Caddy config are untouched. Rolling back = revert the commit on `main` (the next deploy mirrors it). The `Caddyfile` itself is **not** deployed by CI; routing changes stay a manual, backed-up edit on the server.
+Mechanics: the workflow authenticates as an unprivileged `deploy` user that owns `/var/www/family-pie/site`; the SSH private key + host live in GitHub repo **Secrets** (`DEPLOY_SSH_KEY`, `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_TARGET`) — never in the repo or on a laptop. The site rsync is an exact mirror (`--delete`) scoped to the web root, so the food proxy (`/opt`) is untouched. The `Caddyfile` is installed by a **root-owned, validated, self-rolling-back wrapper** the deploy user may run via one scoped `sudo` entry ([`tools/vps/fp-deploy-caddy.sh`](tools/vps/fp-deploy-caddy.sh)) — CI never gets blanket root, and a broken config auto-reverts. **One-time enablement** of the Caddyfile path: [`tools/vps/README.md`](tools/vps/README.md). Rolling back = revert the commit on `main` (the next deploy mirrors it), or restore a backup from `/etc/caddy/backups/`.
 
 ## ⚠️ Owner TODO before publishing (legal placeholders)
 
