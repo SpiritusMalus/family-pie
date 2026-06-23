@@ -1,10 +1,10 @@
-# Privacy Policy — HealthRoutine
+# Privacy Policy — Driftora
 
 **Effective date:** June 22, 2026
-**Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("HealthRoutine")
+**Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("Driftora")
 **Contact:** support@family-pie.ru
 
-HealthRoutine is a mobile app for self-care: a thought journal (CBT/SMER), mood
+Driftora is a mobile app for self-care: a thought journal (CBT/SMER), mood
 check-ins, weight, steps and meal tracking. Your records live **on your device** in an
 encrypted database. At your choice you can make an **encrypted backup**, which only you
 hold, or enable **optional encrypted sync** — in both cases the **operator cannot read**

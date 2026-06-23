@@ -1,15 +1,15 @@
-# Terms of Use — HealthRoutine
+# Terms of Use — Driftora
 
 **Effective date:** June 22, 2026
-**Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("HealthRoutine")
+**Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("Driftora")
 **Contact:** support@family-pie.ru
 
-By using the HealthRoutine app (the "App"), you agree to these Terms. If you do not
+By using the Driftora app (the "App"), you agree to these Terms. If you do not
 agree, do not use the App.
 
 ## 1. The service
 
-HealthRoutine helps you take care of yourself: keep a thought journal (CBT/SMER), track
+Driftora helps you take care of yourself: keep a thought journal (CBT/SMER), track
 mood, weight and steps, and log meals. The App is provided for personal, non-commercial
 use. Your records are stored on your device in encrypted form; at your choice you can
 make an encrypted backup or enable optional encrypted sync (via an anonymous
