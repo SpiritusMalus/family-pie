@@ -28,21 +28,21 @@ All project docs live in:
 
 ## What this repo is (and is not)
 
-- **Is:** a hand-built **vanilla HTML/CSS/JS** static site (`site/`), deployed as static files behind Caddy + Let's Encrypt on the same VPS that already runs `food.family-pie.ru` and the legacy `health_routine/legal`. Chosen over Astro for **reuse-consistency** with the existing `web-legal/legal.html` pattern — the deployed artifact is identical (static files), with zero build step. (Stack delegated to the orchestrator by the owner.)
-- **Is:** the **central public legal host** — public Оферта (Terms) + Конфиденциальность (Privacy) for every studio app, served under `family-pie.ru/<repo>/legal` (repo-name URL scheme: `/health_routine/`, `/relo_dojo/`).
+- **Is:** a hand-built **vanilla HTML/CSS/JS** static site (`site/`), deployed as static files behind Caddy + Let's Encrypt on the same VPS that already runs `food.family-pie.ru` and the legacy `driftora/legal`. Chosen over Astro for **reuse-consistency** with the existing `web-legal/legal.html` pattern — the deployed artifact is identical (static files), with zero build step. (Stack delegated to the orchestrator by the owner.)
+- **Is:** the **central public legal host** — public Оферта (Terms) + Конфиденциальность (Privacy) for every studio app, served under `family-pie.ru/<repo>/legal` (URL scheme: `/driftora/`, `/relo_dojo/`; legacy `/health_routine/*` 301-redirects to `/driftora/*`).
 - **Is NOT:** an app. No React/Expo, no server runtime here. (`design/support.js` is a React runtime for the **design-reference** `.dc.html` files only — never shipped.)
 
 ## Repo layout (folder = truth; keep `claude.md` in sync)
 
-- `site/` — the **deployed web root**. `index.html` (landing, RU/EN), `robots.txt`, `sitemap.xml`; `health_routine/` + `relo_dojo/` = built legal pages (generated from `content/`).
-- `content/` — legal **markdown canon** mirrored from the app repos: `health-routine/*.ru.md`, `relo-dojo/*.en.md` (+ `STORE_LISTING.md`, `BRAND_ASSETS.md`). **`[INSERT …]` placeholders are owner-filled — never invent values.**
+- `site/` — the **deployed web root**. `index.html` (landing, RU/EN), `robots.txt`, `sitemap.xml`; `driftora/` + `relo_dojo/` = built legal pages (generated from `content/`).
+- `content/` — legal **markdown canon** mirrored from the app repos: `driftora/*.ru.md`, `relo-dojo/*.en.md` (+ `STORE_LISTING.md`, `BRAND_ASSETS.md`). **`[INSERT …]` placeholders are owner-filled — never invent values.**
 - `data/` — `products.json`: the **catalog-as-data** (one record per product). Adding a product = one record + 4 legal md files, no markup edits.
 - `design/` — design references, **not deployed**: `Family Pie.dc.html` (style source of truth, direction A), `Family Pie - Home.dc.html` (A/B/C), `support.js` (dc runtime), `CLAUDE_CODE_PROMPT.md` (original build spec).
 - `Caddyfile` — **deployed production** routing for the VPS (`103.246.144.198`). ⚠️ Reconcile with the live server config before changing it.
 
 ## Key locked decisions (don't re-litigate)
 
-- **URL scheme = repo names**: `family-pie.ru/health_routine/…`, `family-pie.ru/relo_dojo/…` (no rename, no redirect). Apex `/` = studio landing.
+- **URL scheme = repo names**: `family-pie.ru/driftora/…` (health app, rebranded from `health_routine` — legacy path 301-redirects), `family-pie.ru/relo_dojo/…`. Apex `/` = studio landing.
 - **Role** = studio landing **+ central public legal host**. The HealthRoutine `web-legal/legal.html` content migrates here; each app keeps its **in-app** legal copy (`lib/legal/documents.ts` etc.) and that stays in sync with the canon in `content/`.
 - **Static on Caddy**, same VPS (`103.246.144.198`, NL). No new infra.
 - **Legal text = canon in the owning app repo** (`SpiritusMalus/HealthRoutine`, `SpiritusMalus/relo_dojo`); `content/` here mirrors it for the public web. If text changes in an app → update `content/` here + regenerate the page.

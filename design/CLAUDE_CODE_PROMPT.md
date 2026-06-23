@@ -68,7 +68,7 @@ RU по умолчанию + переключатель EN. Переключат
 ### 2. Health Routine — Забота о себе каждый день (коралловый)
 Спокойный дневник самочувствия: настроение и мысли (КПТ), вес, шаги, питание. Без рекламы и регистрации, сквозное шифрование, данные на устройстве. Русский интерфейс.
 - Иконка: сердце-контур — SVG в референсе.
-- Юр-документы: `content/health-routine/TERMS_OF_USE.ru.md`, `content/health-routine/PRIVACY_POLICY.ru.md` (оригинал — русский).
+- Юр-документы: `content/driftora/TERMS_OF_USE.ru.md`, `content/driftora/PRIVACY_POLICY.ru.md` (оригинал — русский).
 - У Health Routine уже есть готовая юр-страница (`web-legal/legal.html` в репозитории HealthRoutine) — можно переиспользовать её содержимое/верстку или привести к единому стилю family-pie.
 
 ## Юридические страницы (важно)
@@ -114,6 +114,6 @@ RU по умолчанию + переключатель EN. Переключат
 - `Family Pie.dc.html` — **дизайн-референс главной** (открой в браузере; источник истины по стилю и анимациям).
 - `Family Pie - Home.dc.html` — три исследованных направления (A/B/C); владелец выбрал **A**. Для контекста.
 - `content/relo-dojo/` — STORE_LISTING, BRAND_ASSETS, TERMS_OF_USE.en.md, PRIVACY_POLICY.en.md
-- `content/health-routine/` — TERMS_OF_USE.ru.md, PRIVACY_POLICY.ru.md
+- `content/driftora/` — TERMS_OF_USE.ru.md, PRIVACY_POLICY.ru.md
 
 Исходные репозитории (для сверки тона и фактов): `SpiritusMalus/relo_dojo`, `SpiritusMalus/HealthRoutine`.
