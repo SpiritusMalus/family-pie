@@ -1,0 +1,64 @@
+name: Deploy site to VPS
+
+# Standards-based CI/CD: every push to `main` that touches the site rebuilds the
+# legal pages from content/ and rsyncs site/ to the VPS web root over SSH. Prod
+# always equals `main` — no manual rsync, no laptop dependency. The deploy key
+# lives in GitHub Secrets (DEPLOY_*), the server only holds the matching public
+# key authorized for an unprivileged `deploy` user that owns the web root.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'content/**'
+      - 'data/**'
+      - 'tools/build-legal.mjs'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build legal pages from content/
+        run: node tools/build-legal.mjs
+
+      - name: Deploy site/ to VPS (rsync over SSH, exact mirror)
+        uses: easingthemes/ssh-deploy@v6.0.3
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+          TARGET: ${{ secrets.DEPLOY_TARGET }}
+          SOURCE: 'site/'
+          ARGS: '-rlptDvz --delete'
+          EXCLUDE: '.git/, .github/'
+
+      - name: Smoke-check live routes
+        run: |
+          set -euo pipefail
+          code() { curl -s -o /dev/null -w '%{http_code}' -L --max-time 15 "$1"; }
+          for url in \
+            'https://family-pie.ru/' \
+            'https://family-pie.ru/relo_dojo/checkout/' \
+            'https://family-pie.ru/relo_dojo/terms' \
+            'https://family-pie.ru/health_routine/privacy' \
+            'https://food.family-pie.ru/health'; do
+            c=$(code "$url")
+            echo "$c  $url"
+            test "$c" = 200
+          done
+          echo 'smoke OK — all routes 200'
