@@ -53,23 +53,26 @@ jobs:
           ARGS: '-rlptDvz --delete'
           EXCLUDE: '.git/, .github/'
 
-      # Ship the Caddyfile too: rsync it into a deploy-owned staging dir, then run
-      # the root-owned wrapper (scoped sudo) which validates, installs to
+      # Ship the Caddyfile too: scp it into a deploy-owned staging dir, then run the
+      # root-owned wrapper (scoped sudo) which validates, installs to
       # /etc/caddy/Caddyfile and reloads — auto-rolling-back on failure. Runs AFTER
       # the site rsync so redirect targets (e.g. /driftora/*) already exist.
-      # Requires the one-time setup in tools/vps/README.md; until then this step
-      # fails loudly (the site step above still succeeds).
+      # Plain scp+ssh (not the rsync action) so a failed validate/reload — or a
+      # missing one-time setup, tools/vps/README.md — fails THIS step loudly,
+      # instead of being swallowed and only surfacing in the smoke-check.
       - name: Deploy Caddyfile to VPS + reload (scoped sudo wrapper)
-        uses: easingthemes/ssh-deploy@v6.0.3
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
-          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
-          TARGET: '/var/www/family-pie/caddy-staging/'
-          SOURCE: 'Caddyfile'
-          ARGS: '-rlptDvz'
-          SCRIPT_AFTER: |
-            sudo -n /usr/local/bin/fp-deploy-caddy
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          SSH_OPTS="-i $HOME/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
+          scp $SSH_OPTS Caddyfile "$DEPLOY_USER@$DEPLOY_HOST:/var/www/family-pie/caddy-staging/Caddyfile"
+          ssh $SSH_OPTS "$DEPLOY_USER@$DEPLOY_HOST" 'sudo -n /usr/local/bin/fp-deploy-caddy'
 
       - name: Smoke-check live routes
         run: |
