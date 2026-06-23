@@ -23,9 +23,9 @@ tools/vps/            CI Caddyfile-deploy wrapper + one-time VPS setup (see tool
 ## URLs
 
 - `https://family-pie.ru/` — studio landing
-- `https://family-pie.ru/driftora/legal` (`/privacy`, `/terms`) — Health Routine legal _(old `/health_routine/*` 301-redirects here)_
+- `https://family-pie.ru/driftora/legal` (`/privacy`, `/terms`) — Driftora legal _(old `/health_routine/*` 301-redirects here)_
 - `https://family-pie.ru/relo_dojo/legal` (`/privacy`, `/terms`) — Relo Dojo legal
-- `https://food.family-pie.ru/` — Health Routine Gemini food proxy (separate service, same VPS)
+- `https://food.family-pie.ru/` — Driftora Gemini food proxy (separate service, same VPS)
 
 ## Adding a product
 

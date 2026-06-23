@@ -135,7 +135,7 @@
           <svg width="24" height="24" viewBox="0 0 48 48"><path d="M24 39 C10 30 8 20 14 15 C19 11 24 16 24 16 C24 16 29 11 34 15 C40 20 38 30 24 39 Z" fill="none" stroke="#fff" stroke-width="3.2" stroke-linejoin="round"></path></svg>
         </span>
         <span style="flex:1">
-          <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:34px;letter-spacing:-.015em">Health Routine</span>
+          <span style="display:block;font-family:'Space Grotesk';font-weight:700;font-size:34px;letter-spacing:-.015em">Driftora</span>
           <span style="display:block;font-size:16px;color:#6b655c;margin-top:7px">{{ L.health.tag }}</span>
         </span>
         <span style="font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8d8678;padding-top:14px;white-space:nowrap">{{ healthLabel }}</span>
@@ -273,8 +273,8 @@ class Component extends DCLogic {
       notify: {
         dojoApp: () => this.showToast(L.notify('Relo Dojo', 'App Store')),
         dojoPlay: () => this.showToast(L.notify('Relo Dojo', 'Google Play')),
-        healthApp: () => this.showToast(L.notify('Health Routine', 'App Store')),
-        healthPlay: () => this.showToast(L.notify('Health Routine', 'Google Play')),
+        healthApp: () => this.showToast(L.notify('Driftora', 'App Store')),
+        healthPlay: () => this.showToast(L.notify('Driftora', 'Google Play')),
       },
       toastText: this.state.toast || '',
       toastOpacity: this.state.toast ? 1 : 0,
