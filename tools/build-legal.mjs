@@ -186,11 +186,11 @@ function page(product, initialDoc, models, rawLinks) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(pageTitleEn)} — family-pie</title>
-<meta name="description" content="${esc(product.name)} — ${initialDoc === 'privacy' ? 'privacy policy' : 'terms of use'} (draft). Central legal host for the family-pie app studio.">
+<meta name="description" content="${esc(product.name)} — ${initialDoc === 'privacy' ? 'privacy policy' : 'terms of use'}. Central legal host for the family-pie app studio.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://family-pie.ru/${id}/${initialDoc}">
 <meta property="og:title" content="${esc(pageTitleEn)}">
-<meta property="og:description" content="${esc(product.name)} — ${initialDoc === 'privacy' ? 'privacy policy' : 'terms of use'} (draft). Central legal host for the family-pie app studio.">
+<meta property="og:description" content="${esc(product.name)} — ${initialDoc === 'privacy' ? 'privacy policy' : 'terms of use'}. Central legal host for the family-pie app studio.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://family-pie.ru/${id}/${initialDoc}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,7 +294,7 @@ ${cols}
 
 <footer class="foot">
   <span>© 2026 <a href="/">family-pie</a> · legal host</span>
-  <a href="mailto:hello@family-pie.ru">hello@family-pie.ru</a>
+  <a href="mailto:support@family-pie.ru">support@family-pie.ru</a>
 </footer>
 
 <noscript>
