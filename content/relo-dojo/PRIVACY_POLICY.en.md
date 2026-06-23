@@ -4,11 +4,6 @@
 **Operator ("we", "us"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("Relo Dojo")
 **Contact:** support@family-pie.ru
 
-> Draft prepared for the app stores. The factual descriptions below match how the app actually
-> works; the bracketed fields and the governing-law section must be completed by the operator, and
-> the whole document should be reviewed by a qualified lawyer before publication. This is not legal
-> advice.
-
 Relo Dojo is a mobile app for learning English through short daily grammar exercises. This policy
 explains what we collect, why, and your choices.
 

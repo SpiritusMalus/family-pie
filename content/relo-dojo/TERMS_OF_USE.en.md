@@ -4,9 +4,6 @@
 **Operator ("we", "us"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("Relo Dojo")
 **Contact:** support@family-pie.ru
 
-> Draft prepared for the app stores. Complete the bracketed fields and the governing-law section, and
-> have a qualified lawyer review before publication. This is not legal advice.
-
 By creating an account or using Relo Dojo (the "App"), you agree to these Terms. If you do not
 agree, do not use the App.
 

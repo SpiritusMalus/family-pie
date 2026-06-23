@@ -4,11 +4,6 @@
 **Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("HealthRoutine")
 **Contact:** support@family-pie.ru
 
-> Draft for publication in the app stores and on the website. The factual descriptions
-> below match how the app actually works; the bracketed fields and the governing-law
-> section must be completed by the operator, and the whole document should be reviewed
-> by a lawyer before publication. This is not legal advice.
-
 HealthRoutine is a mobile app for self-care: a thought journal (CBT/SMER), mood
 check-ins, weight, steps and meal tracking. Your records live **on your device** in an
 encrypted database. At your choice you can make an **encrypted backup**, which only you

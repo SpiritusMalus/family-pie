@@ -4,10 +4,6 @@
 **Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("HealthRoutine")
 **Contact:** support@family-pie.ru
 
-> Draft for publication in the app stores and on the website. Complete the bracketed
-> fields and the governing-law section, and have the document reviewed by a lawyer
-> before publication. This is not legal advice.
-
 By using the HealthRoutine app (the "App"), you agree to these Terms. If you do not
 agree, do not use the App.
 
