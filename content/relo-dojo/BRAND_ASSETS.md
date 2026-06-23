@@ -114,7 +114,7 @@ Before publishing **[YOU]**:
 - Wire the **store badges + links** in the `#get` band and nav (placeholders marked `TODO`).
 - Point **Privacy / Terms** in the footer at the published `legal/` URLs.
 - Export a real **`og-image.png`** (1200×630) for social previews — reuse shot 1 or the hero.
-- Set the contact email (currently `hello@relodojo.app`) and confirm the domain (hub note: the
+- Set the contact email (use `support@family-pie.ru`) and confirm the domain (hub note: the
   registered domain is `relodojo.app`; decide the public marketing domain).
 - Optional: drop one real product screenshot into the hero in place of the CSS phone mock.
 
