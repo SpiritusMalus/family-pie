@@ -54,6 +54,6 @@ grep -rn "INSERT" content/ site/      # should return 0 lines when complete
 ## Beyond the brackets (not auto-detected — decide before publishing)
 
 - [ ] **Translation review.** The RU↔EN second language of each document was produced by the executor (machine translation, structure + placeholders verified) and is **not certified**. Have a qualified bilingual lawyer review both languages.
-- [ ] **Store/contact details** referenced on the landing (`hello@family-pie.ru`) — confirm the address is real and monitored.
+- [ ] **Store/contact details** referenced on the landing (`support@family-pie.ru`) — confirm the address is real and monitored.
 
 _Generated 2026-06-22 as part of TASK-2026-06-21-build-family-pie (step 7)._

@@ -46,7 +46,7 @@ Mechanics: the workflow authenticates as an unprivileged `deploy` user that owns
 The legal markdown contains `[INSERT …]` placeholders that **only the owner can fill** — do not invent them:
 
 - `[INSERT LEGAL NAME / ИП]` — operator legal entity / sole proprietor
-- `[INSERT CONTACT EMAIL]` — contact email (proposed: `hello@family-pie.ru`)
+- `[INSERT CONTACT EMAIL]` — contact email (proposed: `support@family-pie.ru`)
 - `[INSERT DATE]` — effective date
 - `[INSERT JURISDICTION]` / `[INSERT VENUE]` — governing law + venue
 - `[INSERT POSTAL ADDRESS …]` — postal address, if a store requires it
