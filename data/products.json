@@ -70,10 +70,10 @@
       "sourceRepo": "SpiritusMalus/relo_dojo"
     },
     {
-      "id": "health_routine",
+      "id": "driftora",
       "order": 2,
       "name": "Health Routine",
-      "contentDir": "health-routine",
+      "contentDir": "driftora",
       "iconId": "heart",
       "accent": "#D8513A",
       "accentText": "#B8442E",
@@ -98,8 +98,8 @@
       "legal": {
         "originalLang": "ru",
         "translationPending": null,
-        "terms": { "ru": "content/health-routine/TERMS_OF_USE.ru.md", "en": "content/health-routine/TERMS_OF_USE.en.md" },
-        "privacy": { "ru": "content/health-routine/PRIVACY_POLICY.ru.md", "en": "content/health-routine/PRIVACY_POLICY.en.md" }
+        "terms": { "ru": "content/driftora/TERMS_OF_USE.ru.md", "en": "content/driftora/TERMS_OF_USE.en.md" },
+        "privacy": { "ru": "content/driftora/PRIVACY_POLICY.ru.md", "en": "content/driftora/PRIVACY_POLICY.en.md" }
       },
       "extras": {
         "existingWebLegal": "SpiritusMalus/HealthRoutine:web-legal/legal.html"

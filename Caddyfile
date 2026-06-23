@@ -8,7 +8,9 @@
 #   - studio web-root = /var/www/family-pie/site (this repo's site/)
 #   - apex /            -> studio landing (was a 200 text fallback)
 #   - /<app>/legal|terms|privacy -> built legal pages under site/<app>/
-#   - apex /privacy /terms -> back-compat alias to the new health_routine pages
+#   - apex /privacy /terms -> back-compat alias to the driftora pages
+#   - /health_routine/* -> 301 to /driftora/* (HealthRoutine→Driftora rebrand;
+#     old links must never 404 during the transition)
 # =============================================================================
 
 # HealthRoutine food proxy — separate service (node, systemd). Unchanged.
@@ -27,17 +29,32 @@ family-pie.ru {
 		Referrer-Policy "strict-origin-when-cross-origin"
 	}
 
+	# Rebrand HealthRoutine→Driftora: the legal host path moved
+	# /health_routine/* -> /driftora/*. Permanent (301), path- and query-preserving
+	# redirect so every old deep link keeps resolving. Drop once nothing links the
+	# legacy path. The inner `route` keeps directive order (rewrite-before-redir);
+	# `uri replace` swaps just the prefix so the new path lands in {uri} (carrying
+	# the query), and `redir {uri}` is placeholder-led so Caddy doesn't read the
+	# target as a path matcher.
+	@hr_legacy path /health_routine/*
+	handle @hr_legacy {
+		route {
+			uri replace /health_routine /driftora 1
+			redir {uri} permanent
+		}
+	}
+
 	# Back-compat: the HealthRoutine app historically linked the apex /privacy and
-	# /terms. Serve the new health_routine pages at those URLs so existing in-app
-	# links keep working. Drop this once HR links point at /health_routine/{privacy,terms}.
+	# /terms. Serve the driftora pages at those URLs so existing in-app links keep
+	# working. Drop this once the app links point at /driftora/{privacy,terms}.
 	@hr_privacy path /privacy
 	handle @hr_privacy {
-		rewrite * /health_routine/privacy.html
+		rewrite * /driftora/privacy.html
 		file_server
 	}
 	@hr_terms path /terms
 	handle @hr_terms {
-		rewrite * /health_routine/terms.html
+		rewrite * /driftora/terms.html
 		file_server
 	}
 

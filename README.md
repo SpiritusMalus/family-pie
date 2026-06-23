@@ -9,10 +9,10 @@ site/                 deployed web root (Caddy serves this)
   index.html          landing — RU/EN, self-contained (no external JS)
   robots.txt
   sitemap.xml
-  health_routine/     built legal pages (Оферта/Конфиденциальность) — generated from content/
+  driftora/           built legal pages (Оферта/Конфиденциальность) — generated from content/
   relo_dojo/          built legal pages — generated from content/
 content/              legal markdown canon (mirrors the app repos)
-  health-routine/     PRIVACY_POLICY.ru.md, TERMS_OF_USE.ru.md
+  driftora/           PRIVACY_POLICY.ru.md, TERMS_OF_USE.ru.md
   relo-dojo/          PRIVACY_POLICY.en.md, TERMS_OF_USE.en.md, STORE_LISTING.md, BRAND_ASSETS.md
 data/products.json    catalog-as-data — one record per product
 design/               design references (NOT deployed): .dc.html + dc runtime + build spec
@@ -22,7 +22,7 @@ Caddyfile             deployed production routing (VPS 103.246.144.198; reconcil
 ## URLs
 
 - `https://family-pie.ru/` — studio landing
-- `https://family-pie.ru/health_routine/legal` (`/privacy`, `/terms`) — Health Routine legal
+- `https://family-pie.ru/driftora/legal` (`/privacy`, `/terms`) — Health Routine legal _(old `/health_routine/*` 301-redirects here)_
 - `https://family-pie.ru/relo_dojo/legal` (`/privacy`, `/terms`) — Relo Dojo legal
 - `https://food.family-pie.ru/` — Health Routine Gemini food proxy (separate service, same VPS)
 
