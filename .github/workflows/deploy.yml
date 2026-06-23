@@ -1,10 +1,14 @@
 name: Deploy site to VPS
 
 # Standards-based CI/CD: every push to `main` that touches the site rebuilds the
-# legal pages from content/ and rsyncs site/ to the VPS web root over SSH. Prod
-# always equals `main` — no manual rsync, no laptop dependency. The deploy key
-# lives in GitHub Secrets (DEPLOY_*), the server only holds the matching public
-# key authorized for an unprivileged `deploy` user that owns the web root.
+# legal pages from content/, rsyncs site/ to the VPS web root, AND ships the repo
+# Caddyfile to /etc/caddy + reloads Caddy — all over SSH. Prod always equals
+# `main` — no manual rsync, no laptop dependency. The deploy key lives in GitHub
+# Secrets (DEPLOY_*), the server only holds the matching public key authorized
+# for an unprivileged `deploy` user that owns the web root. The Caddyfile install
+# runs via ONE scoped sudo wrapper (tools/vps/fp-deploy-caddy.sh) — CI never gets
+# blanket root, and a bad Caddyfile auto-rolls-back. One-time enablement of that
+# wrapper: tools/vps/README.md.
 
 on:
   push:
@@ -14,6 +18,8 @@ on:
       - 'content/**'
       - 'data/**'
       - 'tools/build-legal.mjs'
+      - 'Caddyfile'
+      - 'tools/vps/fp-deploy-caddy.sh'
       - '.github/workflows/deploy.yml'
   workflow_dispatch: {}
 
@@ -47,18 +53,50 @@ jobs:
           ARGS: '-rlptDvz --delete'
           EXCLUDE: '.git/, .github/'
 
+      # Ship the Caddyfile too: rsync it into a deploy-owned staging dir, then run
+      # the root-owned wrapper (scoped sudo) which validates, installs to
+      # /etc/caddy/Caddyfile and reloads — auto-rolling-back on failure. Runs AFTER
+      # the site rsync so redirect targets (e.g. /driftora/*) already exist.
+      # Requires the one-time setup in tools/vps/README.md; until then this step
+      # fails loudly (the site step above still succeeds).
+      - name: Deploy Caddyfile to VPS + reload (scoped sudo wrapper)
+        uses: easingthemes/ssh-deploy@v6.0.3
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+          TARGET: '/var/www/family-pie/caddy-staging/'
+          SOURCE: 'Caddyfile'
+          ARGS: '-rlptDvz'
+          SCRIPT_AFTER: |
+            sudo -n /usr/local/bin/fp-deploy-caddy
+
       - name: Smoke-check live routes
         run: |
           set -euo pipefail
+          # final status after following redirects (expects 200)
           code() { curl -s -o /dev/null -w '%{http_code}' -L --max-time 15 "$1"; }
+          # raw status without following (to assert a redirect)
+          raw() { curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$1"; }
+
           for url in \
             'https://family-pie.ru/' \
+            'https://family-pie.ru/driftora/legal' \
+            'https://family-pie.ru/driftora/terms' \
+            'https://family-pie.ru/driftora/privacy' \
+            'https://family-pie.ru/privacy' \
+            'https://family-pie.ru/terms' \
             'https://family-pie.ru/relo_dojo/checkout/' \
             'https://family-pie.ru/relo_dojo/terms' \
-            'https://family-pie.ru/health_routine/privacy' \
             'https://food.family-pie.ru/health'; do
-            c=$(code "$url")
-            echo "$c  $url"
-            test "$c" = 200
+            c=$(code "$url"); echo "$c  $url"; test "$c" = 200
           done
-          echo 'smoke OK — all routes 200'
+
+          # legacy legal path must permanently redirect to /driftora/* (not soft-404)
+          for url in \
+            'https://family-pie.ru/health_routine/legal' \
+            'https://family-pie.ru/health_routine/privacy'; do
+            c=$(raw "$url"); echo "$c  (redirect) $url"; test "$c" = 301
+          done
+
+          echo 'smoke OK — driftora 200, legacy 301, apex aliases 200, food 200'
