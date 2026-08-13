@@ -1,6 +1,6 @@
 # Privacy Policy — Driftora
 
-**Effective date:** June 22, 2026
+**Effective date:** August 13, 2026
 **Operator ("we"):** Individual Entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460 ("Driftora")
 **Contact:** support@family-pie.ru
 
@@ -65,8 +65,9 @@ information disclosed when sync is enabled.
 
 ## Data transfer during food recognition
 
-If you have enabled AI food recognition, the text or photo of a dish is transmitted to
-Google Gemini (Google LLC, servers in the USA) to identify the foods. This is a
+If you have enabled AI food recognition, the text, photo or voice recording of a dish is
+transmitted through our server to OpenRouter (OpenRouter, Inc., servers in the USA),
+which performs the AI recognition of the foods. This is a
 cross-border data transfer. Calories and macronutrients are calculated from a built-in
 database, not by the neural network. The journal, mood, weight and any other records are
 not transmitted. Recognition is off by default, is enabled manually, and is revoked in
@@ -98,7 +99,7 @@ your consent** and are off by default. When sync is enabled, the encrypted snaps
 ## Transfer to third parties
 
 The only recipient of **content** outside the device is the AI-recognition provider
-(Google LLC, USA), and only to the extent described in the "Data transfer during food
+(OpenRouter, Inc., USA), and only to the extent described in the "Data transfer during food
 recognition" section. In addition:
 
 - **A backup made at your initiative** goes to the **cloud you choose yourself** (iCloud,
@@ -107,6 +108,13 @@ recognition" section. In addition:
   content.
 - **Sync, if you enable it,** transmits to the operator on a server **in the Russian Federation** only
   the **unreadable ciphertext** and metadata (without decrypted records).
+
+- **Subscription payment, if you take one out,** goes through **ЮKassa (YooMoney NBCO
+  LLC, Russian Federation)**. Card details are entered on ЮKassa's side and are never
+  passed to the operator; from ЮKassa the operator receives only the fact and status of
+  the payment, its identifier and — if you provided one — the email address for the
+  receipt. The journal, weight, mood and meals are not transmitted anywhere during
+  payment.
 
 We do not sell personal data and do not transfer it for advertising. Data may be
 disclosed only if required by law.
@@ -117,7 +125,7 @@ Records are stored on the device until you delete them or delete the app. You de
 **backup** yourself — by deleting the file in your cloud. With **sync** enabled, deleting
 the account/snapshot removes the ciphertext stored by the operator. Requests to the AI
 service are processed ephemerally: content is not stored on the operator's server and is
-not logged. The AI provider's (Google LLC, USA) retention is governed by the Gemini API terms and Google's data processing agreement (DPA).
+not logged. The AI provider's (OpenRouter, Inc., USA) retention is governed by OpenRouter's terms and its data processing agreement.
 
 ## Your rights
 
