@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Подписка · Driftora</title>
+<meta name="description" content="Подписка Driftora снимает дневной лимит на разбор еды с помощью ИИ. Всё остальное в приложении бесплатно." />
+
+<!--
+  Страница подписки Driftora. Здесь ПОКУПАЮТ — единственное место в вебе, где это
+  происходит, и то, что читает модератор платёжного провайдера.
+
+  ВЕСЬ ТЕКСТ ЛЕЖИТ В РАЗМЕТКЕ, а не собирается скриптом. Без JS страница обязана
+  оставаться полным описанием услуги: условия, срок, возврат, реквизиты. Тот, кто
+  проверяет магазин, вполне может смотреть её с отключённым JS, и пустая страница
+  в этот момент стоила бы дороже, чем вся экономия на разметке. Скрипт делает
+  ровно две вещи: переводит на EN и подставляет цены.
+
+  ЦЕНА НЕ ЗАПИСАНА ЗДЕСЬ. Она приходит из GET {api}/billing/plans. Цена уже живёт
+  на сервере, потому что число, вшитое в мобильную сборку, чинится только релизом
+  в магазин; продублировать её тут значило бы завести второе место, где она
+  устаревает молча — и разойтись с тем, что реально спишется.
+
+  Поток: GET  {api}/billing/plans    -> тарифы и нужен ли email для чека
+         POST {api}/billing/checkout -> {confirmation_url}, уводим на ЮKassa
+         возврат -> ./done, там ключ (GET {api}/billing/license?payment_id=…)
+
+  Ключ выдаётся по вебхуку от провайдера — сервер узнаёт об оплате сам, а не с
+  наших слов. Статика, без сборки, как /relo_dojo/checkout/.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* Токены сайта (site/index.html) — страница обязана читаться как его часть,
+     а не как чужая вставка. Акцент — driftora-коралловый из каталога. */
+  :root{
+    --bg:#F4F1EA; --surface:#FBF9F4; --ink:#1B1A17; --ink2:#6b655c; --ink3:#736d5f;
+    --line:#E4DDCE; --accent:#D8513A; --accent-press:#B8442E; --accent-soft:#fbeae5;
+    --ok:#0B6E26; --maxw:1000px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg)}
+  body{color:var(--ink);font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+  a{color:inherit}
+
+  .nav{position:sticky;top:0;z-index:40;background:rgba(244,241,234,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 40px}
+  .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.01em;text-decoration:none}
+  .langtoggle{display:flex;border:1px solid var(--ink);border-radius:999px;overflow:hidden;font-family:'Space Mono',monospace;font-size:12px}
+  .langtoggle button{font-family:inherit;font-size:12px;letter-spacing:.08em;padding:7px 15px;border:none;cursor:pointer;background:transparent;color:var(--ink)}
+  .langtoggle button.on{background:var(--ink);color:#fff}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-press);margin-bottom:22px}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:56px;line-height:1.05;letter-spacing:-.025em;max-width:15ch;text-wrap:balance}
+  .lede{font-size:19px;color:var(--ink2);max-width:56ch;margin-top:24px}
+  .hero{padding:72px 40px 8px}
+
+  h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.015em;margin-bottom:6px}
+  .sec{padding:56px 40px}
+  .sec-label{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:28px}
+
+  .plans{display:flex;gap:20px;flex-wrap:wrap;align-items:stretch}
+  .plan{flex:1 1 260px;position:relative;display:block;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:26px;cursor:pointer;font-family:inherit;color:inherit;transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+  .plan:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(27,26,23,.06)}
+  .plan[aria-checked="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .plan-name{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px}
+  .plan-price{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:42px;letter-spacing:-.02em;margin-top:14px;line-height:1}
+  .plan-per{display:block;font-size:14px;color:var(--ink2);margin-top:8px}
+  .plan-badge{position:absolute;top:-11px;right:18px;background:var(--accent);color:#fff;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+
+  .buy{margin-top:28px;max-width:520px}
+  label.field{display:block;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
+  input[type=email]{width:100%;padding:15px 16px;font-family:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:14px}
+  input[type=email]:focus{outline:none;border-color:var(--accent)}
+  .cta{width:100%;margin-top:20px;padding:18px 24px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:#fff;background:var(--accent);border:none;border-radius:16px;cursor:pointer;transition:background .2s ease,transform .1s ease}
+  .cta:hover{background:var(--accent-press)}
+  .cta:active{transform:scale(.99)}
+  .cta[disabled]{opacity:.5;cursor:not-allowed}
+  .err{margin-top:14px;color:var(--accent-press);font-weight:600}
+  .note{margin-top:14px;font-size:14px;color:var(--ink2)}
+
+  .cols{display:flex;gap:56px;flex-wrap:wrap}
+  .col{flex:1 1 320px}
+  .col p{color:var(--ink2)}
+  ul.list{list-style:none;margin-top:14px}
+  ul.list li{padding:11px 0 11px 30px;position:relative;border-bottom:1px solid var(--line)}
+  ul.list li::before{content:'';position:absolute;left:4px;top:19px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  ul.list.free li::before{background:var(--ok)}
+
+  .faq{border-top:1px solid var(--line)}
+  .faq details{border-bottom:1px solid var(--line)}
+  .faq summary{padding:20px 4px;cursor:pointer;font-weight:600;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:20px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:'+';font-family:'Space Mono',monospace;color:var(--ink3)}
+  .faq details[open] summary::after{content:'—'}
+  .faq p{padding:0 4px 22px;color:var(--ink2);max-width:70ch}
+
+  .legal{background:var(--surface);border-top:1px solid var(--line)}
+  .legal .wrap{padding-top:44px;padding-bottom:52px}
+  .legal p{color:var(--ink2);font-size:15px;max-width:80ch;margin-bottom:12px}
+  .legal a{color:var(--accent-press)}
+  .footer{border-top:1px solid var(--line)}
+  .footer-in{max-width:var(--maxw);margin:0 auto;padding:26px 40px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:14px;color:var(--ink2)}
+
+  @media (max-width:720px){
+    .nav-in,.wrap,.hero,.sec,.footer-in{padding-left:20px;padding-right:20px}
+    h1{font-size:38px} h2{font-size:24px}
+    .hero{padding-top:44px}
+    .sec{padding-top:40px;padding-bottom:40px}
+    .cols{gap:28px}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand-name" href="/">family-pie</a>
+    <div class="langtoggle" role="group" aria-label="Language">
+      <button id="ru" class="on" type="button">RU</button>
+      <button id="en" type="button">EN</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow" data-i18n="eyebrow">Driftora · подписка</div>
+  <h1 data-i18n="title">Платите только за ИИ-разборы</h1>
+  <p class="lede" data-i18n="lede">Подписка снимает дневной лимит на разбор еды с помощью ИИ — фото, голосом и текстом. Дневник, вес, настроение и ручной ввод остаются бесплатными всегда.</p>
+</header>
+
+<section class="sec wrap">
+  <div class="sec-label" data-i18n="secPlans">Тариф</div>
+
+  <!-- Цены подставляет скрипт: единственное место, где они хранятся, — сервер.
+       Без JS остаются названия тарифов и вся суть услуги ниже. -->
+  <div class="plans" id="plans">
+    <span class="plan" aria-checked="true" data-plan="monthly">
+      <span class="plan-name" data-i18n="month">На месяц</span>
+      <span class="plan-price" data-price="monthly">—</span>
+      <span class="plan-per" data-per="monthly"></span>
+    </span>
+    <span class="plan" aria-checked="false" data-plan="yearly">
+      <span class="plan-name" data-i18n="year">На год</span>
+      <span class="plan-price" data-price="yearly">—</span>
+      <span class="plan-per" data-per="yearly"></span>
+    </span>
+  </div>
+
+  <div class="buy" id="buy">
+    <div id="emailWrap" hidden>
+      <label class="field" for="email" data-i18n="emailLabel">Почта для чека</label>
+      <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" />
+    </div>
+    <button class="cta" id="cta" type="button" disabled data-i18n="ctaIdle">Загружаем тарифы…</button>
+    <p class="err" id="err" hidden></p>
+    <p class="note" data-i18n="ctaNote">Оплата картой через ЮKassa. Автопродления нет: подписка продлевается только новой оплатой, деньги сами не спишутся.</p>
+  </div>
+</section>
+
+<section class="sec wrap">
+  <div class="sec-label" data-i18n="secWhat">Что входит</div>
+  <div class="cols">
+    <div class="col">
+      <h2 data-i18n="paidTitle">Что даёт подписка</h2>
+      <p data-i18n="paidLede">Ровно одно: больше разборов в день. Это единственное, что стоит нам денег.</p>
+      <ul class="list" data-list="paid">
+        <li>Разбор еды по фото — без дневного потолка</li>
+        <li>Голосовые заметки о еде</li>
+        <li>Разбор текстом и разбор этикеток</li>
+        <li>Подписка работает на пяти устройствах</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h2 data-i18n="freeTitle">Что бесплатно навсегда</h2>
+      <p data-i18n="freeLede">Всё, что считается на самом телефоне. Оно не стоит нам ничего — значит, и вам тоже.</p>
+      <ul class="list free" data-list="free">
+        <li>Дневник мыслей, настроение, вес и шаги</li>
+        <li>Ручной ввод еды и встроенная база продуктов</li>
+        <li>Несколько ИИ-разборов в день, включая фото</li>
+        <li>Шифрование на устройстве и резервная копия</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec wrap">
+  <div class="sec-label" data-i18n="secFaq">Вопросы</div>
+  <div class="faq" data-list="faq">
+    <details><summary>Спишутся ли деньги повторно?</summary><p>Нет. Автопродления нет вообще: подписка заканчивается сама, а чтобы продлить — нужно оплатить ещё раз. Отменять поэтому нечего.</p></details>
+    <details><summary>Как подписка попадёт в приложение?</summary><p>Сразу после оплаты вы получите лицензионный ключ. Откройте «Ещё» → «Настройки» → «Подписка», вставьте ключ и нажмите «Активировать». В самом приложении можно оплатить и вовсе не выходя из него.</p></details>
+    <details><summary>Я поменял телефон — платить снова?</summary><p>Нет. Тот же ключ активируется на новом телефоне. Один ключ работает на пяти устройствах; при подключении шестого доступ отключится на самом старом.</p></details>
+    <details><summary>Деньги списались, а ключа нет</summary><p>Такое бывает, если уведомление от банка идёт медленнее вас. Страница после оплаты сама дождётся ключа; если закрыли её — откройте экран «Подписка» в приложении через минуту. Ничего не теряется.</p></details>
+    <details><summary>Можно вернуть деньги?</summary><p>Да. Напишите на support@family-pie.ru — вернём за неиспользованный срок на ту же карту в течение 10 рабочих дней.</p></details>
+    <details><summary>Что с моими записями?</summary><p>Они остаются на телефоне и не передаются никуда. При оплате мы вообще не видим ни дневник, ни вес, ни еду — только факт платежа.</p></details>
+  </div>
+</section>
+
+<section class="legal">
+  <div class="wrap">
+    <div class="sec-label" data-i18n="secLegal">Условия</div>
+    <p data-i18n="legalService">Услуга: доступ к повышенному дневному лимиту ИИ-разборов еды в приложении Driftora на срок, указанный в выбранном тарифе.</p>
+    <p data-i18n="legalDelivery">Услуга цифровая, доставки нет. Лицензионный ключ выдаётся сразу после оплаты на этом сайте; доступ начинается в момент активации ключа в приложении и действует оплаченный срок.</p>
+    <p data-i18n="legalRefund">Возврат: если услуга не заработала или вы передумали — напишите на support@family-pie.ru, вернём деньги за неиспользованный срок на тот же платёжный инструмент в течение 10 рабочих дней.</p>
+    <p data-i18n="legalSeller">Продавец: ИП Тихоненко Евгений Юрьевич, ОГРНИП 326508100294665, ИНН 504414138460. Связь: support@family-pie.ru</p>
+    <p><a href="/driftora/terms" data-i18n="docsTerms">Условия использования</a> · <a href="/driftora/privacy" data-i18n="docsPrivacy">Политика конфиденциальности</a></p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-in">
+    <span>© 2026 <a href="/">family-pie</a></span>
+    <a href="mailto:support@family-pie.ru">support@family-pie.ru</a>
+  </div>
+</footer>
+
+<script>
+/* ============================================================================
+   Скрипт делает ровно две вещи: подставляет цены с сервера и переводит на EN.
+   Русский текст живёт в разметке выше и снимается оттуда при загрузке, поэтому
+   он существует ровно в одном месте.
+   ========================================================================= */
+var API = 'https://food.family-pie.ru';
+
+var EN = {
+  eyebrow:'Driftora · subscription',
+  title:'You only pay for AI parsing',
+  lede:'The subscription lifts the daily cap on parsing food with AI — by photo, voice and text. The journal, weight, mood and manual entry stay free forever.',
+  secPlans:'Plan',
+  month:'Monthly', year:'Yearly',
+  emailLabel:'Email for the receipt',
+  ctaIdle:'Loading plans…',
+  ctaNote:'Card payment via ЮKassa. Nothing auto-renews: a subscription is extended only by paying again, and no money is taken on its own.',
+  secWhat:'What you get',
+  paidTitle:'What the subscription buys',
+  paidLede:'Exactly one thing: more parses a day. It is the only part that costs us money.',
+  freeTitle:'Free forever',
+  freeLede:'Everything computed on the phone itself. It costs us nothing, so it costs you nothing.',
+  secFaq:'Questions',
+  secLegal:'Terms',
+  legalService:'Service: access to a raised daily cap on AI food parsing in the Driftora app, for the period stated in the chosen plan.',
+  legalDelivery:'The service is digital; no delivery is involved. The licence key is issued on this site right after payment; access starts when the key is activated in the app and lasts for the paid period.',
+  legalRefund:'Refunds: if the service did not work or you changed your mind, write to support@family-pie.ru — we refund the unused portion to the same payment instrument within 10 business days.',
+  legalSeller:'Seller: Individual entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460. Contact: support@family-pie.ru',
+  docsTerms:'Terms of Use', docsPrivacy:'Privacy Policy'
+};
+
+var EN_LISTS = {
+  paid:['Food photos parsed — no daily ceiling','Voice notes about meals','Text parsing and package labels','Works on five devices'],
+  free:['Thought journal, mood, weight and steps','Manual entry and the built-in food database','A few AI parses a day, photos included','On-device encryption and backup'],
+  faq:[
+    ['Will I be charged again?','No. Nothing auto-renews: the subscription simply ends, and extending it means paying again. There is nothing to cancel.'],
+    ['How does it reach the app?','Right after payment you get a licence key. Open "More" → "Settings" → "Subscription", paste the key and tap Activate. You can also pay inside the app without leaving it.'],
+    ['I changed phones — pay again?','No. The same key activates on the new phone. One key covers five devices; connecting a sixth turns access off on the oldest one.'],
+    ['I paid but got no key','That happens when the bank notification is slower than you are. The page after payment waits for the key by itself; if you closed it, open the Subscription screen in the app a minute later. Nothing is lost.'],
+    ['Can I get a refund?','Yes. Write to support@family-pie.ru — we refund the unused portion to the same card within 10 business days.'],
+    ['What about my records?','They stay on your phone and are sent nowhere. During payment we see neither the journal, nor weight, nor meals — only the fact of the payment.']
+  ]
+};
+
+var COPY = {
+  ru:{ cta:'Оплатить {price} ₽', wait:'Готовим оплату…', off:'Оплата скоро откроется',
+       perMonth:'≈{n} ₽ в месяц', days:'{n} дней доступа', save:'выгоднее',
+       errEmail:'Укажите почту — на неё придёт чек.',
+       errPlans:'Не удалось загрузить тарифы. Обновите страницу.',
+       errNet:'Сеть недоступна. Попробуйте ещё раз — деньги при этом не списываются.',
+       errStart:'Не получилось начать оплату. Попробуйте ещё раз.',
+       title:'Подписка · Driftora' },
+  en:{ cta:'Pay {price} ₽', wait:'Preparing payment…', off:'Payments open soon',
+       perMonth:'≈{n} ₽ per month', days:'{n} days of access', save:'better value',
+       errEmail:'Enter an email — the receipt goes there.',
+       errPlans:'Could not load the plans. Please refresh.',
+       errNet:'Network unavailable. Try again — no money is taken when this happens.',
+       errStart:'Could not start the payment. Please try again.',
+       title:'Subscription · Driftora' }
+};
+
+var lang = 'ru', plans = [], selected = 'monthly', receiptRequired = false, enabled = false, busy = false;
+var RU = {}, RU_LISTS = {};
+
+function el(id){ return document.getElementById(id); }
+function fmt(s,o){ return String(s).replace(/\{(\w+)\}/g, function(_,k){ return o[k]; }); }
+function c(k){ return COPY[lang][k]; }
+
+// Русский снимается с разметки один раз — так он не продублирован в скрипте.
+(function captureRu(){
+  var nodes = document.querySelectorAll('[data-i18n]');
+  for (var i=0;i<nodes.length;i++) RU[nodes[i].getAttribute('data-i18n')] = nodes[i].textContent;
+  var lists = document.querySelectorAll('[data-list]');
+  for (var j=0;j<lists.length;j++) RU_LISTS[lists[j].getAttribute('data-list')] = lists[j].innerHTML;
+})();
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.title = c('title');
+  var dict = lang === 'en' ? EN : RU;
+  var nodes = document.querySelectorAll('[data-i18n]');
+  for (var i=0;i<nodes.length;i++){
+    var k = nodes[i].getAttribute('data-i18n');
+    if (dict[k] !== undefined) nodes[i].textContent = dict[k];
+  }
+  if (lang === 'en'){
+    setList('paid', EN_LISTS.paid.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join(''));
+    setList('free', EN_LISTS.free.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join(''));
+    setList('faq', EN_LISTS.faq.map(function(p){ return '<details><summary>'+esc(p[0])+'</summary><p>'+esc(p[1])+'</p></details>'; }).join(''));
+  } else {
+    setList('paid', RU_LISTS.paid); setList('free', RU_LISTS.free); setList('faq', RU_LISTS.faq);
+  }
+  el('ru').className = lang === 'ru' ? 'on' : '';
+  el('en').className = lang === 'en' ? 'on' : '';
+  renderPrices(); renderCta();
+}
+
+function setList(name, html){
+  var n = document.querySelector('[data-list="'+name+'"]');
+  if (n) n.innerHTML = html;
+}
+
+function planById(id){
+  for (var i=0;i<plans.length;i++) if (plans[i].id === id) return plans[i];
+  return null;
+}
+
+function renderPrices(){
+  var monthly = planById('monthly');
+  var cards = document.querySelectorAll('.plan');
+  for (var i=0;i<cards.length;i++){
+    var card = cards[i], id = card.getAttribute('data-plan'), p = planById(id);
+    card.setAttribute('aria-checked', String(id === selected));
+    var priceEl = card.querySelector('[data-price]'), perEl = card.querySelector('[data-per]');
+    if (!p){ card.hidden = plans.length > 0; continue; }
+    card.hidden = false;
+    var amount = Number(p.amount);
+    priceEl.textContent = Math.round(amount) + ' ₽';
+    if (p.days > 45){
+      perEl.textContent = fmt(c('perMonth'), { n: Math.round(amount / (p.days / 30)) });
+      // «Выгоднее на N%» считается от месячного тарифа, а не пишется руками:
+      // иначе первая же смена цены превратит честную скидку в неправду.
+      var old = card.querySelector('.plan-badge');
+      if (old) old.parentNode.removeChild(old);
+      if (monthly){
+        var save = Math.round((1 - amount / (Number(monthly.amount) * (p.days / 30))) * 100);
+        if (save > 0){
+          var b = document.createElement('span');
+          b.className = 'plan-badge';
+          b.textContent = save + '% ' + c('save');
+          card.appendChild(b);
+        }
+      }
+    } else {
+      perEl.textContent = fmt(c('days'), { n: p.days });
+    }
+  }
+}
+
+function renderCta(){
+  var p = planById(selected), cta = el('cta');
+  el('emailWrap').hidden = !receiptRequired;
+  if (!plans.length){ cta.disabled = true; cta.textContent = (lang === 'en' ? EN.ctaIdle : RU.ctaIdle); return; }
+  if (!enabled){ cta.disabled = true; cta.textContent = c('off'); return; }
+  cta.disabled = busy || !p;
+  cta.textContent = busy ? c('wait') : fmt(c('cta'), { price: p ? Math.round(Number(p.amount)) : '' });
+}
+
+function showErr(msg){ var e = el('err'); e.textContent = msg; e.hidden = false; }
+
+document.getElementById('plans').addEventListener('click', function(ev){
+  var card = ev.target.closest ? ev.target.closest('.plan') : null;
+  if (!card) return;
+  selected = card.getAttribute('data-plan');
+  renderPrices(); renderCta();
+});
+
+el('cta').addEventListener('click', function(){
+  if (busy || !enabled) return;
+  var email = receiptRequired ? el('email').value.trim() : '';
+  if (receiptRequired && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showErr(c('errEmail')); return; }
+  el('err').hidden = true;
+  busy = true; renderCta();
+
+  fetch(API + '/billing/checkout', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ plan: selected, email: email, return_url: location.origin + '/driftora/subscription/done' })
+  })
+  .then(function(r){ return r.json().then(function(b){ return { ok:r.ok, body:b }; }); })
+  .then(function(res){
+    if (!res.ok || !res.body.confirmation_url){
+      busy = false; renderCta();
+      showErr((res.body && res.body.error && res.body.error.message) || c('errStart'));
+      return;
+    }
+    // Провайдер не возвращает id платежа в адресе — кладём его сами, иначе
+    // страница возврата не будет знать, какой ключ спрашивать.
+    try { sessionStorage.setItem('driftora_payment_id', res.body.payment_id); } catch(e){}
+    location.href = res.body.confirmation_url;
+  })
+  .catch(function(){ busy = false; renderCta(); showErr(c('errNet')); });
+});
+
+el('ru').addEventListener('click', function(){ lang = 'ru'; applyLang(); });
+el('en').addEventListener('click', function(){ lang = 'en'; applyLang(); });
+
+if ((navigator.language || 'ru').slice(0,2) === 'en') lang = 'en';
+applyLang();
+
+fetch(API + '/billing/plans')
+  .then(function(r){ return r.json(); })
+  .then(function(b){
+    plans = b.plans || [];
+    receiptRequired = b.receipt_required === true;
+    enabled = b.enabled === true;
+    if (!planById(selected) && plans.length) selected = plans[0].id;
+    renderPrices(); renderCta();
+  })
+  .catch(function(){ showErr(c('errPlans')); });
+</script>
+</body>
+</html>

@@ -36,6 +36,9 @@
   .langtoggle{display:flex;border:1px solid #1B1A17;border-radius:999px;overflow:hidden;font-family:'Space Mono',monospace;font-size:12px}
   .langtoggle button{font-family:inherit;font-size:12px;letter-spacing:.08em;padding:7px 15px;border:none;cursor:pointer;background:transparent;color:#1B1A17}
   .langtoggle button.on{background:#1B1A17;color:#fff}
+  .subscribe-btn{display:inline-block;margin-bottom:14px;padding:12px 20px;border-radius:12px;background:#1B1A17;color:#fff;text-decoration:none;font-weight:700;font-size:15px;font-family:'Space Grotesk',sans-serif;transition:filter .2s ease,transform .1s ease}
+  .subscribe-btn:hover{filter:brightness(.92)}
+  .subscribe-btn:active{transform:scale(.98)}
   /* layout */
   .wrap{max-width:1000px;margin:0 auto;padding:0 40px}
   .hero{padding:96px 40px 56px}
@@ -176,7 +179,7 @@
     <section class="ns-row">
       <h2 class="ns-name">Driftora</h2>
       <p class="ns-tag">Забота о себе каждый день · Everyday self-care</p>
-      <p class="ns-legal"><a href="https://food.family-pie.ru/billing/pay">Подписка / Subscription</a> · <a href="/driftora/terms">Оферта / Terms</a> · <a href="/driftora/privacy">Конфиденциальность / Privacy</a></p>
+      <p class="ns-legal"><a href="/driftora/subscription">Подписка / Subscription</a> · <a href="/driftora/terms">Оферта / Terms</a> · <a href="/driftora/privacy">Конфиденциальность / Privacy</a></p>
     </section>
   </noscript>
   <div class="roadmap reveal"><span class="dot"></span><span data-i18n="roadmap">Здесь появятся новые продукты</span></div>
@@ -225,7 +228,7 @@ var CATALOG = {
       features:{ ru:['без рекламы','E2E-шифрование','без регистрации'], en:['no ads','E2E encryption','no signup'] },
       desc:{ ru:'Спокойный дневник самочувствия: настроение и мысли по методу КПТ, вес, шаги и питание. Без рекламы и регистрации — данные шифруются сквозным шифрованием и остаются на вашем устройстве.',
         en:'A calm self-care journal: mood and thoughts (CBT), weight, steps and meals. No ads, no signup — your data is end-to-end encrypted and stays on your device.' },
-      subscribeUrl:'https://food.family-pie.ru/billing/pay',
+      subscribeUrl:'/driftora/subscription',
       stores:{ appStore:{ status:'soon', url:null }, googlePlay:{ status:'soon', url:null } } }
   ]
 };
@@ -276,7 +279,8 @@ function rowHTML(p, idx){
       '<div class="panel-side">'+
         '<div class="side-label" data-i18n="download"></div>'+
         '<div class="stores">'+storeHTML(p,'App Store',p.stores.appStore)+storeHTML(p,'Google Play',p.stores.googlePlay)+'</div>'+
-        '<div class="legal-links">'+(p.subscribeUrl?'<a href="'+p.subscribeUrl+'" data-i18n="subscribe"></a>':'')+'<a href="/'+p.id+'/terms" data-i18n="terms"></a><a href="/'+p.id+'/privacy" data-i18n="privacy"></a></div>'+
+        (p.subscribeUrl?'<a class="subscribe-btn" style="background:'+p.accent+'" href="'+p.subscribeUrl+'" data-i18n="subscribe"></a>':'')+
+        '<div class="legal-links"><a href="/'+p.id+'/terms" data-i18n="terms"></a><a href="/'+p.id+'/privacy" data-i18n="privacy"></a></div>'+
       '</div>'+
     '</div></div></div>'+
   '</section>';

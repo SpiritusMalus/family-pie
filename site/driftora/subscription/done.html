@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Оплата прошла · Driftora</title>
+
+<!--
+  Куда провайдер возвращает покупателя.
+
+  Страница ОПРАШИВАЕТ, а не делает вывод: попасть сюда значит, что закончил
+  браузер, а не платёж. Ключ выдаётся по вебхуку — отдельной доставкой, обычно
+  за секунды. Сказать «оплата не прошла» на первом же 404 значило бы соврать
+  человеку, с которого только что списали деньги.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{--bg:#F4F1EA;--surface:#FBF9F4;--ink:#1B1A17;--ink2:#6b655c;--ink3:#736d5f;
+        --line:#E4DDCE;--accent:#D8513A;--accent-press:#B8442E;--accent-soft:#fbeae5;--ok:#0B6E26}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg)}
+  body{color:var(--ink);font-family:'Manrope',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .nav{border-bottom:1px solid var(--line)}
+  .nav-in{max-width:1000px;margin:0 auto;padding:20px 40px}
+  .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;text-decoration:none}
+  .wrap{max-width:640px;margin:0 auto;padding:64px 40px 80px}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ok);margin-bottom:18px}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:42px;line-height:1.08;letter-spacing:-.02em}
+  .status{margin-top:16px;font-size:18px;color:var(--ink2)}
+  .status.bad{color:var(--accent-press);font-weight:600}
+  .keycard{margin-top:32px;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:24px}
+  .keylabel{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+  .key{font-family:'Space Mono',monospace;font-size:26px;letter-spacing:.06em;margin-top:12px;user-select:all;word-break:break-all}
+  .key.pending{color:var(--ink3);font-size:20px;letter-spacing:0}
+  .copy{margin-top:16px;padding:12px 18px;font-family:inherit;font-weight:600;font-size:15px;color:#fff;background:var(--accent);border:none;border-radius:12px;cursor:pointer}
+  .copy:hover{background:var(--accent-press)}
+  .copy[disabled]{opacity:.45;cursor:not-allowed}
+  ol{margin-top:28px;padding-left:22px;color:var(--ink2)}
+  ol li{margin-bottom:10px}
+  .save{margin-top:24px;padding:16px 18px;background:var(--accent-soft);border-radius:14px;font-size:15px}
+  .foot{margin-top:36px;font-size:14px;color:var(--ink2)}
+  @media (max-width:720px){ .nav-in,.wrap{padding-left:20px;padding-right:20px} h1{font-size:30px} .key{font-size:20px} }
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-in"><a class="brand-name" href="/">family-pie</a></div></nav>
+
+<main class="wrap">
+  <div class="eyebrow" id="eyebrow">Driftora</div>
+  <h1 id="head">Спасибо за оплату</h1>
+  <p class="status" id="status">Проверяем платёж…</p>
+
+  <div class="keycard">
+    <div class="keylabel" id="keylabel">Ключ подписки</div>
+    <div class="key pending" id="key">—</div>
+    <button class="copy" id="copy" type="button" disabled>Скопировать</button>
+  </div>
+
+  <ol id="steps">
+    <li>Откройте приложение Driftora.</li>
+    <li>«Ещё» → «Настройки» → «Подписка».</li>
+    <li>Вставьте ключ и нажмите «Активировать».</li>
+  </ol>
+
+  <p class="save" id="save">Сохраните ключ. Он же вернёт подписку, если вы смените телефон — до пяти устройств.</p>
+  <p class="foot" id="foot">Что-то не так? Напишите на <a href="mailto:support@family-pie.ru">support@family-pie.ru</a> — платёж мы видим.</p>
+</main>
+
+<script>
+var API = 'https://food.family-pie.ru';
+var EN = (navigator.language || 'ru').slice(0,2) === 'en';
+
+if (EN) {
+  document.documentElement.lang = 'en';
+  document.title = 'Payment complete · Driftora';
+  document.getElementById('head').textContent = 'Thank you';
+  document.getElementById('status').textContent = 'Checking the payment…';
+  document.getElementById('keylabel').textContent = 'Licence key';
+  document.getElementById('copy').textContent = 'Copy';
+  document.getElementById('steps').innerHTML =
+    '<li>Open the Driftora app.</li><li>"More" → "Settings" → "Subscription".</li><li>Paste the key and tap Activate.</li>';
+  document.getElementById('save').textContent = 'Keep the key. It also restores the subscription on a new phone — up to five devices.';
+  document.getElementById('foot').innerHTML = 'Something wrong? Write to <a href="mailto:support@family-pie.ru">support@family-pie.ru</a> — we can see the payment.';
+}
+
+var params = new URLSearchParams(location.search);
+var id = params.get('payment_id');
+if (!id) { try { id = sessionStorage.getItem('driftora_payment_id'); } catch(e){} }
+
+var statusEl = document.getElementById('status');
+var keyEl = document.getElementById('key');
+var copyEl = document.getElementById('copy');
+var tries = 0;
+
+function fail(ru, en){ statusEl.className = 'status bad'; statusEl.textContent = EN ? en : ru; }
+
+function done(body){
+  var until = new Date(body.paid_until).toLocaleDateString(EN ? 'en-GB' : 'ru-RU');
+  statusEl.className = 'status';
+  statusEl.textContent = EN ? ('Subscription active until ' + until + '.') : ('Подписка активна до ' + until + '.');
+  keyEl.className = 'key';
+  keyEl.textContent = body.key;
+  copyEl.disabled = false;
+  copyEl.addEventListener('click', function(){
+    navigator.clipboard.writeText(body.key).then(function(){
+      copyEl.textContent = EN ? 'Copied' : 'Скопировано';
+    }).catch(function(){
+      // Буфер может быть недоступен (старый браузер, отказ в правах) — ключ
+      // и так выделяется целиком по клику, так что это не тупик.
+      copyEl.textContent = EN ? 'Select it manually' : 'Выделите вручную';
+    });
+  });
+}
+
+function poll(){
+  tries += 1;
+  fetch(API + '/billing/license?payment_id=' + encodeURIComponent(id))
+    .then(function(r){
+      if (r.ok) return r.json();
+      // 404, пока уведомление в пути, — это не ответ, а «ещё не приехало».
+      if (r.status === 404 && tries < 20) { setTimeout(poll, 3000); return null; }
+      if (r.status === 404) {
+        fail('Платёж ещё не подтверждён. Обновите страницу через минуту — деньги не потеряются.',
+             'The payment is not confirmed yet. Refresh in a minute — nothing is lost.');
+        return null;
+      }
+      fail('Не удалось получить ключ. Напишите нам — платёж мы видим.',
+           'Could not fetch the key. Write to us — we can see the payment.');
+      return null;
+    })
+    .then(function(b){ if (b) done(b); })
+    .catch(function(){
+      if (tries < 20) { setTimeout(poll, 3000); return; }
+      fail('Сеть недоступна. Обновите страницу.', 'Network unavailable. Please refresh.');
+    });
+}
+
+if (id) { poll(); }
+else {
+  fail('Не знаем, какой это платёж. Откройте ссылку из письма от ЮKassa или напишите нам.',
+       'We do not know which payment this is. Use the link from the ЮKassa email, or write to us.');
+}
+</script>
+</body>
+</html>
