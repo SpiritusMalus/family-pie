@@ -176,7 +176,7 @@
     <section class="ns-row">
       <h2 class="ns-name">Driftora</h2>
       <p class="ns-tag">Забота о себе каждый день · Everyday self-care</p>
-      <p class="ns-legal"><a href="/driftora/terms">Оферта / Terms</a> · <a href="/driftora/privacy">Конфиденциальность / Privacy</a></p>
+      <p class="ns-legal"><a href="https://food.family-pie.ru/billing/pay">Подписка / Subscription</a> · <a href="/driftora/terms">Оферта / Terms</a> · <a href="/driftora/privacy">Конфиденциальность / Privacy</a></p>
     </section>
   </noscript>
   <div class="roadmap reveal"><span class="dot"></span><span data-i18n="roadmap">Здесь появятся новые продукты</span></div>
@@ -205,12 +205,12 @@ var CATALOG = {
     ru: { products:'Продукты', studioEyebrow:'Студия приложений',
       studioTag:'Спокойные приложения для повседневной жизни.',
       studioIntro:'Небольшая независимая студия. Делаем приватные, неспешные приложения, которыми пользуешься каждый день — без рекламы и лишнего шума.',
-      soon:'Скоро', download:'Где будет', terms:'Оферта', privacy:'Конфиденциальность',
+      soon:'Скоро', download:'Где будет', terms:'Оферта', privacy:'Конфиденциальность', subscribe:'Подписка',
       roadmap:'Здесь появятся новые продукты', open:'открыть +', close:'— свернуть' },
     en: { products:'Products', studioEyebrow:'App studio',
       studioTag:'Calm apps for everyday life.',
       studioIntro:'A small independent studio. We make private, unhurried apps you reach for every day — no ads, no noise.',
-      soon:'Soon', download:'Where to get it', terms:'Terms', privacy:'Privacy',
+      soon:'Soon', download:'Where to get it', terms:'Terms', privacy:'Privacy', subscribe:'Subscription',
       roadmap:'More products land here', open:'open +', close:'— close' }
   },
   products: [
@@ -225,6 +225,7 @@ var CATALOG = {
       features:{ ru:['без рекламы','E2E-шифрование','без регистрации'], en:['no ads','E2E encryption','no signup'] },
       desc:{ ru:'Спокойный дневник самочувствия: настроение и мысли по методу КПТ, вес, шаги и питание. Без рекламы и регистрации — данные шифруются сквозным шифрованием и остаются на вашем устройстве.',
         en:'A calm self-care journal: mood and thoughts (CBT), weight, steps and meals. No ads, no signup — your data is end-to-end encrypted and stays on your device.' },
+      subscribeUrl:'https://food.family-pie.ru/billing/pay',
       stores:{ appStore:{ status:'soon', url:null }, googlePlay:{ status:'soon', url:null } } }
   ]
 };
@@ -275,7 +276,7 @@ function rowHTML(p, idx){
       '<div class="panel-side">'+
         '<div class="side-label" data-i18n="download"></div>'+
         '<div class="stores">'+storeHTML(p,'App Store',p.stores.appStore)+storeHTML(p,'Google Play',p.stores.googlePlay)+'</div>'+
-        '<div class="legal-links"><a href="/'+p.id+'/terms" data-i18n="terms"></a><a href="/'+p.id+'/privacy" data-i18n="privacy"></a></div>'+
+        '<div class="legal-links">'+(p.subscribeUrl?'<a href="'+p.subscribeUrl+'" data-i18n="subscribe"></a>':'')+'<a href="/'+p.id+'/terms" data-i18n="terms"></a><a href="/'+p.id+'/privacy" data-i18n="privacy"></a></div>'+
       '</div>'+
     '</div></div></div>'+
   '</section>';
