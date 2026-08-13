@@ -83,6 +83,17 @@
   .err{margin-top:14px;color:var(--accent-press);font-weight:600}
   .note{margin-top:14px;font-size:14px;color:var(--ink2)}
 
+  .recover{margin-top:34px;padding-top:22px;border-top:1px solid var(--line)}
+  .recover summary{cursor:pointer;font-weight:600;list-style:none;color:var(--ink2)}
+  .recover summary::-webkit-details-marker{display:none}
+  .recover summary::before{content:'? ';font-family:'Space Mono',monospace;color:var(--accent-press)}
+  .recover p{margin:12px 0;color:var(--ink2);font-size:15px;max-width:60ch}
+  .recover input{width:100%;max-width:520px;padding:14px 16px;font-family:'Space Mono',monospace;font-size:14px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:14px}
+  .recover input:focus{outline:none;border-color:var(--accent)}
+  .cta.ghost{max-width:520px;margin-top:12px;background:transparent;color:var(--accent-press);border:1.5px solid var(--accent)}
+  .cta.ghost:hover{background:var(--accent-soft)}
+  .recover-out{font-family:'Space Mono',monospace;font-size:19px;letter-spacing:.05em;color:var(--ink);user-select:all;word-break:break-all}
+  .recover-out.bad{font-family:'Manrope',sans-serif;font-size:15px;letter-spacing:0;color:var(--accent-press);font-weight:600}
   .cols{display:flex;gap:56px;flex-wrap:wrap}
   .col{flex:1 1 320px}
   .col p{color:var(--ink2)}
@@ -160,6 +171,13 @@
     <p class="err" id="err" hidden></p>
     <p class="note" data-i18n="ctaNote">Оплата картой через ЮKassa. Автопродления нет: подписка продлевается только новой оплатой, деньги сами не спишутся.</p>
   </div>
+  <details class="recover" id="recover">
+    <summary data-i18n="recoverTitle">Уже оплатили, но потеряли ключ?</summary>
+    <p data-i18n="recoverLede">Номер платежа есть в чеке от ЮKassa — вставьте его, и мы покажем ключ ещё раз. Почту мы не храним, поэтому искать можно только по номеру.</p>
+    <input id="pid" type="text" autocomplete="off" spellcheck="false" placeholder="2f0a1b3c-000f-5000-9000-1a2b3c4d5e6f" />
+    <button class="cta ghost" id="recoverBtn" type="button" data-i18n="recoverBtn">Показать ключ</button>
+    <p class="recover-out" id="recoverOut" hidden></p>
+  </details>
 </section>
 
 <section class="sec wrap">
@@ -235,6 +253,9 @@ var EN = {
   emailLabel:'Email for the receipt',
   ctaIdle:'Loading plans…',
   ctaNote:'Card payment via ЮKassa. Nothing auto-renews: a subscription is extended only by paying again, and no money is taken on its own.',
+  recoverTitle:'Paid already but lost the key?',
+  recoverLede:'The payment id is in the ЮKassa receipt — paste it and we will show the key again. We do not store your email, so the id is the only thing to search by.',
+  recoverBtn:'Show the key',
   secWhat:'What you get',
   paidTitle:'What the subscription buys',
   paidLede:'Exactly one thing: more parses a day. It is the only part that costs us money.',
@@ -269,6 +290,9 @@ var COPY = {
        errPlans:'Не удалось загрузить тарифы. Обновите страницу.',
        errNet:'Сеть недоступна. Попробуйте ещё раз — деньги при этом не списываются.',
        errStart:'Не получилось начать оплату. Попробуйте ещё раз.',
+       recoverEmpty:'Вставьте номер платежа из чека.',
+       recoverWait:'Ищем…',
+       recoverNone:'По этому номеру ключа нет. Проверьте номер в чеке или напишите на support@family-pie.ru.',
        title:'Подписка · Driftora' },
   en:{ cta:'Pay {price} ₽', wait:'Preparing payment…', off:'Payments open soon',
        perMonth:'≈{n} ₽ per month', days:'{n} days of access', save:'better value',
@@ -276,6 +300,9 @@ var COPY = {
        errPlans:'Could not load the plans. Please refresh.',
        errNet:'Network unavailable. Try again — no money is taken when this happens.',
        errStart:'Could not start the payment. Please try again.',
+       recoverEmpty:'Paste the payment id from the receipt.',
+       recoverWait:'Looking…',
+       recoverNone:'No key for that id. Check it in the receipt, or write to support@family-pie.ru.',
        title:'Subscription · Driftora' }
 };
 
@@ -402,6 +429,24 @@ el('cta').addEventListener('click', function(){
     location.href = res.body.confirmation_url;
   })
   .catch(function(){ busy = false; renderCta(); showErr(c('errNet')); });
+});
+
+// Восстановление ключа. Ищем по payment_id — он неугадываем и есть только у
+// того, кто платил. По почте искать было бы удобнее и небезопасно: почта не
+// секрет, а мы её и не храним.
+el('recoverBtn').addEventListener('click', function(){
+  var out = el('recoverOut'), pid = el('pid').value.trim();
+  out.hidden = false;
+  if (!pid){ out.className = 'recover-out bad'; out.textContent = c('recoverEmpty'); return; }
+  out.className = 'recover-out'; out.textContent = c('recoverWait');
+  fetch(API + '/billing/license?payment_id=' + encodeURIComponent(pid))
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(b){
+      if (!b){ out.className = 'recover-out bad'; out.textContent = c('recoverNone'); return; }
+      out.className = 'recover-out';
+      out.textContent = b.key;
+    })
+    .catch(function(){ out.className = 'recover-out bad'; out.textContent = c('errNet'); });
 });
 
 el('ru').addEventListener('click', function(){ lang = 'ru'; applyLang(); });
