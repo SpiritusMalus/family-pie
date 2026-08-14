@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fp-deploy-caddy — install a CI-staged Caddyfile into /etc/caddy and reload Caddy.
+# fp-deploy-caddy — install a CI-staged Caddyfile into /etc/caddy and apply it.
 # =============================================================================
 # Runs as root via ONE scoped NOPASSWD sudoers entry for the unprivileged
 # `deploy` user (the same user the GitHub Actions deploy uses). Security model:
@@ -39,16 +39,44 @@ if [ -f "$LIVE" ]; then
 	cp -p "$LIVE" "$backup"
 fi
 
-# 4. Install + reload. If the reload fails, roll back to the backup and re-reload.
+# 4. Apply the new config, rolling back to the backup if it will not come up.
+#
+# RELOAD IS NOT ALWAYS AVAILABLE. `systemctl reload caddy` runs `caddy reload`,
+# which talks to the admin API on :2019 — and this deployment sets `admin off`,
+# so the reload fails with "connection refused" no matter how good the config is.
+# A wrapper that only knew how to reload therefore failed EVERY deploy while the
+# config it had just installed was perfectly valid.
+#
+# So: try reload (zero downtime, the good path), fall back to restart (a blip,
+# but it is the only way with the admin API off). Rollback uses the same ladder.
+apply() {
+	systemctl reload caddy 2>/dev/null && { echo reloaded; return 0; }
+	systemctl restart caddy && { echo restarted; return 0; }
+	return 1
+}
+
 install -m 0644 "$STAGED" "$LIVE"
-if ! systemctl reload caddy; then
-	log "reload FAILED" >&2
+if ! how=$(apply); then
+	log "apply FAILED" >&2
 	if [ -n "$backup" ]; then
 		log "rolling back to $backup" >&2
 		cp -p "$backup" "$LIVE"
-		systemctl reload caddy || log "rollback reload also failed — caddy may need manual attention" >&2
+		apply >/dev/null || log "rollback also failed — caddy needs manual attention" >&2
 	fi
 	exit 1
 fi
 
-log "installed + reloaded${backup:+ (backup: $backup)}"
+# `systemctl restart` returning 0 only means it started; a unit that dies a second
+# later would otherwise be reported as a successful deploy.
+sleep 2
+if ! systemctl is-active --quiet caddy; then
+	log "caddy is not active after $how" >&2
+	if [ -n "$backup" ]; then
+		log "rolling back to $backup" >&2
+		cp -p "$backup" "$LIVE"
+		apply >/dev/null || log "rollback also failed — caddy needs manual attention" >&2
+	fi
+	exit 1
+fi
+
+log "installed + $how${backup:+ (backup: $backup)}"
