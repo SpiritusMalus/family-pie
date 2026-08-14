@@ -1,41 +1,66 @@
-# family-pie.ru — production Caddy config (deployed 2026-06-22).
+# family-pie.ru — production Caddy config.
 # =============================================================================
-# Static studio landing + central public legal host, ADDITIVE to the existing
-# VPS (103.246.144.198, NL; Caddy v2.11.4). The previous /etc/caddy/Caddyfile is
-# backed up on the server (Caddyfile.bak.<ts>) before each change.
+# ⚠️ THIS FILE IS INSTALLED ONTO THE SERVER by .github/workflows/deploy.yml.
+# It must therefore describe production EXACTLY — every host, including the ones
+# this repository knows nothing about.
 #
-#   - food-proxy port = 8787 (healthroutine-food.service, node) — unchanged
-#   - studio web-root = /var/www/family-pie/site (this repo's site/)
-#   - apex /            -> studio landing (was a 200 text fallback)
-#   - /<app>/legal|terms|privacy -> built legal pages under site/<app>/
-#   - apex /privacy /terms -> back-compat alias to the driftora pages
-#   - /health_routine/* -> 301 to /driftora/* (HealthRoutine→Driftora rebrand;
-#     old links must never 404 during the transition)
+# It did not, between 2026-06-22 and 2026-08-13. The site deploy had been broken
+# since June (see the deploy workflow), so nobody noticed that /etc/caddy grew a
+# global options block and a whole extra host while this file stood still.
+# Shipping the old copy would have dropped relo.family-pie.ru and put Caddy back
+# on :443 — where it is not supposed to be — taking every site down. Reconstructed
+# from the live config on 2026-08-13.
+#
+# BEFORE EDITING: diff against production, because the wrapper installs whatever
+# is here.
+#     ssh <box> "cat /etc/caddy/Caddyfile" > /tmp/live && diff /tmp/live Caddyfile
 # =============================================================================
 
-# HealthRoutine food proxy — separate service (node, systemd). Unchanged.
-food.family-pie.ru {
-	reverse_proxy 127.0.0.1:8787
-	encode gzip
+{
+	admin off
+	# Caddy is NOT the edge here: something else owns :443 and forwards inward,
+	# so TLS is terminated on 9443 and Caddy must not invent its own redirects.
+	# Removing these three lines makes Caddy grab :443, collide, and take the box
+	# offline — this is the single most dangerous block in the file.
+	http_port 80
+	https_port 9443
+	auto_https disable_redirects
 }
 
+# Studio landing + the central public legal host (built from content/ by
+# tools/build-legal.mjs into site/).
 family-pie.ru {
 	encode zstd gzip
 	root * /var/www/family-pie/site
 
 	header {
-		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"
+
+		# Pages must be revalidated, never served from cache on faith. Without an
+		# explicit Cache-Control a browser invents one from Last-Modified (the usual
+		# heuristic is ~10% of the document's age), so a page stable for weeks gets
+		# cached for days — and a deploy becomes invisible to exactly the people who
+		# have been here before, while nothing in the logs looks wrong. It cost us a
+		# "where is the button?" about a button that had been live for twenty minutes.
+		# `no-cache` still STORES the copy; the ETag turns the check into a bodiless
+		# 304.
+		#
+		# Applied to EVERYTHING here, not just *.html, and that is deliberate: the
+		# site serves clean URLs (/driftora/subscription, /driftora/terms) that are
+		# rewritten to .html only AFTER matching, so a `path *.html` matcher covers
+		# the landing and misses every page that matters. Nothing on this host is
+		# content-hashed, so there is nothing that wants a long cache anyway.
+		Cache-Control "no-cache"
 	}
 
 	# Rebrand HealthRoutine→Driftora: the legal host path moved
 	# /health_routine/* -> /driftora/*. Permanent (301), path- and query-preserving
-	# redirect so every old deep link keeps resolving. Drop once nothing links the
-	# legacy path. The inner `route` keeps directive order (rewrite-before-redir);
-	# `uri replace` swaps just the prefix so the new path lands in {uri} (carrying
-	# the query), and `redir {uri}` is placeholder-led so Caddy doesn't read the
-	# target as a path matcher.
+	# so every old deep link keeps resolving. The inner `route` keeps directive
+	# order (rewrite-before-redir); `uri replace` swaps just the prefix so the new
+	# path lands in {uri} carrying the query, and `redir {uri}` is placeholder-led
+	# so Caddy does not read the target as a path matcher.
 	@hr_legacy path /health_routine/*
 	handle @hr_legacy {
 		route {
@@ -45,8 +70,7 @@ family-pie.ru {
 	}
 
 	# Back-compat: the HealthRoutine app historically linked the apex /privacy and
-	# /terms. Serve the driftora pages at those URLs so existing in-app links keep
-	# working. Drop this once the app links point at /driftora/{privacy,terms}.
+	# /terms. Serve the driftora pages there so existing in-app links keep working.
 	@hr_privacy path /privacy
 	handle @hr_privacy {
 		rewrite * /driftora/privacy.html
@@ -58,9 +82,34 @@ family-pie.ru {
 		file_server
 	}
 
-	# Clean URLs: /<app>/legal|terms|privacy -> <app>/<doc>.html ; apex -> landing.
+	# Clean URLs: /<app>/legal|terms|privacy -> <app>/<doc>.html, and a directory
+	# such as /driftora/subscription/ -> its index.html. Apex falls back to the
+	# landing.
 	handle {
 		try_files {path} {path}/ {path}.html /index.html
 		file_server
 	}
+}
+
+# Driftora food-parse service (node, systemd: healthroutine-food.service).
+# Also serves /billing/* — payments, licence keys and the app's return page.
+food.family-pie.ru {
+	reverse_proxy 127.0.0.1:8787
+	encode gzip
+}
+
+# Relo Dojo backend. NOT built from this repository — it is here because this
+# file is the whole server config, and omitting it deletes the host.
+relo.family-pie.ru {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		-Server
+	}
+	reverse_proxy 127.0.0.1:8010
 }
