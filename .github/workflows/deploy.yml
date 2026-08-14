@@ -89,6 +89,8 @@ jobs:
             'https://family-pie.ru/driftora/privacy' \
             'https://family-pie.ru/privacy' \
             'https://family-pie.ru/terms' \
+            'https://family-pie.ru/driftora/subscription/' \
+            'https://family-pie.ru/driftora/subscription/done' \
             'https://family-pie.ru/relo_dojo/checkout/' \
             'https://family-pie.ru/relo_dojo/terms' \
             'https://food.family-pie.ru/health'; do
@@ -102,4 +104,11 @@ jobs:
             c=$(raw "$url"); echo "$c  (redirect) $url"; test "$c" = 301
           done
 
-          echo 'smoke OK — driftora 200, legacy 301, apex aliases 200, food 200'
+          # The purchase page is the one page where being down costs money, and the
+          # one whose price block depends on the food service answering. A 200 here
+          # is not proof it can sell — that needs /billing/plans — so check both.
+          plans=$(curl -s --max-time 15 https://food.family-pie.ru/billing/plans)
+          echo "$plans" | grep -q '"plans"' || { echo "billing/plans did not answer with plans: $plans"; exit 1; }
+          echo "  plans OK  $(echo "$plans" | head -c 80)"
+
+          echo 'smoke OK — driftora 200, subscription 200, legacy 301, apex aliases 200, food 200'
