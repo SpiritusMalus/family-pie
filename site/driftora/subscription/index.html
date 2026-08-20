@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Подписка · Driftora</title>
-<meta name="description" content="Подписка Driftora снимает дневной лимит на разбор еды с помощью ИИ. Всё остальное в приложении бесплатно." />
+<meta name="description" content="Бесплатно — 30 ИИ-разборов еды на устройство, один раз. Подписка Driftora даёт 30 разборов в сутки. Всё остальное в приложении бесплатно." />
 
 <!--
   Страница подписки Driftora. Здесь ПОКУПАЮТ — единственное место в вебе, где это
@@ -141,7 +141,7 @@
 <header class="hero wrap">
   <div class="eyebrow" data-i18n="eyebrow">Driftora · подписка</div>
   <h1 data-i18n="title">Платите только за ИИ-разборы</h1>
-  <p class="lede" data-i18n="lede">Подписка снимает дневной лимит на разбор еды с помощью ИИ — фото, голосом и текстом. Дневник, вес, настроение и ручной ввод остаются бесплатными всегда.</p>
+  <p class="lede" data-i18n="lede">Бесплатно даётся 30 ИИ-разборов еды на устройство — один раз, они не обновляются. Подписка даёт 30 разборов в сутки, каждый день. Дневник, вес, настроение и ручной ввод остаются бесплатными всегда.</p>
 </header>
 
 <section class="sec wrap">
@@ -185,21 +185,23 @@
   <div class="cols">
     <div class="col">
       <h2 data-i18n="paidTitle">Что даёт подписка</h2>
-      <p data-i18n="paidLede">Ровно одно: больше разборов в день. Это единственное, что стоит нам денег.</p>
+      <p data-i18n="paidLede">Ровно одно: разборы каждый день, а не один раз. Это единственное, что стоит нам денег.</p>
       <ul class="list" data-list="paid">
-        <li>Разбор еды по фото — без дневного потолка</li>
-        <li>Голосовые заметки о еде</li>
-        <li>Разбор текстом и разбор этикеток</li>
+        <!-- Цифры дублируют .env сервера (AI_FREE_TOTAL, AI_PER_INSTALL_PER_DAY_PAID).
+             Меняете лимит там — меняйте и здесь: страница статическая и сама не узнает. -->
+        <li>30 ИИ-разборов в сутки — фото, голос, текст, этикетки</li>
+        <li>Каждые сутки снова 30 — неизрасходованное не копится</li>
+        <li>Остаток видно в приложении: «Ещё» → «Подписка»</li>
         <li>Подписка работает на пяти устройствах</li>
       </ul>
     </div>
     <div class="col">
       <h2 data-i18n="freeTitle">Что бесплатно навсегда</h2>
-      <p data-i18n="freeLede">Всё, что считается на самом телефоне. Оно не стоит нам ничего — значит, и вам тоже.</p>
+      <p data-i18n="freeLede">Всё, что считается на самом телефоне, — бесплатно всегда. ИИ-разборы даются на пробу: их считает не телефон, а внешняя нейросеть, и она стоит денег.</p>
       <ul class="list free" data-list="free">
         <li>Дневник мыслей, настроение, вес и шаги</li>
         <li>Ручной ввод еды и встроенная база продуктов</li>
-        <li>Несколько ИИ-разборов в день, включая фото</li>
+        <li>30 ИИ-разборов на пробу — один раз, не в день</li>
         <li>Шифрование на устройстве и резервная копия</li>
       </ul>
     </div>
@@ -221,7 +223,7 @@
 <section class="legal">
   <div class="wrap">
     <div class="sec-label" data-i18n="secLegal">Условия</div>
-    <p data-i18n="legalService">Услуга: доступ к повышенному дневному лимиту ИИ-разборов еды в приложении Driftora на срок, указанный в выбранном тарифе.</p>
+    <p data-i18n="legalService">Услуга: доступ к суточному лимиту в 30 ИИ-разборов еды в приложении Driftora на срок, указанный в выбранном тарифе. Без подписки приложение даёт 30 таких разборов на устройство однократно; всё остальное в приложении бесплатно и без подписки.</p>
     <p data-i18n="legalDelivery">Услуга цифровая, доставки нет. Лицензионный ключ выдаётся сразу после оплаты на этом сайте; доступ начинается в момент активации ключа в приложении и действует оплаченный срок.</p>
     <p data-i18n="legalRefund">Возврат: если услуга не заработала или вы передумали — напишите на support@family-pie.ru, вернём деньги за неиспользованный срок на тот же платёжный инструмент в течение 10 рабочих дней.</p>
     <p data-i18n="legalSeller">Продавец: ИП Тихоненко Евгений Юрьевич, ОГРНИП 326508100294665, ИНН 504414138460. Связь: support@family-pie.ru</p>
@@ -247,7 +249,7 @@ var API = 'https://food.family-pie.ru';
 var EN = {
   eyebrow:'Driftora · subscription',
   title:'You only pay for AI parsing',
-  lede:'The subscription lifts the daily cap on parsing food with AI — by photo, voice and text. The journal, weight, mood and manual entry stay free forever.',
+  lede:'You get 30 AI food parses per device for free — once, and they do not refill. The subscription gives you 30 parses a day, every day. The journal, weight, mood and manual entry stay free forever.',
   secPlans:'Plan',
   month:'Monthly', year:'Yearly',
   emailLabel:'Email for the receipt',
@@ -258,12 +260,12 @@ var EN = {
   recoverBtn:'Show the key',
   secWhat:'What you get',
   paidTitle:'What the subscription buys',
-  paidLede:'Exactly one thing: more parses a day. It is the only part that costs us money.',
+  paidLede:'Exactly one thing: parses every day instead of a one-off allowance. It is the only part that costs us money.',
   freeTitle:'Free forever',
-  freeLede:'Everything computed on the phone itself. It costs us nothing, so it costs you nothing.',
+  freeLede:'Everything computed on the phone itself is free forever. The AI parses are a trial: they are computed by an outside neural network, not by your phone, and that costs money.',
   secFaq:'Questions',
   secLegal:'Terms',
-  legalService:'Service: access to a raised daily cap on AI food parsing in the Driftora app, for the period stated in the chosen plan.',
+  legalService:'Service: access to a daily cap of 30 AI food parses in the Driftora app, for the period stated in the chosen plan. Without a subscription the app gives 30 such parses per device, once; everything else in the app is free and needs no subscription.',
   legalDelivery:'The service is digital; no delivery is involved. The licence key is issued on this site right after payment; access starts when the key is activated in the app and lasts for the paid period.',
   legalRefund:'Refunds: if the service did not work or you changed your mind, write to support@family-pie.ru — we refund the unused portion to the same payment instrument within 10 business days.',
   legalSeller:'Seller: Individual entrepreneur Evgeny Yu. Tikhonenko, OGRNIP 326508100294665, INN 504414138460. Contact: support@family-pie.ru',
@@ -271,8 +273,8 @@ var EN = {
 };
 
 var EN_LISTS = {
-  paid:['Food photos parsed — no daily ceiling','Voice notes about meals','Text parsing and package labels','Works on five devices'],
-  free:['Thought journal, mood, weight and steps','Manual entry and the built-in food database','A few AI parses a day, photos included','On-device encryption and backup'],
+  paid:['30 AI parses a day — photo, voice, text, labels','A full 30 again every day; unused ones do not stack','The balance is visible in the app: More → Subscription','Works on five devices'],
+  free:['Thought journal, mood, weight and steps','Manual entry and the built-in food database','30 AI parses to try — once, not per day','On-device encryption and backup'],
   faq:[
     ['Will I be charged again?','No. Nothing auto-renews: the subscription simply ends, and extending it means paying again. There is nothing to cancel.'],
     ['How does it reach the app?','Right after payment you get a licence key. Open "More" → "Settings" → "Subscription", paste the key and tap Activate. You can also pay inside the app without leaving it.'],

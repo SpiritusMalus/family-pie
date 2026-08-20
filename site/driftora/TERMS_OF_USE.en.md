@@ -47,12 +47,13 @@ example, faces, documents, bystanders in the frame, or other people's speech).
 
 ## 6. Subscription and payment
 
-The App is free. Only one feature is paid — lifting the daily cap on AI food parsing
-(photo, voice, text). The journal, mood, weight, steps, manual entry and the built-in
-food database are available at no cost and with no time limit.
+The App is free. Only one feature is paid — the cap on AI food parsing (photo, voice,
+text): free of charge you get a limited number of parses per device, and with a
+subscription a daily cap that refills every day. The journal, mood, weight, steps, manual
+entry and the built-in food database are available at no cost and with no time limit.
 
-**What you buy.** Access to a raised daily cap on AI parses for the period stated in the
-plan (a month or a year). The service is digital; no delivery is required.
+**What you buy.** Access to a daily cap on AI parses for the period stated in the plan
+(a month or a year). The service is digital; no delivery is required.
 
 **How it works.** After payment you receive a licence key. The service is considered
 rendered from the moment the key is activated in the App; access lasts until the paid
