@@ -38,6 +38,28 @@ family-pie.ru {
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"
 
+		# The purchase page lives on this host, so a missing frame guard is not
+		# theoretical: framed by someone else's page, its buttons can be clicked
+		# through. `frame-ancestors 'none'` is the modern control and X-Frame-Options
+		# the fallback for anything that predates it — both, because the cost is two
+		# lines and the failure is silent.
+		#
+		# The CSP fits what these pages actually are: static HTML with inline <style>
+		# and one inline <script> (the subscription pages call /billing/*), so
+		# 'unsafe-inline' is required for style-src and script-src until those move to
+		# files. connect-src names the API host that script calls; everything else is
+		# denied by the default-src 'self' floor. No frames, no objects, no <base>
+		# takeover, and forms cannot post anywhere (these pages carry no <form>).
+		#
+		# fonts.googleapis.com / fonts.gstatic.com are NOT optional decoration: every
+		# page here <link>s the Space Grotesk / Space Mono / Manrope stylesheet, and a
+		# CSP without them serves the whole site in fallback type. The stylesheet is a
+		# style-src; the font files it then pulls are a font-src — both are needed, and
+		# omitting either breaks it silently in the browser rather than loudly here.
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://food.family-pie.ru; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
+		X-Frame-Options "DENY"
+		Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
 		# Pages must be revalidated, never served from cache on faith. Without an
 		# explicit Cache-Control a browser invents one from Last-Modified (the usual
 		# heuristic is ~10% of the document's age), so a page stable for weeks gets
@@ -94,6 +116,25 @@ family-pie.ru {
 # Driftora food-parse service (node, systemd: healthroutine-food.service).
 # Also serves /billing/* — payments, licence keys and the app's return page.
 food.family-pie.ru {
+	# NOTE: production has never carried the /test-billing/* route that used to
+	# stand here — it was removed from the live config once the real shop was
+	# verified, but survived in this file. Deploying it back would republish the
+	# TEST-shop instance on :8799 (payments that take no money) on a live host.
+	# It is deleted rather than commented out so it cannot be revived by accident.
+
+	# The API answers a native app, not a browser: nothing here should ever be
+	# framed, sniffed, or reached as a document. `-Server`/`-X-Powered-By` stop
+	# the stack from naming itself and its version to a scanner.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
+		X-Frame-Options "DENY"
+		-Server
+		-X-Powered-By
+	}
+
 	reverse_proxy 127.0.0.1:8787
 	encode gzip
 }
