@@ -21,14 +21,29 @@ on:
       - 'Caddyfile'
       - 'tools/vps/fp-deploy-caddy.sh'
       - '.github/workflows/deploy.yml'
+  pull_request:
   workflow_dispatch: {}
 
 concurrency:
   group: deploy-prod
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check tools/build-legal.mjs && node tools/build-legal.mjs
+      - run: test -s site/index.html
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,6 +56,11 @@ jobs:
 
       - name: Build legal pages from content/
         run: node tools/build-legal.mjs
+
+      - name: Stamp deployed revision
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: node -e 'require("fs").writeFileSync("site/release.json",JSON.stringify({revision:process.env.RELEASE_SHA})+"\n")'
 
       - name: Deploy site/ to VPS (rsync over SSH, exact mirror)
         uses: easingthemes/ssh-deploy@v6.0.3
@@ -75,8 +95,13 @@ jobs:
           ssh $SSH_OPTS "$DEPLOY_USER@$DEPLOY_HOST" 'sudo -n /usr/local/bin/fp-deploy-caddy'
 
       - name: Smoke-check live routes
+        env:
+          RELEASE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          # Prove this revision reached the public origin, not merely that an old page is healthy.
+          curl --fail --silent --show-error --max-time 15 "https://family-pie.ru/release.json?revision=$RELEASE_SHA" > /tmp/family-release.json
+          node -e 'const r=require("/tmp/family-release.json");if(r.revision!==process.env.RELEASE_SHA)process.exit(1)'
           # final status after following redirects (expects 200)
           code() { curl -s -o /dev/null -w '%{http_code}' -L --max-time 15 "$1"; }
           # raw status without following (to assert a redirect)
