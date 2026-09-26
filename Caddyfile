@@ -155,5 +155,68 @@ relo.family-pie.ru {
 	reverse_proxy 127.0.0.1:8010
 }
 
-# Host-owned sites (for example the project hub) survive application deploys.
+# ---------------------------------------------------------------------------
+# grammardojo.ru — демо-стенд сайта кадастрового инженера (боевой: mkadastr.ru).
+# Стоит в этом файле по той же причине, что и relo.family-pie.ru: ЭТОТ ФАЙЛ —
+# ВЕСЬ КОНФИГ СЕРВЕРА, и хост, которого здесь нет, при следующем деплое исчезает.
+#
+# Домен обязан стоять ещё и в SNI-карте /etc/nginx/nginx.conf: без неё :443
+# уводит это имя в xray, и сайт не открывается вообще.
+# Сертификат берётся через tls-alpn-01 — то есть через тот же :443 и ту же
+# карту. Порт 80 здесь занят acme.sh под sub.family-pie.ru и не трогается.
+# ---------------------------------------------------------------------------
+grammardojo.ru, www.grammardojo.ru {
+	encode zstd gzip
+	root * /var/www/grammardojo
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+		# Демо в поиск не пускаем: боевой сайт живёт на другом домене, и две
+		# одинаковые копии в индексе бьют по нему же. Дублирует <meta robots>
+		# в разметке — заголовок действует и на то, что метатега не имеет.
+		X-Robots-Tag "noindex, nofollow"
+
+		# Ни одна страница и ни один файл стилей здесь не содержит хеша в
+		# имени, поэтому браузер обязан каждый раз переспрашивать, не
+		# изменились ли они. Без Cache-Control он придумывает срок годности
+		# сам — обычная эвристика около 10% от возраста файла — и после
+		# выкатки человек продолжает видеть старую вёрстку, причём в логах
+		# сервера всё выглядит нормально: запросов просто нет.
+		#
+		# `no-cache` не запрещает хранить копию — он требует переспросить.
+		# Вместе с ETag ответ превращается в пустой 304, трафик почти не растёт.
+		Cache-Control "no-cache"
+
+		# script-src без 'unsafe-inline': на страницах нет ни одного инлайнового
+		# <script>, весь код в js/main.js. А вот style-src с 'unsafe-inline'
+		# обязателен — в разметке 92 инлайновых style=, снятых с макета.
+		# frame-src нужен под виджет Яндекс.Карт в секции контактов; без него
+		# карта молча остаётся белым прямоугольником.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src https://yandex.ru https://*.yandex.ru https://yandex.com https://*.yandex.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'"
+		-Server
+	}
+
+	# Приём заявок. Сервис слушает только петлю (127.0.0.1:8791), наружу он
+	# виден исключительно по этому пути и ничем больше.
+	handle /api/zayavka* {
+		reverse_proxy 127.0.0.1:8791
+	}
+
+	handle {
+		try_files {path} {path}/ {path}.html
+		file_server
+	}
+
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}
+
+# Host-owned sites survive application deploys.
 import /etc/caddy/local-sites/*.caddy
