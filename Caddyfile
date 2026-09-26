@@ -154,3 +154,6 @@ relo.family-pie.ru {
 	}
 	reverse_proxy 127.0.0.1:8010
 }
+
+# Host-owned sites (for example the project hub) survive application deploys.
+import /etc/caddy/local-sites/*.caddy
