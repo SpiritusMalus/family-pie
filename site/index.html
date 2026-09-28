@@ -167,7 +167,7 @@
 
 <!-- PRODUCTS -->
 <main id="products" class="products wrap">
-  <div class="sec-label reveal"><span data-i18n="products">Продукты</span> · <span id="sec-count">02</span></div>
+  <div class="sec-label reveal"><span data-i18n="products">Продукты</span> · <span id="sec-count">03</span></div>
   <div id="product-list"><!-- product rows generated from CATALOG (mirror of data/products.json) --></div>
   <!-- No-JS / crawler fallback: real product content. Mirrors CATALOG below + the JS-rendered rows (keep in sync); the JS render replaces #product-list when enabled. Links match <id>/terms · <id>/privacy. -->
   <noscript>
@@ -181,6 +181,7 @@
       <p class="ns-tag">Забота о себе каждый день · Everyday self-care</p>
       <p class="ns-legal"><a href="/driftora/subscription">Подписка / Subscription</a> · <a href="/driftora/terms">Оферта / Terms</a> · <a href="/driftora/privacy">Конфиденциальность / Privacy</a></p>
     </section>
+    <section class="ns-row"><h2 class="ns-name">Lumen + REST</h2><p class="ns-tag">Мягкий свет и перерывы / Soft light and breaks</p><a href="/rest_lumen/">Скачать / Download</a></section>
   </noscript>
   <div class="roadmap reveal"><span class="dot"></span><span data-i18n="roadmap">Здесь появятся новые продукты</span></div>
 </main>
@@ -204,32 +205,153 @@
    a product = adding one record below (+ its legal markdown in content/).
    ============================================================================ */
 var CATALOG = {
-  ui: {
-    ru: { products:'Продукты', studioEyebrow:'Студия приложений',
-      studioTag:'Спокойные приложения для повседневной жизни.',
-      studioIntro:'Небольшая независимая студия. Делаем приватные, неспешные приложения, которыми пользуешься каждый день — без рекламы и лишнего шума.',
-      soon:'Скоро', download:'Где будет', terms:'Оферта', privacy:'Конфиденциальность', subscribe:'Подписка',
-      roadmap:'Здесь появятся новые продукты', open:'открыть +', close:'— свернуть' },
-    en: { products:'Products', studioEyebrow:'App studio',
-      studioTag:'Calm apps for everyday life.',
-      studioIntro:'A small independent studio. We make private, unhurried apps you reach for every day — no ads, no noise.',
-      soon:'Soon', download:'Where to get it', terms:'Terms', privacy:'Privacy', subscribe:'Subscription',
-      roadmap:'More products land here', open:'open +', close:'— close' }
+  "ui": {
+    "ru": {
+      "products": "Продукты",
+      "studioEyebrow": "Студия приложений",
+      "studioTag": "Спокойные приложения для повседневной жизни.",
+      "studioIntro": "Небольшая независимая студия. Делаем приватные, неспешные приложения, которыми пользуешься каждый день — без рекламы и лишнего шума.",
+      "soon": "Скоро",
+      "download": "Где будет",
+      "terms": "Оферта",
+      "privacy": "Конфиденциальность",
+      "roadmap": "Здесь появятся новые продукты",
+      "open": "открыть +",
+      "close": "— свернуть",
+      "subscribe": "Подписка",
+      "appDownload": "Скачать приложение"
+    },
+    "en": {
+      "products": "Products",
+      "studioEyebrow": "App studio",
+      "studioTag": "Calm apps for everyday life.",
+      "studioIntro": "A small independent studio. We make private, unhurried apps you reach for every day — no ads, no noise.",
+      "soon": "Soon",
+      "download": "Where to get it",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "roadmap": "More products land here",
+      "open": "open +",
+      "close": "— close",
+      "subscribe": "Subscription",
+      "appDownload": "Download app"
+    }
   },
-  products: [
-    { id:'relo_dojo', order:1, name:'Relo Dojo', iconId:'dojo', accent:'#0E8A30', accentText:'#0B6E26', badgeBg:'#e9f5ec', chipLead:'XP',
-      tag:{ ru:'Английский для IT-релокации', en:'English for IT relocation' },
-      features:{ ru:['стрики','пояса','5 минут в день'], en:['streaks','belts','5 min a day'] },
-      desc:{ ru:'Геймифицированная практика английского для айтишников, которые переезжают за рубеж: пять честных минут в день, упражнения под вашу роль и цели, XP, стрики и пояса от белого до чёрного. Подготовка к интервью, жизнь после переезда и английский на работе.',
-        en:'Gamified English for developers moving abroad: five honest minutes a day, exercises built from your own role and goals, XP, streaks and belts from white to black. Interview prep, life after the move, and everyday workplace English.' },
-      stores:{ appStore:{ status:'soon', url:null }, googlePlay:{ status:'soon', url:null } } },
-    { id:'driftora', order:2, name:'Driftora', iconId:'heart', accent:'#D8513A', accentText:'#B8442E', badgeBg:'#fbeae5',
-      tag:{ ru:'Забота о себе каждый день', en:'Everyday self-care' },
-      features:{ ru:['без рекламы','E2E-шифрование','без регистрации'], en:['no ads','E2E encryption','no signup'] },
-      desc:{ ru:'Спокойный дневник самочувствия: настроение и мысли по методу КПТ, вес, шаги и питание. Без рекламы и регистрации — данные шифруются сквозным шифрованием и остаются на вашем устройстве.',
-        en:'A calm self-care journal: mood and thoughts (CBT), weight, steps and meals. No ads, no signup — your data is end-to-end encrypted and stays on your device.' },
-      subscribeUrl:'/driftora/subscription',
-      stores:{ appStore:{ status:'soon', url:null }, googlePlay:{ status:'soon', url:null } } }
+  "products": [
+    {
+      "id": "relo_dojo",
+      "order": 1,
+      "name": "Relo Dojo",
+      "iconId": "dojo",
+      "accent": "#0E8A30",
+      "accentText": "#0B6E26",
+      "badgeBg": "#e9f5ec",
+      "chipLead": "XP",
+      "tag": {
+        "ru": "Английский для IT-релокации",
+        "en": "English for IT relocation"
+      },
+      "features": {
+        "ru": [
+          "стрики",
+          "пояса",
+          "5 минут в день"
+        ],
+        "en": [
+          "streaks",
+          "belts",
+          "5 min a day"
+        ]
+      },
+      "desc": {
+        "ru": "Геймифицированная практика английского для айтишников, которые переезжают за рубеж: пять честных минут в день, упражнения под вашу роль и цели, XP, стрики и пояса от белого до чёрного. Подготовка к интервью, жизнь после переезда и английский на работе.",
+        "en": "Gamified English for developers moving abroad: five honest minutes a day, exercises built from your own role and goals, XP, streaks and belts from white to black. Interview prep, life after the move, and everyday workplace English."
+      },
+      "stores": {
+        "appStore": {
+          "status": "soon",
+          "url": null
+        },
+        "googlePlay": {
+          "status": "soon",
+          "url": null
+        }
+      },
+      "legal": true
+    },
+    {
+      "id": "driftora",
+      "order": 2,
+      "name": "Driftora",
+      "iconId": "heart",
+      "accent": "#D8513A",
+      "accentText": "#B8442E",
+      "badgeBg": "#fbeae5",
+      "tag": {
+        "ru": "Забота о себе каждый день",
+        "en": "Everyday self-care"
+      },
+      "features": {
+        "ru": [
+          "без рекламы",
+          "E2E-шифрование",
+          "без регистрации"
+        ],
+        "en": [
+          "no ads",
+          "E2E encryption",
+          "no signup"
+        ]
+      },
+      "desc": {
+        "ru": "Спокойный дневник самочувствия: настроение и мысли по методу КПТ, вес, шаги и питание. Без рекламы и регистрации — данные шифруются сквозным шифрованием и остаются на вашем устройстве.",
+        "en": "A calm self-care journal: mood and thoughts (CBT), weight, steps and meals. No ads, no signup — your data is end-to-end encrypted and stays on your device."
+      },
+      "stores": {
+        "appStore": {
+          "status": "soon",
+          "url": null
+        },
+        "googlePlay": {
+          "status": "soon",
+          "url": null
+        }
+      },
+      "subscribeUrl": "/driftora/subscription",
+      "legal": true
+    },
+    {
+      "id": "rest_lumen",
+      "order": 3,
+      "name": "Lumen + REST",
+      "iconId": "heart",
+      "accent": "#405d49",
+      "accentText": "#405d49",
+      "badgeBg": "#e7ede1",
+      "tag": {
+        "ru": "Мягкий свет и время для паузы",
+        "en": "Soft light and time for a break"
+      },
+      "features": {
+        "ru": [
+          "macOS",
+          "Windows",
+          "Linux"
+        ],
+        "en": [
+          "macOS",
+          "Windows",
+          "Linux"
+        ]
+      },
+      "desc": {
+        "ru": "Настрой яркость и теплоту экрана, работай в своём ритме и делай перерывы. Настольное приложение с локальными настройками и без аккаунта.",
+        "en": "Adjust screen brightness and warmth, work at your own pace and take breaks. A desktop app with local settings and no account."
+      },
+      "landingUrl": "/rest_lumen/",
+      "image": "/rest_lumen/assets/lamp.png",
+      "legal": false
+    }
   ]
 };
 /* store-toast copy stays a JS template (not a plain string) so it lives here, not in the data file */
@@ -270,17 +392,17 @@ function rowHTML(p, idx){
   return '<section class="row reveal" data-product="'+p.id+'" data-idx="'+idx+'">'+
     '<button class="row-btn" aria-expanded="false">'+
       '<span class="row-num" style="color:'+p.accentText+'">'+pad2(p.order)+'</span>'+
-      '<span class="row-ico" style="background:'+p.accent+'"><svg width="24" height="24" viewBox="0 0 48 48"><use href="#ico-'+p.iconId+'"></use></svg></span>'+
+      '<span class="row-ico" style="background:'+p.accent+'">'+(p.image ? '<img src="'+p.image+'" width="40" height="40" alt="">' : '<svg width="24" height="24" viewBox="0 0 48 48"><use href="#ico-'+p.iconId+'"></use></svg>')+'</span>'+
       '<span style="flex:1"><span class="row-name">'+esc(p.name)+'</span><span class="row-tag" data-field="tag"></span></span>'+
       '<span class="row-toggle" data-toggle></span>'+
     '</button>'+
     '<div class="panel"><div class="panel-clip"><div class="panel-in">'+
       '<div class="panel-text"><p class="panel-desc" data-field="desc"></p><div class="chips" data-field="chips"></div></div>'+
       '<div class="panel-side">'+
-        '<div class="side-label" data-i18n="download"></div>'+
-        '<div class="stores">'+storeHTML(p,'App Store',p.stores.appStore)+storeHTML(p,'Google Play',p.stores.googlePlay)+'</div>'+
+        (p.landingUrl ? '' : '<div class="side-label" data-i18n="download"></div>')+
+        (p.landingUrl ? '<a class="subscribe-btn" style="background:'+p.accent+'" href="'+p.landingUrl+'" data-i18n="appDownload"></a>' : '<div class="stores">'+storeHTML(p,'App Store',p.stores.appStore)+storeHTML(p,'Google Play',p.stores.googlePlay)+'</div>')+
         (p.subscribeUrl?'<a class="subscribe-btn" style="background:'+p.accent+'" href="'+p.subscribeUrl+'" data-i18n="subscribe"></a>':'')+
-        '<div class="legal-links"><a href="/'+p.id+'/terms" data-i18n="terms"></a><a href="/'+p.id+'/privacy" data-i18n="privacy"></a></div>'+
+        (p.legal ? '<div class="legal-links"><a href="/'+p.id+'/terms" data-i18n="terms"></a><a href="/'+p.id+'/privacy" data-i18n="privacy"></a></div>' : '')+
       '</div>'+
     '</div></div></div>'+
   '</section>';

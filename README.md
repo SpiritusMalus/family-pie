@@ -20,6 +20,10 @@ Caddyfile             production routing (VPS 103.246.144.198) — auto-deployed
 tools/vps/            CI Caddyfile-deploy wrapper + one-time VPS setup (see tools/vps/README.md)
 ```
 
+## Lumen + REST
+
+`/rest_lumen/` is the desktop app download page. Native UI images are rendered from the actual 0.2.5 app views; the public Apple Silicon ZIP matches the verified private release hash. Intel, Windows and Linux links remain explicitly labeled 0.2.0 beta. App source stays private. Desktop-only catalog entries use `landingUrl` without invented legal documents; the builder skips legal generation when `legal` is absent and includes the landing URL in the sitemap.
+
 ## URLs
 
 - `https://family-pie.ru/` — studio landing
