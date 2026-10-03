@@ -64,7 +64,8 @@
   .sec-label{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:28px}
 
   .plans{display:flex;gap:20px;flex-wrap:wrap;align-items:stretch}
-  .plan{flex:1 1 260px;position:relative;display:block;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:26px;cursor:pointer;font-family:inherit;color:inherit;transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+  .plan{flex:1 1 210px;position:relative;display:block;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:26px;cursor:pointer;font-family:inherit;color:inherit;transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+  .plan[hidden]{display:none}
   .plan:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(27,26,23,.06)}
   .plan[aria-checked="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   .plan-name{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px}
@@ -154,6 +155,16 @@
       <span class="plan-name" data-i18n="month">На месяц</span>
       <span class="plan-price" data-price="monthly">—</span>
       <span class="plan-per" data-per="monthly"></span>
+    </span>
+    <span class="plan" aria-checked="false" data-plan="quarterly">
+      <span class="plan-name" data-i18n="quarter">На 90 дней</span>
+      <span class="plan-price" data-price="quarterly">—</span>
+      <span class="plan-per" data-per="quarterly"></span>
+    </span>
+    <span class="plan" aria-checked="false" data-plan="semiannual">
+      <span class="plan-name" data-i18n="halfYear">На 180 дней</span>
+      <span class="plan-price" data-price="semiannual">—</span>
+      <span class="plan-per" data-per="semiannual"></span>
     </span>
     <span class="plan" aria-checked="false" data-plan="yearly">
       <span class="plan-name" data-i18n="year">На год</span>
@@ -251,7 +262,7 @@ var EN = {
   title:'You only pay for AI parsing',
   lede:'You get 30 AI food parses per device for free — once, and they do not refill. The subscription gives you 30 parses a day, every day. The journal, weight, mood and manual entry stay free forever.',
   secPlans:'Plan',
-  month:'Monthly', year:'Yearly',
+  month:'Monthly', quarter:'90 days', halfYear:'180 days', year:'Yearly',
   emailLabel:'Email for the receipt',
   ctaIdle:'Loading plans…',
   ctaNote:'Card payment via ЮKassa. Nothing auto-renews: a subscription is extended only by paying again, and no money is taken on its own.',
