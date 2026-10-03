@@ -45,10 +45,16 @@ h2 { margin: 0 0 25px; font-size: clamp(29px, 3.3vw, 39px); font-weight: 600; li
 .section-body p { margin: 0 0 18px; font-size: 17px; }
 .section-body p:last-child { margin-bottom: 0; }
 .section-body h3 { margin: 44px 0 12px; font-size: 19px; font-weight: 650; letter-spacing: -.025em; }
+.platform-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin: 30px 0 25px; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.platform-list li { display: flex; align-items: center; min-height: 57px; gap: 14px; border-bottom: 1px solid var(--line); font-size: 15px; font-weight: 550; }
+.platform-list img { flex: none; width: 27px; height: 27px; object-fit: contain; opacity: .82; }
+.platform-list img[src$="/zoom.svg"] { transform: scale(1.35); }
+.platform-list .platform-text { padding-left: 41px; }
 .setup-steps { margin: 25px 0 30px; padding-left: 23px; }
 .setup-steps li { padding-left: 9px; margin-bottom: 10px; font-size: 16px; }
 .setup-steps li::marker { color: var(--muted); }
 .section-body .note { padding-left: 17px; border-left: 2px solid #a6b6a0; color: var(--muted); font-size: 14px; }
+.text-link { font-size: 15px; font-weight: 600; }
 .contact { display: inline-block; margin-top: 9px; padding: 12px 19px; background: var(--ink); color: var(--paper); border-radius: 5px; font-size: 14px; font-weight: 600; text-decoration: none; }
 .contact:hover { background: #3a3832; }
 .access-row { padding-bottom: 110px; }
@@ -81,6 +87,10 @@ h2 { margin: 0 0 25px; font-size: clamp(29px, 3.3vw, 39px); font-weight: 600; li
   .lead { font-size: 17px; }
   .section-body p { font-size: 16px; }
   .section-body .note { font-size: 14px; }
+  .platform-list { gap: 0 14px; }
+  .platform-list li { gap: 9px; font-size: 13px; }
+  .platform-list img { width: 23px; height: 23px; }
+  .platform-list .platform-text { padding-left: 32px; }
   .footer-inner { flex-wrap: wrap; gap: 8px 20px; padding-block: 23px; }
   .footer-inner a:last-child { width: 100%; margin-left: 0; }
 }

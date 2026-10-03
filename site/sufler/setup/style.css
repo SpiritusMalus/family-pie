@@ -1,0 +1,26 @@
+.guide-intro { max-width: 760px; padding-block: 92px 58px; }
+.guide-intro h1 { margin-bottom: 25px; }
+.guide-status { max-width: 650px; margin: 24px 0 0; padding-left: 17px; border-left: 2px solid #a6b6a0; color: var(--muted); font-size: 15px; }
+.guide-index { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 24px; padding-block: 8px 44px; }
+.guide-index a { padding: 11px 0; border-top: 1px solid var(--line); color: var(--ink); font-size: 14px; text-decoration: none; }
+.guide-index a:hover { color: var(--link); text-decoration: underline; }
+.guide .content-row { scroll-margin-top: 30px; }
+.guide .section-body h3:first-of-type { margin-top: 28px; }
+.setting-list { margin: 26px 0 30px; border-top: 1px solid var(--line); }
+.setting-list > div { display: grid; grid-template-columns: minmax(180px, .65fr) minmax(0, 1fr); gap: 24px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.setting-list dt { font-size: 15px; font-weight: 600; line-height: 1.5; }
+.setting-list dd { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.setting-list code, kbd { padding: 1px 4px; border: 1px solid var(--line); border-radius: 3px; background: #ece8df; font: 13px/1.5 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.shortcut-list > div { grid-template-columns: 180px minmax(0, 1fr); }
+.guide-last { padding-bottom: 105px; }
+
+@media (max-width: 760px) {
+  .guide-intro { padding-block: 67px 45px; }
+  .guide-index { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-bottom: 34px; }
+  .setting-list > div { grid-template-columns: 1fr; gap: 4px; }
+  .guide-last { padding-bottom: 75px; }
+}
+@media (max-width: 480px) {
+  .guide-index { gap: 0 15px; }
+  .guide-index a { font-size: 13px; }
+}
