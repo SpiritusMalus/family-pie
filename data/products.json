@@ -200,12 +200,12 @@
         "en": "Live prompts during a conversation"
       },
       "features": {
-        "ru": ["Windows", "30 минут пробы", "Ранний доступ"],
-        "en": ["Windows", "30-minute trial", "Early access"]
+        "ru": ["Windows", "30 минут пробы", "Запуск вручную"],
+        "en": ["Windows", "30-minute trial", "Manual start"]
       },
       "desc": {
-        "ru": "Оверлей показывает распознанный вопрос и краткий ответ поверх рабочих окон. Прослушивание включается вручную. Публичный установщик готовится; для речи нужен собственный аккаунт Deepgram.",
-        "en": "An overlay shows the recognized question and a short answer over your work windows. Listening starts only when you ask. A public installer is in preparation; speech recognition requires your own Deepgram account."
+        "ru": "Приложение для Windows показывает распознанную речь и ответы поверх других окон. Проба — 30 минут активной работы. Публичный выпуск готовится.",
+        "en": "The Windows app shows recognized speech and answers over other windows. The trial includes 30 minutes of active use. Public release is in preparation."
       }
     }
   ]
