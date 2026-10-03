@@ -424,6 +424,7 @@ const today = new Date().toISOString().slice(0, 10);
 const urls = [{ loc: 'https://family-pie.ru/', freq: 'monthly', pri: '1.0' }];
 for (const p of products) {
   if (p.landingUrl) urls.push({ loc: `https://family-pie.ru${p.landingUrl}`, freq: 'monthly', pri: '0.8' });
+  if (p.id === 'sufler') urls.push({ loc: 'https://family-pie.ru/sufler/setup/', freq: 'monthly', pri: '0.6' });
   if (!p.legal) continue;
   for (const e of ['legal', 'terms', 'privacy']) {
     urls.push({ loc: `https://family-pie.ru/${p.id}/${e}`, freq: 'yearly', pri: e === 'legal' ? '0.6' : '0.5' });

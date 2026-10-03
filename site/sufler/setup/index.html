@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f1ea">
+  <title>Настройка Sufler · family-pie</title>
+  <meta name="description" content="Пошаговая настройка Sufler для Windows: ключи Deepgram и OpenRouter, звук, ответы, защита окна, горячие клавиши и пробный доступ.">
+  <link rel="canonical" href="https://family-pie.ru/sufler/setup/">
+  <link rel="stylesheet" href="/sufler/style.css">
+  <link rel="stylesheet" href="/sufler/setup/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">К содержанию</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/sufler/" aria-label="Sufler — к странице приложения">family-pie <span>/ Sufler</span></a>
+      <nav aria-label="Навигация"><a href="/sufler/">О приложении</a><a href="#quick-start">Быстрый старт</a><a href="#troubleshooting">Если не работает</a></nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap guide">
+    <div class="guide-intro">
+      <p class="overline">Инструкция · Windows</p>
+      <h1>Настройка Sufler</h1>
+      <p class="lead">Откройте настройки кнопкой ⚙ в окне приложения. Ниже — что заполнить для первого разговора и что означают остальные параметры.</p>
+      <p class="guide-status">Публичной загрузки пока нет. Инструкция описывает текущую тестовую сборку; для неё нужны собственные ключи Deepgram и OpenRouter.</p>
+    </div>
+
+    <nav class="guide-index" aria-label="Разделы инструкции">
+      <a href="#quick-start">Быстрый старт</a><a href="#keys">Ключи</a><a href="#audio">Звук</a><a href="#models">Модели и ответы</a><a href="#window">Окно и защита</a><a href="#hotkeys">Горячие клавиши</a><a href="#access">Доступ</a><a href="#troubleshooting">Если не работает</a>
+    </nav>
+
+    <section class="content-row" id="quick-start" aria-labelledby="quick-start-title">
+      <p class="section-label">Сначала</p>
+      <div class="section-body">
+        <h2 id="quick-start-title">Первый запуск</h2>
+        <ol class="setup-steps">
+          <li>Откройте ⚙ и добавьте ключи в разделе «Ключи». Нажмите «Проверить ключи».</li>
+          <li>В разделе «Звук» выберите ваш микрофон и источник голоса собеседника.</li>
+          <li>Проверьте защиту окна и превью демонстрации экрана до звонка.</li>
+          <li>Вернитесь к основному окну и нажмите «начать». При запуске Sufler всегда на паузе.</li>
+        </ol>
+        <p class="note">Настройка и проверка ключей не расходуют 30 минут пробного доступа. Время идёт во время прослушивания или обработки ответа.</p>
+      </div>
+    </section>
+
+    <section class="content-row" id="keys" aria-labelledby="keys-title">
+      <p class="section-label">Ключи</p>
+      <div class="section-body">
+        <h2 id="keys-title">Подключите два сервиса</h2>
+        <h3>Deepgram · речь</h3>
+        <p>Создайте аккаунт в <a href="https://console.deepgram.com/" target="_blank" rel="noopener noreferrer">Deepgram Console</a>. В своём проекте откройте <strong>Settings → API Keys</strong>, создайте ключ и вставьте его в поле «Deepgram · речь». Deepgram получает звук и возвращает распознанный текст.</p>
+        <h3>OpenRouter · ответы</h3>
+        <p>Создайте ключ в <a href="https://openrouter.ai/settings/keys" target="_blank" rel="noopener noreferrer">OpenRouter</a> и вставьте его в поле «OpenRouter · ответы». Этот сервис получает распознанный текст для ответа и снимок экрана, только когда вы запускаете его разбор.</p>
+        <p>В текущей тестовой сборке расходы в обоих сервисах идут через ваши аккаунты. Проверка ключа OpenRouter не подтверждает остаток средств на счёте. Позже планируется версия, где отдельный аккаунт OpenRouter пользователю не понадобится.</p>
+        <p>Нажмите <strong>«Проверить ключи»</strong>: у обоих сервисов должна появиться отметка ✓. Ключи хранятся в файле настроек на вашем компьютере. Никому их не отправляйте.</p>
+      </div>
+    </section>
+
+    <section class="content-row" id="audio" aria-labelledby="audio-title">
+      <p class="section-label">Звук</p>
+      <div class="section-body">
+        <h2 id="audio-title">Кого слушать</h2>
+        <dl class="setting-list">
+          <div><dt>Слушать собеседника</dt><dd>Включает отдельный канал для голоса из звонка. На Windows в поле «Голос собеседника читать с» выберите «Системного звука».</dd></div>
+          <div><dt>Слушать и вас</dt><dd>Добавляет вашу речь в контекст. В поле «Ваш микрофон» выберите нужное устройство; «По умолчанию» использует системный вход.</dd></div>
+          <div><dt>Микрофон или виртуальный кабель</dt><dd>Альтернативный источник для собеседника, если системный звук недоступен. Обычный микрофон не услышит голос в наушниках; для этого нужен виртуальный аудиовход.</dd></div>
+          <div><dt>Модель STT и язык STT</dt><dd>По умолчанию стоят <code>nova-3</code> и <code>multi</code>. <code>multi</code> распознаёт смену языков; если весь разговор на одном языке, выберите <code>ru</code> или <code>en-US</code>.</dd></div>
+          <div><dt>Endpointing и конец фразы</dt><dd>Настраивают паузы, по которым распознавание считает фразу завершённой. Для начала оставьте значения по умолчанию: 300 и 1000 мс.</dd></div>
+        </dl>
+        <p>Параметры источников можно выставить заранее. Соединение с Deepgram открывается после явного нажатия <strong>«начать»</strong>; кнопка «слушаю» ставит прослушивание на паузу.</p>
+      </div>
+    </section>
+
+    <section class="content-row" id="models" aria-labelledby="models-title">
+      <p class="section-label">Модели и ответ</p>
+      <div class="section-body">
+        <h2 id="models-title">Как формируется подсказка</h2>
+        <dl class="setting-list">
+          <div><dt>Речь / Скриншот</dt><dd>Отдельные модели OpenRouter для ответа по разговору и разбора изображения. Выбирайте модель для снимков с поддержкой изображений.</dd></div>
+          <div><dt>Температура</dt><dd>Меняет вариативность ответа. Значение по умолчанию — 0,2.</dd></div>
+          <div><dt>Лимит токенов / Лимит на снимок</dt><dd>Максимальная длина ответа. Для речи по умолчанию 500, для снимка 2000: разбор кода часто требует больше места.</dd></div>
+          <div><dt>Язык</dt><dd>Автоматически следует за собеседником; можно принудительно выбрать русский или английский.</dd></div>
+          <div><dt>Отвечать сам</dt><dd>Автоматически запрашивает подсказку после реплики. Если выключить, используйте кнопку ответа или <kbd>Ctrl+Shift+A</kbd>.</dd></div>
+          <div><dt>Забегать вперёд</dt><dd>Запрашивает ответ до конца фразы. Может ускорить подсказку, но чаще ошибается на незавершённом вопросе; по умолчанию выключено.</dd></div>
+          <div><dt>Усиленный разбор</dt><dd>Помогает отличать реальный вопрос от подводки; может добавить лишний запрос к модели.</dd></div>
+          <div><dt>Паузы и контекст</dt><dd>«Ждать конца фразы», «Пауза», «Слов минимум» и «Реплик собеседника в контекст» регулируют момент запроса и объём разговора, который видит модель. Начните со значений по умолчанию.</dd></div>
+          <div><dt>Профиль / Системный промпт</dt><dd>Выберите готовый профиль: технический разговор, собеседование, созвон с заказчиком или разбор кода. Ручная правка текста превращает его в свой промпт; повторный выбор профиля заменит правки.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="content-row" id="window" aria-labelledby="window-title">
+      <p class="section-label">Окно</p>
+      <div class="section-body">
+        <h2 id="window-title">Видимость и защита</h2>
+        <p><strong>«Прятать от захвата»</strong> включено по умолчанию. На Windows 10 версии 2004 и новее Sufler исключает окно из стандартного захвата экрана. Нажмите <strong>«Проверить, видно ли окно при захвате»</strong>, затем запустите пробную демонстрацию в своей программе для звонка: в превью не должно быть ни окна, ни чёрного прямоугольника.</p>
+        <p>Если защита выключена или работает неполно, Sufler показывает предупреждение. Быстро убрать окно можно клавишами <kbd>Ctrl+Shift+Space</kbd>. Защита не скрывает экран от камеры телефона и аппаратной карты захвата.</p>
+        <dl class="setting-list">
+          <div><dt>Непрозрачность / Размер шрифта</dt><dd>Настройте читаемость окна поверх других программ.</dd></div>
+          <div><dt>Показывать речь</dt><dd>Добавляет расшифровку в окно. По умолчанию скрыта, чтобы оставить место ответу.</dd></div>
+          <div><dt>Ответы на телефон</dt><dd>Дополнительный режим для чтения подсказок на телефоне в той же локальной сети. После включения адрес появляется в приложении.</dd></div>
+          <div><dt>Прятаться при демонстрации</dt><dd>Дополнительная автоматическая попытка убрать окно при обнаружении показа экрана. Она зависит от программы и языка её интерфейса; проверьте результат в превью.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="content-row" id="hotkeys" aria-labelledby="hotkeys-title">
+      <p class="section-label">Управление</p>
+      <div class="section-body">
+        <h2 id="hotkeys-title">Горячие клавиши</h2>
+        <p>Комбинации можно изменить в разделе «Горячие клавиши». Ниже — значения по умолчанию.</p>
+        <dl class="setting-list shortcut-list">
+          <div><dt><kbd>Ctrl+Shift+M</kbd></dt><dd>Начать или остановить прослушивание.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+A</kbd></dt><dd>Ответить на последнюю реплику.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+D</kbd></dt><dd>Выделить область экрана для разбора.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+S</kbd></dt><dd>Разобрать весь экран.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+X</kbd></dt><dd>Оборвать текущий ответ.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+Space</kbd></dt><dd>Показать или скрыть окно.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+C</kbd></dt><dd>Включить сквозные клики.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+R</kbd></dt><dd>Переключить рабочий режим окна.</dd></div>
+          <div><dt><kbd>Ctrl+Shift+Q</kbd></dt><dd>Закрыть приложение.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="content-row" id="access" aria-labelledby="access-title">
+      <p class="section-label">Доступ</p>
+      <div class="section-body">
+        <h2 id="access-title">Проба и код доступа</h2>
+        <p>Проба даёт 30 минут активной работы на устройстве. Время идёт, когда Sufler слушает, отвечает или разбирает экран. Пауза останавливает счётчик после завершения уже начатого ответа.</p>
+        <p>Когда время закончится, в разделе «Доступ к Sufler» появится поле «Код доступа». Введите полученный код и нажмите «Активировать». Для проверки доступа нужен интернет; серверу не передаются ключи сервисов, звук, текст разговора и снимки.</p>
+        <p class="note">Приём оплаты и самостоятельная выдача кодов на сайте ещё готовятся. Сейчас публичной загрузки нет.</p>
+      </div>
+    </section>
+
+    <section class="content-row guide-last" id="troubleshooting" aria-labelledby="troubleshooting-title">
+      <p class="section-label">Если не работает</p>
+      <div class="section-body">
+        <h2 id="troubleshooting-title">Что проверить</h2>
+        <dl class="setting-list">
+          <div><dt>Нет распознанной речи</dt><dd>Нажата ли «начать»? Прошёл ли проверку Deepgram? Выбраны ли правильные источники в разделе «Звук»?</dd></div>
+          <div><dt>Не слышно собеседника</dt><dd>Для Windows выберите системный звук. При выборе обычного микрофона голос в наушниках в него не попадёт.</dd></div>
+          <div><dt>Есть текст, но нет ответа</dt><dd>Проверьте ключ и баланс OpenRouter, выбранную модель и переключатель «Отвечать сам». Для ручного ответа нажмите <kbd>Ctrl+Shift+A</kbd>.</dd></div>
+          <div><dt>Окно видно в трансляции</dt><dd>Проверьте Windows 10 версии 2004 или новее, включённый пункт «Прятать от захвата» и результат встроенной проверки. До решения вопроса скрывайте окно вручную.</dd></div>
+        </dl>
+        <p>Если проблема остаётся, напишите на <a href="mailto:support@family-pie.ru?subject=Sufler%20%E2%80%94%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0">support@family-pie.ru</a>. Не отправляйте API-ключи и запись разговора.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="wrap footer-inner"><a href="/">family-pie</a><a href="/sufler/">Sufler</a><a href="mailto:support@family-pie.ru">support@family-pie.ru</a></div></footer>
+</body>
+</html>

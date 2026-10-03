@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f4f1ea">
   <title>Sufler — подсказки во время разговора · family-pie</title>
-  <meta name="description" content="Sufler показывает распознанную речь и ответы поверх других окон. Пробный доступ на 30 минут активной работы. Для Windows.">
+  <meta name="description" content="Sufler показывает распознанную речь и ответы поверх других окон, скрывает своё окно из стандартного захвата экрана Windows. Пробный доступ на 30 минут.">
   <link rel="canonical" href="https://family-pie.ru/sufler/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Sufler — подсказки во время разговора">
@@ -20,7 +20,7 @@
       <nav aria-label="Разделы страницы">
         <a href="#about">О приложении</a>
         <a href="#setup">Подключение</a>
-        <a href="#access">Доступ</a>
+        <a href="/sufler/setup/">Инструкция</a>
       </nav>
     </div>
   </header>
@@ -48,6 +48,27 @@
       </div>
     </section>
 
+    <section class="content-row" id="capture" aria-labelledby="capture-title">
+      <p class="section-label">Демонстрация экрана</p>
+      <div class="section-body">
+        <h2 id="capture-title">Вы видите окно. Зрители — нет.</h2>
+        <p>На Windows 10 версии 2004 и новее Sufler исключает своё окно из стандартного захвата экрана. Подсказки не должны попадать в показ экрана, запись и трансляцию — например, при работе с этими сервисами:</p>
+        <ul class="platform-list" aria-label="Примеры программ для звонков и трансляций">
+          <li><img src="/sufler/assets/zoom.svg" alt="" width="27" height="27" loading="lazy">Zoom</li>
+          <li><img src="/sufler/assets/googlemeet.svg" alt="" width="27" height="27" loading="lazy">Google Meet</li>
+          <li class="platform-text">Microsoft Teams</li>
+          <li><img src="/sufler/assets/discord.svg" alt="" width="27" height="27" loading="lazy">Discord</li>
+          <li><img src="/sufler/assets/webex.svg" alt="" width="27" height="27" loading="lazy">Webex</li>
+          <li><img src="/sufler/assets/telegram.svg" alt="" width="27" height="27" loading="lazy">Telegram</li>
+          <li><img src="/sufler/assets/obsstudio.svg" alt="" width="27" height="27" loading="lazy">OBS Studio</li>
+          <li><img src="/sufler/assets/streamlabs.svg" alt="" width="27" height="27" loading="lazy">Streamlabs</li>
+          <li><img src="/sufler/assets/twitch.svg" alt="" width="27" height="27" loading="lazy">Twitch</li>
+          <li><img src="/sufler/assets/youtube.svg" alt="" width="27" height="27" loading="lazy">YouTube Live</li>
+        </ul>
+        <p class="note">Это примеры программ и площадок, а не отдельные интеграции. Защита зависит от способа захвата и версии Windows; перед важным звонком проверьте превью трансляции и кнопку проверки защиты в настройках. Логотипы принадлежат их владельцам; Sufler с ними не связан.</p>
+      </div>
+    </section>
+
     <section class="content-row" id="trial" aria-labelledby="trial-title">
       <p class="section-label">Пробный период</p>
       <div class="section-body">
@@ -69,6 +90,7 @@
         <p class="note">На <a href="https://deepgram.com/pricing" target="_blank" rel="noopener noreferrer">странице цен Deepgram</a> сейчас указаны $200 стартового кредита и регистрация без банковской карты. Условия определяет Deepgram; они могут измениться.</p>
         <h3>Ответы через OpenRouter</h3>
         <p>Сейчас тестовая сборка требует отдельный ключ OpenRouter. Мы готовим версию с включённым доступом, чтобы пользователю не пришлось создавать там аккаунт. До её выпуска публичной загрузки нет.</p>
+        <p><a class="text-link" href="/sufler/setup/">Подробная инструкция по настройкам →</a></p>
       </div>
     </section>
 
