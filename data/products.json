@@ -181,6 +181,32 @@
         "ru": "Настрой яркость и теплоту экрана, работай в своём ритме и делай перерывы. Настольное приложение с локальными настройками и без аккаунта.",
         "en": "Adjust screen brightness and warmth, work at your own pace and take breaks. A desktop app with local settings and no account."
       }
+    },
+    {
+      "id": "sufler",
+      "order": 4,
+      "name": "Sufler",
+      "iconId": "sufler",
+      "accent": "#243f42",
+      "accentText": "#345b45",
+      "badgeBg": "#e7efe7",
+      "landingUrl": "/sufler/",
+      "landingCta": {
+        "ru": "О Sufler",
+        "en": "About Sufler"
+      },
+      "tag": {
+        "ru": "Подсказки во время разговора",
+        "en": "Live prompts during a conversation"
+      },
+      "features": {
+        "ru": ["Windows", "30 минут пробы", "Ранний доступ"],
+        "en": ["Windows", "30-minute trial", "Early access"]
+      },
+      "desc": {
+        "ru": "Оверлей показывает распознанный вопрос и краткий ответ поверх рабочих окон. Прослушивание включается вручную. Публичный установщик готовится; для речи нужен собственный аккаунт Deepgram.",
+        "en": "An overlay shows the recognized question and a short answer over your work windows. Listening starts only when you ask. A public installer is in preparation; speech recognition requires your own Deepgram account."
+      }
     }
   ]
 }

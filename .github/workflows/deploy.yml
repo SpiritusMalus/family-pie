@@ -110,6 +110,7 @@ jobs:
           for url in \
             'https://family-pie.ru/' \
             'https://family-pie.ru/rest_lumen/' \
+            'https://family-pie.ru/sufler/' \
             'https://family-pie.ru/driftora/legal' \
             'https://family-pie.ru/driftora/terms' \
             'https://family-pie.ru/driftora/privacy' \
