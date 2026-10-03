@@ -204,8 +204,8 @@
         "en": ["Windows", "30-minute trial", "Manual start"]
       },
       "desc": {
-        "ru": "Приложение для Windows показывает распознанную речь и ответы поверх других окон. Проба — 30 минут активной работы. Публичный выпуск готовится.",
-        "en": "The Windows app shows recognized speech and answers over other windows. The trial includes 30 minutes of active use. Public release is in preparation."
+        "ru": "Приложение для Windows распознаёт речь и показывает подсказки поверх других окон. Проба — 30 минут активной работы. Публичной загрузки пока нет.",
+        "en": "The Windows app recognizes speech and shows prompts over other windows. The trial includes 30 minutes of active use. A public download is not available yet."
       }
     }
   ]
