@@ -111,6 +111,10 @@ jobs:
             'https://family-pie.ru/' \
             'https://family-pie.ru/rest_lumen/' \
             'https://family-pie.ru/sufler/' \
+            'https://family-pie.ru/sufler/buy/' \
+            'https://family-pie.ru/sufler/buy/done/' \
+            'https://family-pie.ru/sufler/terms/' \
+            'https://family-pie.ru/sufler/privacy/' \
             'https://family-pie.ru/driftora/legal' \
             'https://family-pie.ru/driftora/terms' \
             'https://family-pie.ru/driftora/privacy' \

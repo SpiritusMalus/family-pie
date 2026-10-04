@@ -1,0 +1,29 @@
+.purchase-page { padding-block: 86px 110px; }
+.purchase-page h1 { max-width: 780px; margin-top: 18px; }
+.purchase-lead { max-width: 710px; margin: 0 0 48px; font-size: 19px; line-height: 1.6; }
+.purchase-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); gap: 9%; border-top: 1px solid var(--line); padding-top: 50px; }
+.purchase-card { max-width: 650px; padding: 32px; border: 1px solid var(--line); background: #f8f6f1; }
+.purchase-card h2, .purchase-aside h2, .recover h2 { margin: 0 0 18px; font-size: 28px; }
+.purchase-card p, .purchase-aside p, .recover p { margin: 0 0 18px; }
+.purchase-aside ol { margin: 0 0 28px; padding-left: 23px; }
+.purchase-aside li { margin-bottom: 16px; padding-left: 6px; }
+.purchase-aside li::marker { color: var(--muted); }
+.purchase-card label, .recover label { display: block; margin-bottom: 7px; font-size: 14px; font-weight: 600; }
+.purchase-card input, .recover input { width: 100%; min-height: 47px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; background: white; color: var(--ink); font: inherit; }
+.purchase-card input:focus-visible, .recover input:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.pay-button, .recover button, .code-line button { min-height: 48px; padding: 10px 17px; border: 0; border-radius: 4px; background: var(--ink); color: var(--paper); font: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; cursor: pointer; }
+.pay-button { width: 100%; margin: 18px 0 14px; }
+.pay-button:hover:not(:disabled), .recover button:hover:not(:disabled), .code-line button:hover:not(:disabled) { background: #3b3932; }
+button:disabled { cursor: wait; opacity: .6; }
+.small, .purchase-card .small { color: var(--muted); font-size: 13px; line-height: 1.55; }
+.purchase-help { max-width: 710px; margin: 48px 0 0; color: var(--muted); font-size: 14px; }
+.return-page .purchase-card { margin: 0 0 55px; }
+.return-page .purchase-lead { margin-bottom: 32px; }
+.code-line, .recover-line { display: flex; gap: 10px; margin-bottom: 21px; }
+.code-line { align-items: center; flex-wrap: wrap; }
+.code-line code { display: block; flex: 1 1 auto; overflow-wrap: anywhere; padding: 12px; border: 1px solid var(--line); background: white; font: 16px/1.5 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.recover { max-width: 650px; padding-top: 39px; border-top: 1px solid var(--line); }
+.recover-line input { min-width: 0; flex: 1; }
+.recover-line button { flex: none; }
+@media (max-width: 760px) { .purchase-page { padding-block: 62px 80px; } .purchase-grid { grid-template-columns: 1fr; gap: 45px; padding-top: 35px; } .purchase-card { padding: 25px; } }
+@media (max-width: 480px) { .purchase-page h1 { font-size: 43px; } .purchase-lead { font-size: 17px; } .purchase-card { padding: 20px; } .recover-line { flex-direction: column; } .recover-line button { width: 100%; } }
