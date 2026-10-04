@@ -60,6 +60,12 @@ h2 { margin: 0 0 25px; font-size: clamp(29px, 3.3vw, 39px); font-weight: 600; li
 .setup-steps { margin: 25px 0 30px; padding-left: 23px; }
 .setup-steps li { padding-left: 9px; margin-bottom: 10px; font-size: 16px; }
 .setup-steps li::marker { color: var(--muted); }
+.journey { margin: 34px 0 31px; padding: 0; list-style: none; counter-reset: journey; border-top: 1px solid var(--line); }
+.journey li { position: relative; counter-increment: journey; padding: 25px 0 26px 51px; border-bottom: 1px solid var(--line); }
+.journey li::before { content: counter(journey, decimal-leading-zero); position: absolute; top: 28px; left: 0; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.section-body .journey h3 { margin: 0 0 7px; font-size: 19px; }
+.section-body .journey p { margin: 0 0 7px; font-size: 15px; line-height: 1.6; }
+.journey li > a { font-size: 14px; font-weight: 600; }
 .section-body .note { padding-left: 17px; border-left: 2px solid #a6b6a0; color: var(--muted); font-size: 14px; }
 .text-link { font-size: 15px; font-weight: 600; }
 
@@ -91,6 +97,8 @@ h2 { margin: 0 0 25px; font-size: clamp(29px, 3.3vw, 39px); font-weight: 600; li
   .downloads { align-items: stretch; }
   .download.primary { flex: 1 1 100%; }
   .section-body p { font-size: 16px; }
+  .journey li { padding-left: 42px; }
+  .section-body .journey p { font-size: 15px; }
   .section-body .note { font-size: 14px; }
   .platform-list { gap: 0 14px; }
   .platform-list li { gap: 9px; font-size: 13px; }
