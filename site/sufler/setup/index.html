@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f4f1ea">
-  <title>Настройка Sufler · family-pie</title>
-  <meta name="description" content="Установка и настройка Sufler для Windows и macOS: Deepgram, звук, ответы, защита окна и 30 минут пробы.">
+  <title>Установка и первый запуск Sufler · family-pie</title>
+  <meta name="description" content="Скачайте Sufler для Windows или Mac, подключите свой ключ Deepgram, проверьте звук и попробуйте 30 минут активной работы.">
   <link rel="canonical" href="https://family-pie.ru/sufler/setup/">
   <link rel="stylesheet" href="/sufler/style.css">
   <link rel="stylesheet" href="/sufler/setup/style.css">
@@ -14,163 +14,132 @@
   <a class="skip" href="#main">К содержанию</a>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="brand" href="/sufler/" aria-label="Sufler — к странице приложения">family-pie <span>/ Sufler</span></a>
-      <nav aria-label="Навигация"><a href="/sufler/">О приложении</a><a href="#quick-start">Быстрый старт</a><a href="#troubleshooting">Если не работает</a></nav>
+      <a class="brand" href="/sufler/" aria-label="Sufler: к странице приложения">family-pie <span>/ Sufler</span></a>
+      <nav aria-label="Навигация"><a href="/sufler/">О приложении</a><a href="#quick-start">Первый запуск</a><a href="#troubleshooting">Помощь</a></nav>
     </div>
   </header>
 
   <main id="main" class="wrap guide">
-    <div class="guide-intro">
-      <p class="overline">Инструкция · Windows и macOS</p>
-      <h1>Настройка Sufler</h1>
-      <p class="lead">Скачайте приложение, создайте ключ Deepgram и пройдите первый запуск по шагам ниже. Дальше — подробности по каждому параметру.</p>
-      <p class="guide-status">Свой аккаунт нужен только в Deepgram. OpenRouter оплачивает Sufler: регистрироваться там и вводить его ключ не нужно. Пробный доступ — 30 минут активной работы.</p>
-    </div>
+    <section class="setup-hero" id="install" aria-labelledby="setup-title">
+      <p class="overline">Установка и первый запуск</p>
+      <h1 id="setup-title">Скачайте Sufler.<br>Настройте и попробуйте.</h1>
+      <p class="lead">Выберите свою систему. Для распознавания речи нужен ваш ключ Deepgram. Ответы уже подключены.</p>
+      <div class="setup-downloads" aria-label="Скачать Sufler">
+        <a class="download primary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-Setup-0.2.0-beta.1-x64.exe">Скачать для Windows <span>64 бит · .exe</span></a>
+        <a class="download primary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-0.2.0-beta.1-arm64.dmg">Скачать для Mac <span>Apple Silicon · .dmg</span></a>
+        <a class="download secondary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-0.2.0-beta.1-x64.dmg">Mac с Intel →</a>
+      </div>
+      <p class="setup-trial">30 минут активной пробы. Пока Sufler на паузе, время не идёт.</p>
+      <details class="fine-print">
+        <summary>Перед установкой: версия без подписи издателя</summary>
+        <div class="disclosure-copy">
+          <p>Windows 10 версии 2004 и новее: запустите скачанный файл .exe. Mac: откройте DMG и перенесите Sufler в «Программы». Система может предупредить, что издатель не подтверждён. На Mac порядок открытия описан в <a href="https://support.apple.com/en-au/102445" target="_blank" rel="noopener noreferrer">справке Apple</a>.</p>
+          <p>При желании <a href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/SHA256SUMS.txt">сверьте контрольные суммы</a> перед запуском. Настройки сохраняются в вашем профиле при обновлении.</p>
+        </div>
+      </details>
+    </section>
 
-    <nav class="guide-index" aria-label="Разделы инструкции">
-      <a href="#install">Установка</a><a href="#quick-start">Быстрый старт</a><a href="#keys">Подключение</a><a href="#audio">Звук</a><a href="#models">Ответы</a><a href="#window">Окно и защита</a><a href="#hotkeys">Горячие клавиши</a><a href="#access">Доступ</a><a href="#troubleshooting">Если не работает</a>
+    <nav class="setup-nav" aria-label="Разделы инструкции">
+      <a href="#install">Скачать</a><a href="#quick-start">Первый запуск</a><a href="#audio">Звук</a><a href="#access">Проба и оплата</a><a href="#troubleshooting">Помощь</a>
     </nav>
 
-    <section class="content-row" id="install" aria-labelledby="install-title">
-      <p class="section-label">Установка</p>
-      <div class="section-body">
-        <h2 id="install-title">Скачайте приложение</h2>
-        <p>Выберите <a href="/sufler/#download">кнопку скачивания для своей системы</a>. Это предварительная версия без подтверждённой подписи издателя: система может показать предупреждение при открытии.</p>
-        <p><strong>Windows:</strong> запустите файл <code>Sufler-Setup…x64.exe</code> и пройдите установку. Работает на Windows 10 версии 2004 и новее. Сверьте файл с опубликованной контрольной суммой перед запуском.</p>
-        <p><strong>Mac:</strong> выберите файл для Apple Silicon или Intel, откройте DMG и перенесите Sufler в «Программы». Если macOS не открывает приложение без подписи и нотариального заверения, прочитайте <a href="https://support.apple.com/en-au/102445" target="_blank" rel="noopener noreferrer">инструкцию Apple</a> и решайте, доверяете ли вы этому файлу. При обновлении сохранённые настройки остаются в профиле пользователя.</p>
+    <section class="setup-section" id="quick-start" aria-labelledby="quick-title">
+      <p class="overline">Первый запуск</p>
+      <h2 id="quick-title">Четыре шага до первой подсказки</h2>
+      <div class="setup-flow">
+        <article class="flow-step" id="keys">
+          <span class="step-number" aria-hidden="true">01</span>
+          <div>
+            <h3>Создайте ключ Deepgram</h3>
+            <p>Зарегистрируйтесь в <a href="https://console.deepgram.com/" target="_blank" rel="noopener noreferrer">Deepgram Console</a>. В проекте откройте <strong>Settings → API Keys → Create a New API Key</strong>. Скопируйте ключ сразу: позже его не покажут.</p>
+            <details class="step-detail"><summary>Зачем он нужен?</summary><p>Deepgram распознаёт речь. Звук идёт напрямую с вашего устройства в Deepgram, а расход оплачивается в вашем аккаунте отдельно от доступа к Sufler. Сейчас Deepgram указывает <a href="https://deepgram.com/pricing" target="_blank" rel="noopener noreferrer">$200 стартового кредита</a> без банковской карты; условия могут измениться.</p></details>
+          </div>
+        </article>
+        <article class="flow-step">
+          <span class="step-number" aria-hidden="true">02</span>
+          <div>
+            <h3>Вставьте ключ в Sufler</h3>
+            <p>Откройте настройки, вставьте ключ в поле «Deepgram · речь» и нажмите «Проверить подключение». Поле «Свой OpenRouter · необязательно» оставьте пустым.</p>
+            <p class="step-aside">OpenRouter уже подключён и оплачивается Sufler в пределах дневных квот.</p>
+          </div>
+        </article>
+        <article class="flow-step" id="audio">
+          <span class="step-number" aria-hidden="true">03</span>
+          <div>
+            <h3>Выберите звук</h3>
+            <p><strong>Windows:</strong> выберите свой микрофон и системный звук для голоса собеседника.</p>
+            <p><strong>Mac:</strong> выберите микрофон. Чтобы слышать собеседника из звонка, понадобится <a href="https://github.com/ExistentialAudio/BlackHole" target="_blank" rel="noopener noreferrer">BlackHole 2ch</a>.</p>
+            <details class="step-detail"><summary>Как настроить BlackHole на Mac</summary><div class="disclosure-copy"><ol><li>Установите BlackHole 2ch.</li><li>В «Настройке Audio-MIDI» создайте устройство с несколькими выходами: BlackHole и ваши наушники. Выберите его системным выходом. <a href="https://github.com/ExistentialAudio/BlackHole/wiki/Getting-Started%3A-Creating-a-Multi-Output-Device" target="_blank" rel="noopener noreferrer">Пошаговая схема</a>.</li><li>В Sufler для голоса собеседника выберите «Микрофона или виртуального кабеля», затем BlackHole 2ch.</li></ol></div></details>
+          </div>
+        </article>
+        <article class="flow-step">
+          <span class="step-number" aria-hidden="true">04</span>
+          <div>
+            <h3>Нажмите «начать»</h3>
+            <p>Сначала проверьте окно в превью демонстрации. Затем нажмите «начать» в Sufler. Приложение открывается на паузе и ничего не слушает без вашей команды.</p>
+          </div>
+        </article>
       </div>
     </section>
 
-    <section class="content-row" id="quick-start" aria-labelledby="quick-start-title">
-      <p class="section-label">Сначала</p>
-      <div class="section-body">
-        <h2 id="quick-start-title">Пять шагов до первой подсказки</h2>
-        <ol class="journey">
-          <li><h3>Установите Sufler</h3><p>Скачайте файл для Windows или Mac и откройте приложение. <a href="#install">Если установка не проходит →</a></p></li>
-          <li><h3>Получите ключ Deepgram</h3><p>Зарегистрируйтесь в <a href="https://console.deepgram.com/" target="_blank" rel="noopener noreferrer">Deepgram Console</a>, выберите проект и создайте API-ключ. <a href="#keys">Где найти кнопку →</a></p></li>
-          <li><h3>Проверьте подключение</h3><p>В Sufler откройте ⚙, вставьте ключ в «Deepgram · речь» и нажмите «Проверить подключение». Поле «Свой OpenRouter · необязательно» оставьте пустым. У Deepgram и OpenRouter должны появиться отметки ✓.</p></li>
-          <li><h3>Настройте звук</h3><p>Выберите микрофон и голос собеседника. На Windows доступен системный звук; на Mac для голоса из звонка нужен BlackHole. <a href="#audio">Настройка звука →</a></p></li>
-          <li><h3>Начните пробу</h3><p>Перед звонком проверьте <a href="#window">видимость окна</a>, затем в основном окне нажмите «начать». Проба даёт 30 минут активной работы; на паузе счётчик не идёт. <a href="#access">Что дальше →</a></p></li>
-        </ol>
-        <p class="note">Sufler открывается на паузе. Настройка и проверка подключения не расходуют пробное время.</p>
+    <section class="setup-section access-section" id="access" aria-labelledby="access-title">
+      <div>
+        <p class="overline">После пробы</p>
+        <h2 id="access-title">30 минут бесплатно.<br>Потом 990 ₽ за 30 дней.</h2>
+        <p>Время идёт, пока Sufler слушает, отвечает или разбирает экран. После оплаты сайт покажет код: вставьте его в «Доступ к Sufler» и нажмите «Активировать».</p>
+        <p>Код начинает действовать с активации на одном устройстве. Оплата разовая, автоматического продления нет.</p>
+        <a class="access-link" href="/sufler/buy/">Купить доступ за 990 ₽ →</a>
       </div>
     </section>
 
-    <section class="content-row" id="keys" aria-labelledby="keys-title">
-      <p class="section-label">Подключение</p>
-      <div class="section-body">
-        <h2 id="keys-title">Подключите распознавание речи</h2>
-        <h3>Deepgram · речь</h3>
-        <ol class="setup-steps">
-          <li>Зарегистрируйтесь в <a href="https://console.deepgram.com/" target="_blank" rel="noopener noreferrer">Deepgram Console</a> и выберите проект.</li>
-          <li>Откройте <strong>Settings → API Keys → Create a New API Key</strong>. Создайте ключ и сразу скопируйте: позже Deepgram не покажет его снова. <a href="https://developers.deepgram.com/docs/create-additional-api-keys" target="_blank" rel="noopener noreferrer">Инструкция Deepgram по ключам</a>.</li>
-          <li>Вставьте ключ в поле «Deepgram · речь» в Sufler.</li>
-        </ol>
-        <p>Deepgram получает звук и возвращает распознанный текст. Его расход учитывается в вашем аккаунте отдельно от 30 минут пробы Sufler. На <a href="https://deepgram.com/pricing" target="_blank" rel="noopener noreferrer">странице цен Deepgram</a> сейчас указаны $200 стартового кредита и регистрация без банковской карты. Deepgram может изменить эти условия.</p>
-        <h3>OpenRouter · ответы</h3>
-        <p>Оставьте поле «Свой OpenRouter · необязательно» пустым. Отдельный аккаунт и оплата OpenRouter не нужны: ответы оплачивает Sufler. Текст запроса и снимок экрана после вашей команды проходят через сервер Sufler в OpenRouter без сохранения на нашем сервере. Звук и ключ Deepgram туда не идут. При желании можно указать свой ключ OpenRouter — тогда приложение обращается к сервису напрямую.</p>
-        <p>Нажмите <strong>«Проверить подключение»</strong>: у Deepgram и сервиса ответов должна появиться отметка ✓. Никому не отправляйте свой ключ Deepgram.</p>
+    <section class="setup-section" id="troubleshooting" aria-labelledby="help-title">
+      <p class="overline">Если возник вопрос</p>
+      <h2 id="help-title">Короткие ответы</h2>
+      <div class="faq-list">
+        <details id="window">
+          <summary>Будет ли видно окно при демонстрации экрана?</summary>
+          <div class="disclosure-copy"><p>На Windows 10 версии 2004 и новее Sufler исключает окно из стандартного захвата, если включён пункт «Прятать от захвата». Защита зависит от программы и способа захвата. Перед важным звонком нажмите «Проверить, видно ли окно при захвате» и посмотрите превью демонстрации.</p><p>На Mac скрытие не гарантируется. Спрячьте окно клавишами <kbd>Ctrl+Shift+Space</kbd> или читайте ответы на телефоне. Проверьте превью своего приложения для звонков. Если микрофон или снимки экрана недоступны, откройте в настройках Sufler раздел «Окно», выдайте разрешения macOS и перезапустите приложение.</p><p>В настройках окна также можно изменить непрозрачность, размер шрифта, показ распознанной речи и режим ответов на телефон. Автоматическое скрытие при демонстрации на Mac зависит от программы звонка и требует проверки в превью.</p></div>
+        </details>
+        <details>
+          <summary>Есть текст, но нет ответа. Что проверить?</summary>
+          <div class="disclosure-copy"><p>Нажмите «Проверить подключение» и проверьте переключатель «Отвечать сам». Для ручного ответа используйте <kbd>Ctrl+Shift+A</kbd>. Если вы ввели собственный ключ OpenRouter, проверьте его баланс.</p></div>
+        </details>
+        <details>
+          <summary>Не слышно собеседника. Что проверить?</summary>
+          <div class="disclosure-copy"><p>На Windows выберите системный звук. На Mac проверьте BlackHole и устройство с несколькими выходами. Обычный микрофон не услышит голос в наушниках.</p></div>
+        </details>
+        <details>
+          <summary>Куда отправляются звук, текст и снимки?</summary>
+          <div class="disclosure-copy"><p>Звук идёт напрямую в Deepgram. Распознанный текст и снимок экрана после вашей команды проходят через сервер Sufler в OpenRouter для ответа. Звук и ключ Deepgram туда не отправляются. <a href="/sufler/privacy/">Подробнее о данных</a>.</p></div>
+        </details>
       </div>
+      <p class="support-line">Если это не помогло, напишите на <a href="mailto:support@family-pie.ru?subject=Sufler%20%E2%80%94%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0">support@family-pie.ru</a>. Не отправляйте ключи и запись разговора.</p>
     </section>
 
-    <section class="content-row" id="audio" aria-labelledby="audio-title">
-      <p class="section-label">Звук</p>
-      <div class="section-body">
-        <h2 id="audio-title">Кого слушать</h2>
-        <dl class="setting-list">
-          <div><dt>Слушать собеседника</dt><dd>Включает отдельный канал для голоса из звонка. На Windows в поле «Голос собеседника читать с» выберите «Системного звука».</dd></div>
-          <div><dt>Слушать и вас</dt><dd>Добавляет вашу речь в контекст. В поле «Ваш микрофон» выберите нужное устройство; «По умолчанию» использует системный вход.</dd></div>
-          <div><dt>Микрофон или виртуальный кабель</dt><dd>Альтернативный источник для собеседника, если системный звук недоступен. Обычный микрофон не услышит голос в наушниках; для этого нужен виртуальный аудиовход.</dd></div>
-          <div><dt>Модель STT и язык STT</dt><dd>STT — распознавание речи. По умолчанию стоят <code>nova-3</code> и <code>multi</code>. <code>multi</code> распознаёт смену языков; если весь разговор на одном языке, выберите <code>ru</code> или <code>en-US</code>.</dd></div>
-          <div><dt>Endpointing и конец фразы</dt><dd>Это длительность пауз, после которых распознавание считает мысль законченной. Для начала оставьте значения по умолчанию: 300 и 1000 мс.</dd></div>
-        </dl>
-        <p><strong>На Mac</strong> прямой захват системного звука недоступен. Чтобы слышать собеседника в наушниках:</p>
-        <ol class="setup-steps">
-          <li>Установите <a href="https://github.com/ExistentialAudio/BlackHole" target="_blank" rel="noopener noreferrer">BlackHole 2ch</a>.</li>
-          <li>В «Настройке Audio-MIDI» создайте устройство с несколькими выходами (BlackHole + ваши наушники) и выберите его системным выходом. <a href="https://github.com/ExistentialAudio/BlackHole/wiki/Getting-Started%3A-Creating-a-Multi-Output-Device" target="_blank" rel="noopener noreferrer">Пошаговая схема BlackHole</a>.</li>
-          <li>В Sufler выберите «Голос собеседника читать с» → «Микрофона или виртуального кабеля», затем в поле «Какого именно» выберите BlackHole 2ch.</li>
-        </ol>
-        <p>Параметры источников можно выставить заранее. Соединение с Deepgram открывается после явного нажатия <strong>«начать»</strong>; кнопка «слушаю» ставит прослушивание на паузу.</p>
-      </div>
-    </section>
-
-    <section class="content-row" id="models" aria-labelledby="models-title">
-      <p class="section-label">Модели и ответ</p>
-      <div class="section-body">
-        <h2 id="models-title">Как формируется подсказка</h2>
-        <dl class="setting-list">
-          <div><dt>Речь / Скриншот</dt><dd>При ответах за счёт Sufler модели уже выбраны: Gemini Flash Lite для разговора и Claude Sonnet для снимка. Со своим ключом OpenRouter модели можно менять.</dd></div>
-          <div><dt>Температура и лимиты</dt><dd>При ответах за счёт Sufler действуют значения по умолчанию: температура 0,2; длина ответа 500 токенов для речи и 2000 для снимка. Со своим ключом их можно менять.</dd></div>
-          <div><dt>Язык</dt><dd>Автоматически следует за собеседником; можно принудительно выбрать русский или английский.</dd></div>
-          <div><dt>Отвечать сам</dt><dd>Автоматически запрашивает подсказку после реплики. Если выключить, используйте кнопку ответа или <kbd>Ctrl+Shift+A</kbd>.</dd></div>
-          <div><dt>Забегать вперёд</dt><dd>Запрашивает ответ до конца фразы. Может ускорить подсказку, но чаще ошибается на незавершённом вопросе; по умолчанию выключено.</dd></div>
-          <div><dt>Усиленный разбор</dt><dd>Помогает отличать реальный вопрос от подводки; может добавить лишний запрос к модели.</dd></div>
-          <div><dt>Паузы и контекст</dt><dd>«Ждать конца фразы», «Пауза», «Слов минимум» и «Реплик собеседника в контекст» регулируют момент запроса и объём разговора, который видит модель. Начните со значений по умолчанию.</dd></div>
-          <div><dt>Профиль / Системный промпт</dt><dd>Профиль задаёт правила ответа для модели. Выберите технический разговор, собеседование, созвон с заказчиком или разбор кода. Текст правил можно изменить; повторный выбор готового профиля заменит ваши правки.</dd></div>
-        </dl>
-      </div>
-    </section>
-
-    <section class="content-row" id="window" aria-labelledby="window-title">
-      <p class="section-label">Окно</p>
-      <div class="section-body">
-        <h2 id="window-title">Видимость и защита</h2>
-        <p><strong>На Windows</strong> «Прятать от захвата» включено по умолчанию. Начиная с Windows 10 версии 2004 Sufler исключает окно из стандартного захвата экрана. Нажмите <strong>«Проверить, видно ли окно при захвате»</strong>, затем запустите пробную демонстрацию в своей программе для звонка: в превью не должно быть ни окна, ни чёрного прямоугольника.</p>
-        <p>Если защита на Windows выключена или работает неполно, Sufler показывает предупреждение. Быстро убрать окно можно клавишами <kbd>Ctrl+Shift+Space</kbd>. Защита не скрывает экран от камеры телефона и аппаратной карты захвата.</p>
-        <p><strong>На Mac</strong> Sufler не гарантирует скрытие окна от демонстрации. Перед показом скройте его горячей клавишей или читайте ответы на телефоне. Проверьте превью в своей программе для звонка. Если Sufler не слышит микрофон или не может разобрать экран, откройте в настройках приложения раздел «Окно»: кнопки «Открыть микрофон» и «Открыть запись экрана» ведут к нужным разрешениям macOS. Разрешите доступ строке Sufler и перезапустите приложение.</p>
-        <dl class="setting-list">
-          <div><dt>Непрозрачность / Размер шрифта</dt><dd>Настройте читаемость окна поверх других программ.</dd></div>
-          <div><dt>Показывать речь</dt><dd>Добавляет расшифровку в окно. По умолчанию скрыта, чтобы оставить место ответу.</dd></div>
-          <div><dt>Ответы на телефон</dt><dd>Дополнительный режим для чтения подсказок на телефоне в той же локальной сети. После включения адрес появляется в приложении.</dd></div>
-          <div><dt>Прятаться при демонстрации · Mac</dt><dd>Дополнительная автоматическая попытка убрать окно при обнаружении показа экрана. Она зависит от программы и языка её интерфейса; проверьте результат в превью.</dd></div>
-        </dl>
-      </div>
-    </section>
-
-    <section class="content-row" id="hotkeys" aria-labelledby="hotkeys-title">
-      <p class="section-label">Управление</p>
-      <div class="section-body">
-        <h2 id="hotkeys-title">Горячие клавиши</h2>
-        <p>Комбинации можно изменить в разделе «Горячие клавиши». Ниже — значения по умолчанию.</p>
-        <dl class="setting-list shortcut-list">
-          <div><dt><kbd>Ctrl+Shift+M</kbd></dt><dd>Начать или остановить прослушивание.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+A</kbd></dt><dd>Ответить на последнюю реплику.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+D</kbd></dt><dd>Выделить область экрана для разбора.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+S</kbd></dt><dd>Разобрать весь экран.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+X</kbd></dt><dd>Оборвать текущий ответ.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+Space</kbd></dt><dd>Показать или скрыть окно.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+C</kbd></dt><dd>Включить сквозные клики.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+R</kbd></dt><dd>Переключить рабочий режим окна.</dd></div>
-          <div><dt><kbd>Ctrl+Shift+Q</kbd></dt><dd>Закрыть приложение.</dd></div>
-        </dl>
-      </div>
-    </section>
-
-    <section class="content-row" id="access" aria-labelledby="access-title">
-      <p class="section-label">Доступ</p>
-      <div class="section-body">
-        <h2 id="access-title">Проба и код доступа</h2>
-        <p class="note"><a href="/sufler/buy/">Купить 30 дней за 990 ₽ →</a> После подтверждения оплаты сайт покажет код. Он начнёт действовать с момента активации в приложении. Автоматического продления и списаний нет.</p>
-        <p>Проба даёт 30 минут активной работы на устройстве. Время идёт, когда Sufler слушает, отвечает или разбирает экран. Пауза останавливает счётчик после завершения уже начатого ответа.</p>
-        <p>В настройках откройте «Доступ к Sufler», вставьте купленный код в «Код доступа» и нажмите «Активировать». Ждать окончания пробы не нужно. Один код закрепляется за первым устройством, на котором его активировали; новый код продлевает доступ на том же устройстве ещё на 30 дней. Без кода после 30 минут Sufler остановит прослушивание и ответы. Для проверки доступа нужен интернет. Ключ Deepgram и звук не идут на сервер Sufler; при ответах за счёт Sufler текст и выбранные снимки проходят через него в OpenRouter.</p>
-      </div>
-    </section>
-
-    <section class="content-row guide-last" id="troubleshooting" aria-labelledby="troubleshooting-title">
-      <p class="section-label">Если не работает</p>
-      <div class="section-body">
-        <h2 id="troubleshooting-title">Что проверить</h2>
-        <dl class="setting-list">
-          <div><dt>Нет распознанной речи</dt><dd>Нажата ли «начать»? Прошёл ли проверку Deepgram? Выбраны ли правильные источники в разделе «Звук»?</dd></div>
-          <div><dt>Не слышно собеседника</dt><dd>На Windows выберите системный звук. На Mac настройте BlackHole и устройство с несколькими выходами. Обычный микрофон не услышит голос в наушниках.</dd></div>
-          <div><dt>Есть текст, но нет ответа</dt><dd>Нажмите «Проверить подключение» и проверьте переключатель «Отвечать сам». Для ручного ответа нажмите <kbd>Ctrl+Shift+A</kbd>. Если используется свой OpenRouter, проверьте его ключ и баланс.</dd></div>
-          <div><dt>Окно видно в трансляции</dt><dd>Проверьте Windows 10 версии 2004 или новее, включённый пункт «Прятать от захвата» и результат встроенной проверки. До решения вопроса скрывайте окно вручную.</dd></div>
-        </dl>
-        <p>Если проблема остаётся, напишите на <a href="mailto:support@family-pie.ru?subject=Sufler%20%E2%80%94%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0">support@family-pie.ru</a>. Не отправляйте API-ключи и запись разговора.</p>
+    <section class="setup-section advanced-section" aria-labelledby="advanced-title">
+      <p class="overline">Для тех, кто хочет настроить больше</p>
+      <h2 id="advanced-title">Остальные настройки</h2>
+      <p>Для первого запуска оставьте значения по умолчанию. Эти параметры можно изменить позже.</p>
+      <div class="faq-list">
+        <details id="models"><summary>Ответы и язык</summary><div class="disclosure-copy"><p>При ответах за счёт Sufler модели уже выбраны: Gemini Flash Lite для разговора и Claude Sonnet для снимка. Язык определяется автоматически; при желании выберите русский или английский. «Отвечать сам» запрашивает подсказку после реплики; для ручного ответа есть <kbd>Ctrl+Shift+A</kbd>.</p><p>«Забегать вперёд» запрашивает ответ до конца фразы, но может ошибаться чаще. «Усиленный разбор» помогает отличать вопрос от подводки, иногда ценой дополнительного запроса. Паузы, минимум слов и число реплик в контексте влияют на момент и содержание ответа: сначала оставьте значения по умолчанию.</p><p>Профиль задаёт стиль ответа. Текст системного промпта можно изменить, но повторный выбор готового профиля заменит ваши правки. Со своим ключом OpenRouter также доступны выбор моделей, температура и длина ответа.</p></div></details>
+        <details><summary>Распознавание и паузы</summary><div class="disclosure-copy"><p>Для первого разговора оставьте модель STT <code>nova-3</code>, язык <code>multi</code>, endpointing 300 мс и конец фразы 1000 мс. Если весь разговор на одном языке, можно выбрать <code>ru</code> или <code>en-US</code>. Эти настройки влияют на момент распознавания фразы и появления подсказки.</p></div></details>
+        <details id="hotkeys"><summary>Горячие клавиши</summary><div class="disclosure-copy"><p>Начать или остановить прослушивание: <kbd>Ctrl+Shift+M</kbd>. Ответить на последнюю реплику: <kbd>Ctrl+Shift+A</kbd>. Выделить область экрана: <kbd>Ctrl+Shift+D</kbd>. Разобрать весь экран: <kbd>Ctrl+Shift+S</kbd>. Оборвать ответ: <kbd>Ctrl+Shift+X</kbd>.</p><p>Показать или скрыть окно: <kbd>Ctrl+Shift+Space</kbd>. Включить сквозные клики: <kbd>Ctrl+Shift+C</kbd>. Переключить рабочий режим окна: <kbd>Ctrl+Shift+R</kbd>. Закрыть Sufler: <kbd>Ctrl+Shift+Q</kbd>. Все сочетания можно изменить в настройках.</p></div></details>
       </div>
     </section>
   </main>
 
   <footer class="site-footer"><div class="wrap footer-inner"><a href="/">family-pie</a><a href="/sufler/">Sufler</a><a href="mailto:support@family-pie.ru">support@family-pie.ru</a></div></footer>
+  <script>
+    (function () {
+      function openHashDetail() {
+        var id = decodeURIComponent(location.hash.slice(1));
+        if (!id) return;
+        var target = document.getElementById(id);
+        if (target && target.tagName === 'DETAILS') target.open = true;
+      }
+      window.addEventListener('hashchange', openHashDetail);
+      openHashDetail();
+    })();
+  </script>
 </body>
 </html>
