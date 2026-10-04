@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f4f1ea">
   <title>Sufler — подсказки во время разговора · family-pie</title>
-  <meta name="description" content="Sufler распознаёт речь и показывает короткие подсказки поверх других окон. Окно скрывается из стандартного захвата экрана Windows. Пробный доступ на 30 минут.">
+  <meta name="description" content="Sufler для Windows и macOS: подсказки во время разговора, 30 минут пробы. Скачайте приложение, подключите Deepgram и начните вручную.">
   <link rel="canonical" href="https://family-pie.ru/sufler/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Sufler — подсказки во время разговора">
-  <meta property="og:description" content="Приложение для Windows: распознавание речи и подсказки поверх других окон. Публичной загрузки пока нет.">
+  <meta property="og:description" content="Приложение для Windows и macOS: распознавание речи и подсказки поверх других окон. Скачайте и попробуйте 30 минут.">
   <link rel="stylesheet" href="/sufler/style.css">
 </head>
 <body>
@@ -28,14 +28,20 @@
   <main id="main" class="wrap">
     <section class="hero" aria-labelledby="page-title">
       <div class="hero-main">
-        <p class="overline">Приложение для Windows</p>
+        <p class="overline">Приложение для Windows и macOS</p>
         <h1 id="page-title">Подсказки во время разговора</h1>
-        <p class="lead">Sufler распознаёт речь и показывает короткий ответ поверх других окон. Прослушивание включается вручную; после запуска приложение находится на паузе.</p>
+        <p class="lead">Sufler распознаёт речь и показывает короткий ответ поверх других окон. После запуска он на паузе — прослушивание включаете вы.</p>
+        <div class="downloads" aria-label="Скачать Sufler">
+          <a class="download primary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-Setup-0.2.0-beta.1-x64.exe">Скачать для Windows <span>64 бит · .exe</span></a>
+          <a class="download primary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-0.2.0-beta.1-arm64.dmg">Скачать для Mac <span>Apple Silicon · .dmg</span></a>
+          <a class="download secondary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-0.2.0-beta.1-x64.dmg">Mac с Intel →</a>
+        </div>
+        <p class="download-note">Предварительная версия без подтверждённой подписи издателя. <a href="/sufler/setup/">Как установить и настроить</a> · <a href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/SHA256SUMS.txt">Контрольные суммы</a></p>
       </div>
       <dl class="facts" aria-label="Статус Sufler">
-        <div><dt>Платформа</dt><dd>Windows</dd></div>
+        <div><dt>Платформа</dt><dd>Windows 64 бит · macOS</dd></div>
         <div><dt>Пробный доступ</dt><dd>30 минут активной работы</dd></div>
-        <div><dt>Сейчас</dt><dd>Публичной загрузки пока нет</dd></div>
+        <div><dt>Для старта</dt><dd>Свой ключ Deepgram</dd></div>
       </dl>
     </section>
 
@@ -45,6 +51,7 @@
         <h2 id="about-title">Что делает Sufler</h2>
         <p>После нажатия «Начать» Sufler получает звук с микрофона или из системы, распознаёт речь и показывает ответ в небольшом окне поверх рабочего экрана. Расшифровку можно включить в настройках.</p>
         <p>Снимок экрана можно отправить на разбор отдельной командой.</p>
+        <p class="note">На Windows Sufler может слышать системный звук напрямую. На Mac для голоса собеседника нужен виртуальный аудиокабель; <a href="/sufler/setup/#audio">настройка описана в инструкции</a>.</p>
       </div>
     </section>
 
@@ -89,7 +96,7 @@
         </ol>
         <p class="note">На <a href="https://deepgram.com/pricing" target="_blank" rel="noopener noreferrer">странице цен Deepgram</a> сейчас указаны $200 стартового кредита и регистрация без банковской карты. Условия определяет Deepgram; они могут измениться.</p>
         <h3>Ответы через OpenRouter</h3>
-        <p>В текущей тестовой сборке нужен свой ключ OpenRouter. Версия, где ответы оплачивает Sufler, ещё не готова; публичной загрузки пока нет.</p>
+        <p>Ответы через OpenRouter оплачивает Sufler. Свой аккаунт и ключ OpenRouter для пробы не нужны. Текст запроса и снимок, который вы отправите на разбор, проходят через сервер Sufler в OpenRouter без сохранения на нашем сервере. Звук идёт только в Deepgram.</p>
         <p><a class="text-link" href="/sufler/setup/">Подробная инструкция по настройкам →</a></p>
       </div>
     </section>
