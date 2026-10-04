@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f4f1ea">
-  <title>Купить доступ к Sufler · 299 ₽ за 30 дней</title>
-  <meta name="description" content="Купите код доступа к Sufler на 30 дней за 299 ₽. Оплата через ЮKassa; код появится после подтверждения платежа.">
+  <title>Купить доступ к Sufler · 990 ₽ за 30 дней</title>
+  <meta name="description" content="Купите код доступа к Sufler на 30 дней за 990 ₽. Оплата через ЮKassa; код появится после подтверждения платежа.">
   <link rel="canonical" href="https://family-pie.ru/sufler/buy/">
   <link rel="stylesheet" href="/sufler/style.css">
   <link rel="stylesheet" href="/sufler/buy/style.css">
@@ -15,7 +15,7 @@
   <header class="site-header"><div class="wrap header-inner"><a class="brand" href="/sufler/">family-pie <span>/ Sufler</span></a><nav aria-label="Навигация"><a href="/sufler/">Приложение</a><a href="/sufler/setup/">Инструкция</a></nav></div></header>
   <main id="main" class="wrap purchase-page">
     <p class="overline">Доступ к Sufler</p>
-    <h1>30 дней за 299 ₽</h1>
+    <h1>30 дней за 990 ₽</h1>
     <p class="purchase-lead">Сначала попробуйте Sufler бесплатно: 30 минут активной работы. Если подходит, купите код и введите его в настройках приложения.</p>
     <div class="purchase-grid">
       <section class="purchase-card" aria-labelledby="pay-title">
@@ -53,12 +53,12 @@
   fetch(API + '/billing/plan', {cache:'no-store'})
     .then(function(r){ if (!r.ok) throw new Error('plan'); return r.json(); })
     .then(function(plan){
-      if (plan.amount !== '299.00' || plan.days !== 30 || plan.currency !== 'RUB') throw new Error('plan mismatch');
+      if (plan.amount !== '990.00' || plan.days !== 30 || plan.currency !== 'RUB') throw new Error('plan mismatch');
       receiptRequired = plan.receiptRequired === true;
       emailWrap.hidden = !receiptRequired;
       if (plan.enabled !== true){ say('Оплата временно недоступна. Попробуйте позже.'); pay.textContent = 'Оплата недоступна'; return; }
       pay.disabled = false;
-      pay.textContent = 'Оплатить 299 ₽';
+      pay.textContent = 'Оплатить 990 ₽';
       say('После оплаты код появится на странице возврата.');
     })
     .catch(function(){ pay.textContent = 'Оплата недоступна'; say('Не удалось проверить платёжный сервис. Попробуйте позже.'); });
@@ -74,7 +74,7 @@
         localStorage.setItem('sufler_payment_id', result.payment_id);
         location.assign(result.confirmation_url);
       })
-      .catch(function(){ pay.disabled = false; pay.textContent = 'Оплатить 299 ₽'; say('Не удалось открыть оплату. Попробуйте ещё раз или напишите в поддержку.'); });
+      .catch(function(){ pay.disabled = false; pay.textContent = 'Оплатить 990 ₽'; say('Не удалось открыть оплату. Попробуйте ещё раз или напишите в поддержку.'); });
   });
 })();
 </script>
