@@ -45,7 +45,7 @@ family-pie.ru {
 		# lines and the failure is silent.
 		#
 		# The CSP fits what these pages actually are: static HTML with inline <style>
-		# and one inline <script> (the subscription pages call /billing/*), so
+		# and inline checkout scripts (Driftora and Sufler call their APIs), so
 		# 'unsafe-inline' is required for style-src and script-src until those move to
 		# files. connect-src names the API host that script calls; everything else is
 		# denied by the default-src 'self' floor. No frames, no objects, no <base>
@@ -56,7 +56,7 @@ family-pie.ru {
 		# CSP without them serves the whole site in fallback type. The stylesheet is a
 		# style-src; the font files it then pulls are a font-src — both are needed, and
 		# omitting either breaks it silently in the browser rather than loudly here.
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://food.family-pie.ru; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://food.family-pie.ru https://hub.146-103-120-137.sslip.io; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
 		X-Frame-Options "DENY"
 		Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
 

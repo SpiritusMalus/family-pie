@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f4f1ea">
+  <meta name="robots" content="noindex">
+  <title>Ваш код Sufler · проверка оплаты</title>
+  <link rel="stylesheet" href="/sufler/style.css">
+  <link rel="stylesheet" href="/sufler/buy/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">К содержанию</a>
+  <header class="site-header"><div class="wrap header-inner"><a class="brand" href="/sufler/">family-pie <span>/ Sufler</span></a><nav aria-label="Навигация"><a href="/sufler/">Приложение</a><a href="/sufler/setup/">Инструкция</a></nav></div></header>
+  <main id="main" class="wrap purchase-page return-page">
+    <p class="overline">Доступ к Sufler</p>
+    <h1>Ваш код доступа</h1>
+    <p id="status" class="purchase-lead" role="status" aria-live="polite">Проверяем платёж в ЮKassa…</p>
+    <section id="code-card" class="purchase-card" hidden aria-labelledby="code-title">
+      <h2 id="code-title">Оплата подтверждена</h2>
+      <p>Ваш код на 30 дней:</p>
+      <div class="code-line"><code id="code"></code><button id="copy" type="button">Скопировать</button></div>
+      <p>Откройте Sufler → ⚙ → «Доступ к Sufler». Вставьте код в «Код доступа» и нажмите «Активировать». Срок начнётся с этого момента.</p>
+      <p class="small">Код закрепится за первым устройством. Сохраните код и номер платежа, показанный ниже. По номеру можно открыть код снова.</p>
+    </section>
+    <section class="recover" aria-labelledby="recover-title">
+      <h2 id="recover-title">Вернуться к своему коду</h2>
+      <p>Если закрыли страницу, номер последнего платежа останется в этом браузере. Можно ввести и другой сохранённый номер.</p>
+      <label for="payment-id">Номер платежа</label>
+      <div class="recover-line"><input id="payment-id" type="text" autocomplete="off" spellcheck="false" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><button id="check" type="button">Проверить</button></div>
+      <p id="recover-message" class="small" role="status" aria-live="polite"></p>
+    </section>
+    <p class="purchase-help">Не нашли платёж или код? Напишите на <a href="mailto:support@family-pie.ru?subject=Sufler%20%E2%80%94%20%D0%BA%D0%BE%D0%B4">support@family-pie.ru</a> и укажите номер платежа. API-ключ Deepgram присылать не нужно.</p>
+    <p><a href="/sufler/buy/">Вернуться к оплате →</a></p>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><a href="/">family-pie</a><a href="/sufler/">Sufler</a><a href="/sufler/terms/">Условия</a><a href="/sufler/privacy/">Данные</a></div></footer>
+<script>
+(function(){
+  'use strict';
+  var API = 'https://hub.146-103-120-137.sslip.io/sufler-license';
+  var status = document.getElementById('status');
+  var card = document.getElementById('code-card');
+  var code = document.getElementById('code');
+  var input = document.getElementById('payment-id');
+  var check = document.getElementById('check');
+  var recoverMessage = document.getElementById('recover-message');
+  var activeId = '';
+  var polls = 0;
+  function verify(id){
+    activeId = id; input.value = id; check.disabled = true;
+    fetch(API + '/billing/result', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({payment_id:id}),cache:'no-store'})
+      .then(function(r){ if (!r.ok) throw new Error('result'); return r.json(); })
+      .then(function(result){
+        check.disabled = false;
+        if (activeId !== id) return;
+        if (result.status === 'paid' && result.code){
+          code.textContent = result.code; card.hidden = false; status.textContent = 'Оплата прошла. Код готов к активации.'; recoverMessage.textContent = '';
+        } else if (result.status === 'canceled'){
+          status.textContent = 'Платёж отменён. Деньги за него не списаны.'; recoverMessage.textContent = 'Можно вернуться к оплате и попробовать снова.';
+        } else {
+          status.textContent = 'Платёж ещё не подтверждён. Подождите — мы проверим его снова.';
+          if (++polls < 40) setTimeout(function(){ if (activeId === id) verify(id); }, 3000);
+          else recoverMessage.textContent = 'Проверка заняла больше времени. Нажмите «Проверить» ещё раз позднее.';
+        }
+      })
+      .catch(function(){ check.disabled = false; status.textContent = 'Пока не удалось проверить платёж.'; recoverMessage.textContent = 'Повторите проверку. Если деньги списаны, код сохранится за вашим платежом.'; });
+  }
+  check.addEventListener('click',function(){
+    var id = input.value.trim();
+    if (!/^[0-9a-fA-F-]{36}$/.test(id)){ recoverMessage.textContent = 'Проверьте номер платежа.'; return; }
+    polls = 0; recoverMessage.textContent = ''; card.hidden = true;
+    localStorage.setItem('sufler_payment_id',id);
+    verify(id);
+  });
+  document.getElementById('copy').addEventListener('click',function(){
+    navigator.clipboard.writeText(code.textContent).then(function(){ document.getElementById('copy').textContent = 'Скопировано'; });
+  });
+  var saved = localStorage.getItem('sufler_payment_id');
+  if (saved && /^[0-9a-fA-F-]{36}$/.test(saved)) verify(saved);
+  else status.textContent = 'Введите сохранённый номер платежа, чтобы получить код.';
+})();
+</script>
+</body>
+</html>
