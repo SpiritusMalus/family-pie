@@ -1,4 +1,11 @@
 .purchase-page { padding-block: 86px 110px; }
+.purchase-page:not(.return-page) { padding-block: 45px 75px; }
+.purchase-page:not(.return-page) h1 { margin: 10px 0 14px; }
+.purchase-page:not(.return-page) .purchase-lead { margin-bottom: 22px; }
+.purchase-page:not(.return-page) .purchase-grid { padding-top: 23px; }
+.purchase-page:not(.return-page) .purchase-card { padding: 23px; }
+.purchase-page:not(.return-page) .purchase-card h2 { margin-bottom: 9px; }
+.purchase-page:not(.return-page) .pay-button { margin-top: 9px; }
 .purchase-page h1 { max-width: 780px; margin-top: 18px; }
 .purchase-lead { max-width: 710px; margin: 0 0 48px; font-size: 19px; line-height: 1.6; }
 .purchase-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); gap: 9%; border-top: 1px solid var(--line); padding-top: 50px; }
@@ -26,4 +33,4 @@ button:disabled { cursor: wait; opacity: .6; }
 .recover-line input { min-width: 0; flex: 1; }
 .recover-line button { flex: none; }
 @media (max-width: 760px) { .purchase-page { padding-block: 62px 80px; } .purchase-grid { grid-template-columns: 1fr; gap: 45px; padding-top: 35px; } .purchase-card { padding: 25px; } }
-@media (max-width: 480px) { .purchase-page h1 { font-size: 43px; } .purchase-lead { font-size: 17px; } .purchase-card { padding: 20px; } .recover-line { flex-direction: column; } .recover-line button { width: 100%; } }
+@media (max-width: 480px) { .purchase-page h1 { font-size: 43px; } .purchase-page:not(.return-page) h1 { font-size: 39px; } .purchase-lead { font-size: 17px; } .purchase-card { padding: 20px; } .recover-line { flex-direction: column; } .recover-line button { width: 100%; } }

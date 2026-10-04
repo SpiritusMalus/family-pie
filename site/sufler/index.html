@@ -18,9 +18,8 @@
     <div class="wrap header-inner">
       <a class="brand" href="/" aria-label="family-pie: на главную">family-pie <span>/ Sufler</span></a>
       <nav aria-label="Разделы страницы">
-        <a href="#about">Как работает</a>
         <a href="#setup">Как начать</a>
-        <a href="/sufler/setup/">Инструкция</a>
+        <a href="#trial">Цена</a>
       </nav>
     </div>
   </header>
@@ -29,14 +28,14 @@
     <section class="landing-hero wrap" aria-labelledby="page-title">
       <p class="overline">Sufler для Windows и Mac</p>
       <h1 id="page-title">Подсказки во время разговора.</h1>
-      <p class="lead">Sufler слышит вопрос и показывает опорные мысли поверх других окон. Прослушивание включаете вы.</p>
+      <p class="lead">Слышит вопрос и показывает короткий ответ поверх звонка. Запуск прослушивания — только по вашей команде.</p>
       <div class="landing-actions" id="download" aria-label="Скачать Sufler">
-        <a class="landing-button" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-Setup-0.2.0-beta.1-x64.exe">Скачать для Windows</a>
-        <a class="landing-button landing-button-light" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-0.2.0-beta.1-arm64.dmg">Скачать для Mac</a>
+        <a class="landing-button" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/Sufler-Setup-0.2.0-beta.2-x64.exe">Скачать для Windows</a>
+        <a class="landing-button landing-button-light" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/Sufler-0.2.0-beta.2-arm64.dmg">Скачать для Mac</a>
       </div>
-      <p class="hero-small">Mac с Intel? <a href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/Sufler-0.2.0-beta.1-x64.dmg">Скачать версию для Intel</a></p>
+      <p class="hero-small">30 минут бесплатно · <a href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/Sufler-0.2.0-beta.2-x64.dmg">Mac с Intel</a></p>
 
-      <div class="preview" aria-label="Пример подсказки Sufler">
+      <div class="preview" id="about" aria-label="Пример подсказки Sufler">
         <div class="preview-caption">Пример подсказки во время разговора</div>
         <div class="preview-screen">
           <div class="preview-question">Собеседник спрашивает</div>
@@ -50,24 +49,9 @@
       </div>
     </section>
 
-    <section class="landing-section wrap" id="about" aria-labelledby="about-title">
-      <div class="section-heading">
-        <p class="overline">Как работает</p>
-        <h2 id="about-title">Вопрос → короткая подсказка</h2>
-      </div>
-      <div class="feature-list">
-        <article><h3>Слышит собеседника</h3><p>На Windows берёт системный звук. На Mac для звука звонка нужен BlackHole.</p></article>
-        <article><h3>Помогает ответить</h3><p>Показывает опорные мысли в небольшом окне поверх приложений.</p></article>
-        <article><h3>Разбирает экран</h3><p>Отправьте снимок или выделенную область на разбор отдельной командой.</p></article>
-      </div>
-    </section>
-
-    <section class="landing-section wrap" id="capture" aria-labelledby="capture-title">
-      <div class="section-heading">
-        <p class="overline">Демонстрация экрана</p>
-        <h2 id="capture-title">Окно можно скрыть от захвата на Windows</h2>
-        <p>Перед звонком проверьте превью демонстрации. На Mac скрытие окна не гарантируется.</p>
-      </div>
+    <details class="landing-compat wrap" id="capture">
+      <summary>Звонки и демонстрация экрана</summary>
+      <p>На Windows окно можно скрыть от стандартного захвата; проверьте превью перед звонком. На Mac скрытие не гарантируется, а для звука собеседника нужен BlackHole.</p>
       <ul class="landing-logos" aria-label="Примеры программ для звонков и трансляций">
         <li><img class="zoom-wordmark" src="/sufler/assets/zoom.svg" alt="Zoom" width="60" height="27" loading="lazy"></li>
         <li><img src="/sufler/assets/googlemeet.svg" alt="" width="27" height="27" loading="lazy">Google Meet</li>
@@ -80,33 +64,33 @@
         <li><img src="/sufler/assets/twitch.svg" alt="" width="27" height="27" loading="lazy">Twitch</li>
         <li><img src="/sufler/assets/youtube.svg" alt="" width="27" height="27" loading="lazy">YouTube Live</li>
       </ul>
-      <p class="landing-fine">Это примеры программ, а не отдельные интеграции. Защита зависит от способа захвата и версии Windows. <a href="/sufler/setup/#window">Как проверить окно</a>.</p>
-    </section>
+      <p class="landing-fine">Примеры программ, не отдельные интеграции. <a href="/sufler/setup/#window">Как проверить окно</a>.</p>
+    </details>
 
     <section class="landing-section wrap" id="setup" aria-labelledby="setup-title">
       <div class="section-heading">
         <p class="overline">Первый запуск</p>
-        <h2 id="setup-title">Скачайте. Подключите. Попробуйте.</h2>
+        <h2 id="setup-title">Три шага — и можно пробовать</h2>
       </div>
       <ol class="landing-steps">
-        <li><span>01</span><div><h3>Установите Sufler</h3><p>Выберите Windows или Mac. Приложение откроется на паузе.</p></div></li>
-        <li><span>02</span><div><h3>Создайте ключ Deepgram</h3><p>Он нужен для распознавания речи. OpenRouter уже подключён.</p></div></li>
-        <li><span>03</span><div><h3>Нажмите «начать»</h3><p>Проба длится 30 минут активной работы. Пауза время не расходует.</p></div></li>
+        <li><span>01</span><div><h3>Скачайте Sufler</h3><p>Windows или Mac — кнопки выше.</p></div></li>
+        <li><span>02</span><div><h3>Подключите Deepgram</h3><p><a href="https://console.deepgram.com/" target="_blank" rel="noopener noreferrer">Создайте аккаунт</a> и ключ для распознавания речи. <a href="/sufler/setup/#keys">Покажите, куда нажать →</a></p></div></li>
+        <li><span>03</span><div><h3>Нажмите «Начать»</h3><p>Ответы уже подключены. Время идёт только во время работы.</p></div></li>
       </ol>
-      <a class="landing-text-link" href="/sufler/setup/#install">Инструкция по настройке →</a>
+      <a class="landing-text-link" href="/sufler/setup/#install">Нужна помощь с установкой? →</a>
     </section>
 
     <section class="landing-price wrap" id="trial" aria-labelledby="trial-title">
       <div>
         <p class="overline">Сначала попробуйте</p>
         <h2 id="trial-title">30 минут бесплатно</h2>
-        <p>После пробы доступ стоит 990 ₽ за 30 дней. Оплата разовая, без автопродления.</p>
-        <p class="landing-fine">Для речи нужен ваш аккаунт Deepgram; его расход оплачивается отдельно. Ответы OpenRouter оплачивает Sufler в пределах квот.</p>
+        <p>Потом 990 ₽ за 30 дней. Разовая оплата, без автопродления.</p>
+        <p class="landing-fine">Deepgram для речи — ваш аккаунт. Ответы OpenRouter — за счёт Sufler в пределах квот.</p>
       </div>
       <a class="landing-button" href="/sufler/buy/">Купить доступ за 990 ₽</a>
     </section>
 
-    <p class="landing-end wrap">Sufler пока без подтверждённой подписи издателя. <a href="/sufler/setup/#install">Что нужно знать перед установкой</a> · <a href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.1/SHA256SUMS.txt">Контрольные суммы</a></p>
+    <p class="landing-end wrap">Sufler пока без подтверждённой подписи издателя. <a href="/sufler/setup/#install">Что нужно знать перед установкой</a> · <a href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/SHA256SUMS.txt">Контрольные суммы</a></p>
   </main>
 
   <footer class="site-footer"><div class="wrap footer-inner"><a href="/">family-pie</a><span>Sufler</span><a href="mailto:support@family-pie.ru">support@family-pie.ru</a></div></footer>
