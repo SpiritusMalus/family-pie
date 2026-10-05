@@ -23,48 +23,47 @@
     <section class="setup-hero" id="install" aria-labelledby="setup-title">
       <p class="overline">Быстрый старт</p>
       <h1 id="setup-title">Скачать и запустить</h1>
-      <p class="lead">Выберите систему. Для речи понадобится ключ Deepgram — покажем, где его взять.</p>
+      <p class="lead">После установки добавьте ключ Deepgram для распознавания речи. Ниже показано, как его получить.</p>
       <div class="setup-downloads" aria-label="Скачать Sufler">
         <a class="download primary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/Sufler-Setup-0.2.0-beta.2-x64.exe">Скачать .exe для Windows <span>64 бит</span></a>
         <a class="download primary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/Sufler-0.2.0-beta.2-arm64.dmg">Скачать .dmg для Mac <span>Apple Silicon</span></a>
         <a class="download secondary" href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/Sufler-0.2.0-beta.2-x64.dmg">Mac с Intel · .dmg →</a>
       </div>
-      <p class="setup-trial">30 минут бесплатно · OpenRouter уже подключён</p>
-      <p class="vpn-note"><strong>Для работы нужен VPN.</strong> Включите его перед запуском, чтобы Sufler подключился к Deepgram. <span>Наш VPN — скоро.</span></p>
+      <p class="setup-trial">30 минут бесплатно</p>
+      <p class="vpn-note">Перед запуском включите VPN для Deepgram. <span>Наш VPN будет доступен отдельно.</span></p>
       <details class="fine-print">
-        <summary>Перед установкой: версия без подписи издателя</summary>
+        <summary>Установка на Windows и Mac</summary>
         <div class="disclosure-copy">
-          <p>Windows 10 версии 2004 и новее: запустите скачанный файл .exe. Mac: откройте DMG и перенесите Sufler в «Программы». Система может предупредить, что издатель не подтверждён. На Mac порядок открытия описан в <a href="https://support.apple.com/en-au/102445" target="_blank" rel="noopener noreferrer">справке Apple</a>.</p>
+          <p>Windows 10 версии 2004 и новее: запустите скачанный файл .exe. Mac: откройте DMG и перенесите Sufler в «Программы». Установщики пока без цифровой подписи, поэтому система может попросить подтвердить открытие. Для Mac есть <a href="https://support.apple.com/en-au/102445" target="_blank" rel="noopener noreferrer">инструкция Apple</a>.</p>
           <p>При желании <a href="https://github.com/SpiritusMalus/family-pie/releases/download/sufler-v0.2.0-beta.2/SHA256SUMS.txt">сверьте контрольные суммы</a> перед запуском. Настройки сохраняются в вашем профиле при обновлении.</p>
         </div>
       </details>
     </section>
 
     <section class="setup-section" id="quick-start" aria-labelledby="quick-title">
-      <h2 id="quick-title">Настройка за три шага</h2>
+      <h2 id="quick-title">Получите ключ и начните</h2>
       <div class="setup-flow">
         <article class="flow-step" id="keys">
           <span class="step-number" aria-hidden="true">01</span>
           <div>
             <h3>Получите ключ Deepgram</h3>
             <p><a class="deepgram-link" href="https://console.deepgram.com/" target="_blank" rel="noopener noreferrer">Открыть Deepgram →</a></p>
-            <ol class="deepgram-path"><li>Зарегистрируйтесь и выберите проект.</li><li>Откройте <strong>Settings → API Keys → Create a New API Key</strong>.</li><li>Назовите ключ «Sufler» и скопируйте его — позже Deepgram его не покажет.</li></ol>
-            <p class="step-aside">Новый аккаунт сейчас получает <a href="https://deepgram.com/pricing" target="_blank" rel="noopener noreferrer">$200 стартового кредита</a>. Расходы после него — в вашем Deepgram.</p>
+            <ol class="deepgram-path"><li>Зарегистрируйтесь и выберите проект.</li><li>Откройте <strong>Settings → API Keys → Create a New API Key</strong>.</li><li>Назовите ключ «Sufler» и сразу скопируйте его.</li></ol>
+            <p class="step-aside">Для новых аккаунтов Deepgram предлагает <a href="https://deepgram.com/pricing" target="_blank" rel="noopener noreferrer">$200 стартового кредита</a>.</p>
           </div>
         </article>
         <article class="flow-step">
           <span class="step-number" aria-hidden="true">02</span>
           <div>
             <h3>Вставьте ключ в Sufler</h3>
-            <p>В Sufler откройте ⚙ → «Deepgram · речь», вставьте ключ и нажмите «Проверить подключение». Должны загореться две галочки: Deepgram и ответы Sufler.</p>
-            <p class="step-aside">Других аккаунтов и ключей не требуется.</p>
+            <p>В Sufler откройте ⚙ → «Deepgram · речь», вставьте ключ и нажмите «Проверить подключение». Проверьте отметки «Deepgram» и «Ответы Sufler».</p>
           </div>
         </article>
         <article class="flow-step">
           <span class="step-number" aria-hidden="true">03</span>
           <div>
-            <h3>Нажмите «начать»</h3>
-            <p>Sufler открывается на паузе. На Windows он слышит системный звук; на Mac для звука собеседника понадобится <a href="#audio">BlackHole</a>.</p>
+            <h3>Нажмите «Начать»</h3>
+            <p>Прослушивание начнётся только после нажатия. На Windows выберите системный звук; на Mac для голоса собеседника настройте <a href="#audio">BlackHole</a>.</p>
             <details class="step-detail" id="audio"><summary>Как настроить звук на Mac</summary><div class="disclosure-copy"><ol><li><a href="https://github.com/ExistentialAudio/BlackHole" target="_blank" rel="noopener noreferrer">Установите BlackHole 2ch</a>.</li><li>В «Настройке Audio-MIDI» создайте устройство с несколькими выходами: BlackHole и ваши наушники. Выберите его системным выходом. <a href="https://github.com/ExistentialAudio/BlackHole/wiki/Getting-Started%3A-Creating-a-Multi-Output-Device" target="_blank" rel="noopener noreferrer">Пошаговая схема</a>.</li><li>В Sufler для голоса собеседника выберите «Микрофона или виртуального кабеля» → BlackHole 2ch.</li></ol></div></details>
           </div>
         </article>
@@ -73,20 +72,18 @@
 
     <section class="setup-section access-section" id="access" aria-labelledby="access-title">
       <div>
-        <p class="overline">Если подошло</p>
-        <h2 id="access-title">30 минут бесплатно.<br>Потом 990 ₽ за 30 дней.</h2>
-        <p>После оплаты получите код и вставьте его в настройках Sufler. Платёж разовый, без автопродления.</p>
+        <h2 id="access-title">После пробных 30 минут</h2>
+        <p>Доступ на 30 дней стоит 990 ₽. Оплата разовая, без автопродления. Код появится после оплаты.</p>
         <a class="access-link" href="/sufler/buy/">Купить доступ за 990 ₽ →</a>
       </div>
     </section>
 
     <section class="setup-section" id="troubleshooting" aria-labelledby="help-title">
-      <p class="overline">Если возник вопрос</p>
-      <h2 id="help-title">Короткие ответы</h2>
+      <h2 id="help-title">Помощь с настройкой</h2>
       <div class="faq-list">
         <details id="window">
-          <summary>Будет ли видно окно при демонстрации экрана?</summary>
-          <div class="disclosure-copy"><p>На Windows 10 версии 2004 и новее Sufler исключает окно из стандартного захвата, если включён пункт «Прятать от захвата». Защита зависит от программы и способа захвата. Перед важным звонком нажмите «Проверить, видно ли окно при захвате» и посмотрите превью демонстрации.</p><p>На Mac скрытие не гарантируется. Спрячьте окно клавишами <kbd>Ctrl+Shift+Space</kbd> или читайте ответы на телефоне. Проверьте превью своего приложения для звонков. Если микрофон или снимки экрана недоступны, откройте в настройках Sufler раздел «Окно», выдайте разрешения macOS и перезапустите приложение.</p><p>В настройках окна также можно изменить непрозрачность, размер шрифта, показ распознанной речи и режим ответов на телефон. Автоматическое скрытие при демонстрации на Mac зависит от программы звонка и требует проверки в превью.</p></div>
+          <summary>Как проверить окно перед демонстрацией?</summary>
+          <div class="disclosure-copy"><p>На Windows 10 версии 2004 и новее включите «Прятать от захвата», затем нажмите «Проверить, видно ли окно при захвате» и посмотрите превью. Результат зависит от программы и способа демонстрации.</p><p>На Mac тоже проверьте превью перед звонком. Окно можно спрятать клавишами <kbd>Ctrl+Shift+Space</kbd> или читать ответы на телефоне. Если звук или снимки экрана недоступны, проверьте разрешения macOS в настройках Sufler и перезапустите приложение.</p></div>
         </details>
         <details>
           <summary>Есть текст, но нет ответа. Что проверить?</summary>
@@ -101,7 +98,7 @@
           <div class="disclosure-copy"><p>Звук идёт напрямую в Deepgram. Распознанный текст и снимок экрана после вашей команды проходят через сервер Sufler в OpenRouter для ответа. Звук и ключ Deepgram туда не отправляются. <a href="/sufler/privacy/">Подробнее о данных</a>.</p></div>
         </details>
       </div>
-      <p class="support-line">Если это не помогло, напишите на <a href="mailto:support@family-pie.ru?subject=Sufler%20%E2%80%94%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0">support@family-pie.ru</a>. Не отправляйте ключи и запись разговора.</p>
+      <p class="support-line">Если нужна помощь, напишите на <a href="mailto:support@family-pie.ru?subject=Sufler%20%E2%80%94%20%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0">support@family-pie.ru</a>. Ключ Deepgram и запись разговора для этого не нужны.</p>
     </section>
 
     <details class="setup-section advanced-section" id="advanced">
