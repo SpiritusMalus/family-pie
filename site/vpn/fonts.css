@@ -1,0 +1,42 @@
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/vpn/fonts/14b6aebb899c.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/vpn/fonts/5276ae12340d.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/vpn/fonts/2ddbbcb0584d.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/vpn/fonts/2f7cd19cf0f7.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/vpn/fonts/84f611d2daf1.woff2) format('truetype');
+}
+@font-face {
+  font-family: 'Unbounded';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/vpn/fonts/75ad872ee8d3.woff2) format('truetype');
+}

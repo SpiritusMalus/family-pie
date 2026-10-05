@@ -1,39 +1,35 @@
 ---
-name: Family VPN
+name: Family VPN — Window world
 scope: /vpn/ only
 colors:
-  background: "#111310"
-  surface: "#1b1e18"
-  foreground: "#f1f4e9"
-  muted: "#aab39e"
-  line: "#343c2e"
-  primary: "#c4ee76"
+  background: "#fbfaf6"
+  foreground: "#192744"
+  muted: "#58657d"
+  primary: "#234de1"
+  surface: "#f0f2f7"
+  line: "#d9deea"
 typography:
+  display:
+    fontFamily: "Unbounded, sans-serif"
   body:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "16px"
-    lineHeight: 1.6
+    fontFamily: "Golos Text, sans-serif"
 rounded:
-  controls: "10px"
-  panels: "16px"
-spacing:
-  small: "12px"
-  medium: "24px"
-  large: "32px"
+  controls: "999px"
+  panels: "22px"
 ---
 ## Overview
-The VPN extension alone uses graphite and lime. Other Family Pie product routes retain their incumbent systems. User pinned chashkakofe.app landing/cabinet as the structural reference, replacing coffee with family access. Roll fb08fb83 does not override that reference. Provisional brand: Family VPN.
+Owner rejected the reference-derived identity on 2026-10-05 and authorized style exploration. The new independent direction is an open window into the world, with daylight and cobalt. Reference informs journeys only. Existing studio routes and all cabinet functions/demo boundaries are preserved.
 ## Colors
-Dark and light themes use shared CSS properties. Lime action surfaces have dark text. Muted foreground remains legible; live status is never implied by a decorative color.
+Light is the new default, with warm neutral background, cobalt actions and navy type. An alternate navy night theme remains usable. Generated illustration uses cobalt, warm orange and pale sky. Invitation and subscription panels retain fixed accessible white-on-cobalt contrast in both modes.
 ## Typography
-Manrope 800 display, tight tracking capped at -.04em, responsive display scale. Body 16px and captions 12–14px. CSS imports the same approved Google Fonts origin as existing production CSP.
+Self-hosted Golos Text and Unbounded, OFL licence texts included in site/vpn/fonts. Cyrillic editorial headlines replace the uppercase brand-word opening. Landing section headings use sentence case; body remains plain and scannable.
 ## Layout
-1200px landing measure. Centered oversized opening, feature columns, duration plans, family invitation ticket, device links, native FAQ. Cabinet sidebar with task-oriented sections; at 760px it becomes horizontal navigation. Panels flatten to a single column. Public demonstration notices remain visible.
+Asymmetric hero: Russian headline/action at left, original family-and-window illustration at right. On phones the art follows the primary action. Feature section pairs heading and two-column text; durations use a single segmented group; family invitation uses a saturated blue panel. FAQ is two columns on desktop and one on mobile. Sidebar, route slugs, field names, device tabs and working interactions are unchanged.
 ## Elevation & Depth
-Thin borders carry panel boundaries. Toast has a soft downward shadow. Reference-pinned ruled hero ground is the sole advisory detector finding, retained from the supplied visual reference.
+Own generated raster illustration supplies tactile spatial depth. Thin borders distinguish operating panels. No ruled grid or mesh background, no neon decorative accents. Arrival animation is bounded to the hero image and disabled with reduced-motion preference.
 ## Shapes
-SVG line icons, 10px controls, 16px panels, 20px invitation ticket. No copied competitor assets or proprietary source.
+Window motif updates the existing brand SVG and favicon. Controls become round capsules, art is a rounded rectangle, panels 22px. Existing line icon set is retained rather than introducing a mixed library.
 ## Components
-Native links, buttons, details/summary; keyboard tabs for platforms. Theme storage is local preference only. Cabinet routes are hash-linked and restorable. No credentials, fabricated account or billing state. Clipboard failures and network probe failures have explicit recovery messages.
+A small explicit window-style.css layer restyles shared primitives. Theme preference v2 resets the default to daylight while retaining user-toggle persistence. Public demonstration notices remain visible. No real identity, billing, key issuance or support delivery is added by a visual revision.
 ## Do's and Don'ts
-Preserve the public demo boundary until real identity, fulfilment, merchant and tariff decisions are supplied. Never import competitor customers, private keys, referral terms or location/performance promises. Never publish VPN subscription credentials in the static directory.
+Preserve functional and demo truth. Do not revert to the competitor's centered oversized wordmark, coffee palette or decorative grid. Image is AI-created brand illustration, not a customer photograph or testimonial. Do not expose subscription URLs in artwork or code.
