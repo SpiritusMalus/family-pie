@@ -6,8 +6,8 @@
   const store = (key, value) => { try { localStorage.setItem(key, value); } catch { /* Preferences remain usable without storage. */ } };
   let toastTimer;
   function toast(message) { const el = $('.toast'); if (!el) return; el.textContent = message; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 5500); }
-  function theme(value) { document.body.classList.toggle('light', value === 'light'); store('family-vpn-theme', value); const select = $('#appearance'); if (select) select.value = value; }
-  theme(read('family-vpn-theme') || 'dark');
+  function theme(value) { document.body.classList.toggle('light', value === 'light'); store('family-vpn-theme-v2', value); const select = $('#appearance'); if (select) select.value = value; }
+  theme(read('family-vpn-theme-v2') || 'light');
   $$('[data-theme]').forEach(btn => btn.addEventListener('click', () => theme(document.body.classList.contains('light') ? 'dark' : 'light')));
   $('#appearance')?.addEventListener('change', e => theme(e.target.value));
   $('[data-menu]')?.addEventListener('click', e => { const button = e.currentTarget; const open = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(open)); $('#navigation').classList.toggle('open', open); });

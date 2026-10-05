@@ -11,3 +11,5 @@ Before commercial launch: approve tariffs/device policy and legal texts; impleme
 Verification: JS syntax; existing legal build; local IDs/assets/links; real browser journeys for route navigation, platform selection, plan selection, unavailable promo, FAQ, QR, site-only latency probe, local draft save/reload, theme persistence and auth placeholder; desktop 1280px and mobile 390/320px. No horizontal page overflow in final checked views, no observed browser JS errors. Live payment/identity and physical VPN client tests were not performed.
 
 Rollback: revert the scoped PR; standard Family Pie deploy removes this directory. Existing site routes and Caddyfile remain unchanged.
+
+Style revision 2026-10-05: independent open-window identity, daylight/cobalt, asymmetric Russian editorial hero, generated family-window illustration, self-hosted Golos Text/Unbounded and font licences. Reference now informs journeys only. Demo scope unchanged. Final browser checks at 1280/390/320px found no page overflow; dark/light themes, period selection and device tabs remain usable, no observed browser JS errors.
