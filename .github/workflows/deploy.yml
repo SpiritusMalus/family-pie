@@ -41,6 +41,8 @@ jobs:
           node-version: '22'
       - run: node --check tools/build-legal.mjs && node tools/build-legal.mjs
       - run: test -s site/index.html
+      - name: Test VPN service core
+        run: node --test services/vpn/test/*.test.mjs
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify
