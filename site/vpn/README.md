@@ -12,4 +12,4 @@ Verification: JS syntax; existing legal build; local IDs/assets/links; real brow
 
 Rollback: revert the scoped PR; standard Family Pie deploy removes this directory. Existing site routes and Caddyfile remain unchanged.
 
-Style revision 2026-10-05: independent open-window identity, daylight/cobalt, asymmetric Russian editorial hero, generated family-window illustration, self-hosted Golos Text/Unbounded and font licences. Reference now informs journeys only. Demo scope unchanged. Final browser checks at 1280/390/320px found no page overflow; dark/light themes, period selection and device tabs remain usable, no observed browser JS errors.
+Style revision 2026-10-05: owner-selected dark/red portal identity across landing, authentication and all cabinet screens. Original procedural Canvas art replaces the rejected window and literal-saber concepts. Self-hosted Golos Text/Unbounded and licences retained. `portal.js` honours reduced motion and pauses offscreen/hidden; dark preference v3 is default, light variant stays available. Demo scope unchanged.
