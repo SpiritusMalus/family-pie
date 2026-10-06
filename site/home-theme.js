@@ -4,10 +4,12 @@
   const button = document.querySelector('.theme-toggle');
   function apply(value) {
     const light = value === 'light';
+    document.documentElement.classList.toggle('light', light);
     document.body.classList.toggle('light', light);
     button.setAttribute('aria-pressed', String(light));
     document.documentElement.style.colorScheme = light ? 'light' : 'dark';
-    document.documentElement.style.backgroundColor = light ? '#f7f6f3' : '#090d13';
+    window.updatePortalLabel?.();
+    window.dispatchEvent(new Event('family-themechange'));
   }
   let saved;
   try { saved = localStorage.getItem(key); } catch { /* Optional preference. */ }

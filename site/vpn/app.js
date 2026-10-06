@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   if('serviceWorker' in navigator)navigator.serviceWorker.register('/vpn/sw.js',{scope:'/vpn/'}).catch(()=>{});
+  const t = text => window.FPi18n?.t(text) ?? text;
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
@@ -13,7 +14,7 @@
   $('#appearance')?.addEventListener('change', e => theme(e.target.value));
   $('[data-menu]')?.addEventListener('click', e => { const button = e.currentTarget; const open = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(open)); $('#navigation').classList.toggle('open', open); });
   $$('#navigation a').forEach(a => a.addEventListener('click', () => { $('#navigation').classList.remove('open'); $('[data-menu]').setAttribute('aria-expanded', 'false'); }));
-  async function copy(text) { try { await navigator.clipboard.writeText(text); toast('Скопировано'); } catch { toast('Не удалось скопировать. Разреши доступ к буферу обмена или скопируй вручную.'); } }
+  async function copy(text) { try { await navigator.clipboard.writeText(t(text)); toast('Скопировано'); } catch { toast('Не удалось скопировать. Разреши доступ к буферу обмена или скопируй вручную.'); } }
   $('[data-share]')?.addEventListener('click', () => copy('https://family-pie.ru/vpn/'));
   $('[data-copy-checklist]')?.addEventListener('click', () => copy('Устройство:\nВерсия VPN-приложения:\nПровайдер:\nВремя ошибки:\nМаршрут:\nТекст ошибки:\nНе добавляй личную ссылку подписки или QR-код.'));
   $$('[data-auth]').forEach(b => b.addEventListener('click', () => { $('#auth-message').textContent = `Вход через ${b.dataset.auth} ещё не подключён. Открой демонстрацию кабинета — регистрация не нужна.`; }));
@@ -57,5 +58,6 @@
     if (key === 'plans' && ['30','90','180','365'].includes(params.get('period'))) $('#plan-message').textContent = `Выбран период: ${params.get('period')} дней. Цена ещё не утверждена; оплата пока недоступна.`;
     document.title = `${$('[data-route][aria-current="page"]')?.textContent.trim() || 'Кабинет'} — Family VPN`;
   }
-  window.addEventListener('hashchange', route); route();
+  window.addEventListener('hashchange', route);
+  window.addEventListener('fp-languagechange', route); route();
 })();

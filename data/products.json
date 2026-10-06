@@ -3,99 +3,45 @@
   "ui": {
     "ru": {
       "products": "Продукты",
-      "studioEyebrow": "Студия приложений",
-      "studioTag": "Спокойные приложения. Каждый день.",
-      "studioIntro": "Небольшая независимая студия. Делаем приватные приложения для повседневной жизни, без рекламы и лишнего шума.",
+      "studioEyebrow": "Независимый разработчик",
+      "studioTag": "Автоматизирую то, что отнимает время.",
+      "studioIntro": "Я делаю приложения, которые помогают учиться, работать и заботиться о себе. Без рекламы и лишней суеты.",
       "soon": "Скоро",
-      "download": "Где будет",
+      "download": "Скоро в магазинах",
       "terms": "Оферта",
       "privacy": "Конфиденциальность",
       "roadmap": "Здесь появятся новые продукты",
       "open": "открыть +",
       "close": "свернуть −",
       "subscribe": "Подписка",
-      "appDownload": "Скачать приложение"
+      "appDownload": "Скачать приложение",
+      "pageTitle": "family-pie — приложения независимого разработчика",
+      "homeLabel": "family-pie — на главную",
+      "languageLabel": "Язык"
     },
     "en": {
       "products": "Products",
-      "studioEyebrow": "App studio",
-      "studioTag": "Calm apps. Every day.",
-      "studioIntro": "A small independent studio. We make private apps for everyday life, with no ads and no noise.",
+      "studioEyebrow": "Independent developer",
+      "studioTag": "I automate time-consuming tasks.",
+      "studioIntro": "I make apps to help you learn, work and look after yourself. No ads, no fuss.",
       "soon": "Soon",
-      "download": "Where to get it",
+      "download": "Coming to app stores",
       "terms": "Terms",
       "privacy": "Privacy",
-      "roadmap": "More products land here",
+      "roadmap": "More products will appear here",
       "open": "open +",
       "close": "close −",
       "subscribe": "Subscription",
-      "appDownload": "Download app"
+      "appDownload": "Download app",
+      "pageTitle": "family-pie — apps by an independent developer",
+      "homeLabel": "family-pie — home",
+      "languageLabel": "Language"
     }
   },
   "products": [
     {
-      "id": "relo_dojo",
-      "order": 1,
-      "name": "Relo Dojo",
-      "contentDir": "relo-dojo",
-      "iconId": "dojo",
-      "accent": "#0E8A30",
-      "accentText": "#0B6E26",
-      "accentSecondary": "#E3A52C",
-      "badgeBg": "#e9f5ec",
-      "chipLead": "XP",
-      "appLanguage": "en",
-      "tag": {
-        "ru": "Английский для IT-релокации",
-        "en": "English for IT relocation"
-      },
-      "features": {
-        "ru": [
-          "стрики",
-          "пояса",
-          "5 минут в день"
-        ],
-        "en": [
-          "streaks",
-          "belts",
-          "5 min a day"
-        ]
-      },
-      "desc": {
-        "ru": "Геймифицированная практика английского для айтишников, которые переезжают за рубеж: пять честных минут в день, упражнения под вашу роль и цели, XP, стрики и пояса от белого до чёрного. Подготовка к интервью, жизнь после переезда и английский на работе.",
-        "en": "Gamified English for developers moving abroad: five honest minutes a day, exercises built from your own role and goals, XP, streaks and belts from white to black. Interview prep, life after the move, and everyday workplace English."
-      },
-      "stores": {
-        "appStore": {
-          "status": "soon",
-          "url": null
-        },
-        "googlePlay": {
-          "status": "soon",
-          "url": null
-        }
-      },
-      "legal": {
-        "originalLang": "en",
-        "translationPending": null,
-        "terms": {
-          "en": "content/relo-dojo/TERMS_OF_USE.en.md",
-          "ru": "content/relo-dojo/TERMS_OF_USE.ru.md"
-        },
-        "privacy": {
-          "en": "content/relo-dojo/PRIVACY_POLICY.en.md",
-          "ru": "content/relo-dojo/PRIVACY_POLICY.ru.md"
-        }
-      },
-      "extras": {
-        "storeListing": "content/relo-dojo/STORE_LISTING.md",
-        "brandAssets": "content/relo-dojo/BRAND_ASSETS.md"
-      },
-      "sourceRepo": "SpiritusMalus/relo_dojo"
-    },
-    {
       "id": "driftora",
-      "order": 2,
+      "order": 1,
       "name": "Driftora",
       "contentDir": "driftora",
       "iconId": "heart",
@@ -153,7 +99,7 @@
     },
     {
       "id": "rest_lumen",
-      "order": 3,
+      "order": 2,
       "name": "Lumen + REST",
       "iconId": "heart",
       "accent": "#405d49",
@@ -184,7 +130,7 @@
     },
     {
       "id": "sufler",
-      "order": 4,
+      "order": 3,
       "name": "Sufler",
       "iconId": "sufler",
       "accent": "#243f42",
@@ -218,7 +164,7 @@
     },
     {
       "id": "vpn",
-      "order": 5,
+      "order": 4,
       "name": "Family VPN",
       "iconId": "vpn",
       "accent": "#090d13",
@@ -241,8 +187,8 @@
           "Telegram-бот"
         ],
         "en": [
-          "Personal account",
-          "Timed subscriptions",
+          "Account",
+          "Subscription period",
           "Telegram bot"
         ]
       },
@@ -251,6 +197,66 @@
         "en": "A family VPN with a personal account, subscription management and Telegram reminders. Sign in with your account and connect your devices. Public checkout is still being prepared."
       },
       "legal": false
+    },
+    {
+      "id": "relo_dojo",
+      "order": 5,
+      "name": "Relo Dojo",
+      "contentDir": "relo-dojo",
+      "iconId": "dojo",
+      "accent": "#0E8A30",
+      "accentText": "#0B6E26",
+      "accentSecondary": "#E3A52C",
+      "badgeBg": "#e9f5ec",
+      "chipLead": "XP",
+      "appLanguage": "en",
+      "tag": {
+        "ru": "Английский для IT-релокации",
+        "en": "English for IT relocation"
+      },
+      "features": {
+        "ru": [
+          "стрики",
+          "пояса",
+          "5 минут в день"
+        ],
+        "en": [
+          "streaks",
+          "belts",
+          "5 min a day"
+        ]
+      },
+      "desc": {
+        "ru": "Геймифицированная практика английского для айтишников, которые переезжают за рубеж: пять минут в день, упражнения под вашу роль и цели, XP, стрики и пояса от белого до чёрного. Подготовка к интервью, жизнь после переезда и английский на работе.",
+        "en": "English practice for IT professionals moving abroad: five minutes a day, exercises tailored to your role and goals, XP, streaks and belts from white to black. Prepare for interviews, everyday life abroad and English at work."
+      },
+      "stores": {
+        "appStore": {
+          "status": "soon",
+          "url": null
+        },
+        "googlePlay": {
+          "status": "soon",
+          "url": null
+        }
+      },
+      "legal": {
+        "originalLang": "en",
+        "translationPending": null,
+        "terms": {
+          "en": "content/relo-dojo/TERMS_OF_USE.en.md",
+          "ru": "content/relo-dojo/TERMS_OF_USE.ru.md"
+        },
+        "privacy": {
+          "en": "content/relo-dojo/PRIVACY_POLICY.en.md",
+          "ru": "content/relo-dojo/PRIVACY_POLICY.ru.md"
+        }
+      },
+      "extras": {
+        "storeListing": "content/relo-dojo/STORE_LISTING.md",
+        "brandAssets": "content/relo-dojo/BRAND_ASSETS.md"
+      },
+      "sourceRepo": "SpiritusMalus/relo_dojo"
     }
   ]
 }

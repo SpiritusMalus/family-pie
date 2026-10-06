@@ -47,6 +47,8 @@
   .foot{margin-top:36px;font-size:14px;color:var(--ink2)}
   @media (max-width:720px){ .nav-in,.wrap{padding-left:20px;padding-right:20px} h1{font-size:30px} .key{font-size:20px} }
 </style>
+<link rel="stylesheet" href="/i18n/language.css">
+<script src="/i18n/language.js"></script>
 </head>
 <body>
 
@@ -75,7 +77,8 @@
 
 <script>
 var API = 'https://food.family-pie.ru';
-var EN = (navigator.language || 'ru').slice(0,2) === 'en';
+var EN = window.FPi18n.lang === 'en';
+window.addEventListener('fp-languagechange', function(){ location.reload(); });
 
 if (EN) {
   document.documentElement.lang = 'en';
@@ -145,7 +148,7 @@ function poll(){
 if (id) { poll(); }
 else {
   fail('Не знаем, какой это платёж. Откройте ссылку из письма от ЮKassa или напишите нам.',
-       'We do not know which payment this is. Use the link from the ЮKassa email, or write to us.');
+       'We do not know which payment this is. Use the link from the YooKassa email, or write to us.');
 }
 </script>
 </body>
