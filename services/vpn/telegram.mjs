@@ -37,6 +37,7 @@ export class TelegramStore {
  }
  const membership=update.my_chat_member;
  if(membership?.chat?.type==='private'&&membership.new_chat_member?.status==='kicked'){
+  this.db.prepare('DELETE FROM telegram_challenges WHERE chat_id=?').run(String(membership.chat.id));
   const row=this.db.prepare('SELECT account_id FROM telegram_links WHERE chat_id=?').get(String(membership.chat.id));if(row)this.disconnectInternal(row.account_id);
  }
  this.db.prepare("INSERT INTO telegram_meta VALUES('offset',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(update.update_id+1);

@@ -75,3 +75,6 @@ test('durable offsets, linkage and sent dedupe survive disk reopen',async t=>{
 test('stale expired reminder after long downtime is canceled rather than sent weeks late',async t=>{
  const f=await fixture(t);f.link();f.advance(3*DAY);f.telegram.plan();assert.equal(f.telegram.next().stage,'expired');f.advance(8*DAY);assert.equal(f.telegram.next(),null);f.telegram.plan();assert.equal(f.telegram.next(),null);
 });
+test('blocking the bot invalidates even an unconfirmed candidate link',async t=>{
+ const f=await fixture(t);const token=f.telegram.issue(f.user.accountId,f.sessionHash);f.telegram.candidate(token,'1001','@fixture');assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).pending,true);f.telegram.update({update_id:9,my_chat_member:{chat:{type:'private',id:1001},new_chat_member:{status:'kicked'}}});assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).pending,false);assert.throws(()=>f.telegram.confirm(f.user.accountId,f.sessionHash));
+});
