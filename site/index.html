@@ -370,6 +370,11 @@ var CATALOG = {
   ]
 };
 
+var NOTIFY = {
+  ru:function(p,s){ return p+' выйдет в '+s+' — сообщим, когда будет готово'; },
+  en:function(p,s){ return 'We will let you know when '+p+' lands on '+s; }
+};
+
 var UI = CATALOG.ui;
 var PRODUCTS = CATALOG.products.slice().sort(function(a,b){ return a.order - b.order; });
 var lang = 'ru';
