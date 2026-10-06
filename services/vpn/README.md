@@ -1,6 +1,6 @@
 # Family VPN service foundation
 
-Internal domain library, not a deployed HTTP service. The published cabinet still accurately says demo. No live customer accounts, payments or VPN clients are created by this source. Existing family users and panel/submerge database are untouched.
+Account/admin API and a separate payment domain library. Deployment and live account import require the acceptance steps in deploy/README.md; a source merge alone does not activate the runtime. Billing, Google/passkey, referrals and support delivery remain unfinished.
 
 Node >=22.16, built-in SQLite, no external dependencies. Run `npm test` in this directory. Tests use reserved example.invalid identities and explicitly fictional test prices. No real charge or provider call occurs during tests.
 
@@ -8,7 +8,7 @@ Implemented: durable accounts/order snapshots, checkout request idempotency, acc
 
 ## Production boundaries
 
-- Accounts here are internal records, not authenticated sessions. Email verification, Google/passkey, secure session/CSRF/rate limits and HTTP endpoints are still required.
+- Password identities, sessions, CSRF and rate limits are implemented in the account/admin API. Email verification and Google/passkey remain required for those separate sign-in methods.
 - The tariff configuration defaults to empty. Owner-approved prices/devices must be supplied; test fixtures are never production tariffs.
 - Refund policy currently supports confirmed full refunds only. Partial refunds require an explicitly designed business rule and tests before exposure.
 - A job does not mean provisioned access. A worker must safely upsert/read back the specific account through the currently verified panel API, synchronize UDP/submerge with backups/rollback and re-read current revision before any external write. Skip superseded jobs and use stable profile identity. Do not mark access ready on job enqueue.

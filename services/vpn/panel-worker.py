@@ -56,7 +56,8 @@ def main():
  backup=Path('/root/family-vpn-backups')/str(time.time_ns());backup.mkdir(parents=True,mode=0o700);os.chmod(backup.parent,0o700)
  panel=sqlite3.connect(PANEL,timeout=10);copy=sqlite3.connect(backup/'panel.sqlite');panel.backup(copy);copy.close();os.chmod(backup/'panel.sqlite',0o600)
  app_copy=sqlite3.connect(backup/'cabinet.sqlite');app.backup(app_copy);app_copy.close();os.chmod(backup/'cabinet.sqlite',0o600)
- for path in [CFG,NODES,HY]:shutil.copy2(path,backup/path.name);os.chmod(backup/path.name,0o600)
+ for path,label in [(CFG,'submerge.config.json'),(NODES,'nodes.json'),(HY,'hy2.config.json')]:
+  shutil.copy2(path,backup/label);os.chmod(backup/label,0o600)
  before={r[0] for r in panel.execute('SELECT id FROM api_tokens')};original=None;created=False;token=None
  try:
   text=re.sub(r'\x1b\[[0-9;]*m','',run(['/usr/local/x-ui/x-ui','setting','-getApiToken']))
