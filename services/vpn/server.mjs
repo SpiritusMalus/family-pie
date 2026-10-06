@@ -1,8 +1,10 @@
 import { createServer } from 'node:http';
 import { VpnStore } from './store.mjs';
 import { Accounts } from './auth.mjs';
-export function createApp({store,origin='https://family-pie.ru',secure=true,revision='development'}){
+import { TelegramStore } from './telegram.mjs';
+export function createApp({store,origin='https://family-pie.ru',secure=true,revision='development',botUsername=''}){
  const users=new Accounts(store),attempts=new Map();let passwordOperations=0;let globalAttempts={count:0,until:0};
+ const telegram=new TelegramStore(store),botReady=/^[A-Za-z0-9_]{5,32}$/.test(botUsername)&&/bot$/i.test(botUsername);
  const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));};
  const cookie=(res,token)=>res.setHeader('Set-Cookie',`vpn_session=${token}; Path=/vpn/; HttpOnly; SameSite=Strict; ${secure?'Secure; ':''}Max-Age=${token?43200:0}`);
  const token=req=>(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_session='))?.slice(12);
@@ -38,6 +40,13 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
     try{const updated=await users.changePassword(id,body.current,body.next);cookie(res,updated.token);return send(res,200,{ok:true,csrf:updated.csrf});}finally{passwordOperations--;}
    }
    if(session.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль',mustChange:true});
+   if(path==='/vpn/api/telegram'&&req.method==='GET')return send(res,200,{available:botReady,...telegram.state(id,session.token_hash)});
+   if(path==='/vpn/api/telegram'&&req.method==='DELETE'){telegram.disconnect(id);return send(res,200,{ok:true});}
+   if(path==='/vpn/api/telegram/link'&&req.method==='POST'){
+    if(!botReady)return send(res,503,{error:'Telegram-бот ещё подключается'});
+    return send(res,200,{url:`https://t.me/${botUsername}?start=bind_${telegram.issue(id,session.token_hash)}`});
+   }
+   if(path==='/vpn/api/telegram/confirm'&&req.method==='POST'){if(!botReady)return send(res,503,{error:'Telegram-бот ещё подключается'});telegram.confirm(id,session.token_hash);return send(res,200,{ok:true});}
    if(path.startsWith('/vpn/api/admin/')){
     if(session.identity.role!=='admin')return send(res,403,{error:'Только для администратора'});
     if(path==='/vpn/api/admin/users'&&req.method==='GET')return send(res,200,{users:users.list()});
@@ -60,7 +69,7 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
 if(process.argv[1]?.endsWith('/server.mjs')){
  if(!process.env.VPN_DATABASE_PATH)throw new Error('Private database path required');
  const store=new VpnStore(process.env.VPN_DATABASE_PATH);
- const {server}=createApp({store,revision:process.env.VPN_REVISION||'unknown'});
+ const {server}=createApp({store,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||''});
  server.listen(Number(process.env.VPN_PORT)||8796,'127.0.0.1');
  process.on('SIGTERM',()=>server.close(()=>{store.close();process.exit(0);}));
 }
