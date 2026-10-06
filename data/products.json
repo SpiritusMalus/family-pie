@@ -3,9 +3,9 @@
   "ui": {
     "ru": {
       "products": "Продукты",
-      "studioEyebrow": "Студия приложений",
-      "studioTag": "Автоматизируем то, что отнимает время.",
-      "studioIntro": "Небольшая студия. Делаем приложения, которые помогают учиться, работать и заботиться о себе. Без рекламы и лишней суеты.",
+      "studioEyebrow": "Независимый разработчик",
+      "studioTag": "Автоматизирую то, что отнимает время.",
+      "studioIntro": "Я делаю приложения, которые помогают учиться, работать и заботиться о себе. Без рекламы и лишней суеты.",
       "soon": "Скоро",
       "download": "Скоро в магазинах",
       "terms": "Оферта",
@@ -15,15 +15,15 @@
       "close": "свернуть −",
       "subscribe": "Подписка",
       "appDownload": "Скачать приложение",
-      "pageTitle": "family-pie — студия приложений",
+      "pageTitle": "family-pie — приложения независимого разработчика",
       "homeLabel": "family-pie — на главную",
       "languageLabel": "Язык"
     },
     "en": {
       "products": "Products",
-      "studioEyebrow": "App studio",
-      "studioTag": "We automate time-consuming tasks.",
-      "studioIntro": "We're a small studio. We make apps to help you learn, work and look after yourself. No ads, no fuss.",
+      "studioEyebrow": "Independent developer",
+      "studioTag": "I automate time-consuming tasks.",
+      "studioIntro": "I make apps to help you learn, work and look after yourself. No ads, no fuss.",
       "soon": "Soon",
       "download": "Coming to app stores",
       "terms": "Terms",
@@ -33,7 +33,7 @@
       "close": "close −",
       "subscribe": "Subscription",
       "appDownload": "Download app",
-      "pageTitle": "family-pie — app studio",
+      "pageTitle": "family-pie — apps by an independent developer",
       "homeLabel": "family-pie — home",
       "languageLabel": "Language"
     }

@@ -31,3 +31,6 @@ The VPN uses portal-style.css after its base stylesheet; the studio homepage use
 
 ## Truth and release scope
 This is a visual revision of the explicitly public demonstration. Identity, billing, subscription provisioning, personal referral accounting and sent support are still disconnected. Do not invent prices, real connection status or customer evidence. Roll back via the scoped PR and established Family Pie CI deployment.
+
+## Author voice
+The owner is the sole developer. Studio-homepage copy uses first-person singular (я / I), with an independent-developer label; do not imply a team in RU/EN. Product/legal entities and their business details remain governed by the existing sources.
