@@ -49,3 +49,18 @@ test('adaptive portal redraws in reduced motion while the VPN renderer keeps its
   assert.ok(adaptive.after.some(color=>color.startsWith('rgba(255,219,205,')));
   assert.deepEqual(vpn.initial,vpn.after);
 });
+
+test('cached back navigation resumes observation and keeps the appearance listener',()=>{
+  const listeners={};let observed=0,disconnected=0;
+  const ctx=new Proxy({createRadialGradient(){return {addColorStop(){}};},createLinearGradient(){return {addColorStop(){}};}},{get(target,key){return target[key]??(()=>{});}});
+  const canvas={dataset:{portalTheme:'adaptive'},getContext(){return ctx;},getBoundingClientRect(){return {width:400,height:400};},addEventListener(){}};
+  const context={document:{querySelector(){return canvas;},body:{classList:{contains(){return true;}}},hidden:false,addEventListener(){}},
+    matchMedia(){return {matches:true,addEventListener(){}};},performance:{now(){return 0;}},devicePixelRatio:1,
+    ResizeObserver:class{constructor(fn){this.fn=fn;}observe(){observed++;this.fn();}disconnect(){disconnected++;}},
+    IntersectionObserver:class{observe(){observed++;}disconnect(){disconnected++;}},cancelAnimationFrame(){},
+    addEventListener(name,fn){listeners[name]=fn;},removeEventListener(name){delete listeners[name];}};
+  context.window=context;vm.runInNewContext(readFileSync('site/vpn/portal.js','utf8'),context);
+  for(let i=0;i<2;i++){listeners.pagehide();listeners.pageshow({persisted:true});assert.equal(typeof listeners['family-themechange'],'function');}
+  assert.equal(observed,6);assert.equal(disconnected,4);
+  listeners['family-themechange']();
+});

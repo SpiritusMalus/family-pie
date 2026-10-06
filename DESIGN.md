@@ -42,3 +42,4 @@ Russian-first pages opt into `data-fp-translate`; reviewed English copy lives in
 
 ## Homepage appearance and navigation
 The original six-slice pie geometry uses neutral theme surfaces, muted outlines and one coral/red segment on the homepage. VPN is one catalog product: do not duplicate its link in the header or hero. Light homepage appearance includes the root/background and an adaptive red portal on a transparent canvas; avoid a dark rectangular art tile. The shared portal opts into the light palette via `data-portal-theme="adaptive"` and redraws on `family-themechange`, including reduced motion.
+Canvas observation resumes on a persisted `pageshow` after cached back navigation; `pagehide` stops frames/observers without discarding theme listeners needed on return.
