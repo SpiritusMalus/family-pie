@@ -1,0 +1,31 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {VpnStore} from '../store.mjs';import {Accounts} from '../auth.mjs';import {createApp} from '../server.mjs';
+test('migration preserves old unlimited profiles and cannot upgrade new dated users',async t=>{
+ const store=new VpnStore(':memory:');t.after(()=>store.close());let users=new Accounts(store);
+ const admin=await users.add({login:'policy-admin',role:'admin'});
+ const old=await users.add({login:'old-fixture',panelLogin:'old-fixture',profileUrl:'https://example.invalid/old',unlimited:true,allowUnlimited:true});
+ const timed=await users.add({login:'timed-fixture',expiresAt:Date.now()+86400_000});
+ const before=users.subscription(old.accountId);store.db.exec('ALTER TABLE managed_subscriptions DROP COLUMN allow_unlimited');
+ users=new Accounts(store);const after=users.subscription(old.accountId);
+ assert.equal(after.allow_unlimited,1);assert.equal(after.profile_url,before.profile_url);assert.equal(after.unlimited,1);assert.equal(after.expires_at,0);
+ assert.equal(users.subscription(timed.accountId).allow_unlimited,0);
+ assert.throws(()=>users.edit(admin.accountId,timed.accountId,{unlimited:true,allow_unlimited:1}),/reserved/);
+ const jobs=store.db.prepare('SELECT count(*) n FROM admin_jobs').get().n;assert.equal(jobs,0);
+ users.edit(admin.accountId,old.accountId,{unlimited:false,expiresAt:Date.now()+86400_000});users.edit(admin.accountId,old.accountId,{unlimited:true});
+ assert.equal(users.subscription(old.accountId).profile_url,before.profile_url);
+ const reopened=new Accounts(store);assert.equal(reopened.subscription(timed.accountId).allow_unlimited,0);
+});
+test('public admin cannot create unlimited or expired accounts or bypass policy with extra fields',async t=>{
+ const store=new VpnStore(':memory:');const {server,users}=createApp({store,origin:'http://localhost',secure:false});
+ const admin=await users.add({login:'http-policy-admin',role:'admin'});const session=users.newSession(admin.accountId);
+ store.db.prepare('UPDATE identities SET must_change=0 WHERE account_id=?').run(admin.accountId);
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(async()=>{await new Promise(r=>server.close(r));store.close();});
+ const url='http://127.0.0.1:'+server.address().port+'/vpn/api/admin/users';
+ const req=(body,path='',method='POST')=>fetch(url+path,{method,headers:{Origin:'http://localhost','Content-Type':'application/json',Cookie:'vpn_session='+session.token,'X-CSRF-Token':session.csrf},body:JSON.stringify(body)});
+ for(const body of [{login:'blocked',unlimited:true,expiresAt:0,allowUnlimited:true},{login:'blocked',unlimited:false,expiresAt:0},{login:'blocked',unlimited:false,expiresAt:Date.now()-1000}])assert.equal((await req(body)).status,400);
+ assert.equal(users.list().length,1);
+ const created=await req({login:'dated-fixture',unlimited:false,expiresAt:Date.now()+86400_000,allowUnlimited:true,role:'admin'});assert.equal(created.status,201);const result=await created.json();
+ assert.equal(users.subscription(result.accountId).allow_unlimited,0);assert.equal(users.identity(result.accountId).role,'user');
+ assert.equal((await req({unlimited:true,allow_unlimited:1},'/'+result.accountId,'PATCH')).status,400);
+ assert.equal(users.subscription(result.accountId).unlimited,0);
+});

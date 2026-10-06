@@ -25,7 +25,7 @@ try{
   const password=temporaryPassword();
   // Store recovery before creating the account; never log credentials.
   writeSync(fd,JSON.stringify({login:x.login,temporaryPassword:password,role:x.role||'user'})+'\n');
-  await users.add({...x,password});created++;
+  await users.add({...x,password,allowUnlimited:x.role!=='admin'});created++;
  }
  console.log(JSON.stringify({created,existing:users.list().length-created}));
 }finally{closeSync(fd);store.close();}
