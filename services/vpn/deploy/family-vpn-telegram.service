@@ -1,0 +1,25 @@
+[Unit]
+Description=Family VPN opt-in subscription Telegram reminders
+After=network.target family-vpn.service
+StartLimitIntervalSec=300
+StartLimitBurst=3
+[Service]
+User=family-vpn
+Group=family-vpn
+WorkingDirectory=/opt/family-vpn/current/services/vpn
+EnvironmentFile=/etc/family-vpn/service.env
+LoadCredential=bot-token:/etc/family-vpn/telegram.token
+ExecStart=/usr/bin/flock -n /var/lib/family-vpn/telegram-worker.lock /opt/family-vpn/node/bin/node /opt/family-vpn/current/services/vpn/telegram-worker.mjs
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=40
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/family-vpn
+MemoryMax=192M
+CPUQuota=30%
+[Install]
+WantedBy=multi-user.target
