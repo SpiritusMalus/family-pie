@@ -12,6 +12,7 @@
   }));
   function draw(time = 0) {
     frame = 0;
+    const light = canvas.dataset.portalTheme === 'adaptive' && document.body.classList.contains('light');
     const t = reduced.matches ? 0 : time * .00013;
     tiltX += (targetX - tiltX) * .06;
     tiltY += (targetY - tiltY) * .06;
@@ -20,8 +21,8 @@
     ctx.clearRect(0, 0, width, height);
     const glow = ctx.createRadialGradient(cx, cy, r * .48, cx, cy, r * 1.3);
     glow.addColorStop(0, 'rgba(245,35,60,0)');
-    glow.addColorStop(.36, 'rgba(218,21,49,.11)');
-    glow.addColorStop(.7, 'rgba(158,22,35,.055)');
+    glow.addColorStop(.36, light ? 'rgba(165,47,50,.065)' : 'rgba(218,21,49,.11)');
+    glow.addColorStop(.7, light ? 'rgba(165,47,50,.035)' : 'rgba(158,22,35,.055)');
     glow.addColorStop(1, 'rgba(158,22,35,0)');
     ctx.fillStyle = glow; ctx.fillRect(0, 0, width, height);
     for (let n = 7; n >= 0; n--) {
@@ -32,16 +33,16 @@
       const rotation = -.28 + tiltX * .06;
       ctx.save(); ctx.translate(x, y); ctx.rotate(rotation);
       ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(221,54,72,${.1 + (7 - n) * .015})`;
+      ctx.strokeStyle = light ? `rgba(116,43,47,${.15 + (7 - n) * .025})` : `rgba(221,54,72,${.1 + (7 - n) * .015})`;
       ctx.lineWidth = .7; ctx.stroke();
       const start = -.5 + n * .43 + t * (n % 2 ? .2 : -.15);
       const gradient = ctx.createLinearGradient(-rx, -ry, rx, ry);
-      gradient.addColorStop(0, `rgba(255,42,67,${.22 + depth * .3})`);
-      gradient.addColorStop(.55, `rgba(255,80,86,${.45 + depth * .45})`);
-      gradient.addColorStop(1, `rgba(255,219,205,${.3 + depth * .65})`);
+      gradient.addColorStop(0, light ? `rgba(165,47,50,${.3 + depth * .35})` : `rgba(255,42,67,${.22 + depth * .3})`);
+      gradient.addColorStop(.55, light ? `rgba(187,58,56,${.6 + depth * .4})` : `rgba(255,80,86,${.45 + depth * .45})`);
+      gradient.addColorStop(1, light ? `rgba(120,35,39,${.5 + depth * .5})` : `rgba(255,219,205,${.3 + depth * .65})`);
       ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, start, start + 2.7);
       ctx.strokeStyle = gradient; ctx.lineWidth = n === 0 ? 2.3 : 1.1;
-      ctx.shadowBlur = n === 0 ? 18 : 9; ctx.shadowColor = '#ff2847'; ctx.stroke();
+      ctx.shadowBlur = light ? 5 : n === 0 ? 18 : 9; ctx.shadowColor = light ? '#b8494938' : '#ff2847'; ctx.stroke();
       ctx.restore();
     }
     for (const p of particles) {
@@ -49,7 +50,7 @@
       const x = cx + Math.cos(a) * r * p.radius * 1.35;
       const y = cy + Math.sin(a) * r * p.radius * 1.18;
       ctx.beginPath(); ctx.arc(x, y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = p.size > 1 ? 'rgba(255,182,164,.65)' : 'rgba(255,91,103,.25)';
+      ctx.fillStyle = light ? (p.size > 1 ? 'rgba(120,35,39,.6)' : 'rgba(165,47,50,.35)') : (p.size > 1 ? 'rgba(255,182,164,.65)' : 'rgba(255,91,103,.25)');
       ctx.fill();
     }
     if (!reduced.matches && visible && !document.hidden) frame = requestAnimationFrame(draw);
@@ -76,7 +77,9 @@
   visibility.observe(canvas);
   document.addEventListener('visibilitychange', restart);
   reduced.addEventListener('change', restart);
+  window.addEventListener('family-themechange', restart);
   window.addEventListener('pagehide', () => {
     cancelAnimationFrame(frame); resize.disconnect(); visibility.disconnect();
+    window.removeEventListener('family-themechange', restart);
   }, { once: true });
 })();
