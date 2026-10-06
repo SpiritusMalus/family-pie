@@ -24,16 +24,23 @@ export class Accounts {
     panel_login TEXT UNIQUE, profile_url TEXT, expires_at INTEGER NOT NULL DEFAULT 0, unlimited INTEGER NOT NULL DEFAULT 0, devices INTEGER NOT NULL DEFAULT 0, enabled INTEGER NOT NULL DEFAULT 1, deleted INTEGER NOT NULL DEFAULT 0, revision INTEGER NOT NULL DEFAULT 0, sync_state TEXT NOT NULL DEFAULT 'synced');
    CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,action TEXT NOT NULL,target TEXT NOT NULL,at INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS admin_jobs(id INTEGER PRIMARY KEY,account_id TEXT NOT NULL,revision INTEGER NOT NULL,payload TEXT NOT NULL,state TEXT NOT NULL DEFAULT 'pending',error TEXT,created_at INTEGER NOT NULL);`);
+  if(!this.db.prepare('PRAGMA table_info(managed_subscriptions)').all().some(x=>x.name==='allow_unlimited'))this.store.transaction(()=>{
+   this.db.exec('ALTER TABLE managed_subscriptions ADD COLUMN allow_unlimited INTEGER NOT NULL DEFAULT 0');
+   // One-time preservation of existing imported unlimited subscriptions.
+   this.db.exec("UPDATE managed_subscriptions SET allow_unlimited=1 WHERE unlimited=1 AND panel_login IS NOT NULL");
+  });
  }
  normalize(login){if(typeof login!=='string'||!login.trim()||login.length>80)throw new Error('Invalid login');return login.trim().toLowerCase();}
- async add({login,password=temporaryPassword(),role='user',panelLogin=null,profileUrl=null,expiresAt=0,unlimited=false,devices=0,enabled=true,actor=null}) {
+ async add({login,password=temporaryPassword(),role='user',panelLogin=null,profileUrl=null,expiresAt=0,unlimited=false,devices=0,enabled=true,actor=null,allowUnlimited=false}) {
   login=this.normalize(login);if(!['user','admin'].includes(role))throw new Error('Invalid role');
+  if(unlimited&&!allowUnlimited)throw new Error('Unlimited access is reserved for existing users');
   if(this.db.prepare('SELECT 1 FROM identities WHERE login=?').get(login))return {created:false};
   const hash=await passwordHash(password);
   return this.store.transaction(()=>{
    const account=this.store.createAccount(`${randomBytes(16).toString('hex')}@accounts.invalid`);
    this.db.prepare('INSERT INTO identities(account_id,login,password_hash,role) VALUES(?,?,?,?)').run(account.id,login,hash,role);
    this.db.prepare('INSERT INTO managed_subscriptions(account_id,panel_login,profile_url,expires_at,unlimited,devices,enabled) VALUES(?,?,?,?,?,?,?)').run(account.id,panelLogin,profileUrl,expiresAt,Number(unlimited),devices,Number(enabled));
+   this.db.prepare('UPDATE managed_subscriptions SET allow_unlimited=? WHERE account_id=?').run(Number(allowUnlimited),account.id);
    if(actor)this.editInternal(actor,account.id,{expiresAt,unlimited,devices,enabled});
    return {created:true,accountId:account.id,login,password};
   });
@@ -81,6 +88,7 @@ export class Accounts {
    if(!Number.isSafeInteger(expires)||expires<0||!Number.isInteger(devices)||devices<0||devices>1000)throw new Error('Invalid limits');
    const enabled=patch.enabled??Boolean(old.enabled),unlimited=patch.unlimited??Boolean(old.unlimited),deleted=patch.deleted??Boolean(old.deleted);
    if([enabled,unlimited,deleted].some(x=>typeof x!=='boolean'))throw new Error('Invalid status');
+   if(unlimited&&!old.allow_unlimited)throw new Error('Unlimited access is reserved for existing users');
    if(enabled&&!deleted&&!unlimited&&!expires)throw new Error('Specify expiry or unlimited access');
    const rev=old.revision+1;
    this.db.prepare("UPDATE managed_subscriptions SET expires_at=?,unlimited=?,devices=?,enabled=?,deleted=?,revision=?,sync_state='pending' WHERE account_id=?").run(expires,Number(unlimited),devices,Number(enabled),Number(deleted),rev,id);

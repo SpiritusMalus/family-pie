@@ -45,7 +45,7 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
      const key='pw:'+id,now=Date.now(),limit=attempts.get(key)||{count:0,until:now+600_000};
     if(limit.until<now){limit.count=0;limit.until=now+600_000;}
     if(limit.count>=10||passwordOperations>=1)return send(res,429,{error:'Повтори позже'});limit.count++;attempts.set(key,limit);passwordOperations++;
-     try{if(typeof body.unlimited!=='boolean'||!Number.isSafeInteger(body.expiresAt)||body.expiresAt<0)return send(res,400,{error:'Проверь срок подписки'});
+     try{if(body.unlimited!==false||!Number.isSafeInteger(body.expiresAt)||body.expiresAt<=Date.now())return send(res,400,{error:'Для нового пользователя выбери дату окончания в будущем'});
      const result=await users.add({login:body.login,actor:id,expiresAt:body.expiresAt,unlimited:body.unlimited,devices:body.devices||0});if(!result.created)return send(res,409,{error:'Такой логин уже есть'});
       return send(res,201,{accountId:result.accountId,login:result.login,temporaryPassword:result.password});}finally{passwordOperations--;}
     }
@@ -53,7 +53,7 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
     if(match&&['PATCH','DELETE'].includes(req.method))return send(res,200,{subscription:users.edit(id,match[1],req.method==='DELETE'?{deleted:true,enabled:false}:body)});
    }
    return send(res,404,{error:'Раздел не найден'});
-  }catch(e){send(res,400,{error:['Wrong current password','Choose a new password'].includes(e.message)?'Проверь текущий пароль и выбери новый':e.message.startsWith('Password must')?'Пароль должен содержать от12 до128 символов':'Запрос не выполнен. Проверь данные.'});}
+  }catch(e){send(res,400,{error:e.message==='Unlimited access is reserved for existing users'?'Новым пользователям нужна подписка с датой окончания':['Wrong current password','Choose a new password'].includes(e.message)?'Проверь текущий пароль и выбери новый':e.message.startsWith('Password must')?'Пароль должен содержать от12 до128 символов':'Запрос не выполнен. Проверь данные.'});}
  });server.headersTimeout=10000;server.requestTimeout=15000;
  return {server,users};
 }

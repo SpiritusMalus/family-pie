@@ -2,7 +2,7 @@ import {test} from 'node:test';import assert from 'node:assert/strict';
 import {VpnStore} from '../store.mjs';import {Accounts,checkPassword} from '../auth.mjs';import {createApp} from '../server.mjs';
 test('temporary passwords gate subscription, change revokes sessions and preserves profile',async t=>{
  const store=new VpnStore(':memory:');t.after(()=>store.close());const users=new Accounts(store);
- const a=await users.add({login:'Existing-user',password:'TemporaryPassword-123',profileUrl:'https://example.invalid/private',unlimited:true});
+ const a=await users.add({login:'Existing-user',password:'TemporaryPassword-123',profileUrl:'https://example.invalid/private',unlimited:true,allowUnlimited:true});
  const first=await users.login('existing-user','TemporaryPassword-123');assert.equal(first.identity.must_change,1);
  const second=await users.login('EXISTING-USER','TemporaryPassword-123');
  await assert.rejects(users.changePassword(a.accountId,'wrong','AnotherPassword-123'));
@@ -18,7 +18,7 @@ test('temporary passwords gate subscription, change revokes sessions and preserv
 test('admin subscription actions create durable jobs, soft-delete and restore; users cannot edit',async t=>{
  const store=new VpnStore(':memory:');t.after(()=>store.close());const users=new Accounts(store);
  const admin=await users.add({login:'admin-fixture',role:'admin',password:'TemporaryPassword-123'});
- const user=await users.add({login:'user-fixture',password:'TemporaryPassword-123',unlimited:true});
+ const user=await users.add({login:'user-fixture',password:'TemporaryPassword-123',unlimited:true,allowUnlimited:true});
  assert.throws(()=>users.edit(user.accountId,user.accountId,{enabled:false}),/Forbidden/);
  users.edit(admin.accountId,user.accountId,{enabled:false,deleted:true});assert.equal(users.subscription(user.accountId).active,false);
  users.edit(admin.accountId,user.accountId,{enabled:true,deleted:false});assert.equal(users.subscription(user.accountId).active,true);
@@ -28,7 +28,7 @@ test('admin subscription actions create durable jobs, soft-delete and restore; u
 });
 test('HTTP auth enforces origin/CSRF/role/forced change and private no-store',async t=>{
  const store=new VpnStore(':memory:');const {server,users}=createApp({store,origin:'http://localhost',secure:false});
- const a=await users.add({login:'http-fixture',password:'TemporaryPassword-123',profileUrl:'https://example.invalid/private',unlimited:true});
+ const a=await users.add({login:'http-fixture',password:'TemporaryPassword-123',profileUrl:'https://example.invalid/private',unlimited:true,allowUnlimited:true});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(async()=>{await new Promise(r=>server.close(r));store.close();});
  const base='http://127.0.0.1:'+server.address().port+'/vpn/api/';
  const req=(path,method='GET',data,headers={})=>fetch(base+path,{method,headers:{Origin:'http://localhost','Content-Type':'application/json',...headers},...(data?{body:JSON.stringify(data)}:{})});
