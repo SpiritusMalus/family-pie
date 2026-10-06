@@ -92,7 +92,7 @@
   .toast-in{display:flex;align-items:center;gap:12px;background:#1B1A17;color:#F4F1EA;padding:14px 20px;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:500}
   /* keyboard focus ring (accent green, paper-bg AA-visible) */
   a,button{outline:none}
-  .brand:focus-visible,.nav-link:focus-visible,.langtoggle button:focus-visible,.row-btn:focus-visible,.store:focus-visible,.legal-links a:focus-visible,.footer-in a:focus-visible{outline:2px solid #0B6E26;outline-offset:3px;border-radius:6px}
+  .brand:focus-visible,.nav-link:focus-visible,.langtoggle button:focus-visible,.row-btn:focus-visible,.store:focus-visible,.subscribe-btn:focus-visible,.legal-links a:focus-visible,.footer-in a:focus-visible{outline:2px solid #0B6E26;outline-offset:3px;border-radius:6px}
   @media (max-width:720px){
     .nav-in,.hero,.products{padding-left:22px;padding-right:22px}
     .hero{padding-top:64px}
@@ -151,6 +151,7 @@
     </a>
     <div class="nav-right">
       <a href="#products" class="nav-link" data-i18n="products">Продукты</a>
+      <a href="/vpn/" class="nav-link">VPN</a>
       <div class="langtoggle" role="group" aria-label="Language">
         <button data-lang="ru" class="on" aria-pressed="true">RU</button>
         <button data-lang="en" aria-pressed="false">EN</button>
@@ -168,7 +169,7 @@
 
 <!-- PRODUCTS -->
 <main id="products" class="products wrap">
-  <div class="sec-label reveal"><span data-i18n="products">Продукты</span> · <span id="sec-count">04</span></div>
+  <div class="sec-label reveal"><span data-i18n="products">Продукты</span> · <span id="sec-count">05</span></div>
   <div id="product-list"><!-- product rows generated from CATALOG (mirror of data/products.json) --></div>
   <!-- No-JS / crawler fallback: real product content. Mirrors CATALOG below + the JS-rendered rows (keep in sync); the JS render replaces #product-list when enabled. Links match <id>/terms · <id>/privacy. -->
   <noscript>
@@ -184,6 +185,7 @@
     </section>
     <section class="ns-row"><h2 class="ns-name">Lumen + REST</h2><p class="ns-tag">Мягкий свет и перерывы / Soft light and breaks</p><a href="/rest_lumen/">Скачать / Download</a></section>
     <section class="ns-row"><h2 class="ns-name">Sufler</h2><p class="ns-tag">Подсказки во время разговора / Live prompts during a conversation</p><a href="/sufler/">О Sufler / About Sufler</a></section>
+    <section class="ns-row"><h2 class="ns-name">Family VPN</h2><p class="ns-tag">Интернет на твоей стороне / Internet on your side</p><a href="/vpn/">Открыть VPN / Open VPN</a></section>
   </noscript>
   <div class="roadmap reveal"><span class="dot"></span><span data-i18n="roadmap">Здесь появятся новые продукты</span></div>
 </main>
@@ -367,15 +369,62 @@ var CATALOG = {
         "en": "Live prompts during a conversation"
       },
       "features": {
-        "ru": ["Windows + macOS", "30 минут пробы", "Запуск вручную"],
-        "en": ["Windows + macOS", "30-minute trial", "Manual start"]
+        "ru": [
+          "Windows + macOS",
+          "30 минут пробы",
+          "Запуск вручную"
+        ],
+        "en": [
+          "Windows + macOS",
+          "30-minute trial",
+          "Manual start"
+        ]
       },
       "desc": {
         "ru": "Sufler для Windows и Mac распознаёт речь и показывает подсказки поверх других окон. Скачайте и попробуйте 30 минут; нужен только ключ Deepgram.",
         "en": "Sufler for Windows and Mac recognizes speech and shows prompts over other windows. Download it for a 30-minute trial; only a Deepgram key is needed."
       },
       "landingUrl": "/sufler/",
-      "landingCta": { "ru": "Скачать Sufler", "en": "Download Sufler" },
+      "landingCta": {
+        "ru": "Скачать Sufler",
+        "en": "Download Sufler"
+      },
+      "legal": false
+    },
+    {
+      "id": "vpn",
+      "order": 5,
+      "name": "Family VPN",
+      "iconId": "vpn",
+      "accent": "#090d13",
+      "accentText": "#a43e38",
+      "badgeBg": "#fbeae5",
+      "image": "/vpn/favicon.svg",
+      "landingUrl": "/vpn/",
+      "landingCta": {
+        "ru": "Открыть VPN",
+        "en": "Open VPN"
+      },
+      "tag": {
+        "ru": "Интернет на твоей стороне",
+        "en": "Internet on your side"
+      },
+      "features": {
+        "ru": [
+          "Личный кабинет",
+          "Срок подписки",
+          "Telegram-бот"
+        ],
+        "en": [
+          "Personal account",
+          "Timed subscriptions",
+          "Telegram bot"
+        ]
+      },
+      "desc": {
+        "ru": "Семейный VPN с личным кабинетом, управлением подпиской и напоминаниями в Telegram. Входи со своим аккаунтом и подключай устройства. Публичная оплата пока готовится.",
+        "en": "A family VPN with a personal account, subscription management and Telegram reminders. Sign in with your account and connect your devices. Public checkout is still being prepared."
+      },
       "legal": false
     }
   ]

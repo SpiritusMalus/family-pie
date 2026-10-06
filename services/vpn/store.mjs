@@ -84,7 +84,7 @@ export class VpnStore {
   subscription(accountId) {
     const account = this.account(accountId);
     const rows = this.db.prepare(`SELECT orders.days,orders.devices,grants.granted_at FROM grants
-      JOIN orders ON orders.id=grants.order_id WHERE grants.account_id=? AND grants.reversed=0
+      JOIN orders ON orders.id=grants.order_id WHERE grants.account_id=? AND grants.reversed=0 AND orders.state='paid'
       ORDER BY grants.granted_at,orders.id`).all(accountId);
     let expiresAt = 0, devices = 0;
     for (const row of rows) {

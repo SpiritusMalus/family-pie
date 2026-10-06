@@ -2,6 +2,9 @@
 """Narrow root bridge: client operations only, private backups, no token logging."""
 import sqlite3,json,time,os,re,subprocess,urllib.request,urllib.parse,shutil,fcntl,socket,secrets
 from pathlib import Path
+import importlib.util
+_spec=importlib.util.spec_from_file_location('payment_access',Path(__file__).with_name('payment-access.py'))
+_payments=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(_payments)
 DB=Path('/var/lib/family-vpn/cabinet.sqlite')
 XRAY='/usr/local/x-ui/bin/xray-linux-amd64'
 PANEL=Path('/etc/x-ui/x-ui.db');CFG=Path('/opt/submerge/config.json');NODES=Path('/opt/submerge/nodes.json');HY=Path('/etc/xray-hy2/config.json')
@@ -38,6 +41,7 @@ def main():
  lock=open('/run/family-vpn-panel.lock','a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
  app=sqlite3.connect(DB,timeout=5);app.row_factory=sqlite3.Row;app.execute('PRAGMA foreign_keys=ON')
  now=int(time.time()*1000)
+ _payments.reconcile(app,now)
  # Expiry is applied to both transports, not merely hidden in the website.
  for row in app.execute('SELECT * FROM managed_subscriptions WHERE enabled=1 AND unlimited=0 AND expires_at>0 AND expires_at<=? AND sync_state="synced"',(now,)).fetchall():
   rev=row['revision']+1;payload={'panelLogin':row['panel_login'],'expiresAt':row['expires_at'],'unlimited':False,'devices':row['devices'],'enabled':False}
@@ -51,6 +55,14 @@ def main():
   app.execute("UPDATE admin_jobs SET state='superseded' WHERE id=?",(job['id'],));app.commit();return
  payload=json.loads(job['payload']);expires=payload['expiresAt'];devices=payload['devices'];enabled=payload['enabled'];unlimited=payload['unlimited']
  if type(expires)!=int or expires<0 or type(devices)!=int or not 0<=devices<=1000 or type(enabled)!=bool or type(unlimited)!=bool:raise RuntimeError('Invalid job payload')
+ if not managed['allow_unlimited']:
+  paid=_payments.entitlement(app,job['account_id'])
+  enabled=enabled and paid['expires']>now
+  unlimited=False
+  if paid['expires']:expires=min(expires,paid['expires'])
+  if not enabled and not managed['panel_login']:
+   app.execute("UPDATE managed_subscriptions SET enabled=0,sync_state=? WHERE account_id=?",('synced' if paid['expires'] else 'awaiting_payment',job['account_id']))
+   app.execute("UPDATE admin_jobs SET state='blocked_payment' WHERE id=?",(job['id'],));app.commit();return
  account=app.execute('SELECT profile_ref FROM accounts WHERE id=?',(job['account_id'],)).fetchone()
  name=managed['panel_login'] or 'web_'+job['account_id'].replace('-','')[:24]
  if name.startswith('root-lab-') or len(name)>100:raise RuntimeError('Unsupported client scope')
@@ -96,7 +108,8 @@ def main():
    app.execute('UPDATE managed_subscriptions SET panel_login=?,profile_url=? WHERE account_id=?',(name,'https://sub.family-pie.ru/sub/'+readback['subId'],job['account_id']));app.commit()
   synchronize(app,created)
   # Guard the current website revision: newer edits retain pending state.
-  app.execute("UPDATE managed_subscriptions SET sync_state='synced' WHERE account_id=? AND revision=?",(job['account_id'],job['revision']))
+  state='synced' if managed['allow_unlimited'] or _payments.entitlement(app,job['account_id'])['expires'] else 'awaiting_payment'
+  app.execute("UPDATE managed_subscriptions SET sync_state=?,enabled=? WHERE account_id=? AND revision=?",(state,int(enabled),job['account_id'],job['revision']))
   app.execute("UPDATE admin_jobs SET state='done',error=NULL WHERE id=?",(job['id'],));app.commit()
   print(json.dumps({'job':job['id'],'state':'synced'}))
  except Exception:
