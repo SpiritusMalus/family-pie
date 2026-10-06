@@ -18,7 +18,7 @@ test('temporary passwords gate subscription, change revokes sessions and preserv
 test('admin subscription actions create durable jobs, soft-delete and restore; users cannot edit',async t=>{
  const store=new VpnStore(':memory:');t.after(()=>store.close());const users=new Accounts(store);
  const admin=await users.add({login:'admin-fixture',role:'admin',password:'TemporaryPassword-123'});
- const user=await users.add({login:'user-fixture',password:'TemporaryPassword-123',unlimited:true,allowUnlimited:true});
+ const user=await users.add({login:'user-fixture',panelLogin:'legacy-user-fixture',password:'TemporaryPassword-123',unlimited:true,allowUnlimited:true});
  assert.throws(()=>users.edit(user.accountId,user.accountId,{enabled:false}),/Forbidden/);
  users.edit(admin.accountId,user.accountId,{enabled:false,deleted:true});assert.equal(users.subscription(user.accountId).active,false);
  users.edit(admin.accountId,user.accountId,{enabled:true,deleted:false});assert.equal(users.subscription(user.accountId).active,true);

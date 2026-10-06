@@ -200,13 +200,57 @@
         "en": "Live prompts during a conversation"
       },
       "features": {
-        "ru": ["Windows + macOS", "30 минут пробы", "Запуск вручную"],
-        "en": ["Windows + macOS", "30-minute trial", "Manual start"]
+        "ru": [
+          "Windows + macOS",
+          "30 минут пробы",
+          "Запуск вручную"
+        ],
+        "en": [
+          "Windows + macOS",
+          "30-minute trial",
+          "Manual start"
+        ]
       },
       "desc": {
         "ru": "Sufler для Windows и Mac распознаёт речь и показывает подсказки поверх других окон. Скачайте и попробуйте 30 минут; нужен только ключ Deepgram.",
         "en": "Sufler for Windows and Mac recognizes speech and shows prompts over other windows. Download it for a 30-minute trial; only a Deepgram key is needed."
       }
+    },
+    {
+      "id": "vpn",
+      "order": 5,
+      "name": "Family VPN",
+      "iconId": "vpn",
+      "accent": "#090d13",
+      "accentText": "#a43e38",
+      "badgeBg": "#fbeae5",
+      "image": "/vpn/favicon.svg",
+      "landingUrl": "/vpn/",
+      "landingCta": {
+        "ru": "Открыть VPN",
+        "en": "Open VPN"
+      },
+      "tag": {
+        "ru": "Интернет на твоей стороне",
+        "en": "Internet on your side"
+      },
+      "features": {
+        "ru": [
+          "Личный кабинет",
+          "Срок подписки",
+          "Telegram-бот"
+        ],
+        "en": [
+          "Personal account",
+          "Timed subscriptions",
+          "Telegram bot"
+        ]
+      },
+      "desc": {
+        "ru": "Семейный VPN с личным кабинетом, управлением подпиской и напоминаниями в Telegram. Входи со своим аккаунтом и подключай устройства. Публичная оплата пока готовится.",
+        "en": "A family VPN with a personal account, subscription management and Telegram reminders. Sign in with your account and connect your devices. Public checkout is still being prepared."
+      },
+      "legal": false
     }
   ]
 }

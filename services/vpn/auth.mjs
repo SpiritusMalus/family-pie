@@ -29,6 +29,7 @@ export class Accounts {
    // One-time preservation of existing imported unlimited subscriptions.
    this.db.exec("UPDATE managed_subscriptions SET allow_unlimited=1 WHERE unlimited=1 AND panel_login IS NOT NULL");
   });
+  if(!this.db.prepare('PRAGMA table_info(managed_subscriptions)').all().some(x=>x.name==='entitlement_revision'))this.db.exec('ALTER TABLE managed_subscriptions ADD COLUMN entitlement_revision INTEGER NOT NULL DEFAULT -1');
  }
  normalize(login){if(typeof login!=='string'||!login.trim()||login.length>80)throw new Error('Invalid login');return login.trim().toLowerCase();}
  async add({login,password=temporaryPassword(),role='user',panelLogin=null,profileUrl=null,expiresAt=0,unlimited=false,devices=0,enabled=true,actor=null,allowUnlimited=false}) {
@@ -41,6 +42,7 @@ export class Accounts {
    this.db.prepare('INSERT INTO identities(account_id,login,password_hash,role) VALUES(?,?,?,?)').run(account.id,login,hash,role);
    this.db.prepare('INSERT INTO managed_subscriptions(account_id,panel_login,profile_url,expires_at,unlimited,devices,enabled) VALUES(?,?,?,?,?,?,?)').run(account.id,panelLogin,profileUrl,expiresAt,Number(unlimited),devices,Number(enabled));
    this.db.prepare('UPDATE managed_subscriptions SET allow_unlimited=? WHERE account_id=?').run(Number(allowUnlimited),account.id);
+   if(!allowUnlimited)this.db.prepare("UPDATE managed_subscriptions SET enabled=0,sync_state='awaiting_payment' WHERE account_id=?").run(account.id);
    if(actor)this.editInternal(actor,account.id,{expiresAt,unlimited,devices,enabled});
    return {created:true,accountId:account.id,login,password};
   });
@@ -76,7 +78,7 @@ export class Accounts {
   });return this.newSession(accountId);
  }
  list(){return this.db.prepare('SELECT identities.account_id,login,role,must_change,identities.enabled AS account_enabled,managed_subscriptions.* FROM identities JOIN managed_subscriptions USING(account_id) ORDER BY login').all().map(({profile_url,...x})=>x);}
- subscription(accountId){const s=this.db.prepare('SELECT * FROM managed_subscriptions WHERE account_id=?').get(accountId);return {...s,active:Boolean(s&&!s.deleted&&s.enabled&&(s.unlimited||s.expires_at>this.clock()))};}
+ subscription(accountId){const s=this.db.prepare('SELECT * FROM managed_subscriptions WHERE account_id=?').get(accountId);if(!s)return {active:false};const paid=this.store.subscription(accountId),required=!s.allow_unlimited&&!paid.expiresAt&&this.identity(accountId)?.role==='user';return {...s,profile_url:required?null:s.profile_url,payment_required:Boolean(required),active:Boolean(!s.deleted&&s.enabled&&(s.unlimited||s.expires_at>this.clock())&&(s.allow_unlimited||paid.active))};}
  edit(actor,id,patch){
   if(this.identity(actor)?.role!=='admin')throw new Error('Forbidden');
   return this.store.transaction(()=>this.editInternal(actor,id,patch));
@@ -84,15 +86,17 @@ export class Accounts {
  editInternal(actor,id,patch){
    if(this.identity(actor)?.role!=='admin')throw new Error('Forbidden');
    const old=this.subscription(id);if(!old.account_id||this.identity(id)?.role==='admin')throw new Error('Subscription not found');
-   const expires=patch.expiresAt??old.expires_at,devices=patch.devices??old.devices;
+   let expires=patch.expiresAt??old.expires_at;const devices=patch.devices??old.devices;
    if(!Number.isSafeInteger(expires)||expires<0||!Number.isInteger(devices)||devices<0||devices>1000)throw new Error('Invalid limits');
-   const enabled=patch.enabled??Boolean(old.enabled),unlimited=patch.unlimited??Boolean(old.unlimited),deleted=patch.deleted??Boolean(old.deleted);
+   let enabled=patch.enabled??Boolean(old.enabled);const unlimited=patch.unlimited??Boolean(old.unlimited),deleted=patch.deleted??Boolean(old.deleted);
    if([enabled,unlimited,deleted].some(x=>typeof x!=='boolean'))throw new Error('Invalid status');
    if(unlimited&&!old.allow_unlimited)throw new Error('Unlimited access is reserved for existing users');
    if(enabled&&!deleted&&!unlimited&&!expires)throw new Error('Specify expiry or unlimited access');
+   const paid=this.store.subscription(id);if(!old.allow_unlimited){enabled=enabled&&paid.active;if(paid.expiresAt)expires=Math.min(expires,paid.expiresAt);}
    const rev=old.revision+1;
-   this.db.prepare("UPDATE managed_subscriptions SET expires_at=?,unlimited=?,devices=?,enabled=?,deleted=?,revision=?,sync_state='pending' WHERE account_id=?").run(expires,Number(unlimited),devices,Number(enabled),Number(deleted),rev,id);
-   this.db.prepare('INSERT INTO admin_jobs(account_id,revision,payload,created_at) VALUES(?,?,?,?)').run(id,rev,JSON.stringify({panelLogin:old.panel_login,expiresAt:expires,unlimited,devices,enabled:enabled&&!deleted}),this.clock());
+   const needsPanel=Boolean(old.panel_login||enabled),sync=needsPanel?'pending':old.allow_unlimited||paid.expiresAt?'synced':'awaiting_payment';
+   this.db.prepare('UPDATE managed_subscriptions SET expires_at=?,unlimited=?,devices=?,enabled=?,deleted=?,revision=?,sync_state=? WHERE account_id=?').run(expires,Number(unlimited),devices,Number(enabled),Number(deleted),rev,sync,id);
+   if(needsPanel)this.db.prepare('INSERT INTO admin_jobs(account_id,revision,payload,created_at) VALUES(?,?,?,?)').run(id,rev,JSON.stringify({panelLogin:old.panel_login,expiresAt:expires,unlimited,devices,enabled:enabled&&!deleted}),this.clock());
    this.db.prepare('INSERT INTO audit(actor,action,target,at) VALUES(?,?,?,?)').run(actor,deleted?'subscription.delete':'subscription.update',id,this.clock());
    return this.subscription(id);
  }

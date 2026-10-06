@@ -31,7 +31,7 @@ export class TelegramStore {
    else text='Family VPN: статус подписки и напоминания. Подключи Telegram в настройках: https://family-pie.ru/vpn/cabinet/#settings\n/status — статус\n/stop — отключить уведомления';
   }else if(command==='/status'){
    const row=this.db.prepare('SELECT s.*,i.enabled AS account_enabled FROM telegram_links l JOIN managed_subscriptions s ON s.account_id=l.account_id JOIN identities i ON i.account_id=l.account_id WHERE l.chat_id=?').get(id);
-   text=!row?'Telegram не привязан. Подключи его в личном кабинете.':!row.account_enabled||row.deleted?'Подписка отключена.':row.unlimited&&row.enabled?'Подписка без ограничения срока. Напоминаний об окончании не будет.':row.expires_at?'Подписка '+(row.enabled&&row.expires_at>this.clock()?'действует до ':'закончилась или отключена. Дата окончания: ')+new Date(row.expires_at).toISOString().slice(0,10)+' (UTC).':'Нет активной подписки.';
+   text=!row?'Telegram не привязан. Подключи его в личном кабинете.':!row.account_enabled||row.deleted?'Подписка отключена.':row.sync_state==='awaiting_payment'?'Доступ ожидает подтверждённой оплаты ЮKassa.':row.unlimited&&row.enabled?'Подписка без ограничения срока. Напоминаний об окончании не будет.':row.expires_at?'Подписка '+(row.enabled&&row.expires_at>this.clock()?'действует до ':'закончилась или отключена. Дата окончания: ')+new Date(row.expires_at).toISOString().slice(0,10)+' (UTC).':'Нет активной подписки.';
   }
   if(text&&recent<10)this.reply(id,update.update_id,text);
  }
