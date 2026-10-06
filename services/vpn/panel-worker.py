@@ -71,6 +71,8 @@ def main():
    if route.startswith('update/') and isinstance(data,dict) and 'id' in data:
     data=dict(data);data['id']=data['uuid']
     if isinstance(data.get('allowedIPs'),str):data['allowedIPs']=[x for x in re.split(r'[\s,]+',data['allowedIPs']) if x]
+    for source,target in [('createdAt','created_at'),('updatedAt','updated_at')]:
+     if source in data:data[target]=data[source]
    req=urllib.request.Request(base+route,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method='POST' if data is not None else 'GET')
    result=json.load(urllib.request.urlopen(req,timeout=15))
    if not result.get('success'):raise RuntimeError('Panel rejected operation')
