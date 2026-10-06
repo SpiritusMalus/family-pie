@@ -1,0 +1,12 @@
+[Unit]
+Description=Apply authenticated VPN subscription changes
+After=family-vpn.service x-ui.service
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/family-vpn/current/services/vpn/panel-worker.py
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+TimeoutStartSec=90
+MemoryMax=192M
+CPUQuota=30%
