@@ -3,6 +3,7 @@
 import sqlite3,json,time,os,re,subprocess,urllib.request,urllib.parse,shutil,fcntl,socket,secrets
 from pathlib import Path
 DB=Path('/var/lib/family-vpn/cabinet.sqlite')
+XRAY='/usr/local/x-ui/bin/xray-linux-amd64'
 PANEL=Path('/etc/x-ui/x-ui.db');CFG=Path('/opt/submerge/config.json');NODES=Path('/opt/submerge/nodes.json');HY=Path('/etc/xray-hy2/config.json')
 def run(args,timeout=30):
  r=subprocess.run(args,capture_output=True,timeout=timeout)
@@ -23,14 +24,14 @@ def synchronize(app,created=False):
  if sorted(users,key=lambda u:u.get('email',''))!=sorted(inbound['settings']['users'],key=lambda u:u.get('email','')):
   inbound['settings']['users']=users
   old=HY.read_bytes();dump(HY,hy)
-  try:run(['/usr/local/x-ui/bin/xray-linux','-test','-config',str(HY)]);run(['systemctl','restart','xray-hy2'])
+  try:run([XRAY,'-test','-config',str(HY)]);run(['systemctl','restart','xray-hy2'])
   except Exception:HY.write_bytes(old);run(['systemctl','restart','xray-hy2']);raise
  panel.close()
  old_cfg=CFG.read_bytes();run(['python3','/opt/submerge/gen_config.py'])
  if CFG.read_bytes()!=old_cfg:run(['systemctl','restart','submerge'])
  for unit in ['x-ui','xray-hy2','submerge','nginx']:
   run(['systemctl','is-active','--quiet',unit])
- run(['/usr/local/x-ui/bin/xray-linux','-test','-config','/usr/local/x-ui/bin/config.json'])
+ run([XRAY,'-test','-config','/usr/local/x-ui/bin/config.json'])
  with socket.create_connection(('127.0.0.1',8443),timeout=3):pass
 
 def main():
@@ -66,6 +67,9 @@ def main():
   token=match.group(1);settings=dict(panel.execute('SELECT key,value FROM settings'))
   base='http://127.0.0.1:'+str(settings.get('webPort','31123'))+'/'+settings.get('webBasePath','/').strip('/')+'/panel/api/clients/'
   def api(route,data=None):
+   # 3.4.2 GET emits a numeric row id; its update DTO requires a string.
+   if route.startswith('update/') and isinstance(data,dict) and 'id' in data:
+    data=dict(data);data['id']=str(data['id'])
    req=urllib.request.Request(base+route,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method='POST' if data is not None else 'GET')
    result=json.load(urllib.request.urlopen(req,timeout=15))
    if not result.get('success'):raise RuntimeError('Panel rejected operation')
