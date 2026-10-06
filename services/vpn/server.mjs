@@ -22,13 +22,14 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
  const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));};
  const cookie=(res,token)=>res.setHeader('Set-Cookie',`vpn_session=${token}; Path=/vpn/; HttpOnly; SameSite=Strict; ${secure?'Secure; ':''}Max-Age=${token?43200:0}`);
  const token=req=>(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_session='))?.slice(12);
+ const recent=s=>{if(!users.db.prepare('SELECT 1 FROM session_auth WHERE token_hash=? AND verified_at>?').get(s.token_hash,Date.now()-300000))throw new Error('Повтори вход перед изменением способов входа');};
  const server=createServer(async(req,res)=>{
   try{
    const path=new URL(req.url,origin).pathname;
    if(path==='/vpn/api/health'&&req.method==='GET')return send(res,200,{service:'family-vpn-cabinet',revision});
    if(path==='/vpn/api/plans'&&req.method==='GET')return send(res,200,{plans:[...store.plans.values()],available:billing.ready()&&store.plans.size>0,testMode:billing.config.testMode});
    if(path==='/vpn/api/auth-options'&&req.method==='GET')return send(res,200,{google:google.ready(),email:Boolean(sendEmail),passkey:true,password:true,registration:true});
-   if(path==='/vpn/api/google/start'&&req.method==='GET'){const existing=users.session(token(req));if(existing?.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль'});const s=google.start(existing);res.writeHead(302,{'Location':s.url,'Cache-Control':'no-store','Set-Cookie':`vpn_google=${s.state}; Path=/vpn/api/google/; HttpOnly; SameSite=Lax; ${secure?'Secure; ':''}Max-Age=300`});return res.end();}
+   if(path==='/vpn/api/google/start'&&req.method==='GET'){const existing=users.session(token(req));if(existing?.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль'});if(existing)recent(existing);const s=google.start(existing);res.writeHead(302,{'Location':s.url,'Cache-Control':'no-store','Set-Cookie':`vpn_google=${s.state}; Path=/vpn/api/google/; HttpOnly; SameSite=Lax; ${secure?'Secure; ':''}Max-Age=300`});return res.end();}
    if(path==='/vpn/api/google/callback'&&req.method==='GET'){try{const q=new URL(req.url,origin).searchParams,c=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_google='))?.slice(11),s=await google.finish(q.get('state'),c,q.get('code'));cookie(res,s.token);res.writeHead(302,{'Location':'/vpn/cabinet/','Cache-Control':'no-store'});return res.end();}catch{return send(res,400,{error:'Не удалось подтвердить Google. Вернись на страницу входа и повтори'});}}
    if(path==='/vpn/api/passkeys/login/options'&&req.method==='POST'){
     if(req.headers.origin!==origin)return send(res,403,{error:'Источник запроса не разрешён'});return send(res,200,await passkeys.options());
@@ -36,6 +37,7 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
    const webhook=path==='/vpn/api/billing/webhook'&&req.method==='POST';
    const mutation=req.method!=='GET';
    if(mutation&&!webhook&&req.headers.origin!==origin)return send(res,403,{error:'Источник запроса не разрешён'});
+   if(path==='/vpn/api/support/attachment'&&mutation&&!users.session(token(req)))return send(res,401,{error:'Войди в аккаунт'});
    let body={};
    if(mutation){if(!String(req.headers['content-type']).startsWith('application/json'))return send(res,415,{error:'Ожидается JSON'});
     let raw='';for await(const chunk of req){raw+=chunk;if(Buffer.byteLength(raw)>(path==='/vpn/api/support/attachment'?1500000:32768))return send(res,413,{error:'Слишком большой запрос'});}try{body=JSON.parse(raw);}catch{return send(res,400,{error:'Некорректный запрос'});}}
@@ -72,6 +74,7 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
    }
    if(session.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль',mustChange:true});
    const admin=session.identity.role==='admin';
+   if(mutation&&['/vpn/api/email','/vpn/api/email/confirm','/vpn/api/google','/vpn/api/passkeys','/vpn/api/passkeys/options'].includes(path))recent(session);
    if(path==='/vpn/api/push'&&req.method==='GET')return send(res,200,push.state(id));
    if(path==='/vpn/api/push'&&req.method==='POST')return send(res,201,push.subscribe(id,body.subscription));
    if(path==='/vpn/api/push'&&req.method==='DELETE'){push.disconnect(id,body.id);return send(res,200,{ok:true});}
@@ -97,13 +100,18 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
    if(path==='/vpn/api/orders'&&req.method==='GET')return send(res,200,{orders:cabinet.orders(id)});
    if(path==='/vpn/api/promo'&&req.method==='POST'){const p=cabinet.promo(body.code);return send(res,200,{code:p.code,percent:p.percent});}
    if(path==='/vpn/api/checkout'&&req.method==='POST'){
+    if(admin)return send(res,409,{error:'Для покупки используй отдельный пользовательский аккаунт'});
+    if(users.subscription(id).deleted)return send(res,409,{error:'Подписка отключена. Сначала напиши в поддержку'});
     if(users.subscription(id).allow_unlimited)return send(res,409,{error:'У тебя бессрочный доступ. Оплачивать продление не нужно'});
-    if(!billing.ready())return send(res,503,{error:'Оплата временно недоступна'});cabinet.createOrder(id,body.days,body.requestKey,body.promo);return send(res,200,await billing.checkout(id,body.days,body.requestKey,body.email));
+    if(!billing.ready())return send(res,503,{error:'Оплата временно недоступна'});
+    if(typeof body.email!=='string'||body.email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))return send(res,400,{error:'Укажи email для чека'});
+    if(!users.db.prepare('SELECT 1 FROM orders WHERE account_id=? AND request_key=?').get(id,body.requestKey)&&users.db.prepare("SELECT count(*) n FROM orders WHERE account_id=? AND state='pending' AND created_at>?").get(id,Date.now()-24*3600000).n>=5)return send(res,429,{error:'Сначала заверши или дождись отмены предыдущих платежей'});
+    cabinet.createOrder(id,body.days,body.requestKey,body.promo);return send(res,200,await billing.checkout(id,body.days,body.requestKey,body.email));
    }
    const orderMatch=path.match(/^\/vpn\/api\/orders\/([a-f0-9-]+)\/check$/);if(orderMatch&&req.method==='POST'){const o=await billing.check(id,orderMatch[1]);return send(res,200,{order:{id:o.id,state:o.state},subscription:users.subscription(id)});}
    if(path==='/vpn/api/support'&&req.method==='GET')return send(res,200,{threads:cabinet.threads(id)});
-   if(path==='/vpn/api/support'&&req.method==='POST')return send(res,201,{thread:cabinet.createThread(id,body.subject,body.message)});
-   const threadMatch=path.match(/^\/vpn\/api\/(admin\/)?support\/([a-f0-9-]+)$/);if(threadMatch){if(threadMatch[1]&&!admin)return send(res,403,{error:'Только для администратора'});const privileged=Boolean(threadMatch[1]);if(req.method==='GET')return send(res,200,{thread:cabinet.thread(threadMatch[2],id,privileged),messages:cabinet.messages(threadMatch[2],id,privileged)});if(req.method==='POST')return send(res,201,cabinet.reply(threadMatch[2],id,body.message,privileged));if(req.method==='PATCH'){cabinet.closeThread(threadMatch[2],id,body.closed,privileged);return send(res,200,{ok:true});}}
+   if(path==='/vpn/api/support'&&req.method==='POST')return send(res,201,{thread:cabinet.createThread(id,body.subject,body.message,body.requestKey)});
+   const threadMatch=path.match(/^\/vpn\/api\/(admin\/)?support\/([a-f0-9-]+)$/);if(threadMatch){if(threadMatch[1]&&!admin)return send(res,403,{error:'Только для администратора'});const privileged=Boolean(threadMatch[1]);if(req.method==='GET')return send(res,200,{thread:cabinet.thread(threadMatch[2],id,privileged),messages:cabinet.messages(threadMatch[2],id,privileged)});if(req.method==='POST')return send(res,201,cabinet.reply(threadMatch[2],id,body.message,privileged,body.requestKey));if(req.method==='PATCH'){cabinet.closeThread(threadMatch[2],id,body.closed,privileged);return send(res,200,{ok:true});}}
    if(path==='/vpn/api/support/attachment'&&req.method==='POST')return send(res,201,cabinet.attachment(body.messageId,id,body.name,body.mime,body.data,admin));
    const fileMatch=path.match(/^\/vpn\/api\/support\/files\/([a-f0-9-]+)$/);if(fileMatch&&req.method==='GET'){const f=cabinet.file(fileMatch[1],id,admin);res.writeHead(200,{'Content-Type':f.mime,'Content-Disposition':`attachment; filename*=UTF-8''${encodeURIComponent(f.name)}`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; sandbox"});return res.end(Buffer.from(f.data));}
    if(path==='/vpn/api/news'&&req.method==='GET')return send(res,200,{posts:cabinet.posts(id)});

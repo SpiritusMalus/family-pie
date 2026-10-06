@@ -10,5 +10,5 @@ export class GoogleLogin{
   this.db.prepare('INSERT INTO google_identities VALUES(?,?,?) ON CONFLICT(subject) DO UPDATE SET email=excluded.email').run(payload.sub,id,payload.email);return this.users.newSession(id,{method:'google'});
  }
  state(id){return {available:this.ready(),linked:Boolean(this.db.prepare('SELECT 1 FROM google_identities WHERE account_id=?').get(id))};}
- unlink(id){if(!this.db.prepare('SELECT password_set FROM identities WHERE account_id=?').get(id)?.password_set&&!this.db.prepare('SELECT 1 FROM passkeys WHERE account_id=?').get(id))throw new Error('Сначала установи пароль или добавь ключ входа');this.db.prepare('DELETE FROM google_identities WHERE account_id=?').run(id);}
+ unlink(id){if(!this.db.prepare('SELECT password_set FROM identities WHERE account_id=?').get(id)?.password_set&&!this.db.prepare('SELECT 1 FROM passkeys WHERE account_id=?').get(id)&&!this.db.prepare('SELECT 1 FROM verified_emails WHERE account_id=?').get(id))throw new Error('Сначала установи пароль или добавь ключ входа');this.db.prepare('DELETE FROM google_identities WHERE account_id=?').run(id);}
 }
