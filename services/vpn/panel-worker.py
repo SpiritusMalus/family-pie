@@ -70,6 +70,7 @@ def main():
    # 3.4.2 GET emits a numeric row id; its update DTO requires a string.
    if route.startswith('update/') and isinstance(data,dict) and 'id' in data:
     data=dict(data);data['id']=str(data['id'])
+    if isinstance(data.get('allowedIPs'),str):data['allowedIPs']=[x for x in re.split(r'[\s,]+',data['allowedIPs']) if x]
    req=urllib.request.Request(base+route,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method='POST' if data is not None else 'GET')
    result=json.load(urllib.request.urlopen(req,timeout=15))
    if not result.get('success'):raise RuntimeError('Panel rejected operation')
