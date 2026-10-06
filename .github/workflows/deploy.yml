@@ -41,6 +41,8 @@ jobs:
           node-version: '22'
       - run: node --check tools/build-legal.mjs && node tools/build-legal.mjs
       - run: test -s site/index.html
+      - name: Test site language behavior
+        run: node --test tools/test-i18n.mjs
       - name: Test VPN service core
         run: node --test services/vpn/test/*.test.mjs
   deploy:

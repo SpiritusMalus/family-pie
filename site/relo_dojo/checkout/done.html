@@ -8,9 +8,9 @@
 <!--
   PROVENANCE: hosted copy of relo_dojo/marketing/checkout/done.html (canonical source lives in
   the SpiritusMalus/relo_dojo repo). family-pie HOSTS it at /relo_dojo/checkout/done as the
-  BILLING_RETURN_URL. This hosted copy adds ONE thing the canonical file omits: a best-effort
+  BILLING_RETURN_URL. This hosted copy adds shared site-language controls and a best-effort
   `relodojo://premium` deep-link (short timeout) so the in-app Custom Tab auto-closes back into
-  the app. Everything else is verbatim — change the canonical file and re-copy for the rest.
+  the app. Preserve these hosting additions when refreshing the canonical checkout copy.
 
   Return page after the provider's checkout (BILLING_RETURN_URL points here). Payment is confirmed
   server-side by the webhook, NOT by landing here — so this page only reassures and sends the buyer
@@ -34,6 +34,8 @@
           box-shadow:var(--shadow); padding:28px 22px; }
   .hint { color:var(--ink3); font-size:13px; margin-top:18px; }
 </style>
+<link rel="stylesheet" href="/i18n/language.css">
+<script src="/i18n/language.js"></script>
 </head>
 <body>
 <div class="belt"></div>
@@ -46,7 +48,9 @@
   <p class="hint" id="hint">Доступ обновится при следующем открытии приложения.</p>
 </div>
 <script>
-  if (new URLSearchParams(location.search).get("lang") === "en") {
+  window.addEventListener("fp-languagechange", function(){ location.reload(); });
+  if (window.FPi18n.lang === "en") {
+    document.title = "Done · Relo Dojo";
     document.documentElement.lang = "en";
     document.getElementById("h1").textContent = "Thank you!";
     document.getElementById("body").textContent =

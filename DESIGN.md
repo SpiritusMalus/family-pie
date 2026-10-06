@@ -34,3 +34,8 @@ This is a visual revision of the explicitly public demonstration. Identity, bill
 
 ## Author voice
 The owner is the sole developer. Studio-homepage copy uses first-person singular (я / I), with an independent-developer label; do not imply a team in RU/EN. Product/legal entities and their business details remain governed by the existing sources.
+
+## Website language
+All HTML entry points share `fp_lang` through `/i18n/language.js`. Explicit app-fragment language takes precedence, then `?lang=`, saved preference, and browser language. Keep RU/EN controls keyboard-accessible and preserve the selection across product/legal/purchase/account navigation.
+
+Russian-first pages opt into `data-fp-translate`; reviewed English copy lives in `/i18n/en.js`. Translation updates text nodes and accessibility/metadata attributes, preserving markup, form values and application behavior. Include new static copy and asynchronous states in the map; use `FPi18n.t()` for clipboard text and native dialogs. Exclude user-provided text with `data-fp-no-i18n`. Native bilingual renderers use the shared preference directly. Setup instructions may quote the app's actual Russian control names next to English explanations. UI localization does not change product legal/business facts or external app/payment-provider interfaces.

@@ -7,8 +7,9 @@
 <title>Чёрный пояс · Relo Dojo</title>
 <!--
   PROVENANCE: hosted copy of relo_dojo/marketing/checkout/index.html (canonical source
-  lives in the SpiritusMalus/relo_dojo repo). family-pie only HOSTS it at
-  /relo_dojo/checkout/ — do NOT edit logic here; change the canonical file and re-copy.
+  lives in the SpiritusMalus/relo_dojo repo). family-pie HOSTS it at
+  /relo_dojo/checkout/ with shared site-language controls. Preserve hosting additions
+  when refreshing the canonical copy; payment behavior stays owned by the app.
 
   Web checkout for the premium "Black Belt" subscription.
 
@@ -66,6 +67,8 @@
   .note.warn { background:#FDF6E3; color:#8A6D1A; }
   .hidden { display:none !important; }
 </style>
+<link rel="stylesheet" href="/i18n/language.css">
+<script src="/i18n/language.js"></script>
 </head>
 <body>
 <div class="belt"></div>
@@ -74,7 +77,7 @@
     <svg class="mark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M3 7h18M5 7l1.5-2.5h11L19 7M6.5 7v13M17.5 7v13M6.5 10.5h11" stroke="#15201A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    <span>Relo Dojo <small>· Чёрный пояс</small></span>
+    <span>Relo Dojo <small id="belt-label">· Чёрный пояс</small></span>
   </header>
 
   <h1 id="h1">Чёрный пояс</h1>
@@ -96,7 +99,7 @@
   var hash = new URLSearchParams(location.hash.slice(1));
   var api = (hash.get("api") || "").replace(/\/+$/, "");
   var token = hash.get("token") || "";
-  var lang = hash.get("lang") === "en" ? "en" : "ru";
+  var lang = window.FPi18n.lang;
 
   // Defense-in-depth: the bearer token must only ever be sent to OUR backend. `api` comes from the
   // URL fragment, so refuse to call (and never attach the token to) any host outside this allowlist —
@@ -112,7 +115,7 @@
   }
   var sessionOk = !!token && apiAllowed(api);
 
-  var T = {
+  var COPY = {
     ru: {
       h1: "Чёрный пояс", lead: "Безлимит, двойные коку и «Проверь мой текст» без ограничений.",
       pay: "Оплатить", paying: "Создаём оплату…",
@@ -131,16 +134,29 @@
       errPlans: "Couldn’t load the plans. Refresh the page.",
       errPay: "Couldn’t start the payment. Try again."
     }
-  }[lang];
+  };
+  var T = COPY[lang];
 
-  var plans = [], selected = null;
+  var plans = [], selected = null, busy = false, errorKey = null;
   var $ = function (id) { return document.getElementById(id); };
 
-  document.documentElement.lang = lang;
-  $("h1").textContent = T.h1; $("lead").textContent = T.lead;
-  $("pay").textContent = T.pay; $("fine").textContent = T.fine;
-
-  if (!sessionOk) { var n = $("noToken"); n.textContent = T.noToken; n.classList.remove("hidden"); }
+  function localize() {
+    lang = window.FPi18n.lang; T = COPY[lang];
+    document.documentElement.lang = lang;
+    document.title = T.h1 + " · Relo Dojo";
+    $("belt-label").textContent = "· " + T.h1;
+    $("h1").textContent = T.h1; $("lead").textContent = T.lead;
+    $("pay").textContent = busy ? T.paying : T.pay; $("fine").textContent = T.fine;
+    if (!sessionOk) { var n = $("noToken"); n.textContent = T.noToken; n.classList.remove("hidden"); }
+    if (errorKey) $("err").textContent = T[errorKey];
+    render();
+  }
+  window.addEventListener("fp-languagechange", function(){
+    hash.set("lang", window.FPi18n.lang);
+    history.replaceState(null, "", location.pathname + location.search + "#" + hash.toString());
+    localize();
+  });
+  localize();
 
   function priceLabel(p) {
     return p.price_rub + " ₽";
@@ -165,7 +181,7 @@
       el.onclick = function () { selected = p.id; render(); };
       box.appendChild(el);
     });
-    $("pay").disabled = !selected || !sessionOk;
+    $("pay").disabled = busy || !selected || !sessionOk;
   }
 
   // load the catalog (only from the trusted backend; a tampered `api` is treated as no session)
@@ -173,13 +189,13 @@
     fetch(api + "/billing/plans")
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
       .then(function (d) { plans = d.plans || []; selected = plans.length ? plans[0].id : null; render(); })
-      .catch(function () { var e = $("err"); e.textContent = T.errPlans; e.classList.remove("hidden"); });
+      .catch(function () { var e = $("err"); errorKey = "errPlans"; e.textContent = T.errPlans; e.classList.remove("hidden"); });
   }
 
   // pay → ask the backend for a provider checkout url, then redirect
   $("pay").addEventListener("click", function () {
-    if (!selected || !sessionOk) return;
-    var btn = $("pay"); btn.disabled = true; btn.textContent = T.paying;
+    if (busy || !selected || !sessionOk) return;
+    var btn = $("pay"); busy = true; errorKey = null; btn.disabled = true; btn.textContent = T.paying;
     $("err").classList.add("hidden");
     fetch(api + "/billing/checkout", {
       method: "POST",
@@ -189,8 +205,8 @@
       .then(function (r) { if (!r.ok) throw 0; return r.json(); })
       .then(function (d) { if (d && d.url) { location.href = d.url; } else { throw 0; } })
       .catch(function () {
-        var e = $("err"); e.textContent = T.errPay; e.classList.remove("hidden");
-        btn.disabled = false; btn.textContent = T.pay;
+        var e = $("err"); errorKey = "errPay"; e.textContent = T.errPay; e.classList.remove("hidden");
+        busy = false; btn.disabled = false; btn.textContent = T.pay;
       });
   });
 })();
