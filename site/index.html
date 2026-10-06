@@ -8,115 +8,9 @@
 <meta property="og:title" content="family-pie — студия приложений">
 <meta property="og:description" content="Спокойные приложения для повседневной жизни.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{margin:0;padding:0;background:#F4F1EA}
-  body{color:#1B1A17;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased}
-  a{color:inherit}
-  /* reveal on scroll */
-  .reveal{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
-  .reveal.in{opacity:1;transform:none}
-  /* pie logo */
-  .pielogo{transition:transform .8s cubic-bezier(.22,.61,.36,1)}
-  .pielogo:hover{transform:rotate(180deg)}
-  .seg{transform-box:fill-box;transform-origin:center;animation:segIn .7s cubic-bezier(.22,.61,.36,1) both}
-  .seg:nth-child(1){animation-delay:.05s}.seg:nth-child(2){animation-delay:.13s}.seg:nth-child(3){animation-delay:.21s}
-  .seg:nth-child(4){animation-delay:.29s}.seg:nth-child(5){animation-delay:.37s}.seg:nth-child(6){animation-delay:.45s}
-  @keyframes segIn{from{opacity:0;transform:scale(.4) rotate(-50deg)}to{opacity:1;transform:scale(1) rotate(0)}}
-  /* nav */
-  .nav{position:sticky;top:0;z-index:40;background:rgba(244,241,234,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #E4DDCE}
-  .nav-in{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 40px}
-  .brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;cursor:pointer}
-  .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.01em}
-  .nav-right{display:flex;align-items:center;gap:26px}
-  .nav-link{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#736d5f;text-decoration:none}
-  .langtoggle{display:flex;border:1px solid #1B1A17;border-radius:999px;overflow:hidden;font-family:'Space Mono',monospace;font-size:12px}
-  .langtoggle button{font-family:inherit;font-size:12px;letter-spacing:.08em;padding:7px 15px;border:none;cursor:pointer;background:transparent;color:#1B1A17}
-  .langtoggle button.on{background:#1B1A17;color:#fff}
-  .subscribe-btn{display:inline-block;margin-bottom:14px;padding:12px 20px;border-radius:12px;background:#1B1A17;color:#fff;text-decoration:none;font-weight:700;font-size:15px;font-family:'Space Grotesk',sans-serif;transition:filter .2s ease,transform .1s ease}
-  .subscribe-btn:hover{filter:brightness(.92)}
-  .subscribe-btn:active{transform:scale(.98)}
-  /* layout */
-  .wrap{max-width:1000px;margin:0 auto;padding:0 40px}
-  .hero{padding:96px 40px 56px}
-  .eyebrow{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#0B6E26;margin-bottom:26px}
-  h1.hero-tag{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:64px;line-height:1.04;letter-spacing:-.025em;max-width:820px;text-wrap:balance}
-  .hero-intro{font-size:19px;line-height:1.6;color:#6b655c;max-width:560px;margin-top:28px}
-  .products{padding:40px 40px}
-  .sec-label{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#736d5f;padding-bottom:8px;border-bottom:1px solid #E4DDCE;margin-bottom:4px}
-  .row{border-bottom:1px solid #E4DDCE;transition:background .3s ease}
-  .row:hover{background:#EFEBE0}
-  .row-btn{width:100%;display:flex;align-items:flex-start;gap:28px;padding:38px 16px;background:none;border:none;cursor:pointer;text-align:left;font-family:inherit}
-  .row-num{font-family:'Space Mono',monospace;font-size:14px;padding-top:12px}
-  .row-ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;margin-top:2px}
-  .row-name{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:34px;letter-spacing:-.015em}
-  .row-tag{display:block;font-size:16px;color:#6b655c;margin-top:7px}
-  .row-toggle{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#736d5f;padding-top:14px;white-space:nowrap}
-  .panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.22,.61,.36,1)}
-  .row.open .panel{grid-template-rows:1fr}
-  .panel-clip{overflow:hidden}
-  .panel-in{padding:0 16px 44px 102px;display:flex;gap:56px;flex-wrap:wrap;opacity:0;transition:opacity .5s ease .1s}
-  .row.open .panel-in{opacity:1}
-  .panel-text{flex:1;min-width:320px;max-width:520px}
-  .panel-desc{font-size:16.5px;line-height:1.7;color:#3a382f;margin-bottom:24px}
-  .chips{display:flex;gap:10px;flex-wrap:wrap}
-  .chip{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:6px 13px}
-  .panel-side{flex:none;width:290px}
-  .side-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#736d5f;margin-bottom:12px}
-  .stores{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
-  .store{display:flex;align-items:center;gap:11px;padding:12px 16px;border:1px solid #cfc6b4;border-radius:13px;background:#faf7f1;cursor:pointer;text-align:left;text-decoration:none;font-family:inherit;transition:transform .2s ease,border-color .2s ease,background .2s ease}
-  .store:hover{transform:translateY(-2px);background:#fff}
-  .store .s-name{display:block;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600}
-  .store .s-sub{display:block;font-size:11px;color:#736d5f}
-  .bell{width:16px;height:16px;flex:none;color:currentColor}
-  .store .bell{color:#736d5f}
-  .legal-links{display:flex;gap:20px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em}
-  .legal-links a{color:#1B1A17;text-decoration:underline;text-underline-offset:3px}
-  .roadmap{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#736d5f;padding:30px 16px;display:flex;align-items:center;gap:14px}
-  .roadmap .dot{width:16px;height:16px;border-radius:5px;border:1px dashed #c7bfae}
-  /* no-JS / crawler fallback rows (only shown without JS) */
-  .ns-row{padding:28px 16px;border-bottom:1px solid #E4DDCE}
-  .ns-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.015em}
-  .ns-tag{font-size:16px;color:#6b655c;margin-top:7px}
-  .ns-legal{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.04em;margin-top:14px}
-  .ns-legal a{color:#1B1A17;text-decoration:underline;text-underline-offset:3px}
-  .footer{border-top:1px solid #E4DDCE;margin-top:40px}
-  .footer-in{max-width:1000px;margin:0 auto;padding:34px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;font-family:'Space Mono',monospace;font-size:12px;color:#736d5f}
-  .footer-in a{color:#1B1A17;text-decoration:underline;text-underline-offset:3px}
-  /* toast */
-  .toast{position:fixed;left:50%;bottom:32px;z-index:90;transform:translateX(-50%) translateY(16px);opacity:0;pointer-events:none;transition:opacity .4s ease,transform .4s cubic-bezier(.22,.61,.36,1)}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .toast-in{display:flex;align-items:center;gap:12px;background:#1B1A17;color:#F4F1EA;padding:14px 20px;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.25);font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:500}
-  /* keyboard focus ring (accent green, paper-bg AA-visible) */
-  a,button{outline:none}
-  .brand:focus-visible,.nav-link:focus-visible,.langtoggle button:focus-visible,.row-btn:focus-visible,.store:focus-visible,.legal-links a:focus-visible,.footer-in a:focus-visible{outline:2px solid #0B6E26;outline-offset:3px;border-radius:6px}
-  @media (max-width:720px){
-    .nav-in,.hero,.products{padding-left:22px;padding-right:22px}
-    .hero{padding-top:64px}
-    h1.hero-tag{font-size:42px}
-    .hero-intro{font-size:17px}
-    .row-name{font-size:26px}
-    .row-btn{gap:16px;padding:28px 4px}
-    .panel-in{padding-left:4px;flex-direction:column;gap:28px}
-    .panel-side{width:100%}
-    .nav-link{display:none}
-  }
-  /* respect reduced-motion: keep all content, drop the movement */
-  @media (prefers-reduced-motion: reduce){
-    .reveal{opacity:1 !important;transform:none !important;transition:none !important}
-    .pielogo{transition:none}
-    .pielogo:hover{transform:none}
-    .seg{animation:none !important}
-    .panel{transition:none}
-    .panel-in{transition:none}
-    .row,.store{transition:none}
-    .toast{transform:translateX(-50%);transition:opacity .2s linear}
-    .toast.show{transform:translateX(-50%)}
-  }
-</style>
+<link rel="stylesheet" href="/vpn/fonts.css">
+<link rel="stylesheet" href="/home.css">
+<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
 </head>
 <body>
 
@@ -150,6 +44,11 @@
       <span class="brand-name">family-pie</span>
     </a>
     <div class="nav-right">
+      <a href="/vpn/" class="nav-link vpn-link">Family VPN ↗</a>
+      <button class="theme-toggle" type="button" aria-label="Сменить тему" aria-pressed="false">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 15.3A8.5 8.5 0 0 1 8.7 4a8.5 8.5 0 1 0 11.3 11.3Z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+      </button>
       <a href="#products" class="nav-link" data-i18n="products">Продукты</a>
       <div class="langtoggle" role="group" aria-label="Language">
         <button data-lang="ru" class="on" aria-pressed="true">RU</button>
@@ -161,14 +60,21 @@
 
 <!-- HERO -->
 <header class="hero wrap">
-  <div class="eyebrow reveal" data-i18n="studioEyebrow">Студия приложений</div>
-  <h1 class="hero-tag reveal" data-i18n="studioTag">Спокойные приложения для повседневной жизни.</h1>
-  <p class="hero-intro reveal" data-i18n="studioIntro">Небольшая независимая студия. Делаем приватные, неспешные приложения, которыми пользуешься каждый день — без рекламы и лишнего шума.</p>
+  <div class="hero-content">
+    <div class="eyebrow reveal" data-i18n="studioEyebrow">Студия приложений</div>
+    <h1 class="hero-tag reveal" data-i18n="studioTag">Спокойные приложения. Каждый день.</h1>
+    <p class="hero-intro reveal" data-i18n="studioIntro">Небольшая независимая студия. Делаем приватные приложения для повседневной жизни, без рекламы и лишнего шума.</p>
+    <div class="hero-actions reveal">
+      <a class="primary-btn" href="#products"><span data-i18n="products">Продукты</span><span aria-hidden="true">→</span></a>
+      <a class="hero-secondary" href="/vpn/">Family VPN ↗</a>
+    </div>
+  </div>
+  <figure class="hero-art"><canvas id="portal" role="img" aria-label="Красные световые дуги образуют глубокий портал в темноте"></canvas></figure>
 </header>
 
 <!-- PRODUCTS -->
 <main id="products" class="products wrap">
-  <div class="sec-label reveal"><span data-i18n="products">Продукты</span> · <span id="sec-count">04</span></div>
+  <div class="sec-label reveal"><span data-i18n="products">Продукты</span> <small id="sec-count">04</small></div>
   <div id="product-list"><!-- product rows generated from CATALOG (mirror of data/products.json) --></div>
   <!-- No-JS / crawler fallback: real product content. Mirrors CATALOG below + the JS-rendered rows (keep in sync); the JS render replaces #product-list when enabled. Links match <id>/terms · <id>/privacy. -->
   <noscript>
@@ -207,34 +113,35 @@
    a product = adding one record below (+ its legal markdown in content/).
    ============================================================================ */
 var CATALOG = {
+  "_comment": "Catalog-as-data — single source of truth for the landing + legal pages. Derived from handoff/index.html (i18n dict) + CLAUDE_CODE_PROMPT.md spec. The landing currently hardcodes these rows; the active brief wires index.html to render from this file. Adding a product = one record here + its legal markdown in content/<contentDir>/.",
   "ui": {
     "ru": {
       "products": "Продукты",
       "studioEyebrow": "Студия приложений",
-      "studioTag": "Спокойные приложения для повседневной жизни.",
-      "studioIntro": "Небольшая независимая студия. Делаем приватные, неспешные приложения, которыми пользуешься каждый день — без рекламы и лишнего шума.",
+      "studioTag": "Спокойные приложения. Каждый день.",
+      "studioIntro": "Небольшая независимая студия. Делаем приватные приложения для повседневной жизни, без рекламы и лишнего шума.",
       "soon": "Скоро",
       "download": "Где будет",
       "terms": "Оферта",
       "privacy": "Конфиденциальность",
       "roadmap": "Здесь появятся новые продукты",
       "open": "открыть +",
-      "close": "— свернуть",
+      "close": "свернуть −",
       "subscribe": "Подписка",
       "appDownload": "Скачать приложение"
     },
     "en": {
       "products": "Products",
       "studioEyebrow": "App studio",
-      "studioTag": "Calm apps for everyday life.",
-      "studioIntro": "A small independent studio. We make private, unhurried apps you reach for every day — no ads, no noise.",
+      "studioTag": "Calm apps. Every day.",
+      "studioIntro": "A small independent studio. We make private apps for everyday life, with no ads and no noise.",
       "soon": "Soon",
       "download": "Where to get it",
       "terms": "Terms",
       "privacy": "Privacy",
       "roadmap": "More products land here",
       "open": "open +",
-      "close": "— close",
+      "close": "close −",
       "subscribe": "Subscription",
       "appDownload": "Download app"
     }
@@ -244,11 +151,14 @@ var CATALOG = {
       "id": "relo_dojo",
       "order": 1,
       "name": "Relo Dojo",
+      "contentDir": "relo-dojo",
       "iconId": "dojo",
       "accent": "#0E8A30",
       "accentText": "#0B6E26",
+      "accentSecondary": "#E3A52C",
       "badgeBg": "#e9f5ec",
       "chipLead": "XP",
+      "appLanguage": "en",
       "tag": {
         "ru": "Английский для IT-релокации",
         "en": "English for IT relocation"
@@ -279,16 +189,34 @@ var CATALOG = {
           "url": null
         }
       },
-      "legal": true
+      "legal": {
+        "originalLang": "en",
+        "translationPending": null,
+        "terms": {
+          "en": "content/relo-dojo/TERMS_OF_USE.en.md",
+          "ru": "content/relo-dojo/TERMS_OF_USE.ru.md"
+        },
+        "privacy": {
+          "en": "content/relo-dojo/PRIVACY_POLICY.en.md",
+          "ru": "content/relo-dojo/PRIVACY_POLICY.ru.md"
+        }
+      },
+      "extras": {
+        "storeListing": "content/relo-dojo/STORE_LISTING.md",
+        "brandAssets": "content/relo-dojo/BRAND_ASSETS.md"
+      },
+      "sourceRepo": "SpiritusMalus/relo_dojo"
     },
     {
       "id": "driftora",
       "order": 2,
       "name": "Driftora",
+      "contentDir": "driftora",
       "iconId": "heart",
       "accent": "#D8513A",
       "accentText": "#B8442E",
       "badgeBg": "#fbeae5",
+      "appLanguage": "ru",
       "tag": {
         "ru": "Забота о себе каждый день",
         "en": "Everyday self-care"
@@ -319,8 +247,23 @@ var CATALOG = {
           "url": null
         }
       },
-      "subscribeUrl": "/driftora/subscription",
-      "legal": true
+      "legal": {
+        "originalLang": "ru",
+        "translationPending": null,
+        "terms": {
+          "ru": "content/driftora/TERMS_OF_USE.ru.md",
+          "en": "content/driftora/TERMS_OF_USE.en.md"
+        },
+        "privacy": {
+          "ru": "content/driftora/PRIVACY_POLICY.ru.md",
+          "en": "content/driftora/PRIVACY_POLICY.en.md"
+        }
+      },
+      "extras": {
+        "existingWebLegal": "SpiritusMalus/HealthRoutine:web-legal/legal.html"
+      },
+      "sourceRepo": "SpiritusMalus/HealthRoutine",
+      "subscribeUrl": "/driftora/subscription"
     },
     {
       "id": "rest_lumen",
@@ -330,6 +273,8 @@ var CATALOG = {
       "accent": "#405d49",
       "accentText": "#405d49",
       "badgeBg": "#e7ede1",
+      "landingUrl": "/rest_lumen/",
+      "image": "/rest_lumen/assets/lamp.png",
       "tag": {
         "ru": "Мягкий свет и время для паузы",
         "en": "Soft light and time for a break"
@@ -349,10 +294,7 @@ var CATALOG = {
       "desc": {
         "ru": "Настрой яркость и теплоту экрана, работай в своём ритме и делай перерывы. Настольное приложение с локальными настройками и без аккаунта.",
         "en": "Adjust screen brightness and warmth, work at your own pace and take breaks. A desktop app with local settings and no account."
-      },
-      "landingUrl": "/rest_lumen/",
-      "image": "/rest_lumen/assets/lamp.png",
-      "legal": false
+      }
     },
     {
       "id": "sufler",
@@ -362,21 +304,31 @@ var CATALOG = {
       "accent": "#243f42",
       "accentText": "#345b45",
       "badgeBg": "#e7efe7",
+      "landingUrl": "/sufler/",
+      "landingCta": {
+        "ru": "Скачать Sufler",
+        "en": "Download Sufler"
+      },
       "tag": {
         "ru": "Подсказки во время разговора",
         "en": "Live prompts during a conversation"
       },
       "features": {
-        "ru": ["Windows + macOS", "30 минут пробы", "Запуск вручную"],
-        "en": ["Windows + macOS", "30-minute trial", "Manual start"]
+        "ru": [
+          "Windows + macOS",
+          "30 минут пробы",
+          "Запуск вручную"
+        ],
+        "en": [
+          "Windows + macOS",
+          "30-minute trial",
+          "Manual start"
+        ]
       },
       "desc": {
         "ru": "Sufler для Windows и Mac распознаёт речь и показывает подсказки поверх других окон. Скачайте и попробуйте 30 минут; нужен только ключ Deepgram.",
         "en": "Sufler for Windows and Mac recognizes speech and shows prompts over other windows. Download it for a 30-minute trial; only a Deepgram key is needed."
-      },
-      "landingUrl": "/sufler/",
-      "landingCta": { "ru": "Скачать Sufler", "en": "Download Sufler" },
-      "legal": false
+      }
     }
   ]
 };
@@ -396,7 +348,7 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 function chipsHTML(p, l){
   return p.features[l].map(function(f, i){
     var txt = (i === 0 && p.chipLead) ? (p.chipLead + ' · ' + f) : f;
-    return '<span class="chip" style="color:'+p.accentText+';background:'+p.badgeBg+'">' + esc(txt) + '</span>';
+    return '<span class="chip">' + esc(txt) + '</span>';
   }).join('');
 }
 
@@ -417,17 +369,17 @@ function storeHTML(p, storeName, store){
 function rowHTML(p, idx){
   return '<section class="row reveal" data-product="'+p.id+'" data-idx="'+idx+'">'+
     '<button class="row-btn" aria-expanded="false">'+
-      '<span class="row-num" style="color:'+p.accentText+'">'+pad2(p.order)+'</span>'+
+      '<span class="row-num">'+pad2(p.order)+'</span>'+
       '<span class="row-ico" style="background:'+p.accent+'">'+(p.image ? '<img src="'+p.image+'" width="40" height="40" alt="">' : '<svg width="24" height="24" viewBox="0 0 48 48"><use href="#ico-'+p.iconId+'"></use></svg>')+'</span>'+
       '<span style="flex:1"><span class="row-name">'+esc(p.name)+'</span><span class="row-tag" data-field="tag"></span></span>'+
       '<span class="row-toggle" data-toggle></span>'+
     '</button>'+
-    '<div class="panel"><div class="panel-clip"><div class="panel-in">'+
+    '<div class="panel" inert><div class="panel-clip"><div class="panel-in">'+
       '<div class="panel-text"><p class="panel-desc" data-field="desc"></p><div class="chips" data-field="chips"></div></div>'+
       '<div class="panel-side">'+
         (p.landingUrl ? '' : '<div class="side-label" data-i18n="download"></div>')+
-        (p.landingUrl ? '<a class="subscribe-btn" style="background:'+p.accent+'" href="'+p.landingUrl+'" data-field="landingCta"></a>' : '<div class="stores">'+storeHTML(p,'App Store',p.stores.appStore)+storeHTML(p,'Google Play',p.stores.googlePlay)+'</div>')+
-        (p.subscribeUrl?'<a class="subscribe-btn" style="background:'+p.accent+'" href="'+p.subscribeUrl+'" data-i18n="subscribe"></a>':'')+
+        (p.landingUrl ? '<a class="subscribe-btn" href="'+p.landingUrl+'" data-field="landingCta"></a>' : '<div class="stores">'+storeHTML(p,'App Store',p.stores.appStore)+storeHTML(p,'Google Play',p.stores.googlePlay)+'</div>')+
+        (p.subscribeUrl?'<a class="subscribe-btn" href="'+p.subscribeUrl+'" data-i18n="subscribe"></a>':'')+
         (p.legal ? '<div class="legal-links"><a href="/'+p.id+'/terms" data-i18n="terms"></a><a href="/'+p.id+'/privacy" data-i18n="privacy"></a></div>' : '')+
       '</div>'+
     '</div></div></div>'+
@@ -443,6 +395,8 @@ function applyLang(l){
   lang = l;
   document.documentElement.lang = l;
   var dict = UI[l];
+  document.querySelector('.theme-toggle').setAttribute('aria-label', l === 'ru' ? 'Сменить тему' : 'Switch theme');
+  document.querySelector('#portal').setAttribute('aria-label', l === 'ru' ? 'Красные световые дуги образуют глубокий портал в темноте' : 'Red light arcs form a deep portal in the dark');
   document.querySelectorAll('[data-i18n]').forEach(function(el){
     var key = el.getAttribute('data-i18n');
     if(dict[key] != null) el.textContent = dict[key];
@@ -476,6 +430,7 @@ document.querySelectorAll('.row').forEach(function(row){
   btn.addEventListener('click', function(){
     var open = row.classList.toggle('open');
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    row.querySelector('.panel').inert = !open;
     toggle.textContent = open ? UI[lang].close : UI[lang].open;
   });
 });
@@ -515,5 +470,7 @@ var initial = 'ru';
 try{ var saved = localStorage.getItem('fp_lang'); if(saved && UI[saved]) initial = saved; }catch(e){}
 applyLang(initial);
 </script>
+<script src="/home-theme.js"></script>
+<script src="/vpn/portal.js"></script>
 </body>
 </html>
