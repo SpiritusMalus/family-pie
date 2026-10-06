@@ -27,9 +27,9 @@
 <nav class="nav">
   <div class="nav-in">
     <a class="brand" href="/" aria-label="family-pie — на главную">
-      <svg class="pielogo" width="36" height="36" viewBox="0 0 48 48" style="display:block">
+      <svg class="pielogo" width="36" height="36" viewBox="0 0 48 48" style="display:block" aria-hidden="true">
         <path class="seg" d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#0E8A30"></path>
-        <path class="seg" d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A"></path>
+        <path class="seg seg-accent" d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A"></path>
         <path class="seg" d="M24,24 L43.05,35 A22,22 0 0 1 24,46 Z" fill="#E3A52C"></path>
         <path class="seg" d="M24,24 L24,46 A22,22 0 0 1 4.95,35 Z" fill="#E8E1D3"></path>
         <path class="seg" d="M24,24 L4.95,35 A22,22 0 0 1 4.95,13 Z" fill="#E2DACB"></path>
@@ -45,7 +45,6 @@
       <span class="brand-name">family-pie</span>
     </a>
     <div class="nav-right">
-      <a href="/vpn/" class="nav-link vpn-link">Family VPN ↗</a>
       <button class="theme-toggle" type="button" aria-label="Сменить тему" aria-pressed="false">
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 15.3A8.5 8.5 0 0 1 8.7 4a8.5 8.5 0 1 0 11.3 11.3Z"/></svg>
         <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
@@ -67,10 +66,9 @@
     <p class="hero-intro reveal" data-i18n="studioIntro">Я делаю приложения, которые помогают учиться, работать и заботиться о себе. Без рекламы и лишней суеты.</p>
     <div class="hero-actions reveal">
       <a class="primary-btn" href="#products"><span data-i18n="products">Продукты</span><span aria-hidden="true">→</span></a>
-      <a class="hero-secondary" href="/vpn/">Family VPN ↗</a>
     </div>
   </div>
-  <figure class="hero-art"><canvas id="portal" role="img" aria-label="Красные световые дуги образуют глубокий портал в темноте"></canvas></figure>
+  <figure class="hero-art"><canvas id="portal" data-portal-theme="adaptive" role="img" aria-label="Красные световые дуги образуют глубокий портал в темноте"></canvas></figure>
 </header>
 
 <!-- PRODUCTS -->
@@ -436,6 +434,12 @@ document.getElementById('product-list').innerHTML = PRODUCTS.map(rowHTML).join('
 document.getElementById('sec-count').textContent = pad2(PRODUCTS.length);
 
 /* ---------- i18n ---------- */
+function updatePortalLabel(){
+  var light = document.body.classList.contains('light');
+  document.querySelector('#portal').setAttribute('aria-label', lang === 'ru'
+    ? (light ? 'Красные световые дуги образуют портал на светлом фоне' : 'Красные световые дуги образуют глубокий портал в темноте')
+    : (light ? 'Red light arcs form a portal on a light background' : 'Red light arcs form a deep portal in the dark'));
+}
 function applyLang(l){
   window.FPi18n.set(l);
   lang = l;
@@ -449,7 +453,7 @@ function applyLang(l){
   document.querySelector('.langtoggle').setAttribute('aria-label', dict.languageLabel);
   if (toastProduct && toastTextEl) toastTextEl.textContent = NOTIFY[l](toastProduct[0], toastProduct[1]);
   document.querySelector('.theme-toggle').setAttribute('aria-label', l === 'ru' ? 'Сменить тему' : 'Switch theme');
-  document.querySelector('#portal').setAttribute('aria-label', l === 'ru' ? 'Красные световые дуги образуют глубокий портал в темноте' : 'Red light arcs form a deep portal in the dark');
+  updatePortalLabel();
   document.querySelectorAll('[data-i18n]').forEach(function(el){
     var key = el.getAttribute('data-i18n');
     if(dict[key] != null) el.textContent = dict[key];
