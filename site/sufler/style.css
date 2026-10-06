@@ -113,13 +113,17 @@ h2 { margin: 0 0 25px; font-size: clamp(29px, 3.3vw, 39px); font-weight: 600; li
 .landing-hero { padding-block: 89px 98px; text-align: center; }
 .landing-hero h1 { max-width: 900px; margin: 20px auto 22px; font-size: clamp(48px, 6vw, 76px); line-height: 1.06; }
 .landing-hero .lead { max-width: 630px; margin: 0 auto; color: #45433e; line-height: 1.55; }
-.landing-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 11px; margin-top: 31px; }
+.landing-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 11px; margin-top: 22px; }
 .landing-button { display: inline-flex; align-items: center; justify-content: center; min-height: 53px; padding: 0 22px; border: 1px solid var(--ink); border-radius: 10px; background: var(--ink); color: #fff; font-size: 15px; font-weight: 650; text-decoration: none; white-space: nowrap; }
 .landing-button:hover { background: #3b3932; }
 .landing-button-light { border-color: var(--line); background: transparent; color: var(--ink); }
 .landing-button-light:hover { background: #e9e5dc; }
 .hero-small { margin: 12px 0 0; color: var(--muted); font-size: 13px; }
-.vpn-note { max-width: 630px; margin: 15px auto 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.vpn-note { display: flex; align-items: center; justify-content: space-between; gap: 24px; max-width: 780px; margin: 29px auto 0; padding: 19px 22px; border: 1px solid #c5d3c5; border-radius: 14px; background: #e8ede5; text-align: left; }
+.vpn-note-copy strong { display: block; font-size: 20px; line-height: 1.25; letter-spacing: -.025em; }
+.vpn-note-copy p { margin: 6px 0 0; color: #444e43; font-size: 14px; line-height: 1.45; }
+.vpn-note-link { display: inline-flex; flex: none; align-items: center; justify-content: center; min-height: 45px; padding: 0 17px; border-radius: 9px; background: var(--link); color: #fff; font-size: 14px; font-weight: 650; text-decoration: none; white-space: nowrap; }
+.vpn-note-link:hover { background: #25472d; }
 .preview { max-width: 940px; margin: 68px auto 0; text-align: left; }
 .preview-caption { margin: 0 0 11px; color: var(--muted); font-size: 12px; }
 .preview-screen { position: relative; display: grid; align-content: center; min-height: 340px; padding: 52px 9% 58px; overflow: hidden; border: 1px solid #d4dcd1; border-radius: 20px; background: #e5ebe3; }
@@ -161,6 +165,7 @@ h2 { margin: 0 0 25px; font-size: clamp(29px, 3.3vw, 39px); font-weight: 600; li
 
 @media (max-width: 760px) {
   .landing-hero { padding-block: 66px 75px; }
+  .vpn-note { gap: 16px; }
   .preview { margin-top: 50px; }
   .preview-screen { min-height: 300px; padding: 38px 7%; }
   .feature-list, .landing-steps { grid-template-columns: 1fr; gap: 22px; }
@@ -170,8 +175,12 @@ h2 { margin: 0 0 25px; font-size: clamp(29px, 3.3vw, 39px); font-weight: 600; li
   .landing-end { padding-bottom: 65px; }
 }
 @media (max-width: 480px) {
+  .landing-hero { padding-top: 48px; }
   .landing-hero h1 { font-size: clamp(42px, 10vw, 52px); }
   .landing-hero .lead { font-size: 17px; }
+  .vpn-note { flex-direction: column; align-items: stretch; margin-top: 23px; padding: 18px; }
+  .vpn-note-copy strong { font-size: 19px; }
+  .vpn-note-link { width: 100%; }
   .landing-actions { align-items: stretch; }
   .landing-actions .landing-button { flex: 1 1 100%; }
   .preview-screen { min-height: 315px; padding: 30px 22px; }
