@@ -19,3 +19,7 @@ Implemented: durable accounts/order snapshots, checkout request idempotency, acc
 ## Sources
 
 [YooKassa notifications](https://yookassa.ru/developers/using-api/webhooks), [API interaction format](https://yookassa.ru/developers/using-api/interaction-format), [Node SQLite](https://nodejs.org/download/release/latest-jod/docs/api/sqlite.html).
+
+## Account/admin phase
+
+`server.mjs` exposes same-origin private API behind loopback8796. `auth.mjs` stores scrypt hashes (N65536/r8/p2), hashed opaque12h sessions, per-session CSRF and forced initial password change. Existing aliases are logins, not invented email addresses; internal account keys use reserved accounts.invalid. Google/passkey and billing are not enabled. `panel-worker.py` applies admin changes through currently verified3.4.2 API and reconciles both transports/active profile distribution, with backups/read-back/targeted rollback. See deploy/README.md for actual rollout and acceptance. The public admin is protected by role plus completed password change.

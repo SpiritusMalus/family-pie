@@ -1,0 +1,47 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {VpnStore} from '../store.mjs';import {Accounts,checkPassword} from '../auth.mjs';import {createApp} from '../server.mjs';
+test('temporary passwords gate subscription, change revokes sessions and preserves profile',async t=>{
+ const store=new VpnStore(':memory:');t.after(()=>store.close());const users=new Accounts(store);
+ const a=await users.add({login:'Existing-user',password:'TemporaryPassword-123',profileUrl:'https://example.invalid/private',unlimited:true});
+ const first=await users.login('existing-user','TemporaryPassword-123');assert.equal(first.identity.must_change,1);
+ const second=await users.login('EXISTING-USER','TemporaryPassword-123');
+ await assert.rejects(users.changePassword(a.accountId,'wrong','AnotherPassword-123'));
+ const next=await users.changePassword(a.accountId,'TemporaryPassword-123','AnotherPassword-123');
+ assert.equal(next.identity.must_change,0);assert.equal(users.session(first.token),null);assert.equal(users.session(second.token),null);
+ assert.equal(users.subscription(a.accountId).profile_url,'https://example.invalid/private');
+ assert.equal(await users.login('existing-user','TemporaryPassword-123'),null);
+ assert.equal((await users.login('existing-user','AnotherPassword-123')).identity.must_change,0);
+ const hash=users.db.prepare('SELECT password_hash FROM identities WHERE account_id=?').get(a.accountId).password_hash;
+ assert.ok(!hash.includes('AnotherPassword'));assert.equal(await checkPassword('AnotherPassword-123',hash),true);
+ assert.equal((await users.add({login:'EXISTING-user'})).created,false);
+});
+test('admin subscription actions create durable jobs, soft-delete and restore; users cannot edit',async t=>{
+ const store=new VpnStore(':memory:');t.after(()=>store.close());const users=new Accounts(store);
+ const admin=await users.add({login:'admin-fixture',role:'admin',password:'TemporaryPassword-123'});
+ const user=await users.add({login:'user-fixture',password:'TemporaryPassword-123',unlimited:true});
+ assert.throws(()=>users.edit(user.accountId,user.accountId,{enabled:false}),/Forbidden/);
+ users.edit(admin.accountId,user.accountId,{enabled:false,deleted:true});assert.equal(users.subscription(user.accountId).active,false);
+ users.edit(admin.accountId,user.accountId,{enabled:true,deleted:false});assert.equal(users.subscription(user.accountId).active,true);
+ assert.equal(users.db.prepare('SELECT COUNT(*) n FROM admin_jobs').get().n,2);
+ assert.throws(()=>users.edit(admin.accountId,user.accountId,{expiresAt:-1}));
+ assert.equal(users.list().some(x=>'profile_url' in x),false);
+});
+test('HTTP auth enforces origin/CSRF/role/forced change and private no-store',async t=>{
+ const store=new VpnStore(':memory:');const {server,users}=createApp({store,origin:'http://localhost',secure:false});
+ const a=await users.add({login:'http-fixture',password:'TemporaryPassword-123',profileUrl:'https://example.invalid/private',unlimited:true});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(async()=>{await new Promise(r=>server.close(r));store.close();});
+ const base='http://127.0.0.1:'+server.address().port+'/vpn/api/';
+ const req=(path,method='GET',data,headers={})=>fetch(base+path,{method,headers:{Origin:'http://localhost','Content-Type':'application/json',...headers},...(data?{body:JSON.stringify(data)}:{})});
+ assert.equal((await req('me')).status,401);
+ assert.equal((await req('login','POST',{login:'http-fixture',password:'TemporaryPassword-123'},{Origin:'https://wrong.invalid'})).status,403);
+ const response=await req('login','POST',{login:'http-fixture',password:'TemporaryPassword-123'});const d=await response.json();const cookie=response.headers.get('set-cookie').split(';')[0];
+ assert.match(response.headers.get('set-cookie'),/HttpOnly/);assert.equal(response.headers.get('cache-control'),'no-store');
+ const me=await(await req('me','GET',null,{Cookie:cookie})).json();assert.equal(me.subscription,null);
+ assert.equal((await req('admin/users','GET',null,{Cookie:cookie})).status,403);
+ assert.equal((await req('password','POST',{current:'TemporaryPassword-123',next:'AnotherPassword-123'},{Cookie:cookie})).status,403);
+ const changed=await req('password','POST',{current:'TemporaryPassword-123',next:'AnotherPassword-123'},{Cookie:cookie,'X-CSRF-Token':d.csrf});assert.equal(changed.status,200);
+ assert.equal((await req('me','GET',null,{Cookie:cookie})).status,401);
+ const fresh=changed.headers.get('set-cookie').split(';')[0];assert.equal((await req('admin/users','GET',null,{Cookie:fresh})).status,403);
+ assert.equal((await(await req('me','GET',null,{Cookie:fresh})).json()).subscription.profile_url,'https://example.invalid/private');
+ assert.equal(users.identity(a.accountId).must_change,0);
+});

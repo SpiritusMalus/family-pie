@@ -77,6 +77,12 @@ family-pie.ru {
 		Cache-Control "no-cache"
 	}
 
+	# Authenticated VPN cabinet API; service is isolated on loopback.
+	handle /vpn/api/* {
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:8796
+	}
+
 	# Rebrand HealthRoutine→Driftora: the legal host path moved
 	# /health_routine/* -> /driftora/*. Permanent (301), path- and query-preserving
 	# so every old deep link keeps resolving. The inner `route` keeps directive

@@ -4,8 +4,8 @@ The owner explicitly requests the entire functional cabinet flow of chashkakofe.
 
 | Reference area | Required real behaviour | Current status |
 |---|---|---|
-| Identity | Verified email entry, Google OAuth, passkey registration/login/removal, logout and owned sessions | Public UI only; internal account records are not login |
-| Subscription | Actual owned status/expiry, personal key/link/QR, import into supported clients | Public demo; grant/expiry calculation and durable provisioning queue prepared |
+| Identity | Verified email entry, Google OAuth, passkey registration/login/removal, logout and owned sessions | Password login/session/forced initial change implemented; Google/passkey/email verification pending |
+| Subscription | Actual owned status/expiry, personal key/link/QR, import into supported clients | Owned profile and admin add/edit/soft-delete bridge implemented; live acceptance tracked in task journal |
 | Tariffs and orders |30/90/180/365 days, approved prices/device policy, coupon validation, payment history | Public demo; immutable order snapshots/idempotency prepared; tariff/merchant answers required |
 | Payment lifecycle | Test-store and live confirmation, cancel/failure/retry, renewal, expiry, refund | Provider read-verification and transactional grants/full refunds tested locally; no actual checkout or live adapter |
 | Device onboarding | Account-specific link/QR, Android/iOS/Windows/macOS/Linux/TV guides, actual working profile | Public guides work; personal issuance/import verification pending |
