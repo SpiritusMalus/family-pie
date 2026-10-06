@@ -79,7 +79,10 @@
   reduced.addEventListener('change', restart);
   window.addEventListener('family-themechange', restart);
   window.addEventListener('pagehide', () => {
-    cancelAnimationFrame(frame); resize.disconnect(); visibility.disconnect();
-    window.removeEventListener('family-themechange', restart);
-  }, { once: true });
+    cancelAnimationFrame(frame); frame = 0; resize.disconnect(); visibility.disconnect();
+  });
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted) return;
+    resize.observe(canvas); visibility.observe(canvas); restart();
+  });
 })();
