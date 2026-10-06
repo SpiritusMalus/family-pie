@@ -67,9 +67,9 @@ def main():
   token=match.group(1);settings=dict(panel.execute('SELECT key,value FROM settings'))
   base='http://127.0.0.1:'+str(settings.get('webPort','31123'))+'/'+settings.get('webBasePath','/').strip('/')+'/panel/api/clients/'
   def api(route,data=None):
-   # 3.4.2 GET emits a numeric row id; its update DTO requires a string.
+   # GET uses database row id/uuid; mutation DTO calls the VPN UUID "id".
    if route.startswith('update/') and isinstance(data,dict) and 'id' in data:
-    data=dict(data);data['id']=str(data['id'])
+    data=dict(data);data['id']=data['uuid']
     if isinstance(data.get('allowedIPs'),str):data['allowedIPs']=[x for x in re.split(r'[\s,]+',data['allowedIPs']) if x]
    req=urllib.request.Request(base+route,data=json.dumps(data).encode() if data is not None else None,headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method='POST' if data is not None else 'GET')
    result=json.load(urllib.request.urlopen(req,timeout=15))
@@ -82,7 +82,7 @@ def main():
    template_name=panel.execute("SELECT email FROM clients WHERE email NOT LIKE 'root-lab-%' AND email NOT LIKE 'web_%' ORDER BY email LIMIT 1").fetchone()[0]
    inbound_ids=api('get/'+urllib.parse.quote(template_name,safe=''))['inboundIds']
    sub_id=secrets.token_urlsafe(12)
-   client={'email':name,'uuid':account['profile_ref'],'subId':sub_id,'flow':'xtls-rprx-vision','limitIp':devices,'totalGB':0,'expiryTime':0 if unlimited else expires,'enable':enabled}
+   client={'email':name,'id':account['profile_ref'],'uuid':account['profile_ref'],'subId':sub_id,'flow':'xtls-rprx-vision','limitIp':devices,'totalGB':0,'expiryTime':0 if unlimited else expires,'enable':enabled}
    api('add',{'client':client,'inboundIds':inbound_ids});created=True
    loaded=api('get/'+encoded)['client'];loaded.update(client);client=loaded
   client.update({'expiryTime':0 if unlimited else expires,'limitIp':devices,'enable':enabled})
