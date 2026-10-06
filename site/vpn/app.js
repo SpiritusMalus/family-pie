@@ -1,6 +1,7 @@
 (() => {
   'use strict';
-  const t = text => window.FPi18n.t(text);
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('/vpn/sw.js',{scope:'/vpn/'}).catch(()=>{});
+  const t = text => window.FPi18n?.t(text) ?? text;
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
@@ -21,8 +22,6 @@
   const draft = $('#support-draft');
   if (draft) draft.value = read('family-vpn-support-draft') || '';
   $('[data-draft]')?.addEventListener('click', () => { try { localStorage.setItem('family-vpn-support-draft', draft.value); toast('Черновик сохранён только в этом браузере'); } catch { toast('Браузер не разрешает сохранять черновик'); } });
-  const newsPreference = $('#news-preference');
-  if (newsPreference) { newsPreference.checked = read('family-vpn-show-news') !== 'false'; newsPreference.addEventListener('change', () => { store('family-vpn-show-news', String(newsPreference.checked)); const newsLink = $('[data-route="news"]'); newsLink.hidden = !newsPreference.checked; toast('Настройка сохранена'); }); $('[data-route="news"]').hidden = !newsPreference.checked; }
   $('[data-probe]')?.addEventListener('click', async e => { const button = e.currentTarget; button.disabled = true; button.textContent = 'Проверяю…'; $('#probe-message').textContent = 'Ожидаем ответ сайта…'; const started = performance.now(); const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 10000); try { const response = await fetch('/vpn/probe.json?t=' + Date.now(), { cache: 'no-store', signal: controller.signal }); if (!response.ok) throw new Error('HTTP'); const data = await response.json(); if (data.service !== 'family-vpn-site') throw new Error('Unexpected response'); $('#latency').textContent = Math.round(performance.now() - started) + ' мс'; $('#probe-message').textContent = 'Сайт отвечает. Это не подтверждение работы VPN.'; } catch { $('#latency').textContent = '—'; $('#probe-message').textContent = 'Сайт не ответил за время проверки. Проверь интернет и повтори.'; } finally { clearTimeout(timer); button.disabled = false; button.textContent = 'Проверить соединение'; } });
   const guideData = {
     android: ['Android', 'Установи Happ из магазина приложений или с официального сайта разработчика.'],
@@ -38,7 +37,7 @@
     $$('[data-platform]').forEach(b => { b.setAttribute('aria-selected', String(b.dataset.platform === key)); b.tabIndex = b.dataset.platform === key ? 0 : -1; });
     const target = $('#guide'); if (!target) return;
     target.setAttribute('aria-labelledby', `tab-${key}`);
-    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи приложение.</strong><br>${first}</li><li><strong>Добавь подписку.</strong><br>Скопируй свою личную ссылку, открой приложение и выбери добавление из буфера обмена. В этом демо действующей ссылки нет.</li><li><strong>Включи VPN.</strong><br>Выбери маршрут, нажми подключение и подтверди системный запрос на создание VPN-соединения.</li></ol><a class="btn secondary small" href="https://www.happ.su/" target="_blank" rel="noopener noreferrer">Официальный сайт Happ ↗</a><p class="demo-label">Для Linux и телевизора сначала проверь совместимость выбранного клиента. Если установка не подходит — открой раздел «Помощь».</p>`;
+    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи приложение.</strong><br>${first}</li><li><strong>Добавь подписку.</strong><br>Скопируй свою личную ссылку, открой приложение и выбери добавление из буфера обмена. Личная ссылка находится в разделе «Обзор».</li><li><strong>Включи VPN.</strong><br>Выбери маршрут, нажми подключение и подтверди системный запрос на создание VPN-соединения.</li></ol><a class="btn secondary small" href="https://www.happ.su/" target="_blank" rel="noopener noreferrer">Официальный сайт Happ ↗</a><p class="demo-label">Для Linux и телевизора сначала проверь совместимость выбранного клиента. Если установка не подходит — открой раздел «Помощь».</p>`;
   }
   $$('[data-platform]').forEach((btn, index, list) => {
     btn.addEventListener('click', () => { location.hash = `devices?platform=${btn.dataset.platform}`; });

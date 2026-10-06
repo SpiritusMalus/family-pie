@@ -26,13 +26,13 @@
  $('#create-user')?.addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const d=await api('admin/users','POST',{login:$('#new-login').value,expiresAt:$('#new-expiry').value?Date.parse($('#new-expiry').value+'T23:59:59.000Z'):0,unlimited:false});$('#new-credentials').textContent=`Логин: ${d.login}. Временный пароль: ${d.temporaryPassword}. Передай лично: при входе пользователь обязан сменить пароль. Доступ к VPN появится только после подтверждённой оплаты ЮKassa.`;$('#new-login').value='';await adminList();}catch(err){message(err.message);}finally{b.disabled=false;}});
  async function boot(){try{me=await api('me');if($('#login-form')){if(me.user.must_change||new URLSearchParams(location.search).has('change'))changeView();else location.href=me.user.role==='admin'?'/vpn/admin/':'/vpn/cabinet/';return;}if(me.user.must_change){location.href='/vpn/cabinet/auth/';return;}
  const actions=$('.nav-actions');const logout=el('button','Выйти','btn small secondary');logout.addEventListener('click',async()=>{await api('logout','POST',{});location.href='/vpn/cabinet/auth/';});actions?.append(logout);
- if($('#admin-users')){if(me.user.role!=='admin'){message('Раздел доступен только администратору');$('#main').replaceChildren(el('h1','Нет доступа'));return;}await adminList();return;}
- $('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Оплата, бонусы и поддержка пока готовятся; их экраны показывают предварительную структуру.`;
+ if($('#admin-users')){if(me.user.role!=='admin'){message('Раздел доступен только администратору');$('#main').replaceChildren(el('h1','Нет доступа'));return;}await adminList();window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));return;}
+ $('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;
  if(me.user.role==='admin'){const a=el('a','Администрирование','btn small');a.href='/vpn/admin/';actions?.append(a);}
- const panel=$('.subscription');const sub=me.subscription;panel.replaceChildren(el('h2',sub.payment_required?'Ожидаем подтверждение оплаты':sub.active?'Твоя подписка':'Подписка не активна'),el('p',sub.payment_required?'Аккаунт создан. Ключ VPN выдаётся только после подтверждённой оплаты ЮKassa. Публичная оплата пока готовится.':`${date(sub)}${sub.sync_state!=='synced'?' · Изменения ещё применяются на VPN':''}`));
+ const panel=$('.subscription');const sub=me.subscription;panel.replaceChildren(el('h2',sub.payment_required?'Ожидаем подтверждение оплаты':sub.active?'Твоя подписка':'Подписка не активна'),el('p',sub.payment_required?'Аккаунт создан. Ключ VPN выдаётся только после подтверждённой оплаты ЮKassa. Выбери тариф в разделе «Подписка».':`${date(sub)}${sub.sync_state!=='synced'?' · Изменения ещё применяются на VPN':''}`));
  if(sub.active&&sub.profile_url&&sub.sync_state==='synced'){const copy=el('button','Скопировать подключение','btn');copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sub.profile_url);copy.textContent='Скопировано';}catch{copy.textContent='Не удалось скопировать';}});panel.append(copy);}
  const settings=$('[data-screen="settings"]');const a=el('a','Сменить пароль','btn secondary');a.href='/vpn/cabinet/auth/?change=1';settings?.append(a);
- await telegramSettings(settings);
+ await telegramSettings(settings);window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));
  }catch(err){if(err.status===401){if(!$('#login-form'))location.href='/vpn/cabinet/auth/';}else message(err.message);}}
  boot();
 })();

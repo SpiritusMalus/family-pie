@@ -44,7 +44,7 @@ jobs:
       - name: Test site language and appearance
         run: node --test tools/test-i18n.mjs tools/test-home-theme.mjs
       - name: Test VPN service core
-        run: node --test services/vpn/test/*.test.mjs
+        run: npm ci --prefix services/vpn && node --test services/vpn/test/*.test.mjs
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify

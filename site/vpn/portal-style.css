@@ -32,3 +32,9 @@ input[type=checkbox]{accent-color:var(--accent)}textarea:focus-visible{outline:2
 #create-user{display:grid;gap:12px;max-width:480px}#create-user .form-row{margin:8px 0}#create-user .btn{justify-self:start}.admin-user form input[type=date]{display:block;margin-top:8px}@media(max-width:420px){#create-user .btn{width:100%;font-size:14px}.admin-user form{align-items:start;gap:14px}}
 @media(max-width:760px){.is-cabinet .nav-actions{max-width:calc(100% - 78px);flex-wrap:wrap;justify-content:flex-end}.is-cabinet .nav-in{padding-top:12px;padding-bottom:12px}}
 .telegram-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.telegram-actions [hidden]{display:none}.telegram-actions .btn{max-width:100%;white-space:normal}
+
+/* Account journeys preserve the portal palette and task-first layout. */
+.chat-message{padding:18px 0;border-bottom:1px solid var(--line,#303942)}
+.text-body{white-space:pre-wrap;overflow-wrap:anywhere;max-width:72ch}.admin-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}.admin-plan-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin:20px 0}.admin-plan-row .form-row{flex:1;min-width:150px}.cab-status{position:sticky;top:76px;background:var(--surface,#131b24);z-index:3;padding:12px;border-radius:6px}.cab-status:empty{display:none}.cab-main .btn+details,.cab-main .btn+.btn{margin-top:12px}.cab-main img{max-width:100%;height:auto}.cab-main .row{flex-wrap:wrap;gap:12px}.is-cabinet details form{padding-top:18px}.is-cabinet textarea{resize:vertical;min-height:110px}.is-cabinet section form{display:grid;gap:16px}.is-cabinet .row .btn{font-size:14px;padding:10px 14px}
+
+.cab-subsection{padding:24px 0;border-top:1px solid var(--line,#303942);margin-top:24px}.cab-subsection>h2{font-size:22px}.is-cabinet main:not(.cab-main){padding-top:32px;padding-bottom:56px}.is-cabinet main .panel>p{line-height:1.65}.is-cabinet input[type=checkbox]{width:22px;height:22px}
