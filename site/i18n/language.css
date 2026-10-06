@@ -1,0 +1,8 @@
+.fp-language { display:inline-flex; flex-shrink:0; align-items:center; gap:2px; border:1px solid currentColor; border-radius:3px; padding:2px; color:inherit; margin-inline-start:12px; vertical-align:middle; }
+.fp-language button { font:600 11px/1.2 system-ui,sans-serif; letter-spacing:.05em; color:inherit; background:transparent; border:0; border-radius:1px; padding:8px; min-width:32px; min-height:32px; cursor:pointer; }
+.fp-language button[aria-pressed="true"] { background:#202731; color:#fff; }
+body:not(.light).is-cabinet .fp-language button[aria-pressed="true"], body:not(.light) .nav .fp-language button[aria-pressed="true"] { background:#f1eee7; color:#090d13; }
+.fp-language button:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
+@media (max-width:600px) { .nav-actions, .header-inner nav { flex-wrap:wrap; } .fp-language { margin-inline-start:4px; } .header-inner { flex-wrap:wrap; gap:12px; } }
+.fp-language-standalone { display:flex; width:max-content; margin:16px auto; }
+@media (max-width:760px) { .nav .nav-in { padding-top:12px; padding-bottom:12px; } .nav .nav-links { top:100%; } }

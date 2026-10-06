@@ -271,6 +271,7 @@ function page(product, initialDoc, models, rawLinks) {
     .home:hover .pielogo{transform:none}
   }
 </style>
+<script src="/i18n/language.js"></script>
 </head>
 <body>
 <header class="topbar">
@@ -314,8 +315,7 @@ ${cols}
   var PRODUCT_ID = ${JSON.stringify(id)};
   var DEF_LANG = ${JSON.stringify(defLang)};
   var doc = ${JSON.stringify(initialDoc === 'privacy' ? 'privacy' : 'terms')};
-  var lang = DEF_LANG;
-  try { var s = localStorage.getItem('fp_lang'); if (s === 'ru' || s === 'en') lang = s; } catch(e){}
+  var lang = window.FPi18n.lang;
 
   var cols = Array.prototype.slice.call(document.querySelectorAll('.doc'));
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
@@ -348,6 +348,10 @@ ${cols}
     });
     document.querySelectorAll('.langtoggle button').forEach(function(b){ var on=b.getAttribute('data-lang')===lang; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
     document.documentElement.lang = lang;
+    document.title = ${JSON.stringify(product.name)} + ' — ' + TAB_LABEL[lang][doc] + ' — family-pie';
+    document.querySelector('.langtoggle').setAttribute('aria-label', lang === 'en' ? 'Language' : 'Язык');
+    document.querySelector('.tabs').setAttribute('aria-label', lang === 'en' ? 'Documents' : 'Документы');
+    document.querySelector('.home').setAttribute('aria-label', lang === 'en' ? 'family-pie — home' : 'family-pie — главная');
     if (updateUrl){
       try { history.replaceState(null, '', '/'+PRODUCT_ID+'/'+DOC_PATH[doc]); } catch(e){}
     }
@@ -360,7 +364,7 @@ ${cols}
   document.querySelectorAll('.langtoggle button').forEach(function(b){
     b.addEventListener('click', function(){
       lang = b.getAttribute('data-lang');
-      try { localStorage.setItem('fp_lang', lang); } catch(e){}
+      window.FPi18n.set(lang);
       render(false);
     });
   });

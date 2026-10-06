@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/vpn/fonts.css">
 <link rel="stylesheet" href="/home.css">
 <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+<script src="/i18n/language.js"></script>
 </head>
 <body>
 
@@ -436,6 +437,7 @@ document.getElementById('sec-count').textContent = pad2(PRODUCTS.length);
 
 /* ---------- i18n ---------- */
 function applyLang(l){
+  window.FPi18n.set(l);
   lang = l;
   document.documentElement.lang = l;
   var dict = UI[l];
@@ -519,8 +521,8 @@ document.querySelectorAll('.reveal').forEach(function(el, i){
 });
 
 /* ---------- initial language (saved or default) ---------- */
-var initial = 'ru';
-try{ var saved = localStorage.getItem('fp_lang'); if(saved && UI[saved]) initial = saved; }catch(e){}
+var initial = window.FPi18n.lang;
+
 applyLang(initial);
 </script>
 <script src="/home-theme.js"></script>

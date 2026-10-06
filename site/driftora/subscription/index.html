@@ -126,6 +126,8 @@
     .cols{gap:28px}
   }
 </style>
+<link rel="stylesheet" href="/i18n/language.css">
+<script src="/i18n/language.js"></script>
 </head>
 <body>
 
@@ -270,9 +272,9 @@ var EN = {
   month:'Monthly', twoMonths:'60 days', quarter:'90 days', halfYear:'180 days', year:'Yearly',
   emailLabel:'Email for the receipt',
   ctaIdle:'Loading plans…',
-  ctaNote:'Card payment via ЮKassa. Nothing auto-renews: a subscription is extended only by paying again, and no money is taken on its own.',
+  ctaNote:'Card payment via YooKassa. Nothing auto-renews: a subscription is extended only by paying again, and no money is taken on its own.',
   recoverTitle:'Paid already but lost the key?',
-  recoverLede:'The payment id is in the ЮKassa receipt — paste it and we will show the key again. We do not store your email, so the id is the only thing to search by.',
+  recoverLede:'The payment id is in the YooKassa receipt — paste it and we will show the key again. We do not store your email, so the id is the only thing to search by.',
   recoverBtn:'Show the key',
   secWhat:'What you get',
   paidTitle:'What the subscription buys',
@@ -324,7 +326,7 @@ var COPY = {
        title:'Subscription · Driftora' }
 };
 
-var lang = 'ru', plans = [], selected = 'monthly', receiptRequired = false, enabled = false, busy = false;
+var lang = window.FPi18n.lang, plans = [], selected = 'monthly', receiptRequired = false, enabled = false, busy = false;
 var RU = {}, RU_LISTS = {};
 
 function el(id){ return document.getElementById(id); }
@@ -342,8 +344,19 @@ function c(k){ return COPY[lang][k]; }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function applyLang(){
+  window.FPi18n.set(lang);
+  document.querySelector('.langtoggle').setAttribute('aria-label', lang === 'en' ? 'Language' : 'Язык');
+  document.querySelectorAll('.langtoggle button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.id === lang)); });
   document.documentElement.lang = lang;
   document.title = c('title');
+  el('pid').setAttribute('aria-label', lang === 'en' ? 'Payment ID' : 'Номер платежа');
+  document.querySelector('meta[name=description]').content = lang === 'en' ? 'Try 30 AI food analyses per device, once, for free. A Driftora subscription provides 30 analyses a day. Everything else in the app is free.' : 'Бесплатно — 30 ИИ-разборов еды на устройство, один раз. Подписка Driftora даёт 30 разборов в сутки. Всё остальное в приложении бесплатно.';
+  ['err','recoverOut'].forEach(function(id){
+    var node = el(id);
+    Object.keys(COPY.ru).forEach(function(key){
+      if (node.textContent === COPY.ru[key] || node.textContent === COPY.en[key]) node.textContent = c(key);
+    });
+  });
   var dict = lang === 'en' ? EN : RU;
   var nodes = document.querySelectorAll('[data-i18n]');
   for (var i=0;i<nodes.length;i++){
@@ -438,7 +451,7 @@ el('cta').addEventListener('click', function(){
   .then(function(res){
     if (!res.ok || !res.body.confirmation_url){
       busy = false; renderCta();
-      showErr((res.body && res.body.error && res.body.error.message) || c('errStart'));
+      showErr(c('errStart'));
       return;
     }
     // Провайдер не возвращает id платежа в адресе — кладём его сами, иначе
@@ -470,7 +483,7 @@ el('recoverBtn').addEventListener('click', function(){
 el('ru').addEventListener('click', function(){ lang = 'ru'; applyLang(); });
 el('en').addEventListener('click', function(){ lang = 'en'; applyLang(); });
 
-if ((navigator.language || 'ru').slice(0,2) === 'en') lang = 'en';
+
 applyLang();
 
 fetch(API + '/billing/plans')
