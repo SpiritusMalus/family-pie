@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('/vpn/sw.js',{scope:'/vpn/'}).catch(()=>{});
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
@@ -37,7 +38,7 @@
     $$('[data-platform]').forEach(b => { b.setAttribute('aria-selected', String(b.dataset.platform === key)); b.tabIndex = b.dataset.platform === key ? 0 : -1; });
     const target = $('#guide'); if (!target) return;
     target.setAttribute('aria-labelledby', `tab-${key}`);
-    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи приложение.</strong><br>${first}</li><li><strong>Добавь подписку.</strong><br>Скопируй свою личную ссылку, открой приложение и выбери добавление из буфера обмена. В этом демо действующей ссылки нет.</li><li><strong>Включи VPN.</strong><br>Выбери маршрут, нажми подключение и подтверди системный запрос на создание VPN-соединения.</li></ol><a class="btn secondary small" href="https://www.happ.su/" target="_blank" rel="noopener noreferrer">Официальный сайт Happ ↗</a><p class="demo-label">Для Linux и телевизора сначала проверь совместимость выбранного клиента. Если установка не подходит — открой раздел «Помощь».</p>`;
+    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи приложение.</strong><br>${first}</li><li><strong>Добавь подписку.</strong><br>Скопируй свою личную ссылку, открой приложение и выбери добавление из буфера обмена. Личная ссылка находится в разделе «Обзор».</li><li><strong>Включи VPN.</strong><br>Выбери маршрут, нажми подключение и подтверди системный запрос на создание VPN-соединения.</li></ol><a class="btn secondary small" href="https://www.happ.su/" target="_blank" rel="noopener noreferrer">Официальный сайт Happ ↗</a><p class="demo-label">Для Linux и телевизора сначала проверь совместимость выбранного клиента. Если установка не подходит — открой раздел «Помощь».</p>`;
   }
   $$('[data-platform]').forEach((btn, index, list) => {
     btn.addEventListener('click', () => { location.hash = `devices?platform=${btn.dataset.platform}`; });

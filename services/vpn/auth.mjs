@@ -30,6 +30,8 @@ export class Accounts {
    this.db.exec("UPDATE managed_subscriptions SET allow_unlimited=1 WHERE unlimited=1 AND panel_login IS NOT NULL");
   });
   if(!this.db.prepare('PRAGMA table_info(managed_subscriptions)').all().some(x=>x.name==='entitlement_revision'))this.db.exec('ALTER TABLE managed_subscriptions ADD COLUMN entitlement_revision INTEGER NOT NULL DEFAULT -1');
+  if(!this.db.prepare('PRAGMA table_info(identities)').all().some(x=>x.name==='password_set'))this.db.exec('ALTER TABLE identities ADD COLUMN password_set INTEGER NOT NULL DEFAULT 1');
+  this.db.exec('CREATE TABLE IF NOT EXISTS session_auth(token_hash TEXT PRIMARY KEY REFERENCES sessions(token_hash) ON DELETE CASCADE,method TEXT NOT NULL,verified_at INTEGER NOT NULL)');
  }
  normalize(login){if(typeof login!=='string'||!login.trim()||login.length>80)throw new Error('Invalid login');return login.trim().toLowerCase();}
  async add({login,password=temporaryPassword(),role='user',panelLogin=null,profileUrl=null,expiresAt=0,unlimited=false,devices=0,enabled=true,actor=null,allowUnlimited=false}) {
@@ -53,9 +55,11 @@ export class Accounts {
   if(!identity?.enabled||!valid)return null;
   return this.newSession(identity.account_id);
  }
- newSession(accountId){
+ newSession(accountId,{method='password'}={}){
+  this.db.prepare('DELETE FROM sessions WHERE expires<=?').run(this.clock());
   const token=randomBytes(32).toString('base64url'),csrf=randomBytes(32).toString('base64url');
   this.db.prepare('INSERT INTO sessions VALUES(?,?,?,?)').run(sha(token),accountId,csrf,this.clock()+12*3600_000);
+  this.db.prepare('INSERT INTO session_auth VALUES(?,?,?)').run(sha(token),method,this.clock());
   return {token,csrf,identity:this.identity(accountId)};
  }
  identity(accountId){return this.db.prepare('SELECT account_id,login,role,must_change,enabled FROM identities WHERE account_id=?').get(accountId);}
@@ -66,6 +70,7 @@ export class Accounts {
   return identity?.enabled?{...session,identity}:null;
  }
  logout(token){this.db.prepare('DELETE FROM sessions WHERE token_hash=?').run(sha(token));}
+ async setPassword(accountId,sessionHash,next){const proof=this.db.prepare('SELECT * FROM session_auth WHERE token_hash=? AND verified_at>?').get(sessionHash,this.clock()-300000);if(!proof)throw new Error('Повтори вход перед установкой пароля');const hash=await passwordHash(next);this.store.transaction(()=>{this.db.prepare('UPDATE identities SET password_hash=?,password_set=1,must_change=0 WHERE account_id=?').run(hash,accountId);this.db.prepare('DELETE FROM sessions WHERE account_id=?').run(accountId);});return this.newSession(accountId);}
  async changePassword(accountId,current,next){
   const old=this.db.prepare('SELECT password_hash FROM identities WHERE account_id=?').get(accountId);
   if(!old||!await checkPassword(current,old.password_hash))throw new Error('Wrong current password');
