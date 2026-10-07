@@ -2,6 +2,10 @@
 window.FP_EN = {
   "Подтверди пароль, чтобы изменить способы входа.": "Confirm your password to change sign-in methods.",
   "Вход через Google не завершён. Повтори попытку или войди по логину и паролю.": "Google sign-in was not completed. Try again or sign in with your username and password.",
+  "Переключить свет на странице": "Toggle the page light",
+  "Потяни помпон вниз и отпусти. С клавиатуры — Enter или пробел.": "Pull the pompom down and release. On a keyboard, use Enter or Space.",
+  "Включить или выключить свет на странице": "Turn the page light on or off",
+  "Нажми на лампу, чтобы включить или выключить свет на странице.": "Click the lamp to turn the page light on or off.",
   "Установи Happ из App Store. Если приложение недоступно для твоего региона, обратись в поддержку.": "Install Happ from the App Store. If the app is unavailable in your region, contact support.",
   "Помощь с установкой": "Installation help",
   "Платёж разовый: деньги не списываются автоматически. Для продления выбери тариф и оплати его в кабинете. После подтверждения оплаты новый срок добавится автоматически.": "Payments are one-time: you are not charged automatically. To renew, choose a plan and pay in your account. The new period is added automatically once payment is confirmed.",
