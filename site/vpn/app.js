@@ -1,49 +1,37 @@
 (() => {
   'use strict';
   if('serviceWorker' in navigator)navigator.serviceWorker.register('/vpn/sw.js',{scope:'/vpn/'}).catch(()=>{});
-  const t = text => window.FPi18n?.t(text) ?? text;
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
   const store = (key, value) => { try { localStorage.setItem(key, value); } catch { /* Preferences remain usable without storage. */ } };
-  let toastTimer;
-  function toast(message) { const el = $('.toast'); if (!el) return; el.textContent = message; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 5500); }
   function theme(value) { document.body.classList.toggle('light', value === 'light'); store('family-vpn-theme-v3', value); const select = $('#appearance'); if (select) select.value = value; }
   theme(read('family-vpn-theme-v3') || 'dark');
   $$('[data-theme]').forEach(btn => btn.addEventListener('click', () => theme(document.body.classList.contains('light') ? 'dark' : 'light')));
   $('#appearance')?.addEventListener('change', e => theme(e.target.value));
   $('[data-menu]')?.addEventListener('click', e => { const button = e.currentTarget; const open = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(open)); $('#navigation').classList.toggle('open', open); });
   $$('#navigation a').forEach(a => a.addEventListener('click', () => { $('#navigation').classList.remove('open'); $('[data-menu]').setAttribute('aria-expanded', 'false'); }));
-  async function copy(text) { try { await navigator.clipboard.writeText(t(text)); toast('Скопировано'); } catch { toast('Не удалось скопировать. Разреши доступ к буферу обмена или скопируй вручную.'); } }
-  $('[data-share]')?.addEventListener('click', () => copy('https://family-pie.ru/vpn/'));
-  $('[data-copy-checklist]')?.addEventListener('click', () => copy('Устройство:\nВерсия VPN-приложения:\nПровайдер:\nВремя ошибки:\nМаршрут:\nТекст ошибки:\nНе добавляй личную ссылку подписки или QR-код.'));
-  $$('[data-auth]').forEach(b => b.addEventListener('click', () => { $('#auth-message').textContent = `Вход через ${b.dataset.auth} ещё не подключён. Открой демонстрацию кабинета — регистрация не нужна.`; }));
-  $('[data-promo]')?.addEventListener('click', () => { $('#promo-message').textContent = $('#promo').value.trim() ? 'Проверка промокодов ещё не подключена. Код не применён.' : 'Сначала введи код.'; });
-  const draft = $('#support-draft');
-  if (draft) draft.value = read('family-vpn-support-draft') || '';
-  $('[data-draft]')?.addEventListener('click', () => { try { localStorage.setItem('family-vpn-support-draft', draft.value); toast('Черновик сохранён только в этом браузере'); } catch { toast('Браузер не разрешает сохранять черновик'); } });
-  $('[data-probe]')?.addEventListener('click', async e => { const button = e.currentTarget; button.disabled = true; button.textContent = 'Проверяю…'; $('#probe-message').textContent = 'Ожидаем ответ сайта…'; const started = performance.now(); const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 10000); try { const response = await fetch('/vpn/probe.json?t=' + Date.now(), { cache: 'no-store', signal: controller.signal }); if (!response.ok) throw new Error('HTTP'); const data = await response.json(); if (data.service !== 'family-vpn-site') throw new Error('Unexpected response'); $('#latency').textContent = Math.round(performance.now() - started) + ' мс'; $('#probe-message').textContent = 'Сайт отвечает. Это не подтверждение работы VPN.'; } catch { $('#latency').textContent = '—'; $('#probe-message').textContent = 'Сайт не ответил за время проверки. Проверь интернет и повтори.'; } finally { clearTimeout(timer); button.disabled = false; button.textContent = 'Проверить соединение'; } });
   const guideData = {
-    android: ['Android', 'Установи Happ из магазина приложений или с официального сайта разработчика.'],
-    ios: ['iPhone и iPad', 'Найди Happ в App Store. Доступность приложения зависит от региона твоего аккаунта.'],
-    windows: ['Windows', 'Скачай Happ для Windows с официального сайта и установи приложение.'],
-    macos: ['macOS', 'Установи Happ для macOS с официального сайта или из App Store, если приложение доступно в твоём регионе.'],
-    linux: ['Linux', 'Выбери клиент с поддержкой формата своей подписки. Перед импортом проверь совместимость клиента с выданным профилем.'],
-    tv: ['Smart TV', 'Проверь операционную систему телевизора. Для Android TV нужен совместимый клиент; для других систем может потребоваться подключение через роутер.']
+    android: ['Android', 'Установи Happ из Google Play. Если магазин недоступен, скачай APK с официальной страницы.', [['Google Play','https://play.google.com/store/apps/details?id=com.happproxy'],['Скачать APK','https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk']]],
+    ios: ['iPhone и iPad', 'Установи Happ из App Store. Если приложение недоступно для твоего региона, обратись в поддержку.', [['App Store','https://apps.apple.com/us/app/happ-proxy-utility/id6504287215'],['Помощь с установкой','#support']]],
+    windows: ['Windows', 'Скачай установщик Happ для своего компьютера. Обычно подходит версия x64; ARM64 нужна для компьютеров на ARM.', [['Windows x64','https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe'],['Windows ARM64','https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.arm64.exe']]],
+    macos: ['macOS', 'Скачай Happ для Mac или установи его из App Store.', [['Скачать для Mac','https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.macOS.universal.dmg'],['App Store','https://apps.apple.com/us/app/happ-proxy-utility/id6504287215']]],
+    linux: ['Linux', 'Для Ubuntu и Debian выбери DEB, для Fedora — RPM. Другие сборки доступны на официальной странице.', [['Linux DEB · x64','https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.deb'],['Linux RPM · x64','https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.rpm'],['Все сборки','https://www.happ.su/main/ru']]],
+    tv: ['Smart TV', 'Для Android TV установи Happ из Google Play, для Apple TV — из App Store. На других телевизорах подключение можно настроить через совместимый роутер.', [['Android TV','https://play.google.com/store/apps/details?id=com.happproxy'],['Apple TV','https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'],['Инструкция Android TV','https://www.happ.su/main/ru/faq/android-tv']]]
   };
   function platform(key) {
     if (!(key in guideData)) key = 'android';
-    const [name, first] = guideData[key];
+    const [name, first, downloads] = guideData[key];
     $$('[data-platform]').forEach(b => { b.setAttribute('aria-selected', String(b.dataset.platform === key)); b.tabIndex = b.dataset.platform === key ? 0 : -1; });
     const target = $('#guide'); if (!target) return;
     target.setAttribute('aria-labelledby', `tab-${key}`);
-    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи приложение.</strong><br>${first}</li><li><strong>Добавь подписку.</strong><br>Скопируй свою личную ссылку, открой приложение и выбери добавление из буфера обмена. Личная ссылка находится в разделе «Обзор».</li><li><strong>Включи VPN.</strong><br>Выбери маршрут, нажми подключение и подтверди системный запрос на создание VPN-соединения.</li></ol><a class="btn secondary small" href="https://www.happ.su/" target="_blank" rel="noopener noreferrer">Официальный сайт Happ ↗</a><p class="demo-label">Для Linux и телевизора сначала проверь совместимость выбранного клиента. Если установка не подходит — открой раздел «Помощь».</p>`;
+    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи Happ.</strong><br>${first}<div class="guide-downloads">${downloads.map(([label,url])=>`<a class="btn secondary small" href="${url}"${url.startsWith('#')?'':' target="_blank" rel="noopener noreferrer"'}>${label}${url.startsWith('#')?'':' ↗'}</a>`).join('')}</div></li><li><strong>Добавь подписку.</strong><br>Открой «Моё подключение» ниже. После оплаты там появятся личная ссылка и QR-код. Нажми «Добавить в Happ», чтобы импортировать подписку автоматически, или добавь ссылку из буфера обмена внутри приложения.</li><li><strong>Включи VPN.</strong><br>Выбери маршрут и нажми подключение. При первом запуске разреши приложению создать VPN-соединение.</li></ol><a class="btn secondary small" href="#home">Открыть моё подключение</a><a class="btn secondary small" href="#support">Помощь с настройкой</a>`;
+
   }
   $$('[data-platform]').forEach((btn, index, list) => {
     btn.addEventListener('click', () => { location.hash = `devices?platform=${btn.dataset.platform}`; });
     btn.addEventListener('keydown', e => { let next; if (e.key === 'ArrowRight') next = (index + 1) % list.length; if (e.key === 'ArrowLeft') next = (index + list.length - 1) % list.length; if (e.key === 'Home') next = 0; if (e.key === 'End') next = list.length - 1; if (next !== undefined) { e.preventDefault(); list[next].click(); list[next].focus(); } });
   });
-  $$('[data-plan]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const period = a.dataset.plan; $('#plan-message').textContent = `Выбран период: ${period} дней. Цена ещё не утверждена. Оплата и выдача доступа пока недоступны.`; toast(`Выбран период: ${period} дней`); }));
   let previousScreen;
   function route() {
     if (!$('[data-screen]')) return;
