@@ -55,7 +55,7 @@
     previousScreen = key;
     const params = new URLSearchParams(query);
     if (key === 'devices') platform(params.get('platform') || 'android');
-    if (key === 'plans' && ['30','90','180','365'].includes(params.get('period'))) $('#plan-message').textContent = `Выбран период: ${params.get('period')} дней. Цена ещё не утверждена; оплата пока недоступна.`;
+    if (key === 'plans' && ['30','90','180','365'].includes(params.get('period'))) window.dispatchEvent(new CustomEvent('vpn-plan-selection',{detail:{days:Number(params.get('period'))}}));
     document.title = `${$('[data-route][aria-current="page"]')?.textContent.trim() || 'Кабинет'} — Family VPN`;
   }
   window.addEventListener('hashchange', route);
