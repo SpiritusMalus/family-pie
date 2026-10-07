@@ -29,103 +29,9 @@
   наших слов. Статика, без сборки, как /relo_dojo/checkout/.
 -->
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-  /* Токены сайта (site/index.html) — страница обязана читаться как его часть,
-     а не как чужая вставка. Акцент — driftora-коралловый из каталога. */
-  :root{
-    --bg:#F4F1EA; --surface:#FBF9F4; --ink:#1B1A17; --ink2:#6b655c; --ink3:#736d5f;
-    --line:#E4DDCE; --accent:#D8513A; --accent-press:#B8442E; --accent-soft:#fbeae5;
-    --ok:#0B6E26; --maxw:1000px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--bg)}
-  body{color:var(--ink);font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
-  a{color:inherit}
-
-  .nav{position:sticky;top:0;z-index:40;background:rgba(244,241,234,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-  .nav-in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 40px}
-  .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.01em;text-decoration:none}
-  .langtoggle{display:flex;border:1px solid var(--ink);border-radius:999px;overflow:hidden;font-family:'Space Mono',monospace;font-size:12px}
-  .langtoggle button{font-family:inherit;font-size:12px;letter-spacing:.08em;padding:7px 15px;border:none;cursor:pointer;background:transparent;color:var(--ink)}
-  .langtoggle button.on{background:var(--ink);color:#fff}
-
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
-  .eyebrow{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-press);margin-bottom:22px}
-  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:56px;line-height:1.05;letter-spacing:-.025em;max-width:15ch;text-wrap:balance}
-  .lede{font-size:19px;color:var(--ink2);max-width:56ch;margin-top:24px}
-  .hero{padding:72px 40px 8px}
-
-  h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.015em;margin-bottom:6px}
-  .sec{padding:56px 40px}
-  .sec-label{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:28px}
-
-  .plans{display:flex;gap:20px;flex-wrap:wrap;align-items:stretch}
-  .plan{flex:1 1 210px;position:relative;display:block;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:26px;cursor:pointer;font-family:inherit;color:inherit;transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
-  .plan[hidden]{display:none}
-  .plan:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(27,26,23,.06)}
-  .plan[aria-checked="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .plan-name{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px}
-  .plan-price{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:42px;letter-spacing:-.02em;margin-top:14px;line-height:1}
-  .plan-per{display:block;font-size:14px;color:var(--ink2);margin-top:8px}
-  .plan-badge{position:absolute;top:-11px;right:18px;background:var(--accent);color:#fff;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
-
-  .buy{margin-top:28px;max-width:520px}
-  label.field{display:block;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px}
-  input[type=email]{width:100%;padding:15px 16px;font-family:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:14px}
-  input[type=email]:focus{outline:none;border-color:var(--accent)}
-  .cta{width:100%;margin-top:20px;padding:18px 24px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:#fff;background:var(--accent);border:none;border-radius:16px;cursor:pointer;transition:background .2s ease,transform .1s ease}
-  .cta:hover{background:var(--accent-press)}
-  .cta:active{transform:scale(.99)}
-  .cta[disabled]{opacity:.5;cursor:not-allowed}
-  .err{margin-top:14px;color:var(--accent-press);font-weight:600}
-  .note{margin-top:14px;font-size:14px;color:var(--ink2)}
-
-  .recover{margin-top:34px;padding-top:22px;border-top:1px solid var(--line)}
-  .recover summary{cursor:pointer;font-weight:600;list-style:none;color:var(--ink2)}
-  .recover summary::-webkit-details-marker{display:none}
-  .recover summary::before{content:'? ';font-family:'Space Mono',monospace;color:var(--accent-press)}
-  .recover p{margin:12px 0;color:var(--ink2);font-size:15px;max-width:60ch}
-  .recover input{width:100%;max-width:520px;padding:14px 16px;font-family:'Space Mono',monospace;font-size:14px;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:14px}
-  .recover input:focus{outline:none;border-color:var(--accent)}
-  .cta.ghost{max-width:520px;margin-top:12px;background:transparent;color:var(--accent-press);border:1.5px solid var(--accent)}
-  .cta.ghost:hover{background:var(--accent-soft)}
-  .recover-out{font-family:'Space Mono',monospace;font-size:19px;letter-spacing:.05em;color:var(--ink);user-select:all;word-break:break-all}
-  .recover-out.bad{font-family:'Manrope',sans-serif;font-size:15px;letter-spacing:0;color:var(--accent-press);font-weight:600}
-  .cols{display:flex;gap:56px;flex-wrap:wrap}
-  .col{flex:1 1 320px}
-  .col p{color:var(--ink2)}
-  ul.list{list-style:none;margin-top:14px}
-  ul.list li{padding:11px 0 11px 30px;position:relative;border-bottom:1px solid var(--line)}
-  ul.list li::before{content:'';position:absolute;left:4px;top:19px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
-  ul.list.free li::before{background:var(--ok)}
-
-  .faq{border-top:1px solid var(--line)}
-  .faq details{border-bottom:1px solid var(--line)}
-  .faq summary{padding:20px 4px;cursor:pointer;font-weight:600;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:20px}
-  .faq summary::-webkit-details-marker{display:none}
-  .faq summary::after{content:'+';font-family:'Space Mono',monospace;color:var(--ink3)}
-  .faq details[open] summary::after{content:'—'}
-  .faq p{padding:0 4px 22px;color:var(--ink2);max-width:70ch}
-
-  .legal{background:var(--surface);border-top:1px solid var(--line)}
-  .legal .wrap{padding-top:44px;padding-bottom:52px}
-  .legal p{color:var(--ink2);font-size:15px;max-width:80ch;margin-bottom:12px}
-  .legal a{color:var(--accent-press)}
-  .footer{border-top:1px solid var(--line)}
-  .footer-in{max-width:var(--maxw);margin:0 auto;padding:26px 40px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:14px;color:var(--ink2)}
-
-  @media (max-width:720px){
-    .nav-in,.wrap,.hero,.sec,.footer-in{padding-left:20px;padding-right:20px}
-    h1{font-size:38px} h2{font-size:24px}
-    .hero{padding-top:44px}
-    .sec{padding-top:40px;padding-bottom:40px}
-    .cols{gap:28px}
-  }
-</style>
+<link rel="stylesheet" href="/vpn/fonts.css">
+<link rel="stylesheet" href="/home.css">
+<link rel="stylesheet" href="/driftora/subscription/style.css">
 <link rel="stylesheet" href="/i18n/language.css">
 <script src="/i18n/language.js"></script>
 <link rel="stylesheet" href="/social-footer.css">
@@ -134,18 +40,44 @@
 
 <nav class="nav">
   <div class="nav-in">
-    <a class="brand-name" href="/">family-pie</a>
+    <a class="brand" href="/" aria-label="family-pie — на главную">
+      <svg class="pielogo" width="36" height="36" viewBox="0 0 48 48" style="display:block" aria-hidden="true">
+        <path class="seg" d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#0E8A30"></path>
+        <path class="seg seg-accent" d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A"></path>
+        <path class="seg" d="M24,24 L43.05,35 A22,22 0 0 1 24,46 Z" fill="#E3A52C"></path>
+        <path class="seg" d="M24,24 L24,46 A22,22 0 0 1 4.95,35 Z" fill="#E8E1D3"></path>
+        <path class="seg" d="M24,24 L4.95,35 A22,22 0 0 1 4.95,13 Z" fill="#E2DACB"></path>
+        <path class="seg" d="M24,24 L4.95,13 A22,22 0 0 1 24,2 Z" fill="#EDE7DA"></path>
+        <circle cx="24" cy="24" r="22" fill="none" stroke="#F4F1EA" stroke-width="2.4"></circle>
+        <line x1="24" y1="24" x2="24" y2="2" stroke="#F4F1EA" stroke-width="2.4"></line>
+        <line x1="24" y1="24" x2="43.05" y2="13" stroke="#F4F1EA" stroke-width="2.4"></line>
+        <line x1="24" y1="24" x2="43.05" y2="35" stroke="#F4F1EA" stroke-width="2.4"></line>
+        <line x1="24" y1="24" x2="24" y2="46" stroke="#F4F1EA" stroke-width="2.4"></line>
+        <line x1="24" y1="24" x2="4.95" y2="35" stroke="#F4F1EA" stroke-width="2.4"></line>
+        <line x1="24" y1="24" x2="4.95" y2="13" stroke="#F4F1EA" stroke-width="2.4"></line>
+      </svg>
+      <span class="brand-name">family-pie</span>
+    </a>
+    <div class="nav-right">
+      <button class="theme-toggle" type="button" aria-label="Сменить тему" aria-pressed="false">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 15.3A8.5 8.5 0 0 1 8.7 4a8.5 8.5 0 1 0 11.3 11.3Z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+      </button>
     <div class="langtoggle" role="group" aria-label="Language">
       <button id="ru" class="on" type="button">RU</button>
       <button id="en" type="button">EN</button>
+    </div>
     </div>
   </div>
 </nav>
 
 <header class="hero wrap">
+  <div class="hero-content">
   <div class="eyebrow" data-i18n="eyebrow">Driftora · подписка</div>
   <h1 data-i18n="title">Платите только за ИИ-разборы</h1>
   <p class="lede" data-i18n="lede">Бесплатно даётся 30 ИИ-разборов еды на устройство — один раз, они не обновляются. Подписка даёт 30 разборов в сутки, каждый день. Дневник, вес, настроение и ручной ввод остаются бесплатными всегда.</p>
+  </div>
+  <figure class="hero-art" aria-hidden="true"><canvas id="portal" data-portal-theme="adaptive"></canvas></figure>
 </header>
 
 <section class="sec wrap">
@@ -153,32 +85,32 @@
 
   <!-- Цены подставляет скрипт: единственное место, где они хранятся, — сервер.
        Без JS остаются названия тарифов и вся суть услуги ниже. -->
-  <div class="plans" id="plans">
-    <span class="plan" aria-checked="true" data-plan="monthly">
+  <div class="plans" id="plans" role="radiogroup" aria-label="Тариф">
+    <button type="button" role="radio" class="plan" aria-checked="true" data-plan="monthly">
       <span class="plan-name" data-i18n="month">На месяц</span>
       <span class="plan-price" data-price="monthly">—</span>
       <span class="plan-per" data-per="monthly"></span>
-    </span>
-    <span class="plan" aria-checked="false" data-plan="bimonthly">
+    </button>
+    <button type="button" role="radio" class="plan" aria-checked="false" data-plan="bimonthly">
       <span class="plan-name" data-i18n="twoMonths">На 60 дней</span>
       <span class="plan-price" data-price="bimonthly">—</span>
       <span class="plan-per" data-per="bimonthly"></span>
-    </span>
-    <span class="plan" aria-checked="false" data-plan="quarterly">
+    </button>
+    <button type="button" role="radio" class="plan" aria-checked="false" data-plan="quarterly">
       <span class="plan-name" data-i18n="quarter">На 90 дней</span>
       <span class="plan-price" data-price="quarterly">—</span>
       <span class="plan-per" data-per="quarterly"></span>
-    </span>
-    <span class="plan" aria-checked="false" data-plan="semiannual">
+    </button>
+    <button type="button" role="radio" class="plan" aria-checked="false" data-plan="semiannual">
       <span class="plan-name" data-i18n="halfYear">На 180 дней</span>
       <span class="plan-price" data-price="semiannual">—</span>
       <span class="plan-per" data-per="semiannual"></span>
-    </span>
-    <span class="plan" aria-checked="false" data-plan="yearly">
+    </button>
+    <button type="button" role="radio" class="plan" aria-checked="false" data-plan="yearly">
       <span class="plan-name" data-i18n="year">На год</span>
       <span class="plan-price" data-price="yearly">—</span>
       <span class="plan-per" data-per="yearly"></span>
-    </span>
+    </button>
   </div>
 
   <div class="buy" id="buy">
@@ -350,6 +282,8 @@ function applyLang(){
   document.querySelectorAll('.langtoggle button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.id === lang)); });
   document.documentElement.lang = lang;
   document.title = c('title');
+  document.querySelector('.theme-toggle').setAttribute('aria-label', lang === 'en' ? 'Change theme' : 'Сменить тему');
+  el('plans').setAttribute('aria-label', lang === 'en' ? 'Plan' : 'Тариф');
   el('pid').setAttribute('aria-label', lang === 'en' ? 'Payment ID' : 'Номер платежа');
   document.querySelector('meta[name=description]').content = lang === 'en' ? 'Try 30 AI food analyses per device, once, for free. A Driftora subscription provides 30 analyses a day. Everything else in the app is free.' : 'Бесплатно — 30 ИИ-разборов еды на устройство, один раз. Подписка Driftora даёт 30 разборов в сутки. Всё остальное в приложении бесплатно.';
   ['err','recoverOut'].forEach(function(id){
@@ -429,6 +363,16 @@ function renderCta(){
 
 function showErr(msg){ var e = el('err'); e.textContent = msg; e.hidden = false; }
 
+document.getElementById('plans').addEventListener('keydown', function(ev){
+  if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(ev.key)) return;
+  var cards = Array.from(document.querySelectorAll('.plan:not([hidden])'));
+  var index = cards.indexOf(document.activeElement);
+  if (index < 0) return;
+  ev.preventDefault();
+  index = ev.key === 'Home' ? 0 : ev.key === 'End' ? cards.length - 1 : (index + (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : 1) + cards.length) % cards.length;
+  cards[index].focus(); cards[index].click();
+});
+
 document.getElementById('plans').addEventListener('click', function(ev){
   var card = ev.target.closest ? ev.target.closest('.plan') : null;
   if (!card) return;
@@ -498,5 +442,7 @@ fetch(API + '/billing/plans')
   })
   .catch(function(){ showErr(c('errPlans')); });
 </script>
+<script src="/home-theme.js"></script>
+<script src="/vpn/portal.js"></script>
 </body>
 </html>
