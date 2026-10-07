@@ -1,0 +1,10 @@
+/* Shared profile links retain each product page's typography and palette. */
+.fp-social{box-sizing:border-box;display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:8px 24px;flex-basis:100%;width:100%;max-width:1080px;margin:0 auto;padding:12px 40px 24px;font-family:inherit;font-size:13px;line-height:1.6}
+.fp-social a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:underline;text-underline-offset:4px;overflow-wrap:anywhere}
+.fp-social a:hover{text-decoration-thickness:2px}
+.fp-social a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+footer:has(>.fp-social){flex-wrap:wrap}
+.foot>.fp-social,footer.wrap>.fp-social{padding:0}
+.fp-social-shell{margin-top:24px;color:inherit}
+@media(max-width:760px){.fp-social{padding-left:24px;padding-right:24px}.foot>.fp-social,footer.wrap>.fp-social{padding-left:0;padding-right:0}}
+@media print{.fp-social-shell,.fp-social{display:none}}
