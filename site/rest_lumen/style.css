@@ -14,8 +14,20 @@ h1{font-size:clamp(38px,4.1vw,58px);font-weight:600;line-height:1.08;letter-spac
 .button:hover{background:#ffdaa2}.button:active{transform:translateY(1px)}.quiet,figcaption{font-size:13px;line-height:1.6;color:var(--muted)}.quiet{margin-top:20px}
 figure{margin:0}img{max-width:100%;height:auto}.hero-lamp{margin:0;text-align:center;min-width:0}.hero-lamp figcaption{max-width:320px;margin:14px auto 0;position:relative}
 .lamp-scene{position:relative;aspect-ratio:1;width:100%;max-width:600px;margin:auto;isolation:isolate}
-.lamp-switch{display:block;position:relative;width:100%;padding:0;background:none;border:0;cursor:pointer;border-radius:6px;touch-action:manipulation}.lamp-switch img{display:block;width:100%;height:auto;transition:filter .65s ease-out;mask-image:radial-gradient(ellipse at 55% 50%,#000 42%,#000d 60%,transparent 76%)}
-body[data-lamp="off"] .lamp-switch img{filter:brightness(.26) saturate(.45)}
+/* The photograph and wool cutout are separate so the pull has physical travel. */
+.lamp-photo{display:block;width:100%;height:auto;transition:filter .65s ease-out;mask-image:radial-gradient(ellipse at 55% 50%,#000 42%,#000d 60%,transparent 76%)}
+.pull-art,.pull-shadow{position:absolute;left:47.6%;top:44.4%;width:8.5%;height:23%;pointer-events:none}
+.pull-art img,.pull-shadow img{position:absolute;inset:0;width:100%;height:100%}
+.rope{clip-path:inset(0 0 34%);transform:scaleY(var(--stretch,1));transform-origin:top}
+.pompom{clip-path:inset(64% 0 0);transform:translateY(var(--pull,0px))}
+.pull-shadow{left:38.4%;top:44.4%;filter:brightness(0) blur(3px);opacity:.65;transform:skewX(-12deg);transform-origin:top;transition:opacity .65s ease-out}
+.pull-shadow img{transform:scaleY(var(--stretch,1));transform-origin:top}
+.pull-switch{position:absolute;left:calc(51.85% - 24px);top:calc(64% - 24px);width:48px;height:48px;border:0;padding:0;background:transparent;border-radius:50%;cursor:grab;touch-action:none;transform:translateY(var(--pull,0px))}
+.lamp-scene:not(.pulling) .rope,.lamp-scene:not(.pulling) .pompom,.lamp-scene:not(.pulling) .pull-switch,.lamp-scene:not(.pulling) .pull-shadow img{transition:transform .55s cubic-bezier(.22,1.4,.36,1)}
+.pulling .pull-switch{cursor:grabbing}
+body[data-lamp="off"] .lamp-photo{filter:brightness(.26) saturate(.45)}
+body[data-lamp="off"] .pull-art{filter:brightness(.45) saturate(.6)}
+body[data-lamp="off"] .pull-shadow{opacity:0}
 .story{display:grid;grid-template-columns:.8fr 1.2fr;gap:72px;align-items:center;border-top:1px solid var(--line);padding-block:80px}.story-copy p,.pause p{color:var(--muted);max-width:430px}.shot{max-width:590px}.shot img{display:block;border:1px solid #605c50;border-radius:6px;box-shadow:14px 22px 42px #0004}.shot figcaption{margin-top:16px}
 .pause{display:grid;grid-template-columns:1.2fr .8fr;gap:100px;align-items:center;padding-block:35px 85px}.reminder{max-width:350px;margin:auto}.reminder img{display:block;border-radius:6px;border:1px solid #605c50;box-shadow:14px 22px 42px #0004}kbd{font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:3px;padding:3px 6px;background:var(--surface)}
 .downloads{padding-block:75px;border-top:1px solid var(--line)}.download-intro{color:var(--muted);margin-bottom:36px}.download-row{display:grid;grid-template-columns:230px 1fr;gap:10px 30px;border-top:1px solid var(--line);padding-block:32px}h3{font-size:24px;font-weight:500;margin:0}.download-row p{margin:6px 0;color:var(--muted);font-size:13px}.choices{display:flex;align-items:center;gap:24px;flex-wrap:wrap}.choices span{font-size:11px;font-weight:400}.text-link{font-size:14px;min-height:44px;display:flex;flex-direction:column;justify-content:center}.text-link span{display:block}.download-row .note{grid-column:2;max-width:630px}
@@ -24,4 +36,4 @@ details{margin-top:28px;background:var(--surface);border:1px solid var(--line);p
 @media(max-width:900px){.hero{gap:10px;min-height:580px}h1{font-size:42px}.story{gap:36px}.pause{gap:48px}}
 @media(max-width:767px){.wrap{padding-inline:24px}header{min-height:76px;gap:16px}.studio{font-size:13px}.studio span{margin-left:8px}.hero{grid-template-columns:1fr;gap:16px;min-height:0;padding-block:44px 50px}.wordmark{margin-bottom:25px}h1{font-size:clamp(36px,8.4vw,52px)}.lead{font-size:17px}.hero-lamp{width:100%;max-width:420px;margin:auto}.hero-lamp figcaption{margin-top:0}.story,.pause{grid-template-columns:1fr;gap:32px;padding-block:55px}.story-copy p,.pause p{max-width:none}.reminder{max-width:320px}.downloads{padding-block:50px}.download-row{grid-template-columns:1fr;gap:18px}.download-row .note{grid-column:1}.choices{gap:18px}.button{padding:13px 18px}.choices .button{flex-wrap:wrap;justify-content:flex-start;gap:8px 12px}.choices .button span{white-space:nowrap}footer{flex-wrap:wrap;gap:12px}}
 @media(max-width:380px){.wrap{padding-inline:20px}header{gap:10px}.studio span{display:none}header>a:last-of-type{font-size:13px}.choices{align-items:flex-start;flex-direction:column}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button,.lamp-switch img{transition:none}.button:active{transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button,.lamp-photo,.pull-art,.pull-shadow,.lamp-scene .rope,.lamp-scene .pompom,.lamp-scene .pull-switch,.lamp-scene .pull-shadow img{transition:none}.button:active{transform:none}}

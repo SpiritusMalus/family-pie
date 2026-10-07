@@ -15,7 +15,7 @@ The bilingual RU/EN product page at `/rest_lumen/` helps visitors understand scr
 
 Inherit local Golos Text, the compact Unbounded studio wordmark, 3px control corners and 6px panel corners. Use the implemented dark background `#0d1014`, warm light text and warm accent `#f1c27d`. The owner pinned the AI-generated photographic fabric lamp after rejecting a flat render. `assets/lamp-room.jpg` presents the cream fabric shade and pompon in a dark room with physical illumination and shadows; its masked edges blend into the surrounding background.
 
-Desktop pairs the product headline and download action with the lamp. Mobile stacks the same reading order. The recognizable moment is clicking the lamp to dim or restore its pictured light. Preserve the actual macOS settings and reminder screenshots below the hero as product evidence.
+Desktop pairs the product headline and download action with the lamp. Mobile stacks the same reading order. The recognizable moment is pulling the lamp to dim or restore its pictured light. Preserve the actual macOS settings and reminder screenshots below the hero as product evidence.
 
 ## Content and actions
 
@@ -35,3 +35,6 @@ Preserve honest beta copy, installation constraints and distinctions between mac
 Source basis: `index.html`, `style.css` and `lamp.js`, inspected on 2026-10-07. Acceptance checks: photographic lamp loads and blends into the dark ground; on/off and pressed state agree; keyboard activation and focus work; RU/EN labels remain complete; reduced motion removes transitions; mobile remains readable; real screenshots and all six release links remain unchanged. These criteria do not claim completed browser or deployment verification.
 
 No visual direction remains open: the owner selected the photographic lamp. Application release verification remains governed by the Lumen + REST project separately.
+
+## Pull interaction — owner extension
+Pull the separate photographic pompom downward and release to switch the illustrative light. Native Pointer Events/capture, bounded travel, threshold activation, cancellation cleanup, Enter/Space fallback. The rope extends while pompom dimensions remain fixed. Reduced motion removes return/light transitions. `assets/pull-cord.png` preserves alpha; no app/system control implied.
