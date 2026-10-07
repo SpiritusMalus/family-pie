@@ -7,7 +7,7 @@ import { Billing,billingConfig } from './billing.mjs';
 import { randomBytes } from 'node:crypto';
 import { Passkeys } from './passkeys.mjs';
 import QRCode from 'qrcode';
-import { GoogleLogin } from './google.mjs';
+import { GoogleLogin,googleConfig as readGoogleConfig,googleReturnPath } from './google.mjs';
 import {EmailLogin,smtpSender} from './email.mjs';
 import {PushNotifications} from './push.mjs';
 export function createApp({store,origin='https://family-pie.ru',secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={}}){
@@ -29,8 +29,8 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
    if(path==='/vpn/api/health'&&req.method==='GET')return send(res,200,{service:'family-vpn-cabinet',revision});
    if(path==='/vpn/api/plans'&&req.method==='GET')return send(res,200,{plans:[...store.plans.values()],available:billing.ready()&&store.plans.size>0,testMode:billing.config.testMode});
    if(path==='/vpn/api/auth-options'&&req.method==='GET')return send(res,200,{google:google.ready(),email:Boolean(sendEmail),passkey:true,password:true,registration:true});
-   if(path==='/vpn/api/google/start'&&req.method==='GET'){const existing=users.session(token(req));if(existing?.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль'});if(existing)recent(existing);const s=google.start(existing);res.writeHead(302,{'Location':s.url,'Cache-Control':'no-store','Set-Cookie':`vpn_google=${s.state}; Path=/vpn/api/google/; HttpOnly; SameSite=Lax; ${secure?'Secure; ':''}Max-Age=300`});return res.end();}
-   if(path==='/vpn/api/google/callback'&&req.method==='GET'){try{const q=new URL(req.url,origin).searchParams,c=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_google='))?.slice(11),s=await google.finish(q.get('state'),c,q.get('code'));cookie(res,s.token);res.writeHead(302,{'Location':'/vpn/cabinet/','Cache-Control':'no-store'});return res.end();}catch{return send(res,400,{error:'Не удалось подтвердить Google. Вернись на страницу входа и повтори'});}}
+   if(path==='/vpn/api/google/start'&&req.method==='GET'){const q=new URL(req.url,origin).searchParams,next=googleReturnPath(q.get('next'),origin),existing=users.session(token(req));if(!google.ready()){res.writeHead(302,{'Location':'/vpn/cabinet/auth/?google_error=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}if(existing?.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль'});if(existing){try{recent(existing);}catch{res.writeHead(302,{'Location':'/vpn/cabinet/auth/?reauth=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}}const s=google.start(existing,next);res.writeHead(302,{'Location':s.url,'Cache-Control':'no-store','Set-Cookie':`vpn_google=${s.state}; Path=/vpn/api/google/; HttpOnly; SameSite=Lax; ${secure?'Secure; ':''}Max-Age=300`});return res.end();}
+   if(path==='/vpn/api/google/callback'&&req.method==='GET'){const q=new URL(req.url,origin).searchParams,c=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_google='))?.slice(11),next=google.returnPath(q.get('state'),c);try{const s=await google.finish(q.get('state'),c,q.get('code'));cookie(res,s.token);res.writeHead(302,{'Location':s.identity.role==='admin'&&s.next==='/vpn/cabinet/'?'/vpn/admin/':s.next,'Cache-Control':'no-store'});return res.end();}catch{res.writeHead(302,{'Location':'/vpn/cabinet/auth/?google_error=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}}
    if(path==='/vpn/api/passkeys/login/options'&&req.method==='POST'){
     if(req.headers.origin!==origin)return send(res,403,{error:'Источник запроса не разрешён'});return send(res,200,await passkeys.options());
    }
@@ -161,7 +161,7 @@ if(process.argv[1]?.endsWith('/server.mjs')){
  if(!process.env.VPN_DATABASE_PATH)throw new Error('Private database path required');
  const store=new VpnStore(process.env.VPN_DATABASE_PATH);
  const pushConfig=process.env.VPN_PUSH_CONFIG_FILE?JSON.parse((await import('node:fs')).readFileSync(process.env.VPN_PUSH_CONFIG_FILE,'utf8')):{};
- const {server,billing,push}=createApp({store,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:{clientId:process.env.VPN_GOOGLE_CLIENT_ID,secret:process.env.VPN_GOOGLE_CLIENT_SECRET},sendEmail:smtpSender(),pushConfig});
+ const {server,billing,push}=createApp({store,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig});
  const reconcile=setInterval(()=>{billing.reconcile().catch(()=>{});push.tick().catch(()=>{});},30000);reconcile.unref();
  server.listen(Number(process.env.VPN_PORT)||8796,'127.0.0.1');
  process.on('SIGTERM',()=>server.close(()=>{store.close();process.exit(0);}));

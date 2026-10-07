@@ -1,5 +1,7 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Подтверди пароль, чтобы изменить способы входа.": "Confirm your password to change sign-in methods.",
+  "Вход через Google не завершён. Повтори попытку или войди по логину и паролю.": "Google sign-in was not completed. Try again or sign in with your username and password.",
   "Переключить свет на странице": "Toggle the page light",
   "Потяни помпон вниз и отпусти. С клавиатуры — Enter или пробел.": "Pull the pompom down and release. On a keyboard, use Enter or Space.",
   "Включить или выключить свет на странице": "Turn the page light on or off",
