@@ -196,6 +196,7 @@ function page(product, initialDoc, models, rawLinks) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/social-footer.css">
 <style>
   :root{--accent:${accent};--accent-text:${accentText};--bg:${PALETTE_BG};--ink:${INK};--muted:#6b655c;--subtle:#736d5f;--line:#E4DDCE;--paper:#FBF9F4}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -296,6 +297,7 @@ ${cols}
 <footer class="foot">
   <span>© 2026 <a href="/">family-pie</a> · legal host</span>
   <a href="mailto:support@family-pie.ru">support@family-pie.ru</a>
+<div class="fp-social"><a href="https://github.com/SpiritusMalus" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://www.linkedin.com/in/eugene-tihonenko-94887143b/" target="_blank" rel="noopener noreferrer">LinkedIn</a></div>
 </footer>
 
 <noscript>

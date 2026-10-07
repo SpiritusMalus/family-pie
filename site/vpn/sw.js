@@ -1,5 +1,5 @@
-const CACHE='family-vpn-shell-20261006';
-const ASSETS=['/vpn/offline.html','/vpn/style.css','/vpn/portal-style.css','/vpn/fonts.css','/vpn/favicon.svg'];
+const CACHE='family-vpn-shell-20261006-social';
+const ASSETS=['/social-footer.css','/vpn/offline.html','/vpn/style.css','/vpn/portal-style.css','/vpn/fonts.css','/vpn/favicon.svg'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('family-vpn-shell-')&&k!==CACHE).map(k=>caches.delete(k))))));
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.origin!==self.location.origin||u.pathname.startsWith('/vpn/api/'))return;if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).catch(()=>caches.match('/vpn/offline.html')));return;}if(ASSETS.includes(u.pathname))e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));});
