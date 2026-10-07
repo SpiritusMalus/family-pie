@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {VpnStore} from '../store.mjs';import {Accounts} from '../auth.mjs';import {TelegramStore,TelegramClient,TelegramApiError,deliverOne} from '../telegram.mjs';import {createApp} from '../server.mjs';
+import {VpnStore} from '../store.mjs';import {Accounts} from '../auth.mjs';import {TelegramStore,TelegramClient,TelegramApiError,deliverOne,botCommands,botKeyboard,configureBotMenu} from '../telegram.mjs';import {createApp} from '../server.mjs';
 const DAY=86400_000;
 async function fixture(t,overrides={}){let now=Date.UTC(2026,0,1);const clock=()=>now;const store=new VpnStore(':memory:',{clock,plans:[{days:30,priceMinor:100,devices:1}]});t.after(()=>store.close());const users=new Accounts(store,{clock}),telegram=new TelegramStore(store,{clock});const user=await users.add({login:'tg-fixture',expiresAt:now+2*DAY,...overrides});store.db.prepare('UPDATE identities SET must_change=0 WHERE account_id=?').run(user.accountId);if(!overrides.unlimited){const order=store.createOrder(user.accountId,30,'telegram-fixture-order');store.bindPayment(user.accountId,order.id,'telegram-fixture-payment');store.confirmPayment({id:'telegram-fixture-payment',status:'succeeded',paid:true,test:true,amount:{currency:'RUB',value:'1.00'},metadata:{order_id:order.id}});store.db.prepare("UPDATE managed_subscriptions SET enabled=1,sync_state='synced',entitlement_revision=? WHERE account_id=?").run(store.account(user.accountId).revision,user.accountId);}const session=users.newSession(user.accountId);
  // Sessions are stored by hash, not by raw cookie.
@@ -77,4 +77,43 @@ test('stale expired reminder after long downtime is canceled rather than sent we
 });
 test('blocking the bot invalidates even an unconfirmed candidate link',async t=>{
  const f=await fixture(t);const token=f.telegram.issue(f.user.accountId,f.sessionHash);f.telegram.candidate(token,'1001','@fixture');assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).pending,true);f.telegram.update({update_id:9,my_chat_member:{chat:{type:'private',id:1001},new_chat_member:{status:'kicked'}}});assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).pending,false);assert.throws(()=>f.telegram.confirm(f.user.accountId,f.sessionHash));
+});
+
+function message(id,text,chatId=1001){return {update_id:id,message:{chat:{type:'private',id:chatId},from:{id:chatId},text}};}
+function replyText(f,id){return f.store.db.prepare('SELECT text FROM telegram_outbox WHERE dedupe=?').get('reply:'+id)?.text;}
+test('persistent menu and command list have real actions for linked private accounts',async t=>{
+ const f=await fixture(t);f.link();
+ const sent=[];const client={call:async(method,body)=>sent.push({method,body})};
+ await configureBotMenu(client);assert.deepEqual(sent[0],{method:'setMyCommands',body:{commands:botCommands,scope:{type:'all_private_chats'}}});assert.equal(sent[1].body.menu_button.type,'commands');
+ let id=100;for(const row of botKeyboard.keyboard)for(const button of row){f.telegram.update(message(id,button.text));assert.ok(replyText(f,id),button.text);id++;}
+ assert.match(replyText(f,100),/действует до/);assert.match(replyText(f,101),/QR-код/);assert.match(replyText(f,102),/#plans/);assert.match(replyText(f,103),/личный кабинет/);assert.match(replyText(f,104),/#support/);assert.match(replyText(f,105),/Напоминания включены/);
+ await deliverOne(f.telegram,client);assert.deepEqual(sent.at(-1).body.reply_markup,botKeyboard);assert.equal(sent.at(-1).body.link_preview_options.is_disabled,true);
+ assert.ok(sent.every(x=>!JSON.stringify(x).includes('example.invalid')&&!JSON.stringify(x).includes(f.user.accountId)));
+});
+test('unlinked and unconfirmed bot users get the binding path instead of subscription data',async t=>{
+ const f=await fixture(t);const nonce=f.telegram.issue(f.user.accountId,f.sessionHash);f.telegram.candidate(nonce,'1001','@fixture');
+ f.telegram.update(message(1,'Моя подписка'));assert.match(replyText(f,1),/подтверди привязку/);assert.doesNotMatch(replyText(f,1),/действует до/);
+ f.telegram.update(message(2,'Подключиться'));assert.match(replyText(f,2),/#settings/);
+ f.telegram.update(message(3,'/start'));assert.match(replyText(f,3),/Выбери действие/);
+ f.telegram.update(message(4,'something'));assert.match(replyText(f,4),/кнопками меню/);
+});
+test('menu isolates chats, ignores spoofed authors/groups and hides disabled or gated accounts',async t=>{
+ const f=await fixture(t);f.link();f.telegram.update(message(1,'Моя подписка',1002));assert.match(replyText(f,1),/привяжи Telegram/);
+ const spoof=message(2,'Моя подписка');spoof.message.from.id=1002;f.telegram.update(spoof);assert.equal(replyText(f,2),undefined);
+ const group=message(3,'Моя подписка');group.message.chat.type='group';f.telegram.update(group);assert.equal(replyText(f,3),undefined);
+ f.store.db.prepare('UPDATE identities SET must_change=1 WHERE account_id=?').run(f.user.accountId);f.telegram.update(message(4,'Моя подписка'));assert.doesNotMatch(replyText(f,4),/действует до/);assert.match(replyText(f,4),/войди в кабинет/);
+ f.store.db.prepare('UPDATE identities SET must_change=0,enabled=0 WHERE account_id=?').run(f.user.accountId);f.telegram.update(message(5,'Подключиться'));assert.doesNotMatch(replyText(f,5),/QR-код/);
+});
+test('paid pending provisioning is distinguished from unpaid registration and revoked payment',async t=>{
+ const f=await fixture(t);f.link();f.store.db.prepare("UPDATE managed_subscriptions SET enabled=0,sync_state='awaiting_payment',entitlement_revision=0 WHERE account_id=?").run(f.user.accountId);
+ f.telegram.update(message(1,'Моя подписка'));assert.match(replyText(f,1),/Оплата подтверждена/);assert.match(replyText(f,1),/готовится автоматически/);
+ f.telegram.update(message(2,'Подключиться'));assert.doesNotMatch(replyText(f,2),/QR-код/);
+ f.store.db.prepare('UPDATE grants SET reversed=1 WHERE account_id=?').run(f.user.accountId);
+ f.telegram.update(message(3,'Моя подписка'));assert.match(replyText(f,3),/Активной подписки пока нет/);
+ f.store.db.prepare("UPDATE managed_subscriptions SET enabled=1,sync_state='synced' WHERE account_id=?").run(f.user.accountId);
+ f.telegram.update(message(4,'Подключиться'));assert.doesNotMatch(replyText(f,4),/QR-код/);assert.match(replyText(f,4),/Активной подписки пока нет/);
+});
+test('expired and legacy unlimited subscriptions have distinct renewal behavior',async t=>{
+ const f=await fixture(t,{unlimited:true,allowUnlimited:true,expiresAt:0});f.link();f.telegram.update(message(1,'Моя подписка'));assert.match(replyText(f,1),/без ограничения срока/);f.telegram.update(message(2,'Продлить'));assert.match(replyText(f,2),/Продление не требуется/);
+ const paid=await fixture(t);paid.link();paid.advance(31*DAY);paid.telegram.update(message(1,'Моя подписка'));assert.match(replyText(paid,1),/закончилась/);paid.telegram.update(message(2,'Подключиться'));assert.doesNotMatch(replyText(paid,2),/QR-код/);paid.telegram.update(message(3,'Продлить'));assert.match(replyText(paid,3),/#plans/);
 });
