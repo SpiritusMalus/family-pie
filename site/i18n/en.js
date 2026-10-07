@@ -1,5 +1,6 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Цена без скидки": "Price without discount",
   "Sufler: подсказки во время разговора · family-pie": "Sufler: prompts during conversations · family-pie",
   "Sufler показывает короткие подсказки во время разговора. Скачайте для Windows или Mac, подключите Deepgram и попробуйте 30 минут.": "Sufler shows short prompts during conversations. Download it for Windows or Mac, connect Deepgram and try it for 30 minutes.",
   "Sufler: подсказки во время разговора": "Sufler: prompts during conversations",
@@ -635,7 +636,6 @@ Object.assign(window.FP_EN, {
   "Войти в кабинет": "Sign in to your account",
   "Войти": "Sign in",
   "Выбрать": "Select",
-  "30 дней — 299 ₽. На 90, 180 и 365 дней — скидки примерно 10%, 20% и 30%. После подтверждения оплаты подключение появится в разделе «Обзор» кабинета.": "30 days cost ₽299. Save approximately 10%, 20% and 30% on 90, 180 and 365 days. Once payment is confirmed, your connection appears in the account overview.",
   "Войти с ключом входа": "Sign in with a passkey",
   "Ключ входа сначала добавляют в кабинете: Настройки → Способы входа. Затем можно входить без пароля.": "First add a passkey in Settings → Sign-in methods. Then you can sign in without a password.",
   "Создай аккаунт или войди с существующим логином. Новый VPN-доступ появится после подтверждённой оплаты.": "Create an account or sign in with your existing username. New VPN access is issued after confirmed payment.",
