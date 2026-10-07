@@ -629,3 +629,24 @@ window.FP_PATTERNS = [
     []
   ]
 ];
+
+Object.assign(window.FP_EN, {
+  "Войти в личный кабинет ↗": "Sign in to your account ↗",
+  "Войти в кабинет": "Sign in to your account",
+  "Войти": "Sign in",
+  "Выбрать": "Select",
+  "30 дней — 299 ₽. На 90, 180 и 365 дней — скидки примерно 10%, 20% и 30%. После подтверждения оплаты подключение появится в разделе «Обзор» кабинета.": "30 days cost ₽299. Save approximately 10%, 20% and 30% on 90, 180 and 365 days. Once payment is confirmed, your connection appears in the account overview.",
+  "Войти с ключом входа": "Sign in with a passkey",
+  "Ключ входа сначала добавляют в кабинете: Настройки → Способы входа. Затем можно входить без пароля.": "First add a passkey in Settings → Sign-in methods. Then you can sign in without a password.",
+  "Создай аккаунт или войди с существующим логином. Новый VPN-доступ появится после подтверждённой оплаты.": "Create an account or sign in with your existing username. New VPN access is issued after confirmed payment.",
+  "Повторить вход": "Sign in again",
+  "Введи промокод": "Enter a promo code",
+  "Другие сессии завершены. Текущий вход сохранён": "Other sessions ended. You remain signed in here.",
+  "Твоё подключение готово. Добавь его в Happ, скопируй ссылку или открой QR-код.": "Your connection is ready. Add it to Happ, copy the link or open your QR code.",
+  "Приглашения учитываются в кабинете. Денежные бонусы пока не включены.": "Invitations are tracked in your account. Cash rewards are not enabled yet.",
+  "Приглашай близких по своей ссылке из кабинета. У каждого будет собственный аккаунт и подключение.": "Invite loved ones using your account link. Each person gets their own account and connection.",
+  "Подключение скопировано. Добавь его в VPN-приложение.": "Connection copied. Add it to your VPN app.",
+  "Ссылка приглашения скопирована": "Invitation link copied",
+  "Подтверждение ключа отменено или ключ не найден. Войди по паролю; новый ключ можно добавить в настройках.": "Passkey confirmation was canceled or no key was found. Sign in with your password; you can add a new key in Settings.",
+  "Вход по логину и паролю работает. Ключ входа можно добавить в настройках. Google и email появятся после подключения этих способов входа.": "Username and password sign-in works. Add a passkey in Settings. Google and email will appear once configured."
+});
