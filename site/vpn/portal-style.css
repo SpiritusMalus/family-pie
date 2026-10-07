@@ -51,3 +51,7 @@ input[type=checkbox]{accent-color:var(--accent)}textarea:focus-visible{outline:2
 .plan .plan-pricing .price{font-size:32px;font-weight:650;line-height:1.15;white-space:nowrap}
 
 .guide-downloads{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.guide-body>.btn{margin:0 10px 10px 0}#main [data-screen="devices"] .notice{display:flex;flex-wrap:wrap;gap:12px;align-items:center}#main [data-screen="devices"] .notice>span{flex-basis:100%}
+
+/* Prevent accidental drag selection on controls; readable content stays selectable. */
+.btn,.brand,.nav a,.guide-tabs button,.plan,.discount,summary{-webkit-user-select:none;user-select:none}
+input,textarea,code,.text-body,.is-cabinet main>section p{-webkit-user-select:text;user-select:text}

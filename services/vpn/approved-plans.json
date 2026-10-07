@@ -1,6 +1,22 @@
 [
-  {"days":30,"priceMinor":29900,"devices":1},
-  {"days":90,"priceMinor":80900,"devices":1},
-  {"days":180,"priceMinor":143900,"devices":1},
-  {"days":365,"priceMinor":254900,"devices":1}
+  {
+    "days": 30,
+    "priceMinor": 30000,
+    "devices": 1
+  },
+  {
+    "days": 90,
+    "priceMinor": 80000,
+    "devices": 1
+  },
+  {
+    "days": 180,
+    "priceMinor": 140000,
+    "devices": 1
+  },
+  {
+    "days": 365,
+    "priceMinor": 250000,
+    "devices": 1
+  }
 ]
