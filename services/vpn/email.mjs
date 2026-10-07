@@ -1,5 +1,6 @@
 import {randomBytes,randomInt,createHash} from 'node:crypto';
 import nodemailer from 'nodemailer';
+import {readFileSync} from 'node:fs';
 const hash=x=>createHash('sha256').update(x).digest('hex');
 export class EmailLogin{
  constructor(store,users,{send=null,clock=store.clock}={}){this.store=store;this.users=users;this.db=store.db;this.clock=clock;this.send=send;this.db.exec(`CREATE TABLE IF NOT EXISTS verified_emails(account_id TEXT UNIQUE NOT NULL REFERENCES identities(account_id),email TEXT PRIMARY KEY);CREATE TABLE IF NOT EXISTS email_challenges(id TEXT PRIMARY KEY,email TEXT NOT NULL,account_id TEXT,session_hash TEXT REFERENCES sessions(token_hash) ON DELETE CASCADE,code_hash TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,created_at INTEGER NOT NULL,expires INTEGER NOT NULL);`);}
@@ -14,4 +15,15 @@ export class EmailLogin{
  confirm(id,code,session){const row=this.db.prepare('SELECT * FROM email_challenges WHERE id=? AND expires>? AND attempts<5').get(id,this.clock());if(!row||row.session_hash&&row.session_hash!==session?.token_hash)throw new Error('Код не подходит или устарел');this.db.prepare('UPDATE email_challenges SET attempts=attempts+1 WHERE id=?').run(id);if(typeof code!=='string'||!/^[0-9]{8}$/.test(code)||hash(id+':'+code)!==row.code_hash)throw new Error('Код не подходит или устарел');return this.store.transaction(()=>{this.db.prepare('DELETE FROM email_challenges WHERE id=?').run(id);if(row.session_hash){this.db.prepare('DELETE FROM verified_emails WHERE account_id=?').run(row.account_id);this.db.prepare('INSERT INTO verified_emails VALUES(?,?)').run(row.account_id,row.email);return {linked:true};}if(!this.users.identity(row.account_id)?.enabled)throw new Error('Аккаунт отключён');return this.users.newSession(row.account_id,{method:'email'});});}
  disconnect(id){if(!this.db.prepare('SELECT password_set FROM identities WHERE account_id=?').get(id)?.password_set&&!this.db.prepare('SELECT 1 FROM passkeys WHERE account_id=?').get(id)&&!this.db.prepare('SELECT 1 FROM google_identities WHERE account_id=?').get(id))throw new Error('Сначала добавь другой способ входа');this.db.prepare('DELETE FROM verified_emails WHERE account_id=?').run(id);}
 }
-export function smtpSender(env=process.env){if(!env.VPN_SMTP_HOST||!env.VPN_SMTP_FROM)return null;const transport=nodemailer.createTransport({host:env.VPN_SMTP_HOST,port:Number(env.VPN_SMTP_PORT||465),secure:env.VPN_SMTP_PORT!=='587',requireTLS:true,auth:env.VPN_SMTP_USER?{user:env.VPN_SMTP_USER,pass:env.VPN_SMTP_PASSWORD}:undefined,connectionTimeout:8000,greetingTimeout:8000,socketTimeout:10000});return (email,code)=>transport.sendMail({from:env.VPN_SMTP_FROM,to:email,subject:'Код входа в Family VPN',text:`Код Family VPN: ${code}\nДействует5 минут. Не передавай его другим. Если ты не запрашивал код, просто проигнорируй письмо.`});}
+export function smtpTransport(env=process.env,createTransport=options=>nodemailer.createTransport(options)){
+ if(!env.VPN_SMTP_HOST||!env.VPN_SMTP_FROM)return null;
+ const port=Number(env.VPN_SMTP_PORT||465);
+ if(![465,587].includes(port))throw new Error('SMTP requires TLS on port465 or587');
+ const password=env.VPN_SMTP_PASSWORD_FILE?readFileSync(env.VPN_SMTP_PASSWORD_FILE,'utf8').replace(/[\r\n]+$/,''):env.VPN_SMTP_PASSWORD;
+ if(env.VPN_SMTP_USER&&(!password||/[\r\n]/.test(password)))throw new Error('Private SMTP password missing or invalid');
+ return createTransport({host:env.VPN_SMTP_HOST,port,secure:port===465,requireTLS:true,
+  auth:env.VPN_SMTP_USER?{user:env.VPN_SMTP_USER,pass:password}:undefined,
+  tls:{minVersion:'TLSv1.2',rejectUnauthorized:true},disableFileAccess:true,disableUrlAccess:true,
+  connectionTimeout:8000,greetingTimeout:8000,socketTimeout:10000});
+}
+export function smtpSender(env=process.env,createTransport){const transport=smtpTransport(env,createTransport);if(!transport)return null;return (email,code)=>transport.sendMail({from:env.VPN_SMTP_FROM,to:email,subject:'Код входа в Family VPN',text:`Код Family VPN: ${code}\nДействует5 минут. Не передавай его другим. Если ты не запрашивал код, просто проигнорируй письмо.`});}
