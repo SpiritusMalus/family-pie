@@ -1,0 +1,6 @@
+[
+  {"days":30,"priceMinor":29900,"devices":1},
+  {"days":90,"priceMinor":80900,"devices":1},
+  {"days":180,"priceMinor":143900,"devices":1},
+  {"days":365,"priceMinor":254900,"devices":1}
+]

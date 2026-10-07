@@ -38,3 +38,7 @@ input[type=checkbox]{accent-color:var(--accent)}textarea:focus-visible{outline:2
 .text-body{white-space:pre-wrap;overflow-wrap:anywhere;max-width:72ch}.admin-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}.admin-plan-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin:20px 0}.admin-plan-row .form-row{flex:1;min-width:150px}.cab-status{position:sticky;top:76px;background:var(--surface,#131b24);z-index:3;padding:12px;border-radius:6px}.cab-status:empty{display:none}.cab-main .btn+details,.cab-main .btn+.btn{margin-top:12px}.cab-main img{max-width:100%;height:auto}.cab-main .row{flex-wrap:wrap;gap:12px}.is-cabinet details form{padding-top:18px}.is-cabinet textarea{resize:vertical;min-height:110px}.is-cabinet section form{display:grid;gap:16px}.is-cabinet .row .btn{font-size:14px;padding:10px 14px}
 
 .cab-subsection{padding:24px 0;border-top:1px solid var(--line,#303942);margin-top:24px}.cab-subsection>h2{font-size:22px}.is-cabinet main:not(.cab-main){padding-top:32px;padding-bottom:56px}.is-cabinet main .panel>p{line-height:1.65}.is-cabinet input[type=checkbox]{width:22px;height:22px}
+
+.plan[data-selected="true"]{outline:2px solid var(--accent,#ef4545);outline-offset:3px}
+
+.account-loading .cabinet-layout{visibility:hidden}
