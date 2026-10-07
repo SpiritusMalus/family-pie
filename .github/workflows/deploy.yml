@@ -42,7 +42,7 @@ jobs:
       - run: node --check tools/build-legal.mjs && node tools/build-legal.mjs
       - run: test -s site/index.html
       - name: Test site language and appearance
-        run: node --test tools/test-i18n.mjs tools/test-home-theme.mjs tools/test-vpn-shell.mjs
+        run: node --test tools/test-i18n.mjs tools/test-home-theme.mjs tools/test-vpn-shell.mjs tools/test-vpn-payment-return.mjs
       - name: Test VPN service core
         run: npm ci --prefix services/vpn && node --test services/vpn/test/*.test.mjs
   deploy:

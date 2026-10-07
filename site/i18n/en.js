@@ -1,5 +1,10 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Оплата подтверждена. Твоё подключение готово — добавь его в Happ или открой QR-код ниже.": "Payment confirmed. Your connection is ready — add it to Happ or open the QR code below.",
+  "Оплата подтверждена. Готовим подключение; повторно платить не нужно.": "Payment confirmed. We are preparing your connection; there is no need to pay again.",
+  "Ждём подтверждение платежа от ЮKassa. После оплаты подключение появится автоматически.": "Waiting for YooKassa to confirm the payment. Your connection will appear automatically after payment.",
+  "Платёж отменён. Деньги за этот заказ не приняты.": "Payment canceled. This order has not been charged.",
+  "Проверка займёт больше времени. Открой «Подписка» → «История платежей» и проверь заказ. Повторно оплачивать не нужно.": "This check needs more time. Open Subscription → Payment history and check the order. There is no need to pay again.",
   "Подтверди пароль, чтобы изменить способы входа.": "Confirm your password to change sign-in methods.",
   "Вход через Google не завершён. Повтори попытку или войди по логину и паролю.": "Google sign-in was not completed. Try again or sign in with your username and password.",
   "Переключить свет на странице": "Toggle the page light",
