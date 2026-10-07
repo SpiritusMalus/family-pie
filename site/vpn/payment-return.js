@@ -13,10 +13,10 @@
       stopped = true; clearInterval(timer);
       window.removeEventListener('focus',check);
     }
-    function overview(text) {
+    function overview(text,tone='info') {
       history.replaceState(null,'',location.pathname + location.search + '#home');
       window.dispatchEvent(new Event('hashchange'));
-      status(text);
+      status(text,tone);
     }
     async function check() {
       if (busy || stopped) return;
@@ -34,14 +34,14 @@
           status(state === 'canceled' ? 'Платёж отменён. Деньги за этот заказ не приняты.' : 'Возврат подтверждён. Подписка пересчитана.');
         } else if (sub.active && sub.sync_state === 'synced' && (!valid(order) || state === 'paid')) {
           forget(); stop();
-          overview('Оплата подтверждена. Твоё подключение готово — добавь его в Happ или открой QR-код ниже.');
+          overview('Оплата подтверждена. Твоё подключение готово — добавь его в Happ или открой QR-код ниже.','success');
         } else if (state === 'paid' || !valid(order) && sub.payment_confirmed) {
           overview('Оплата подтверждена. Готовим подключение; повторно платить не нужно.');
         } else {
           status('Ждём подтверждение платежа от ЮKassa. После оплаты подключение появится автоматически.');
         }
       } catch (error) {
-        status(error.message);
+        status(error.message,'error');
         if ([400,403,404].includes(error.status)) { forget(); stop(); }
       } finally {
         busy = false;
