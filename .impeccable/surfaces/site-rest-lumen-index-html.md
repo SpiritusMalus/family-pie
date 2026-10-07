@@ -38,3 +38,5 @@ No visual direction remains open: the owner selected the photographic lamp. Appl
 
 ## Pull interaction — owner extension
 Pull the separate photographic pompom downward and release to switch the illustrative light. Native Pointer Events/capture, bounded travel, threshold activation, cancellation cleanup, Enter/Space fallback. The rope extends while pompom dimensions remain fixed. Reduced motion removes return/light transitions. `assets/pull-cord.png` preserves alpha; no app/system control implied.
+
+Owner refinement: the gesture instruction is visually hidden; the lamp invites discovery. Keep its description available through aria-describedby for assistive technology.
