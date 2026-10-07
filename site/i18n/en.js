@@ -1,5 +1,7 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Включить или выключить свет на странице": "Turn the page light on or off",
+  "Нажми на лампу, чтобы включить или выключить свет на странице.": "Click the lamp to turn the page light on or off.",
   "Установи Happ из App Store. Если приложение недоступно для твоего региона, обратись в поддержку.": "Install Happ from the App Store. If the app is unavailable in your region, contact support.",
   "Помощь с установкой": "Installation help",
   "Платёж разовый: деньги не списываются автоматически. Для продления выбери тариф и оплати его в кабинете. После подтверждения оплаты новый срок добавится автоматически.": "Payments are one-time: you are not charged automatically. To renew, choose a plan and pay in your account. The new period is added automatically once payment is confirmed.",

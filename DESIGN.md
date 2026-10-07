@@ -43,3 +43,10 @@ Russian-first pages opt into `data-fp-translate`; reviewed English copy lives in
 ## Homepage appearance and navigation
 The original six-slice pie geometry uses neutral theme surfaces, muted outlines and one coral/red segment on the homepage. VPN is one catalog product: do not duplicate its link in the header or hero. Light homepage appearance includes the root/background and an adaptive red portal on a transparent canvas; avoid a dark rectangular art tile. The shared portal opts into the light palette via `data-portal-theme="adaptive"` and redraws on `family-themechange`, including reduced motion.
 Canvas observation resumes on a persisted `pageshow` after cached back navigation; `pagehide` stops frames/observers without discarding theme listeners needed on return.
+
+## Lumen + REST product surface
+`/rest_lumen/` inherits local Golos Text typography, the compact Unbounded studio wordmark, and the shared geometry: controls 3px, panels 6px. Its own dark background is `#0d1014`, with warm ivory text and a warm `#f1c27d` action accent; these product-specific colors do not replace the homepage/VPN palette.
+
+The owner selected an AI-generated photographic fabric lamp in a dark room after rejecting the flat render. Preserve believable fabric, physical light and shadows in `site/rest_lumen/assets/lamp-room.jpg`; softly masked image edges blend into the page background. The lamp button toggles an illustrative page-only on/off state with `aria-pressed`, keyboard activation and visible focus. It does not control the visitor's display. Reduced motion removes image/button transitions and smooth scrolling.
+
+Keep the responsive reading order: product purpose and download action → lamp → actual macOS settings and reminder screenshots → platform downloads and honest beta limitations. Preserve the real screenshots and all six existing release-package links. RU/EN copy and accessibility labels use the shared `fp_lang` preference and reviewed `/i18n/en.js` keys.
