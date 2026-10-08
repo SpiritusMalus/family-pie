@@ -42,6 +42,7 @@ test('confirmation failure remains visible and does not claim a link',async()=>{
 });
 test('expired challenge stops polling and creates a fresh link on next click',async()=>{
  const f=await fixture();await f.h.start.click();f.expire();await f.tick();assert.equal(f.intervals.size,0);assert.equal(f.h.fallback.hidden,true);assert.match(f.h.status.textContent,/Ссылка истекла/);await f.h.start.click();assert.equal(f.calls.filter(([p])=>p==='telegram/link').length,2);
+ const cached=await fixture();await cached.h.start.click();cached.listeners.pagehide();cached.expire();cached.listeners.pageshow();await flush();await cached.h.start.click();assert.equal(cached.calls.filter(([p])=>p==='telegram/link').length,2);
 });
 test('connected users are not prompted; disconnect and unavailable states remain actionable',async()=>{
  const f=await fixture({linked:true});assert.equal(f.h.card.hidden,true);await f.s.unlink.click();assert.equal(f.h.card.hidden,false);assert.equal(f.s.start.hidden,false);

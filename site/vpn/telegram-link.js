@@ -4,7 +4,7 @@
   const notifyError = e => { error = e.message; render(); };
   const views = [];
   const node = (tag, text, cls) => { const e = document.createElement(tag); if (text) e.textContent = text; if (cls) e.className = cls; return e; };
-  function stop() { clearInterval(timer); timer = undefined; deadline = 0; }
+  function stop() { clearInterval(timer); timer = undefined; }
   function render() {
    for (const v of views) {
     v.card.hidden = v.overview && Boolean(state?.linked && state?.enabled && !state?.pending);
@@ -21,17 +21,19 @@
   }
   async function refresh() {
    if (checking) return;
+   if (url && deadline && Date.now() >= deadline) { url = ''; deadline = 0; stop(); }
    checking = true;
    try { state = await api('telegram'); error = '';  if (state.linked && state.enabled && !state.pending) { url = ''; stop(); } render(); }
    catch (e) { notifyError(e); }
    finally { checking = false; }
   }
   function watch() {
-   stop(); deadline = Date.now() + 600000;
+   stop();
    timer = setInterval(() => { if (Date.now() >= deadline) { url = ''; stop(); error = 'Ссылка истекла. Нажми «Подключить Telegram» ещё раз.'; render(); } else if (!document.hidden) refresh(); }, 2500);
   }
   async function start() {
    if (busy) return;
+   if (url && Date.now() >= deadline) { url = ''; stop(); }
    // Open synchronously during the click so mobile browsers permit the new tab.
    let popup = window.open('about:blank', '_blank');
    if (popup) popup.opener = null;
@@ -40,7 +42,7 @@
     if (!url) {
      const data = await api('telegram/link', 'POST', {}), parsed = new URL(data.url);
      if (parsed.origin !== 'https://t.me' || !/^\/[A-Za-z0-9_]{5,32}$/.test(parsed.pathname) || !/^bind_[A-Za-z0-9_-]{43}$/.test(parsed.searchParams.get('start') || '')) throw new Error('Не удалось открыть Telegram. Попробуй ещё раз.');
-     url = parsed.href; watch();
+     url = parsed.href; deadline = Date.now() + 600000; watch();
     }
     if (popup && !popup.closed) popup.location.href = url;
     render();
