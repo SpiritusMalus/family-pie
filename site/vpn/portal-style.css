@@ -55,3 +55,19 @@ input[type=checkbox]{accent-color:var(--accent)}textarea:focus-visible{outline:2
 /* Prevent accidental drag selection on controls; readable content stays selectable. */
 .btn,.brand,.nav a,.guide-tabs button,.plan,.discount,summary{-webkit-user-select:none;user-select:none}
 input,textarea,code,.text-body,.is-cabinet main>section p{-webkit-user-select:text;user-select:text}
+
+/* The diagnostic loader extends a red blade until the real measurement ends. */
+.speed-saber{--saber-fill:0;margin:30px 0 22px;max-width:640px}
+.speed-saber-visual{display:flex;align-items:center;height:52px;padding-right:14px}
+.speed-saber-hilt{position:relative;flex:0 0 68px;height:23px;border:1px solid #59616b;border-radius:4px 2px 2px 4px;background:linear-gradient(180deg,#a5adb5 0%,#535c65 18%,#222933 45%,#111820 60%,#66707b 100%);box-shadow:0 3px 9px #0005;z-index:1}
+.speed-saber-hilt:before{content:'';position:absolute;inset:4px 21px 4px 7px;background:repeating-linear-gradient(90deg,#111820 0 3px,transparent 3px 7px);border-radius:1px}
+.speed-saber-hilt:after{content:'';position:absolute;right:8px;top:5px;width:6px;height:6px;border-radius:50%;background:#ed3342;box-shadow:0 0 6px #e32035}
+.speed-saber-blade{position:relative;display:block;flex:1;height:9px;border-radius:0 9px 9px 0;transform:scaleX(var(--saber-fill));transform-origin:left center;background:linear-gradient(180deg,#ff364d 0%,#ff9b9e 25%,#fff5ef 48%,#ffe4dc 60%,#ff364d 100%);box-shadow:0 0 5px 2px #ff344bcc,0 0 17px 5px #e51c3866,0 0 32px 10px #cf15352e;transition:transform .6s linear;will-change:auto}
+.speed-saber[data-state=running] .speed-saber-blade{will-change:transform}
+.speed-saber[data-state=idle] .speed-saber-blade{transition:none}
+.speed-saber[data-state=done] .speed-saber-blade{transition:transform .7s cubic-bezier(.16,1,.3,1)}
+.speed-saber[data-state=error] .speed-saber-blade{opacity:.3;box-shadow:none}
+.speed-saber-label{font-size:14px;color:var(--muted);margin:7px 0 0}
+.speed-saber[data-state=done] .speed-saber-label{color:var(--fg)}
+@media(max-width:420px){.speed-saber-hilt{flex-basis:54px}.speed-saber-visual{padding-right:10px}}
+@media(prefers-reduced-motion:reduce){.speed-saber-blade,.speed-saber[data-state=done] .speed-saber-blade{transition:none}}

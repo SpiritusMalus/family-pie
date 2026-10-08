@@ -1,5 +1,12 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  'Готов к проверке': 'Ready to test',
+  'Проверяем задержку…': 'Testing latency…',
+  'Проверяем загрузку…': 'Testing download…',
+  'Проверяем отправку…': 'Testing upload…',
+  'Проверка завершена': 'Test complete',
+  'Проверка прервана. Попробуй ещё раз.': 'Test interrupted. Try again.',
+
   "Оплата подтверждена. Твоё подключение готово — добавь его в Happ или открой QR-код ниже.": "Payment confirmed. Your connection is ready — add it to Happ or open the QR code below.",
   "Оплата подтверждена. Готовим подключение; повторно платить не нужно.": "Payment confirmed. We are preparing your connection; there is no need to pay again.",
   "Ждём подтверждение платежа от ЮKassa. После оплаты подключение появится автоматически.": "Waiting for YooKassa to confirm the payment. Your connection will appear automatically after payment.",
