@@ -45,3 +45,30 @@ test('HTTP auth enforces origin/CSRF/role/forced change and private no-store',as
  assert.equal((await(await req('me','GET',null,{Cookie:fresh})).json()).subscription.profile_url,'https://example.invalid/private');
  assert.equal(users.identity(a.accountId).must_change,0);
 });
+
+test('verified email can recover password without old password, but stale proof and last-method removal are blocked',async t=>{
+ const store=new VpnStore(':memory:');let code;
+ const {server,users}=createApp({store,origin:'http://localhost',secure:false,sendEmail:async(_to,c)=>{code=c;}});
+ const account=await users.add({login:'recovery-fixture',password:'UnknownPassword-Fixture-123'});
+ store.db.prepare('UPDATE identities SET must_change=0,password_set=0 WHERE account_id=?').run(account.accountId);
+ store.db.prepare('INSERT INTO verified_emails VALUES(?,?)').run(account.accountId,'recovery@example.invalid');
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(async()=>{await new Promise(r=>server.close(r));store.close();});
+ const base='http://127.0.0.1:'+server.address().port+'/vpn/api/';
+ const req=(path,method='GET',data,cookie='',csrf='')=>fetch(base+path,{method,headers:{Origin:'http://localhost','Content-Type':'application/json',Cookie:cookie,'X-CSRF-Token':csrf},...(data?{body:JSON.stringify(data)}:{})});
+ const challenge=await(await req('email/login/request','POST',{email:'recovery@example.invalid'})).json();
+ const signed=await req('email/login/confirm','POST',{challengeId:challenge.challengeId,code}),body=await signed.json(),cookie=signed.headers.get('set-cookie').split(';')[0];
+ assert.equal(signed.status,200);assert.equal(body.user.account_id,account.accountId);
+ const last=await req('email','DELETE',{},cookie,body.csrf);assert.equal(last.status,400);assert.ok((await(await req('email','GET',null,cookie)).json()).email);
+ store.db.prepare('UPDATE session_auth SET verified_at=0').run();
+ assert.equal((await req('password/set','POST',{next:'RecoveredPassword-Fixture-123'},cookie,body.csrf)).status,400);
+ assert.equal((await users.login('recovery-fixture','RecoveredPassword-Fixture-123')),null);
+ store.db.prepare('UPDATE session_auth SET verified_at=?').run(Date.now());
+ const changed=await req('password/set','POST',{next:'RecoveredPassword-Fixture-123'},cookie,body.csrf);assert.equal(changed.status,200);
+ assert.equal((await req('me','GET',null,cookie)).status,401);
+ const fresh=changed.headers.get('set-cookie').split(';')[0],freshBody=await changed.json();
+ assert.equal((await req('me','GET',null,fresh)).status,200);
+ assert.equal(await users.login('recovery-fixture','UnknownPassword-Fixture-123'),null);
+ assert.ok(await users.login('recovery-fixture','RecoveredPassword-Fixture-123'));
+ assert.equal((await req('email','DELETE',{},fresh,freshBody.csrf)).status,200);
+ assert.equal((await(await req('me','GET',null,fresh)).json()).subscription.active,false);
+});

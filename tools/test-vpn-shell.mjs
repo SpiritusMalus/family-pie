@@ -16,15 +16,15 @@ const accountCode=readFileSync(new URL('../site/vpn/account.js',import.meta.url)
 const flushAuth=()=>new Promise(resolve=>setImmediate(resolve));
 function authFixture(responses,search=''){
  const elements=new Map();
- for(const key of ['#login-form','#password-form','#auth-title','#account-message','.demo-label','.auth-layout > div > p','#password-form p','#login','#password','#current','#next','#repeat'])elements.set(key,{hidden:key==='#password-form',value:'test-only-password',dataset:{},listeners:new Map(),addEventListener(name,fn){this.listeners.set(name,fn);},focus(){this.focused=true;}});
+ for(const key of ['#login-form','#password-form','#auth-title','#account-message','.demo-label','.auth-layout > div > p','#password-form p','#login','#password','#current','#next','#repeat','#switch-account'])elements.set(key,{hidden:key==='#password-form',value:'test-only-password',dataset:{},listeners:new Map(),addEventListener(name,fn){this.listeners.set(name,fn);},focus(){this.focused=true;}});
  const calls=[],location={search,pathname:'/vpn/cabinet/auth/',hash:''};
  const document={querySelector:key=>elements.get(key)||null};
  const user={login:'test-only',role:'user',must_change:1},session={user,csrf:'csrf-fresh'};
- runInNewContext(accountCode,{window:{FPi18n:{t:x=>x}},document,location,URLSearchParams,fetch:async(path,options)=>{
+ const window={FPi18n:{t:x=>x}};runInNewContext(accountCode,{window,document,location,URLSearchParams,fetch:async(path,options)=>{
   calls.push({path,options});const response=responses.shift();assert.ok(response,'Unexpected request '+path);const data=typeof response==='function'?await response():response;
   return {ok:!data.status||data.status===200,status:data.status||200,json:async()=>data.body||session};
  }});
- return {elements,calls,location,user,session,submit:async key=>elements.get(key).listeners.get('submit')({preventDefault(){},submitter:{disabled:false}})};
+ return {window,elements,calls,location,user,session,submit:async key=>elements.get(key).listeners.get('submit')({preventDefault(){},submitter:{disabled:false}})};
 }
 test('expired password form returns to login without attempting a password mutation',async()=>{
  const f=authFixture([{}, {status:401,body:{error:'Войди в аккаунт'}}]);await flushAuth();assert.equal(f.elements.get('.demo-label').hidden,true);
@@ -51,4 +51,21 @@ test('reauthentication resumes a requested regular password change',async()=>{
 test('late startup response cannot override a newer completed login',async()=>{
  let release;const old=new Promise(resolve=>release=resolve),user={login:'test-only',role:'user',must_change:1};
  const f=authFixture([()=>old,{body:{user,csrf:'login'}},{body:{user,csrf:'new'}}]);await f.submit('#login-form');release({body:{user:{...user,must_change:0},csrf:'old'}});await flushAuth();assert.equal(f.location.href,undefined);assert.equal(f.elements.get('#password-form').hidden,false);
+});
+
+test('alternative sign-in uses the verified admin role and preserves explicit user destinations',async()=>{
+ const admin={login:'test-admin',role:'admin',must_change:0};
+ const f=authFixture([{status:401,body:{}},{body:{user:admin,csrf:'admin-session'}}]);await flushAuth();await f.window.vpnFinishLogin();assert.equal(f.location.href,'/vpn/admin/');
+ const deep=authFixture([{status:401,body:{}},{body:{user:admin,csrf:'admin-session'}}],'?next=%2Fvpn%2Fcabinet%2F%23settings');await flushAuth();await deep.window.vpnFinishLogin();assert.equal(deep.location.href,'/vpn/cabinet/#settings');
+});
+test('alternative sign-in enforces temporary password change and detects a missing session cookie',async()=>{
+ const f=authFixture([{status:401,body:{}},{}]);await flushAuth();await f.window.vpnFinishLogin();assert.equal(f.elements.get('#password-form').hidden,false);assert.equal(f.location.href,undefined);
+ const blocked=authFixture([{status:401,body:{}},{status:401,body:{error:'Войди в аккаунт'}}]);await flushAuth();await assert.rejects(blocked.window.vpnFinishLogin(),/Разреши cookies/);assert.equal(blocked.location.href,undefined);
+});
+
+test('temporary password screen can switch accounts without changing a password',async()=>{
+ const f=authFixture([{}, {}, {body:{ok:true}}]);await flushAuth();const button={disabled:false};
+ await f.elements.get('#switch-account').listeners.get('click')({currentTarget:button});
+ assert.equal(f.elements.get('#login-form').hidden,false);assert.equal(f.elements.get('#password-form').hidden,true);assert.equal(button.disabled,false);
+ assert.deepEqual(f.calls.map(c=>c.path),['/vpn/api/me','/vpn/api/me','/vpn/api/logout']);assert.equal(f.elements.get('#account-message').dataset.tone,'info');
 });
