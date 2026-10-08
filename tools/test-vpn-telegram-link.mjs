@@ -12,14 +12,14 @@ class Element {
  async click(){if(!this.disabled)return this.events.click?.();}
 }
 const flush=()=>new Promise(r=>setImmediate(r));
-async function fixture({blocked=false,available=true,linked=false}={}){
+async function fixture({blocked=false,available=true,linked=false,storage=new Map(),accountId="fixture-account",denyStorage=false}={}){
  const home=new Element('main'),settings=new Element('main'),listeners={},calls=[],popups=[],intervals=new Map();let count=0,now=0;
  let state={available,linked,enabled:linked,pending:false},fail=false,bad=false;
- const window={addEventListener:(n,f)=>listeners[n]=f,open:()=>{if(blocked)return null;const p={location:{},opener:{},closed:false,close(){this.closed=true;}};popups.push(p);return p;}};
+ const window={sessionStorage:{getItem:k=>{if(denyStorage)throw new Error('Storage denied');return storage.get(k)||null;},setItem:(k,v)=>{if(denyStorage)throw new Error('Storage denied');storage.set(k,v);}},addEventListener:(n,f)=>listeners[n]=f,open:()=>{if(blocked)return null;const p={location:{},opener:{},closed:false,close(){this.closed=true;}};popups.push(p);return p;}};
  const document={hidden:false,createElement:t=>new Element(t),addEventListener:(n,f)=>listeners[n]=f};
  const api=async(path,method='GET')=>{calls.push([path,method]);if(fail)throw new Error('Network unavailable');if(path==='telegram/link')return {url:bad?'https://wrong.example/?start=bind_'+'a'.repeat(43):'https://t.me/fictional_bot?start=bind_'+'a'.repeat(43)};if(path==='telegram/confirm')state={available:true,linked:true,enabled:true,pending:false};if(method==='DELETE')state={available:true,linked:false,enabled:false,pending:false};return state;};
  runInNewContext(source,{window,document,URL,Date:{now:()=>now},setInterval:f=>{intervals.set(++count,f);return count;},clearInterval:id=>intervals.delete(id)});
- await window.vpnTelegramLink({api,home,settings});
+ await window.vpnTelegramLink({api,home,settings,accountId});
  const view=container=>{const card=container.children[0],actions=card.children[2];return {card,status:card.children[1],start:actions.children[0],confirm:actions.children[1],fallback:actions.children[2],cancel:actions.children[3],unlink:actions.children[4],later:actions.children[5]};};
  return {home,settings,h:view(home),s:view(settings),calls,popups,intervals,listeners,setState:s=>state={...state,...s},fail:()=>fail=true,bad:()=>bad=true,expire:()=>now=600001,tick:async()=>{for(const f of [...intervals.values()])f();await flush();}};
 }
@@ -47,4 +47,17 @@ test('expired challenge stops polling and creates a fresh link on next click',as
 test('connected users are not prompted; disconnect and unavailable states remain actionable',async()=>{
  const f=await fixture({linked:true});assert.equal(f.h.card.hidden,true);await f.s.unlink.click();assert.equal(f.h.card.hidden,false);assert.equal(f.s.start.hidden,false);
  const unavailable=await fixture({available:false});assert.equal(unavailable.h.start.disabled,true);assert.match(unavailable.h.status.textContent,/временно недоступен/);
+});
+
+test('Later survives reload for the same account without hiding settings or another account',async()=>{
+ const storage=new Map(),first=await fixture({storage,accountId:'fixture-a'});
+ await first.h.later.click();
+ const reloaded=await fixture({storage,accountId:'fixture-a'});
+ assert.equal(reloaded.h.card.hidden,true);assert.equal(reloaded.s.card.hidden,false);assert.equal(reloaded.s.start.hidden,false);
+ const different=await fixture({storage,accountId:'fixture-b'});assert.equal(different.h.card.hidden,false);
+ const newTab=await fixture({accountId:'fixture-a'});assert.equal(newTab.h.card.hidden,false);
+});
+test('denied session storage does not break Telegram linking or Later',async()=>{
+ const f=await fixture({denyStorage:true});assert.equal(f.h.card.hidden,false);
+ await f.h.later.click();assert.equal(f.home.children.length,0);assert.equal(f.s.start.disabled,false);
 });
