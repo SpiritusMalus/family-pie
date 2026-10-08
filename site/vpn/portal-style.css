@@ -71,3 +71,10 @@ input,textarea,code,.text-body,.is-cabinet main>section p{-webkit-user-select:te
 .speed-saber[data-state=done] .speed-saber-label{color:var(--fg)}
 @media(max-width:420px){.speed-saber-hilt{flex-basis:54px}.speed-saber-visual{padding-right:10px}}
 @media(prefers-reduced-motion:reduce){.speed-saber-blade,.speed-saber[data-state=done] .speed-saber-blade{transition:none}}
+
+/* Keep related cabinet actions distinct and aligned in both layouts. */
+.cab-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:20px}
+.cab-main .cab-actions>.btn+.btn{margin-top:0}
+.subscription .btn.secondary{background:transparent;color:var(--fg);border-color:var(--line)}
+.subscription .btn.secondary:hover{background:var(--bg);color:var(--fg)}
+@media(max-width:420px){.cab-actions>.btn{width:100%}}
