@@ -8,7 +8,8 @@ import { randomBytes } from 'node:crypto';
 import { Passkeys } from './passkeys.mjs';
 import QRCode from 'qrcode';
 import { GoogleLogin,googleConfig as readGoogleConfig,googleReturnPath } from './google.mjs';
-import {EmailLogin,smtpSender} from './email.mjs';
+import {EmailLogin,smtpSender,smtpPurchaseSender} from './email.mjs';
+import {PurchaseMail} from './purchase-mail.mjs';
 import {PushNotifications} from './push.mjs';
 export function createApp({store,origin='https://family-pie.ru',secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={}}){
  const users=new Accounts(store),attempts=new Map();let passwordOperations=0;
@@ -162,7 +163,9 @@ if(process.argv[1]?.endsWith('/server.mjs')){
  const store=new VpnStore(process.env.VPN_DATABASE_PATH);
  const pushConfig=process.env.VPN_PUSH_CONFIG_FILE?JSON.parse((await import('node:fs')).readFileSync(process.env.VPN_PUSH_CONFIG_FILE,'utf8')):{};
  const {server,billing,push}=createApp({store,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig});
- const reconcile=setInterval(()=>{billing.reconcile().catch(()=>{});push.tick().catch(()=>{});},30000);reconcile.unref();
+ const purchaseMail=new PurchaseMail(store,{send:smtpPurchaseSender()});purchaseMail.recover();
+ const reconcile=setInterval(()=>{billing.reconcile().catch(()=>{});push.tick().catch(()=>{});purchaseMail.tick().catch(()=>{});},30000);reconcile.unref();
+ purchaseMail.tick().catch(()=>{});
  server.listen(Number(process.env.VPN_PORT)||8796,'127.0.0.1');
- process.on('SIGTERM',()=>server.close(()=>{store.close();process.exit(0);}));
+ process.on('SIGTERM',()=>{clearInterval(reconcile);server.close(async()=>{await purchaseMail.shutdown().catch(()=>{});store.close();process.exit(0);});});
 }

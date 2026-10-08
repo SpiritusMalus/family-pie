@@ -27,3 +27,20 @@ export function smtpTransport(env=process.env,createTransport=options=>nodemaile
   connectionTimeout:8000,greetingTimeout:8000,socketTimeout:10000});
 }
 export function smtpSender(env=process.env,createTransport){const transport=smtpTransport(env,createTransport);if(!transport)return null;return (email,code)=>transport.sendMail({from:env.VPN_SMTP_FROM,to:email,subject:'Код входа в Family VPN',text:`Код Family VPN: ${code}\nДействует5 минут. Не передавай его другим. Если ты не запрашивал код, просто проигнорируй письмо.`});}
+
+export function smtpPurchaseSender(env=process.env,createTransport){
+ const transport=smtpTransport(env,createTransport);if(!transport)return null;
+ return ({to,days,expiresAt,messageId})=>{
+  const date=new Intl.DateTimeFormat('ru-RU',{dateStyle:'long',timeStyle:'short',timeZone:'Europe/Moscow'}).format(expiresAt);
+  return transport.sendMail({from:{name:'Family VPN',address:env.VPN_SMTP_FROM},to:{address:to},messageId,subject:'Family VPN — подписка готова',text:`Оплата подтверждена. Подписка Family VPN на ${days} дней готова.
+Текущий срок доступа: до ${date} (московское время).
+Количество устройств не ограничено.
+
+Открой кабинет, чтобы добавить подключение в Happ или получить ссылку и QR-код:
+https://family-pie.ru/vpn/cabinet/#home
+
+Актуальный статус подписки всегда доступен в кабинете. Повторно платить не нужно.
+Кассовый чек — отдельный документ от платёжного сервиса.
+Если нужна помощь, ответь на это письмо или открой поддержку в кабинете.`});
+ };
+}
