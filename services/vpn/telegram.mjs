@@ -56,7 +56,7 @@ export class TelegramStore {
   if(row.expires_at&&row.expires_at<=this.clock())return 'Подписка закончилась '+expiryDate(row.expires_at)+'.\nПродлить: '+CABINET+'#plans';
   if(!row.enabled)return 'Подписка отключена. Проверь её в кабинете: '+CABINET+'#home';
   if(row.sync_state!=='synced')return 'Подключение обновляется. Статус и ссылка появятся в кабинете: '+CABINET+'#home';
-  return row.expires_at?'Твоя подписка действует до '+expiryDate(row.expires_at)+'.\nЛимит тарифа: '+row.devices+'.\nПодключение: '+CABINET+'#home':'Нет активной подписки.\n'+CABINET+'#plans';
+  return row.expires_at?'Твоя подписка действует до '+expiryDate(row.expires_at)+'.\nБез ограничений по устройствам.\nПодключение: '+CABINET+'#home':'Нет активной подписки.\n'+CABINET+'#plans';
  }
  update(update){if(!Number.isSafeInteger(update?.update_id)||update.update_id<this.offset())return;this.store.transaction(()=>{
  const msg=update.message,chat=msg?.chat,from=msg?.from;

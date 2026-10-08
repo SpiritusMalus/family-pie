@@ -7,8 +7,8 @@ export class VpnStore {
   constructor(path, { plans = [], clock = Date.now } = {}) {
     this.clock = clock;
     this.plans = new Map(plans.map(p => {
-      if (![30,90,180,365].includes(p.days) || !positive(p.priceMinor) || p.priceMinor > 1_000_000_000 || !positive(p.devices)) throw new Error('Invalid approved plan');
-      return [String(p.days), Object.freeze({ ...p })];
+      if (![30,90,180,365].includes(p.days) || !positive(p.priceMinor) || p.priceMinor > 1_000_000_000 || (!Number.isSafeInteger(p.devices) || p.devices < 0)) throw new Error('Invalid approved plan');
+      return [String(p.days), Object.freeze({ ...p, devices:0 })];
     }));
     if (path !== ':memory:') {
       try { closeSync(openSync(path,'ax',0o600)); }
@@ -89,7 +89,7 @@ export class VpnStore {
     let expiresAt = 0, devices = 0;
     for (const row of rows) {
       expiresAt = Math.max(expiresAt,row.granted_at) + row.days * DAY;
-      devices = row.devices;
+      devices = 0; // Device count is unrestricted, including historical paid orders.
     }
     return { accountId, profileRef:account.profile_ref, revision:account.revision, expiresAt,
       active:expiresAt > this.clock(), devices };

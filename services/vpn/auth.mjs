@@ -35,6 +35,7 @@ export class Accounts {
  }
  normalize(login){if(typeof login!=='string'||!login.trim()||login.length>80)throw new Error('Invalid login');return login.trim().toLowerCase();}
  async add({login,password=temporaryPassword(),role='user',panelLogin=null,profileUrl=null,expiresAt=0,unlimited=false,devices=0,enabled=true,actor=null,allowUnlimited=false}) {
+  devices=0; // No VPN device cap for new or imported accounts.
   login=this.normalize(login);if(!['user','admin'].includes(role))throw new Error('Invalid role');
   if(unlimited&&!allowUnlimited)throw new Error('Unlimited access is reserved for existing users');
   if(this.db.prepare('SELECT 1 FROM identities WHERE login=?').get(login))return {created:false};
@@ -91,7 +92,7 @@ export class Accounts {
  editInternal(actor,id,patch){
    if(this.identity(actor)?.role!=='admin')throw new Error('Forbidden');
    const old=this.subscription(id);if(!old.account_id||this.identity(id)?.role==='admin')throw new Error('Subscription not found');
-   let expires=patch.expiresAt??old.expires_at;const devices=patch.devices??old.devices;
+   let expires=patch.expiresAt??old.expires_at;const devices=0;
    if(!Number.isSafeInteger(expires)||expires<0||!Number.isInteger(devices)||devices<0||devices>1000)throw new Error('Invalid limits');
    let enabled=patch.enabled??Boolean(old.enabled);const unlimited=patch.unlimited??Boolean(old.unlimited),deleted=patch.deleted??Boolean(old.deleted);
    if([enabled,unlimited,deleted].some(x=>typeof x!=='boolean'))throw new Error('Invalid status');

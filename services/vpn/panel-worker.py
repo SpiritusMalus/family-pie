@@ -55,6 +55,7 @@ def main():
   app.execute("UPDATE admin_jobs SET state='superseded' WHERE id=?",(job['id'],));app.commit();return
  payload=json.loads(job['payload']);expires=payload['expiresAt'];devices=payload['devices'];enabled=payload['enabled'];unlimited=payload['unlimited']
  if type(expires)!=int or expires<0 or type(devices)!=int or not 0<=devices<=1000 or type(enabled)!=bool or type(unlimited)!=bool:raise RuntimeError('Invalid job payload')
+ devices=0
  if not managed['allow_unlimited']:
   paid=_payments.entitlement(app,job['account_id'])
   enabled=enabled and paid['expires']>now
