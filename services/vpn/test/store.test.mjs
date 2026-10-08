@@ -35,7 +35,7 @@ test('repeated successful notification creates one grant and one provisioning jo
  assert.equal(first.expiresAt,time()+30*DAY);assert.equal(store.confirmPayment(p).expiresAt,first.expiresAt);
  assert.equal(store.db.prepare('SELECT COUNT(*) n FROM grants').get().n,1);
  assert.equal(store.db.prepare('SELECT COUNT(*) n FROM jobs').get().n,1);
- assert.equal(store.subscription(user.id).devices,2);
+ assert.equal(store.subscription(user.id).devices,0);
 });
 test('renewal extends remaining days and retains same profile identity',t=>{
  const {store,payment,advance}=fixture(t);const a=store.confirmPayment(payment());advance(10*DAY);

@@ -2,21 +2,21 @@
   {
     "days": 30,
     "priceMinor": 30000,
-    "devices": 1
+    "devices": 0
   },
   {
     "days": 90,
     "priceMinor": 80000,
-    "devices": 1
+    "devices": 0
   },
   {
     "days": 180,
     "priceMinor": 140000,
-    "devices": 1
+    "devices": 0
   },
   {
     "days": 365,
     "priceMinor": 250000,
-    "devices": 1
+    "devices": 0
   }
 ]
