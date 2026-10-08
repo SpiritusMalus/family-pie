@@ -1,5 +1,11 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  'Готов к проверке': 'Ready to test',
+  'Проверяем задержку…': 'Testing latency…',
+  'Проверяем загрузку…': 'Testing download…',
+  'Проверяем отправку…': 'Testing upload…',
+  'Проверка завершена': 'Test complete',
+  'Проверка прервана. Попробуй ещё раз.': 'Test interrupted. Try again.',
   "Подписка в Telegram": "Subscription in Telegram",
   "Проверяем Telegram…": "Checking Telegram…",
   "Подключить Telegram": "Connect Telegram",

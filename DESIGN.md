@@ -53,3 +53,6 @@ Keep the responsive reading order: product purpose and download action → lamp 
 
 ## Driftora subscription
 The owner extended the homepage/VPN portal identity to `/driftora/subscription/` on 2026-10-07. The purchase surface reuses `/vpn/fonts.css`, `/home.css`, `/home-theme.js` and `/vpn/portal.js`; scoped styling is in `/driftora/subscription/style.css`. Five server-priced plans form one desktop row and a two-column mobile grid, with a full-width final plan. Plans are keyboard-operable radio buttons. Existing bilingual service, refund and seller copy, receipt fields, checkout and key recovery stay intact. Theme background changes are immediate to preserve text contrast. Subscription hover colors #ff958e/#87262a match the homepage; free-feature markers use #8ed4ad/#286442 in dark/light themes.
+
+## VPN diagnostic progress — 2026-10-07
+The owner explicitly requested a red lightsaber-like loader in the network test. A CSS metal hilt and white/red glowing blade extend while the real HTTP diagnostic runs; full ignition marks success only. No artificial measurement delay or percentage claim. Error stops/dims the blade, retry resets, reduced-motion removes interpolation and hidden/offscreen views skip visual updates. Other cabinet surfaces retain their existing motion policy.
