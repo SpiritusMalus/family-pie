@@ -1,5 +1,21 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Подписка в Telegram": "Subscription in Telegram",
+  "Проверяем Telegram…": "Checking Telegram…",
+  "Подключить Telegram": "Connect Telegram",
+  "Открываем Telegram…": "Opening Telegram…",
+  "Открыть Telegram снова": "Open Telegram again",
+  "Это мой Telegram — подключить": "This is my Telegram — connect",
+  "Отключить Telegram": "Disconnect Telegram",
+  "Отменить привязку": "Cancel linking",
+  "Позже": "Later",
+  "Telegram временно недоступен. Попробуй позже.": "Telegram is temporarily unavailable. Try again later.",
+  "Telegram подключён. В боте доступны подписка, срок действия и напоминания.": "Telegram is connected. View your subscription, expiry and reminders in the bot.",
+  "Нажми «Старт» в Telegram и вернись сюда. Кабинет сам проверит привязку.": "Tap Start in Telegram, then return here. Your account will check the link automatically.",
+  "Подписка и срок действия — в боте. Напоминания помогут вовремя продлить доступ.": "View your subscription and expiry in the bot. Reminders help you renew on time.",
+  "Не удалось открыть Telegram. Попробуй ещё раз.": "Could not open Telegram. Try again.",
+  "Ссылка истекла. Нажми «Подключить Telegram» ещё раз.": "The link expired. Tap Connect Telegram again.",
+
   "Оплата подтверждена. Твоё подключение готово — добавь его в Happ или открой QR-код ниже.": "Payment confirmed. Your connection is ready — add it to Happ or open the QR code below.",
   "Оплата подтверждена. Готовим подключение; повторно платить не нужно.": "Payment confirmed. We are preparing your connection; there is no need to pay again.",
   "Ждём подтверждение платежа от ЮKassa. После оплаты подключение появится автоматически.": "Waiting for YooKassa to confirm the payment. Your connection will appear automatically after payment.",
