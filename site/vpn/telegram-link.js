@@ -1,13 +1,16 @@
 (() => {
- window.vpnTelegramLink = async ({api, settings, home}) => {
+ window.vpnTelegramLink = async ({api, settings, home, accountId}) => {
   let state, url = '', busy = false, checking = false, timer, deadline = 0, error = '';
   const notifyError = e => { error = e.message; render(); };
   const views = [];
+  const deferKey = accountId ? 'family-vpn-telegram-later:'+accountId : '';
+  let deferred = false;
+  try { deferred = Boolean(deferKey && window.sessionStorage.getItem(deferKey)); } catch { /* The settings card stays usable when browser storage is blocked. */ }
   const node = (tag, text, cls) => { const e = document.createElement(tag); if (text) e.textContent = text; if (cls) e.className = cls; return e; };
   function stop() { clearInterval(timer); timer = undefined; }
   function render() {
    for (const v of views) {
-    v.card.hidden = v.overview && Boolean(state?.linked && state?.enabled && !state?.pending);
+    v.card.hidden = v.overview && Boolean(deferred || state?.linked && state?.enabled && !state?.pending);
     v.status.textContent = error || (!state?.available ? 'Telegram временно недоступен. Попробуй позже.' : state.pending ? `Подтверди, что ${state.candidate} — твой Telegram-аккаунт.` : state.linked && state.enabled ? 'Telegram подключён. В боте доступны подписка, срок действия и напоминания.' : url ? 'Нажми «Старт» в Telegram и вернись сюда. Кабинет сам проверит привязку.' : 'Подписка и срок действия — в боте. Напоминания помогут вовремя продлить доступ.');
     v.start.hidden = Boolean(state?.pending || state?.linked && state?.enabled);
     v.start.disabled = busy || !state?.available;
@@ -73,7 +76,7 @@
    startButton.addEventListener('click', start); confirmButton.addEventListener('click', confirm); unlink.addEventListener('click', disconnect); cancel.addEventListener('click', disconnect);
    for (const e of [confirmButton, unlink, cancel, fallback]) e.hidden = true;
    actions.append(startButton, confirmButton, fallback, cancel, unlink); card.append(status, actions);
-   if (overview) { const later = node('button', 'Позже', 'btn secondary'); later.type = 'button'; later.addEventListener('click', () => { card.remove(); views.splice(views.indexOf(view), 1); }); actions.append(later); }
+   if (overview) { const later = node('button', 'Позже', 'btn secondary'); later.type = 'button'; later.addEventListener('click', () => { deferred = true; try { if (deferKey) window.sessionStorage.setItem(deferKey, '1'); } catch { /* Keep dismissal for this render if storage is unavailable. */ } card.remove(); views.splice(views.indexOf(view), 1); }); actions.append(later); }
    const view = {card, overview, status, start: startButton, confirm: confirmButton, unlink, cancel, fallback}; views.push(view); container.append(card);
   }
   window.addEventListener('focus', refresh);

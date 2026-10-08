@@ -1,5 +1,16 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Скачать APK ↗": "Download APK ↗",
+  "Подписка закончилась": "Your subscription has expired",
+  "Продли подписку, чтобы снова подключиться.": "Renew your subscription to connect again.",
+  "Доступ отключён. Напиши в поддержку": "Access is disabled. Contact support",
+  "Оплата не подтверждена": "Payment not confirmed",
+  "Помощь с оплатой": "Payment help",
+  "Оплата подтверждена. Статус подключения — в «Обзоре».": "Payment confirmed. Check your connection status in Overview.",
+  "Оплата пока не подтверждена. Если страница оплаты не открылась или деньги списались, напиши в поддержку перед повторной покупкой.": "Payment has not been confirmed yet. If the payment page did not open or you have been charged, contact support before making another purchase.",
+  "≈ −11,1%": "≈ −11.1%",
+  "≈ −22,2%": "≈ −22.2%",
+  "≈ −30,6%": "≈ −30.6%",
   "Telegram-бот": "Telegram bot",
   "Войти в другой аккаунт": "Sign in to another account",
   "Войди с другим логином.": "Sign in with a different username.",

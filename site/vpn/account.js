@@ -59,7 +59,7 @@
  const panel=$('.subscription');const sub=me.subscription;panel.replaceChildren(el('h2',sub.payment_required?'Ожидаем подтверждение оплаты':sub.active?'Твоя подписка':'Подписка не активна'),el('p',sub.payment_required?'Аккаунт создан. Ключ VPN выдаётся только после подтверждённой оплаты ЮKassa. Выбери тариф в разделе «Подписка».':`${date(sub)}${sub.sync_state!=='synced'?' · Изменения ещё применяются на VPN':''}`));
  if(sub.active&&sub.profile_url&&sub.sync_state==='synced'){const copy=el('button','Скопировать подключение','btn');copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sub.profile_url);copy.textContent='Скопировано';}catch{copy.textContent='Не удалось скопировать';}});panel.append(copy);}
  const settings=$('[data-screen="settings"]');const a=el('a','Сменить пароль','btn secondary');a.href='/vpn/cabinet/auth/?change=1';const security=settings?.querySelector('a[href="/vpn/cabinet/auth/"]')?.closest('section');if(security){const actions=el('div',undefined,'cab-actions');actions.append(security.querySelector('a[href="/vpn/cabinet/auth/"]'),a);security.append(actions);}else settings?.append(a);
- await window.vpnTelegramLink({api,settings,home:$('[data-screen="home"]')});window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));
+ await window.vpnTelegramLink({api,settings,home:$('[data-screen="home"]'),accountId:me.user.account_id});window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));
  }catch(err){if(version!==authVersion)return;if(err.status===401){if(!$('#login-form'))location.href='/vpn/cabinet/auth/?next='+encodeURIComponent(location.pathname+location.hash);}else message(err.message,'error');}}
  boot();
 })();
