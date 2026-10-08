@@ -1,5 +1,6 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Telegram-бот": "Telegram bot",
   "Войти в другой аккаунт": "Sign in to another account",
   "Войди с другим логином.": "Sign in with a different username.",
   "Email для входа": "Sign-in email",
