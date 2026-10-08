@@ -1,5 +1,13 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Покупка предоставляет доступ к VPN на период, указанный в выбранном тарифе. Количество устройств не ограничено. Цена фиксируется в заказе до перехода на страницу оплаты. Срок начинается после серверного подтверждения оплаты ЮKassa. При продлении оплаченные дни добавляются к оставшемуся сроку; если он закончился, новый срок начинается с подтверждения платежа.": "Your purchase provides VPN access for the period shown in your chosen plan. There is no device limit. The price is fixed in the order before you proceed to payment. The period starts after YooKassa payment is confirmed by the server. Renewals add purchased days to the remaining period; if it has expired, the new period starts when payment is confirmed.",
+  "Одну подписку можно использовать на любом количестве своих устройств. Текущий выход находится в Нидерландах. Доступность зависит также от сети, устройства и ограничений провайдера; постоянная скорость или доступность любого стороннего сайта не обещаются.": "Use one subscription on as many of your devices as you like. The current exit is in the Netherlands. Availability also depends on your network, device and provider restrictions; a constant speed or access to every third-party website is not promised.",
+  "Да. Используй подписку на телефоне и компьютере. Количество устройств не ограничено.": "Yes. Use your subscription on your phone and computer. There is no device limit.",
+
+  "Любое количество устройств": "Unlimited devices",
+  "Количество устройств не ограничено.": "There is no device limit.",
+  "Покупка предоставляет доступ к VPN на период, указанный в выбранном тарифе. Количество устройств не ограничено.": "Your purchase provides VPN access for the period shown in your chosen plan. There is no device limit.",
+  "Одну подписку можно использовать на любом количестве своих устройств.": "Use one subscription on as many of your devices as you like.",
   'Готов к проверке': 'Ready to test',
   'Проверяем задержку…': 'Testing latency…',
   'Проверяем загрузку…': 'Testing download…',
