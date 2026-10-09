@@ -5,7 +5,7 @@
 web
 
 ## Product Purpose
-Family Pie is Evgeny Tikhonenko's website. Its homepage addresses employers considering a full-stack developer. Driftora and Lumen + REST are the selected work: each has a case page explaining its purpose and implementation, with existing application screens. The developer's name, role and contact are visible.
+Family Pie is Evgeny Tikhonenko's website. Its homepage addresses employers considering a full-stack developer. Driftora and Lumen + REST are the selected work: each has a case page explaining its purpose and implementation, with existing application screens. The developer's name, role and contact are visible. His full-stack scope includes websites, mobile and desktop applications, and backend services.
 
 The site's separate product, download, legal and purchase routes serve application users. Removing a project from the employer-facing selection does not remove its service or direct routes.
 

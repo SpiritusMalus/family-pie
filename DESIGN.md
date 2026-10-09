@@ -243,7 +243,7 @@ Customer geometry remains distinct: the established control radius is `controls`
 
 Case links are medium-weight coral text with an inline (18px) arrow and a (44px) minimum height. When reduced motion is not requested, hover shifts the arrow (4px) over (.2s) with `cubic-bezier(.16,1,.3,1)`. The full-screenshot link is a separate coral text action, (14px) with a (44px) minimum height; it navigates to the existing image in the same tab. Browser Back returns to the portfolio. There is no lightbox.
 
-All links and buttons retain the visible accent outline (3px) with a (5px) offset. The skip link becomes visible on focus and reaches the main content. Contact, back and footer links remain ordinary working anchors.
+All links and buttons retain the visible accent outline (3px) with a (5px) offset. The skip link becomes visible on focus and reaches the main content. Contact and back links remain ordinary working anchors. The attribution footer has no repeated social link; GitHub appears once in the homepage contact section.
 
 ### Portfolio preference controls and navigation
 
