@@ -1,12 +1,23 @@
 # Product
 <!-- impeccable:product-schema 1 -->
+
 ## Platform
 web
+
 ## Product Purpose
-Family Pie is an independent application studio with a static public website. The owner requested a separate VPN landing and cabinet at /vpn/, preserving the studio homepage.
+Family Pie is Evgeny Tikhonenko's website. Its homepage addresses employers considering a full-stack developer. Driftora and Lumen + REST are the selected work: each has a case page explaining its purpose and implementation, with existing application screens. The developer's name, role and contact are visible.
+
+The site's separate product, download, legal and purchase routes serve application users. Removing a project from the employer-facing selection does not remove its service or direct routes.
+
 ## Capabilities and Constraints
-Existing vanilla HTML/CSS/JS, deployed through Family Pie GitHub CI. VPN infrastructure is a separate project; never expose subscription credentials in source. Public VPN billing, authentication and fulfilment are not yet implemented. Prices, device policy and merchant details remain open. The current cabinet is an explicitly labelled demonstration.
+Static HTML/CSS/JavaScript, released through the repository's existing GitHub CI/CD. `/`, `/work/driftora/` and `/work/lumen-rest/` use scoped portfolio styles. Customer-facing pages retain their own styles and APIs. The complete product catalog remains in `data/products.json` for legal generation; the homepage does not duplicate that catalog.
+
+RU/EN uses the existing `fp_lang` preference and shared language API. Portfolio theme selection shares `family-vpn-theme-v3` with the existing site, with complete light and dark styles and a system-based initial choice. Copy and links remain usable without JavaScript. Payment, authentication and native application behavior are outside this portfolio change.
+
 ## Brand Commitments
-Owner reference: chashkakofe.app/lending/ and its cabinet; preserve structural clarity and journeys. On 2026-10-05 the owner rejected the copied visual style and requested an independent identity. Owner approved the dark/red original animated portal direction and requests it across the landing, login and cabinet. Working name Family VPN is provisional. Owner confirmed family-pie.ru/vpn/ and prefers Chrome/Safari for interaction.
+Keep the Family Pie site name connected to the visible developer. Present actual work and concrete explanations; do not substitute an abstract portal, invented app screens, interchangeable benefit slogans, testimonials or performance numbers. Do not infer achieved weight loss or clinical benefit from personal intent. Sufler, Family VPN and unfinished ReloDojo are excluded from the homepage's employer-facing work selection.
+
 ## Evidence on Hand
-Reference landing and unauthenticated email/passkey/Google entry inspected. Owner signed in; authenticated no-subscription account inspected: home, plans/promo, friends balance/referral QR, diagnostics, FAQ/device guides, support chat, account authentication/notifications and news. Paid-account provisioning and checkout were not exercised. No competitor private content, customer data, testimonials or performance claims imported.
+The owner confirms sole authorship of Driftora, including its backend and calculations. Its photo→draft→review→local-save path, nutrition-source attribution and calculations were inspected in the application source; 66 focused existing tests passed during the case-content step. The Android screen is an existing store asset showing text input, labelled accordingly; it is not fresh camera-flow acceptance.
+
+Lumen + REST's native Mac timer/display integration and separate Python/PySide6 Windows/Linux implementation were inspected. The owner wants movement and eye-rest breaks during computer use. Existing macOS settings and reminder images illustrate these flows. Do not turn the screenshots into new physical-device or cross-platform acceptance claims. The application page retains platform/release limitations.
