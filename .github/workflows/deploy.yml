@@ -42,7 +42,7 @@ jobs:
       - run: node --check tools/build-legal.mjs && node tools/build-legal.mjs
       - run: test -s site/index.html
       - name: Test site language and appearance
-        run: node --test tools/test-i18n.mjs tools/test-home-theme.mjs tools/test-vpn-shell.mjs tools/test-vpn-payment-return.mjs tools/test-vpn-telegram-link.mjs
+        run: node --test tools/test-i18n.mjs tools/test-home-theme.mjs tools/test-portfolio.mjs tools/test-vpn-shell.mjs tools/test-vpn-payment-return.mjs tools/test-vpn-telegram-link.mjs
       - name: Test VPN service core
         run: npm ci --prefix services/vpn && node --test services/vpn/test/*.test.mjs
   deploy:
@@ -113,6 +113,8 @@ jobs:
 
           for url in \
             'https://family-pie.ru/' \
+            'https://family-pie.ru/work/driftora/' \
+            'https://family-pie.ru/work/lumen-rest/' \
             'https://family-pie.ru/rest_lumen/' \
             'https://family-pie.ru/sufler/' \
             'https://family-pie.ru/sufler/buy/' \

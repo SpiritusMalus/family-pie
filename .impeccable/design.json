@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-09T19:14:36.774871Z",
+  "title": "Design System: Family Pie",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Dark Paper"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Dark Appearance Ink"
+      },
+      "quiet": {
+        "role": "neutral",
+        "displayName": "Dark Quiet Text"
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Dark Thin Rule"
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Portfolio Coral"
+      },
+      "stage": {
+        "role": "neutral",
+        "displayName": "Dark Specimen Stage"
+      },
+      "light-paper": {
+        "role": "neutral",
+        "displayName": "Light Paper"
+      },
+      "light-ink": {
+        "role": "neutral",
+        "displayName": "Light Appearance Ink"
+      },
+      "light-quiet": {
+        "role": "neutral",
+        "displayName": "Light Quiet Text"
+      },
+      "light-rule": {
+        "role": "neutral",
+        "displayName": "Light Thin Rule"
+      },
+      "light-accent": {
+        "role": "primary",
+        "displayName": "Deep Portfolio Coral"
+      },
+      "light-stage": {
+        "role": "neutral",
+        "displayName": "Light Specimen Stage"
+      },
+      "vpn-primary": {
+        "role": "primary",
+        "displayName": "Portal Coral"
+      },
+      "vpn-light-primary": {
+        "role": "primary",
+        "displayName": "Light Portal Red"
+      },
+      "vpn-primary-hover": {
+        "role": "primary",
+        "displayName": "Portal Hover Coral"
+      },
+      "vpn-light-primary-hover": {
+        "role": "primary",
+        "displayName": "Light Portal Hover Red"
+      },
+      "lumen-primary": {
+        "role": "primary",
+        "displayName": "Lamp Amber"
+      },
+      "subscription-ok": {
+        "role": "secondary",
+        "displayName": "Dark Purchase Free-Feature Marker"
+      },
+      "subscription-light-ok": {
+        "role": "secondary",
+        "displayName": "Light Purchase Free-Feature Marker"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Developer and application names on portfolio surfaces."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Project and contact headings; case-story headings use the scoped smaller size."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Smaller heading role defined in the portfolio stylesheet."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Portfolio project and case narrative paragraphs."
+      },
+      "case-lead": {
+        "displayName": "Case Lead",
+        "purpose": "Application purpose below the case title."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Technical stack text."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Application image source labels."
+      },
+      "customer-wordmark": {
+        "displayName": "Customer Wordmark",
+        "purpose": "Existing compact Unbounded wordmarks on customer product surfaces only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "android-specimen",
+        "value": "0 14px 30px #0002",
+        "purpose": "The cropped Android store asset on portfolio pages."
+      },
+      {
+        "name": "desktop-specimen",
+        "value": "0 16px 36px #0001",
+        "purpose": "Actual macOS screenshot frames on portfolio pages."
+      }
+    ],
+    "motion": [
+      {
+        "name": "case-link-arrow-duration",
+        "value": ".2s",
+        "purpose": "Case-link arrow hover transition only when reduced motion is not requested."
+      },
+      {
+        "name": "case-link-arrow-easing",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "The small portfolio arrow response."
+      },
+      {
+        "name": "case-link-arrow-shift",
+        "value": "translateX(4px)",
+        "purpose": "Case-link hover destination offset."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "420px"
+      },
+      {
+        "name": "mobile",
+        "value": "760px"
+      },
+      {
+        "name": "sticky-case-media-min",
+        "value": "960px"
+      },
+      {
+        "name": "narrow-desktop",
+        "value": "1000px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Case Text Link",
+      "kind": "button",
+      "refersTo": "text-link",
+      "description": "A real portfolio case destination with a small arrow hover response.",
+      "html": "<a class=\"ds-text-link\" href=\"/work/driftora/\">Inside Driftora<svg class=\"ds-arrow\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 12h15m-6-6 6 6-6 6\"/></svg></a>",
+      "css": ".ds-text-link{display:inline-flex;align-items:center;gap:10px;min-height:44px;color:var(--accent,#ff9d88);font-weight:500;text-underline-offset:5px;font-family:'Golos Text',sans-serif;}.ds-arrow{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;flex:none}.ds-text-link:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}@media(prefers-reduced-motion:no-preference){.ds-text-link .ds-arrow{transition:transform .2s cubic-bezier(.16,1,.3,1)}.ds-text-link:hover .ds-arrow{transform:translateX(4px)}}"
+    },
+    {
+      "name": "Full Screenshot Link",
+      "kind": "button",
+      "refersTo": "screen-link",
+      "description": "Ordinary same-tab image navigation; browser Back returns to the portfolio.",
+      "html": "<a class=\"ds-screen-link\" href=\"/work/assets/driftora-review.png\">View full screenshot</a>",
+      "css": ".ds-screen-link{display:flex;align-items:center;min-height:44px;width:fit-content;font-size:14px;line-height:1.55;color:var(--accent,#ff9d88);text-underline-offset:5px;font-family:'Golos Text',sans-serif;}.ds-screen-link:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}"
+    },
+    {
+      "name": "Theme Toggle",
+      "kind": "button",
+      "refersTo": "theme-toggle",
+      "description": "The thin-bordered circular appearance control, shown in its actual dark state.",
+      "html": "<button class=\"ds-theme-toggle\" type=\"button\" aria-pressed=\"false\" aria-label=\"Change appearance\"><svg class=\"ds-moon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M20 15.3A8.5 8.5 0 0 1 8.7 4a8.5 8.5 0 1 0 11.3 11.3Z\"/></svg></button>",
+      "css": ".ds-theme-toggle{display:grid;place-items:center;border:1px solid var(--rule,#41464c);border-radius:50%;background:none;cursor:pointer;min-width:44px;height:44px;padding:8px;color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-theme-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6}.ds-theme-toggle:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}@media(max-width:420px){.ds-theme-toggle{min-width:38px;height:38px;padding:6px}}"
+    },
+    {
+      "name": "Language Buttons",
+      "kind": "custom",
+      "refersTo": "language-button",
+      "description": "Unfilled RU/EN controls with an underlined selected language.",
+      "html": "<div class=\"ds-langtoggle\" role=\"group\" aria-label=\"Language\"><button type=\"button\" aria-pressed=\"true\">RU</button><button type=\"button\" aria-pressed=\"false\">EN</button></div>",
+      "css": ".ds-langtoggle{display:flex;gap:2px}.ds-langtoggle button{border:0;background:none;cursor:pointer;min-width:44px;height:44px;padding:8px;font-size:12px;color:var(--quiet,#b4bdc6);font-family:'Golos Text',sans-serif;}.ds-langtoggle button[aria-pressed=true]{color:var(--ink,#f3f4f5);text-decoration:underline;text-underline-offset:6px}.ds-langtoggle button:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}@media(max-width:420px){.ds-langtoggle button{min-width:38px;height:38px;padding:6px}}"
+    },
+    {
+      "name": "Portfolio Header",
+      "kind": "nav",
+      "description": "Compact pie brand and direct navigation; mobile retains Work/Contact in a second row.",
+      "html": "<header class=\"ds-header\"><a class=\"ds-brand\" href=\"/\" aria-label=\"Family Pie\"><svg class=\"ds-pie\" viewBox=\"0 0 32 32\" aria-hidden=\"true\"><circle cx=\"16\" cy=\"16\" r=\"14\"/><path class=\"ds-slice\" d=\"M16 16V2a14 14 0 0 1 12.1 7Z\"/><path d=\"M16 2v28M3.9 9l24.2 14M3.9 23 28.1 9\"/></svg>family-pie</a><nav class=\"ds-nav-actions\" aria-label=\"Navigation\"><a href=\"/#work\">Work</a><a href=\"/#contact\">Contact</a><div class=\"ds-controls\"><div class=\"ds-langtoggle\" role=\"group\" aria-label=\"Language\"><button type=\"button\" aria-pressed=\"true\">RU</button><button type=\"button\" aria-pressed=\"false\">EN</button></div><button class=\"ds-theme-toggle\" type=\"button\" aria-pressed=\"false\" aria-label=\"Change appearance\"><svg class=\"ds-moon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M20 15.3A8.5 8.5 0 0 1 8.7 4a8.5 8.5 0 1 0 11.3 11.3Z\"/></svg></button></div></nav></header>",
+      "css": ".ds-header{display:flex;justify-content:space-between;align-items:center;gap:24px;min-height:90px;border-bottom:1px solid var(--rule,#41464c);color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:16px;font-weight:600;color:inherit}.ds-pie{width:26px;height:26px;fill:var(--stage,#202429);stroke:var(--ink,#f3f4f5);stroke-width:1.5}.ds-pie .ds-slice{fill:var(--accent,#ff9d88);stroke:none}.ds-nav-actions{display:flex;align-items:center;gap:24px}.ds-nav-actions>a{font-size:14px;text-decoration:none;min-height:44px;display:flex;align-items:center;color:inherit}.ds-controls{display:flex;gap:12px;align-items:center}.ds-header a:hover{color:var(--accent,#ff9d88)}.ds-header a:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}@media(max-width:760px){.ds-header{display:grid;grid-template-columns:1fr auto;min-height:76px;gap:4px 12px;padding-block:12px}.ds-header>.ds-brand{grid-column:1;grid-row:1}.ds-nav-actions{display:contents}.ds-nav-actions>.ds-controls{grid-column:2;grid-row:1;justify-self:end;gap:4px}.ds-nav-actions>a{display:flex;grid-row:2;min-height:38px}.ds-nav-actions>a:first-child{grid-column:1}.ds-nav-actions>a:nth-child(2){grid-column:2;justify-self:end}}@media(max-width:420px){.ds-brand{font-size:13px;gap:7px}.ds-pie{width:22px;height:22px}.ds-controls{gap:2px}}.ds-langtoggle{display:flex;gap:2px}.ds-langtoggle button{border:0;background:none;cursor:pointer;min-width:44px;height:44px;padding:8px;font-size:12px;color:var(--quiet,#b4bdc6);font-family:'Golos Text',sans-serif;}.ds-langtoggle button[aria-pressed=true]{color:var(--ink,#f3f4f5);text-decoration:underline;text-underline-offset:6px}.ds-langtoggle button:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}@media(max-width:420px){.ds-langtoggle button{min-width:38px;height:38px;padding:6px}}.ds-theme-toggle{display:grid;place-items:center;border:1px solid var(--rule,#41464c);border-radius:50%;background:none;cursor:pointer;min-width:44px;height:44px;padding:8px;color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-theme-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6}.ds-theme-toggle:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}@media(max-width:420px){.ds-theme-toggle{min-width:38px;height:38px;padding:6px}}"
+    },
+    {
+      "name": "Application Caption",
+      "kind": "custom",
+      "description": "Source label attached to the specimen and its separate full-image action.",
+      "html": "<figcaption class=\"ds-caption\"><span>Meal review screen · Android, text input</span><a class=\"ds-screen-link\" href=\"/work/assets/driftora-review.png\">View full screenshot</a></figcaption>",
+      "css": ".ds-caption{font-size:12px;line-height:1.55;margin-top:14px;color:var(--quiet,#b4bdc6);font-family:'Golos Text',sans-serif;}.ds-screen-link{display:flex;align-items:center;min-height:44px;width:fit-content;font-size:14px;line-height:1.55;color:var(--accent,#ff9d88);text-underline-offset:5px;font-family:'Golos Text',sans-serif;}.ds-screen-link:focus-visible{outline:3px solid var(--accent,#ff9d88);outline-offset:5px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Working-Screen Specimen",
+    "overview": "The portfolio uses neutral surfaces, local Golos Text and restrained coral links to make actual applications easy to inspect. Large sentence-case headings and ample space separate the developer's voice from the application evidence. A cropped Android review screen sits beside short annotations; the macOS settings and reminder screens keep their native appearance.\n\nLight and dark appearances share the same composition, rules and typography. Depth belongs to the application specimens; the surrounding page is flat, with thin dividers and direct text links. The six-slice Family Pie mark retains one coral segment, while its accompanying portfolio wordmark uses Golos Text.",
+    "keyCharacteristics": [
+      "Neutral page and specimen surfaces in complete light and dark appearances.",
+      "Golos Text throughout the portfolio, including its compact wordmark.",
+      "Actual application images with adjacent explanation, source labels and a path to the full image.",
+      "Flat section boundaries, generous reading space and restrained link motion."
+    ],
+    "rules": [
+      {
+        "name": "The Surface Palette Rule",
+        "body": "Apply a color family only to the surface that owns it. Sharing fonts or a stored preference does not merge the portfolio, portal and lamp palettes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Local Type Rule",
+        "body": "Use Golos Text for all portfolio text. Preserve Unbounded only on the existing customer wordmarks that already use it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Specimen Depth Rule",
+        "body": "Keep the portfolio shell flat; use the existing image shadows to separate application evidence from its page.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep portfolio paper, ink, quiet text, dividers and specimen stage coherent in both appearances.",
+      "**Do** use local Golos Text for the portfolio, including its compact Family Pie wordmark.",
+      "**Do** keep actual application screens, their source labels, adjacent explanations and full-image links readable.",
+      "**Do** retain Work and Contact in the mobile header's second row.",
+      "**Do** preserve shared language/theme preferences, visible keyboard focus and usable static links.",
+      "**Do** preserve VPN, Lumen product and Driftora purchase rules within their existing customer surfaces."
+    ],
+    "donts": [
+      "**Don't** carry the old homepage portal canvas, decorative red edge lighting or catalog accordion into the replacement portfolio.",
+      "**Don't** turn the customer's portal or lamp palette into portfolio tokens.",
+      "**Don't** invent application screens, testimonials, performance numbers or customer evidence.",
+      "**Don't** present personal motivations as achieved weight loss or clinical benefit.",
+      "**Don't** describe existing Android/macOS image assets as fresh device or cross-platform acceptance.",
+      "**Don't** let the portfolio replacement remove direct product, download, legal or purchase routes."
+    ]
+  }
+}
