@@ -1,0 +1,263 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "url": "https://family-pie.ru/",
+    "title": "family-pie — приложения независимого разработчика",
+    "bytes": 27518,
+    "revision": null
+  },
+  {
+    "path": "/audit-missing-route-20261008",
+    "status": 200,
+    "url": "https://family-pie.ru/audit-missing-route-20261008",
+    "title": "family-pie — приложения независимого разработчика",
+    "bytes": 27518,
+    "revision": null
+  },
+  {
+    "path": "/driftora/legal",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/legal",
+    "title": "Driftora — Terms of Use — family-pie",
+    "bytes": 67563,
+    "revision": null
+  },
+  {
+    "path": "/driftora/privacy",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/privacy",
+    "title": "Driftora — Privacy Policy — family-pie",
+    "bytes": 67579,
+    "revision": null
+  },
+  {
+    "path": "/driftora/subscription/",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/subscription/",
+    "title": "Подписка · Driftora",
+    "bytes": 30777,
+    "revision": null
+  },
+  {
+    "path": "/driftora/subscription/done",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/subscription/done",
+    "title": "Оплата прошла · Driftora",
+    "bytes": 8702,
+    "revision": null
+  },
+  {
+    "path": "/driftora/terms",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/terms",
+    "title": "Driftora — Terms of Use — family-pie",
+    "bytes": 67563,
+    "revision": null
+  },
+  {
+    "path": "/health_routine/legal",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/legal",
+    "title": "Driftora — Terms of Use — family-pie",
+    "bytes": 67563,
+    "revision": null
+  },
+  {
+    "path": "/health_routine/privacy",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/privacy",
+    "title": "Driftora — Privacy Policy — family-pie",
+    "bytes": 67579,
+    "revision": null
+  },
+  {
+    "path": "/health_routine/subscription/",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/subscription/",
+    "title": "Подписка · Driftora",
+    "bytes": 30777,
+    "revision": null
+  },
+  {
+    "path": "/health_routine/terms",
+    "status": 200,
+    "url": "https://family-pie.ru/driftora/terms",
+    "title": "Driftora — Terms of Use — family-pie",
+    "bytes": 67563,
+    "revision": null
+  },
+  {
+    "path": "/privacy",
+    "status": 200,
+    "url": "https://family-pie.ru/privacy",
+    "title": "Driftora — Privacy Policy — family-pie",
+    "bytes": 67579,
+    "revision": null
+  },
+  {
+    "path": "/release.json",
+    "status": 200,
+    "url": "https://family-pie.ru/release.json",
+    "title": null,
+    "bytes": 56,
+    "revision": "5c3203b42c577a896624c4f0771d66d7e68a5add"
+  },
+  {
+    "path": "/relo_dojo/checkout/",
+    "status": 200,
+    "url": "https://family-pie.ru/relo_dojo/checkout/",
+    "bytes": 11600,
+    "retry": "PASS"
+  },
+  {
+    "path": "/relo_dojo/checkout/done",
+    "status": 200,
+    "url": "https://family-pie.ru/relo_dojo/checkout/done",
+    "title": "Готово · Relo Dojo",
+    "bytes": 4069,
+    "revision": null
+  },
+  {
+    "path": "/relo_dojo/legal",
+    "status": 200,
+    "url": "https://family-pie.ru/relo_dojo/legal",
+    "title": "Relo Dojo — Terms of Use — family-pie",
+    "bytes": 65598,
+    "revision": null
+  },
+  {
+    "path": "/relo_dojo/privacy",
+    "status": 200,
+    "url": "https://family-pie.ru/relo_dojo/privacy",
+    "title": "Relo Dojo — Privacy Policy — family-pie",
+    "bytes": 65614,
+    "revision": null
+  },
+  {
+    "path": "/relo_dojo/terms",
+    "status": 200,
+    "url": "https://family-pie.ru/relo_dojo/terms",
+    "title": "Relo Dojo — Terms of Use — family-pie",
+    "bytes": 65598,
+    "revision": null
+  },
+  {
+    "path": "/rest_lumen/",
+    "status": 200,
+    "url": "https://family-pie.ru/rest_lumen/",
+    "title": "Lumen + REST — яркость экрана и таймер перерывов",
+    "bytes": 8733,
+    "revision": null
+  },
+  {
+    "path": "/sufler/",
+    "status": 200,
+    "url": "https://family-pie.ru/sufler/",
+    "title": "Sufler: подсказки во время разговора · family-pie",
+    "bytes": 8053,
+    "revision": null
+  },
+  {
+    "path": "/sufler/buy/",
+    "status": 200,
+    "url": "https://family-pie.ru/sufler/buy/",
+    "bytes": 6387,
+    "retry": "PASS"
+  },
+  {
+    "path": "/sufler/buy/done/",
+    "status": 200,
+    "url": "https://family-pie.ru/sufler/buy/done/",
+    "title": "Ваш код Sufler · проверка оплаты",
+    "bytes": 6667,
+    "revision": null
+  },
+  {
+    "path": "/sufler/privacy/",
+    "status": 200,
+    "url": "https://family-pie.ru/sufler/privacy/",
+    "title": "Обработка данных в Sufler",
+    "bytes": 4945,
+    "revision": null
+  },
+  {
+    "path": "/sufler/setup/",
+    "status": 200,
+    "url": "https://family-pie.ru/sufler/setup/",
+    "title": "Установка и первый запуск Sufler · family-pie",
+    "bytes": 13873,
+    "revision": null
+  },
+  {
+    "path": "/sufler/terms/",
+    "status": 200,
+    "url": "https://family-pie.ru/sufler/terms/",
+    "bytes": 5723,
+    "retry": "PASS"
+  },
+  {
+    "path": "/terms",
+    "status": 200,
+    "url": "https://family-pie.ru/terms",
+    "title": "Driftora — Terms of Use — family-pie",
+    "bytes": 67563,
+    "revision": null
+  },
+  {
+    "path": "/vpn/",
+    "status": 200,
+    "url": "https://family-pie.ru/vpn/",
+    "title": "Интернет для своих — Family VPN",
+    "bytes": 13010,
+    "revision": null
+  },
+  {
+    "path": "/vpn/admin/",
+    "status": 200,
+    "url": "https://family-pie.ru/vpn/admin/",
+    "title": "Администратор — Family VPN",
+    "bytes": 3527,
+    "revision": null
+  },
+  {
+    "path": "/vpn/cabinet/",
+    "status": 200,
+    "url": "https://family-pie.ru/vpn/cabinet/",
+    "title": "Личный кабинет — Family VPN",
+    "bytes": 10252,
+    "revision": null
+  },
+  {
+    "path": "/vpn/cabinet/auth/",
+    "status": 200,
+    "url": "https://family-pie.ru/vpn/cabinet/auth/",
+    "title": "Вход — Family VPN",
+    "bytes": 4153,
+    "revision": null
+  },
+  {
+    "path": "/vpn/offline",
+    "status": 200,
+    "url": "https://family-pie.ru/vpn/offline",
+    "title": "Нет соединения — Family VPN",
+    "bytes": 898,
+    "revision": null
+  },
+  {
+    "path": "/vpn/privacy/",
+    "status": 200,
+    "url": "https://family-pie.ru/vpn/privacy/",
+    "title": "Обработка данных — Family VPN",
+    "bytes": 6057,
+    "revision": null
+  },
+  {
+    "path": "/vpn/terms/",
+    "status": 200,
+    "url": "https://family-pie.ru/vpn/terms/",
+    "title": "Условия Family VPN",
+    "bytes": 4819,
+    "revision": null
+  }
+]
