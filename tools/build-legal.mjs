@@ -428,6 +428,10 @@ for (const p of products) {
 /* ---------- regenerate sitemap.xml from the catalog ---------- */
 const today = new Date().toISOString().slice(0, 10);
 const urls = [{ loc: 'https://family-pie.ru/', freq: 'monthly', pri: '1.0' }];
+// Employer-facing case pages are separate from the product/checkout catalog.
+for (const path of ['/work/driftora/', '/work/lumen-rest/']) {
+  urls.push({ loc: `https://family-pie.ru${path}`, freq: 'monthly', pri: '0.8' });
+}
 for (const p of products) {
   if (p.landingUrl) urls.push({ loc: `https://family-pie.ru${p.landingUrl}`, freq: 'monthly', pri: '0.8' });
   if (p.id === 'sufler') urls.push({ loc: 'https://family-pie.ru/sufler/setup/', freq: 'monthly', pri: '0.6' });
