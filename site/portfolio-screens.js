@@ -14,7 +14,7 @@
     buttons: [...figure.querySelectorAll('[data-screen-language]')],
     status: figure.querySelector('[data-screen-status]'),
     preference: savedLanguage(figure.querySelector('[data-screen-ru-src]')),
-    shown: 'ru',
+    shown: figure.dataset.screenLang || 'ru',
     request: 0
   })).filter(pair => pair.image && pair.link);
 
