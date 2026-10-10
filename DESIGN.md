@@ -77,6 +77,42 @@ typography:
     fontSize: "12px"
     fontWeight: 400
     lineHeight: 1.55
+  showcase-display:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "clamp(36px, 4.2vw, 54px)"
+    fontWeight: 600
+    lineHeight: 1.12
+    letterSpacing: "-0.035em"
+  showcase-compact-display:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "40px"
+    fontWeight: 600
+    lineHeight: 1.12
+  showcase-narrow-display:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "36px"
+    fontWeight: 600
+    lineHeight: 1.12
+  showcase-summary:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "20px"
+    fontWeight: 400
+    lineHeight: 1.65
+  showcase-body:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.65
+  showcase-heading:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "30px"
+    fontWeight: 600
+    lineHeight: 1.12
+  showcase-caption:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: 1.7
   customer-wordmark:
     fontFamily: "Unbounded, sans-serif"
     fontWeight: 600
@@ -290,3 +326,12 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 ### Maker-story paragraph
 
 The homepage introduction includes the owner’s pie-sharing image after his role statement. `.intro .family-note` uses Golos Text at16px,1.65 line height, a66ch maximum measure and24px top spacing, with the existing quiet text color in both themes. This is a local supporting paragraph; it does not introduce another panel, display style or illustration. Selected-work copy and case introductions use his confirmed app motivation and current use.
+
+
+## Reference-led showcase layout preview
+
+`/preview/showcase/` is a separate review variant requested after the owner supplied dev.cmde.ru. It extends the existing neutral Golos/coral world rather than replacing the current homepage or work pages. A compact name/role/action group sits beside the owner-confirmed pie-sharing story. Two image-first project cards show existing Android/macOS evidence before purpose, case links and stack. The topology becomes a single column below700px; the header keeps its mobile Work/Contact row.
+
+The local type steps above reflect this denser composition: display54px maximum (40px intermediate,36px narrow), summary20/18px, project/story/action16px, heading30px, stack/full-image label13px. Panel/control corners use existing6px, Android specimen existing14px. Repeated project cards represent two equivalent work destinations; no new capability claims, badges, testimonial or results are introduced. Existing controls, stored appearance/language preferences and the arrow hover remain shared. Portrait is not supplied and is not fabricated; the proposed composition can be revised around the real photo later.
+
+These type steps intentionally belong only to the review route. They address hook-reported type-ramp gaps; no detector suppression is added. The pre-existing sidecar freshness warning is outside this scoped layout change and is not autonomously repaired. This variant is not owner approval to publish or to replace the main homepage.

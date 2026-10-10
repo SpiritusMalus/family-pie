@@ -1,0 +1,70 @@
+/* Reference-led layout variant. The live homepage and case styles remain separate. */
+.showcase-preview .wrap{width:min(1100px,calc(100% - 80px))}
+.showcase-preview .site-header{min-height:80px}
+.showcase-preview .skip{clip-path:inset(50%)}
+.showcase-preview .skip:focus{clip-path:none}
+.showcase-intro{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:center;padding-block:52px 48px}
+.showcase-intro .intro{padding:0;max-width:none}
+.showcase-intro h1{font-size:clamp(36px,4.2vw,54px);margin-bottom:20px}
+.showcase-intro .intro>p{font-size:20px;max-width:52ch}
+.intro-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px;margin-top:24px}
+.work-button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 22px;border-radius:6px;background:var(--accent);color:var(--paper);text-decoration:none;font-size:16px;font-weight:500}
+.work-button:hover{color:var(--paper);text-decoration:underline}
+.maker-story{padding:28px;border:1px solid var(--rule);border-radius:6px;background:var(--stage)}
+.maker-story h2{font-size:25px;margin:0 0 14px}
+.maker-story p{font-size:16px;color:var(--quiet);line-height:1.65;margin:0;max-width:48ch}
+.showcase-work{padding-block:0 56px;scroll-margin-top:24px}
+.showcase-work>h2{font-size:30px;margin:0 0 24px}
+.showcase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.showcase-project{display:flex;flex-direction:column;min-width:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.showcase-project figure{margin:0}
+.showcase-project .driftora-proof{height:324px;padding:20px;gap:32px}
+.showcase-project .screen-crop{width:148px;border-radius:14px}
+.showcase-project .screen-notes{max-width:145px;font-size:14px}
+.showcase-project .screen-notes p:last-child{margin-bottom:0}
+.showcase-project .desktop-shot{width:100%;height:324px;object-fit:contain;padding:20px;background:var(--stage);border:0;box-shadow:none}
+.showcase-project figcaption{padding:12px 24px 0;margin:0}
+.showcase-project .screen-link{font-size:13px}
+.showcase-project .project-copy{padding:20px 24px 24px;display:flex;flex-direction:column;flex:1}
+.showcase-project h3{font-size:30px;margin:0 0 16px}
+.showcase-project .project-copy>p{font-size:16px;max-width:65ch;margin:0 0 16px}
+.showcase-project .text-link{align-self:flex-start;margin-top:auto;font-size:16px}
+.showcase-project .project-copy .stack{font-size:13px;line-height:1.7;color:var(--quiet);margin:16px 0 0}
+.showcase-preview .contact{padding-block:48px 56px}
+.showcase-preview .contact h2{font-size:30px}
+@media(max-width:900px){
+  .showcase-preview .wrap{width:calc(100% - 48px)}
+  .showcase-intro{gap:28px;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);padding-block:40px}
+  .showcase-intro h1{font-size:40px}
+  .showcase-intro .intro>p{font-size:18px}
+  .maker-story{padding:24px}
+  .showcase-grid{gap:20px}
+  .showcase-project .driftora-proof{gap:18px;padding:20px 16px}
+  .showcase-project .screen-crop{width:132px}
+  .showcase-project .screen-notes{font-size:12px;max-width:112px}
+}
+@media(max-width:700px){
+  .showcase-preview .wrap{width:calc(100% - 40px)}
+  .showcase-intro{grid-template-columns:1fr;gap:28px;padding-block:36px}
+  .showcase-intro h1{font-size:40px}
+  .maker-story{padding:24px}
+  .showcase-grid{grid-template-columns:1fr;gap:28px}
+  .showcase-project .driftora-proof{gap:28px;padding:24px;height:324px}
+  .showcase-project .screen-crop{width:140px}
+  .showcase-project .screen-notes{max-width:150px;font-size:13px}
+  .showcase-work{padding-bottom:40px}
+  .showcase-preview .contact{padding-block:36px 40px}
+}
+@media(max-width:420px){
+  .showcase-preview .wrap{width:calc(100% - 32px)}
+  .showcase-intro h1{font-size:36px}
+  .intro-actions{gap:8px 20px}
+  .intro-actions .text-link{font-size:16px}
+  .maker-story{padding:20px}
+  .showcase-project .driftora-proof{height:300px;gap:18px;padding:20px 16px}
+  .showcase-project .screen-crop{width:130px}
+  .showcase-project .screen-notes{font-size:12px;max-width:110px}
+  .showcase-project .desktop-shot{height:300px;padding:16px}
+  .showcase-project figcaption{padding:12px 20px 0}
+  .showcase-project .project-copy{padding:20px}
+}
