@@ -36,6 +36,7 @@
 .showcase-project .project-copy .stack{font-size:13px;line-height:1.7;color:var(--quiet);margin:16px 0 0}
 .showcase-preview .contact{padding-block:48px 56px}
 .showcase-preview .contact h2{font-size:30px}
+.showcase-project .screen-crop.native-shot{height:100%;width:auto}
 @media(max-width:900px){
   .showcase-preview .wrap{width:calc(100% - 48px)}
   .showcase-intro{gap:28px;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);padding-block:40px}
