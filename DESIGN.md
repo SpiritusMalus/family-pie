@@ -77,6 +77,42 @@ typography:
     fontSize: "12px"
     fontWeight: 400
     lineHeight: 1.55
+  showcase-display:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "clamp(36px, 4.2vw, 54px)"
+    fontWeight: 600
+    lineHeight: 1.12
+    letterSpacing: "-0.035em"
+  showcase-compact-display:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "40px"
+    fontWeight: 600
+    lineHeight: 1.12
+  showcase-narrow-display:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "36px"
+    fontWeight: 600
+    lineHeight: 1.12
+  showcase-summary:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "20px"
+    fontWeight: 400
+    lineHeight: 1.65
+  showcase-body:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.65
+  showcase-heading:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "30px"
+    fontWeight: 600
+    lineHeight: 1.12
+  showcase-caption:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: 1.7
   customer-wordmark:
     fontFamily: "Unbounded, sans-serif"
     fontWeight: 600
@@ -243,7 +279,7 @@ Customer geometry remains distinct: the established control radius is `controls`
 
 Case links are medium-weight coral text with an inline (18px) arrow and a (44px) minimum height. When reduced motion is not requested, hover shifts the arrow (4px) over (.2s) with `cubic-bezier(.16,1,.3,1)`. The full-screenshot link is a separate coral text action, (14px) with a (44px) minimum height; it navigates to the existing image in the same tab. Browser Back returns to the portfolio. There is no lightbox.
 
-All links and buttons retain the visible accent outline (3px) with a (5px) offset. The skip link becomes visible on focus and reaches the main content. Contact, back and footer links remain ordinary working anchors.
+All links and buttons retain the visible accent outline (3px) with a (5px) offset. The skip link becomes visible on focus and reaches the main content. Contact and back links remain ordinary working anchors. The attribution footer has no repeated social link; GitHub appears once in the homepage contact section.
 
 ### Portfolio preference controls and navigation
 
@@ -286,3 +322,16 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 - **Don't** present personal motivations as achieved weight loss or clinical benefit.
 - **Don't** describe existing Android/macOS image assets as fresh device or cross-platform acceptance.
 - **Don't** let the portfolio replacement remove direct product, download, legal or purchase routes.
+
+### Maker-story paragraph
+
+The homepage introduction includes the owner’s pie-sharing image after his role statement. `.intro .family-note` uses Golos Text at16px,1.65 line height, a66ch maximum measure and24px top spacing, with the existing quiet text color in both themes. This is a local supporting paragraph; it does not introduce another panel, display style or illustration. Selected-work copy and case introductions use his confirmed app motivation and current use.
+
+
+## Reference-led showcase layout preview
+
+`/preview/showcase/` is a separate review variant requested after the owner supplied dev.cmde.ru. It extends the existing neutral Golos/coral world rather than replacing the current homepage or work pages. A compact name/role/action group sits beside a real owner portrait; the confirmed pie-sharing story follows in a full-width row. Two image-first project cards show existing Android/macOS evidence before purpose, case links and stack. The topology becomes a single column below700px; the header keeps its mobile Work/Contact row.
+
+The local type steps above reflect this denser composition: display54px maximum (40px intermediate,36px narrow), summary20/18px, project/story/action16px, heading30px, stack/full-image label13px. Panel/control corners use existing6px, Android specimen existing14px. Repeated project cards represent two equivalent work destinations; no new capability claims, badges, testimonial or results are introduced. The owner now pins this review route to a pure-black canvas (#000000) for the page, brand story and screenshot stages. Light-theme switching is removed from this variant; a scoped appearance bootstrap enables JavaScript controls without reading or changing the shared appearance preference. Language controls, case/image destinations and arrow hover remain shared. Coral action, light text and existing neutral borders retain their roles. Actual app screenshot pixels remain source evidence. The owner supplied a real portrait, displayed through CSS square framing with object-position62%45%. The owner subsequently requested a dark-room lighting treatment: the preview now uses a sibling PNG edited with imagegen for soft side light and a subdued room. The original JPEG remains unchanged in private recovery. On mobile the name/role/actions precede a centered280px portrait and single-column brand story. The image is a local-only ignored asset, protected with the private recovery evidence; publishing it still requires approval of the shown result.
+
+These type steps intentionally belong only to the review route. They address hook-reported type-ramp gaps; no detector suppression is added. The pre-existing sidecar freshness warning is outside this scoped layout change and is not autonomously repaired. This variant is not owner approval to publish or to replace the main homepage.

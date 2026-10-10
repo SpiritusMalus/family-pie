@@ -15,7 +15,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'site');
 const PORT = Number(process.argv[2]) || 8100;
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.md': 'text/markdown; charset=utf-8',
-  '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.png': 'image/png' };
+  '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.png': 'image/png',
+  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg' };
 
 async function tryFile(p) {
   try { const s = await stat(p); if (s.isFile()) return p; } catch {}

@@ -7,7 +7,8 @@
   const fragment = new URLSearchParams(location.hash.slice(1)).get('lang');
   let saved;
   try { saved = localStorage.getItem('fp_lang'); } catch { /* In-memory preference still works. */ }
-  let lang = [fragment, query, saved].find(valid) || ((navigator.language || 'ru').startsWith('en') ? 'en' : 'ru');
+  const pageDefault = document.documentElement.getAttribute?.('data-fp-default-lang');
+  let lang = [fragment, query, saved, pageDefault].find(valid) || ((navigator.language || 'ru').startsWith('en') ? 'en' : 'ru');
   const dictionary = window.FP_EN || {};
   const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const patterns = (window.FP_PATTERNS || []).map(([source, target, nested]) => {

@@ -9,6 +9,11 @@
       if (attribute) node.setAttribute(attribute, text);
       else node.textContent = text;
     }
+    for (const image of document.querySelectorAll('img[data-ru-src][data-en-src]')) {
+      image.src = image.dataset[lang + 'Src'];
+      const height = image.dataset[lang + 'Height'];
+      if (height) image.height = Number(height);
+    }
     for (const button of document.querySelectorAll('[data-fp-lang]')) {
       button.setAttribute('aria-pressed', String(button.dataset.fpLang === lang));
     }
