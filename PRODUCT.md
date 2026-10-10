@@ -24,4 +24,4 @@ Lumen + REST's native Mac timer/display integration and separate Python/PySide6 
 
 ## Current layout study
 
-The owner supplied dev.cmde.ru as a reference for a more compact personal portfolio with image-first projects. `/preview/showcase/` is a separate RU/EN/light/dark comparison variant using the existing verified facts and assets. It does not replace the homepage or alter customer routes. The owner portrait is still to be supplied; no synthetic likeness or borrowed author photograph is used. Publication of any shown variant requires explicit owner approval.
+The owner supplied dev.cmde.ru as a reference for a more compact personal portfolio with image-first projects. `/preview/showcase/` is a separate RU/EN/light/dark comparison variant using the existing verified facts and assets. It does not replace the homepage or alter customer routes. The owner has supplied a real portrait for local review; original pixels are retained with CSS framing. The private image is preserved outside public Git pending approval of the shown result. Publication of any shown variant requires explicit owner approval.
