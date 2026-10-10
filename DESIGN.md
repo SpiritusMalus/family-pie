@@ -286,3 +286,7 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 - **Don't** present personal motivations as achieved weight loss or clinical benefit.
 - **Don't** describe existing Android/macOS image assets as fresh device or cross-platform acceptance.
 - **Don't** let the portfolio replacement remove direct product, download, legal or purchase routes.
+
+### Maker-story paragraph
+
+The homepage introduction includes the owner’s pie-sharing image after his role statement. `.intro .family-note` uses Golos Text at16px,1.65 line height, a66ch maximum measure and24px top spacing, with the existing quiet text color in both themes. This is a local supporting paragraph; it does not introduce another panel, display style or illustration. Selected-work copy and case introductions use his confirmed app motivation and current use.
