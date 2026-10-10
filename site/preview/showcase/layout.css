@@ -1,8 +1,10 @@
 /* Reference-led layout variant. The live homepage and case styles remain separate. */
+:root{--paper:#000000;--ink:#f3f4f5;--quiet:#b4bdc6;--rule:#41464c;--accent:#ff9d88;--stage:#000000;color-scheme:dark}
 .showcase-preview .wrap{width:min(1100px,calc(100% - 80px))}
 .showcase-preview .site-header{min-height:80px}
-.showcase-preview .skip{clip-path:inset(50%)}
+.showcase-preview .skip{clip-path:inset(50%);background:var(--paper);color:var(--ink);border:1px solid var(--rule)}
 .showcase-preview .skip:focus{clip-path:none}
+.showcase-preview .screen-crop{background:var(--paper)}
 .showcase-intro{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:center;padding-block:52px 48px}
 .showcase-intro .intro{padding:0;max-width:none}
 .showcase-intro h1{font-size:clamp(36px,4.2vw,54px);margin-bottom:20px}
