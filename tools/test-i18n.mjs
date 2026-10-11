@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
-function page({saved, query = '', hash = '', storageFails = false, defaultLang} = {}) {
+function page({saved, query = '', hash = '', storageFails = false, defaultLang, language = 'ru-RU', languages} = {}) {
   const listeners = {}, writes = [];
   const context = {
-    URL, URLSearchParams, navigator: {language: 'ru-RU'},
+    URL, URLSearchParams, navigator: {language, languages},
     location: {search: query, hash, href: 'https://family-pie.ru/test/' + query + hash},
     localStorage: {getItem() {if (storageFails) throw Error('blocked'); return saved;}, setItem(key,value) {if (storageFails) throw Error('blocked'); writes.push([key,value]);}},
     history: {replaceState(_state,_title,url) {context.url = url;}},
@@ -30,6 +30,18 @@ test('English portfolio default respects explicit choices and leaves product def
   assert.equal(page({defaultLang:'en',saved:'ru'}).api.lang,'ru');
   assert.equal(page({defaultLang:'en',query:'?lang=ru'}).api.lang,'ru');
   assert.equal(page().api.lang,'ru');
+});
+test('browser portfolio locale follows supported preferences with English fallback', () => {
+  assert.equal(page({defaultLang:'browser',language:'ru-RU'}).api.lang,'ru');
+  assert.equal(page({defaultLang:'browser',language:'en-US'}).api.lang,'en');
+  assert.equal(page({defaultLang:'browser',language:'fr-FR',languages:['fr-FR','ru-RU','en-US']}).api.lang,'ru');
+  assert.equal(page({defaultLang:'browser',languages:['en-GB','ru-RU']}).api.lang,'en');
+  assert.equal(page({defaultLang:'browser',language:'de-DE'}).api.lang,'en');
+  assert.equal(page({defaultLang:'browser',language:'RU-ru',storageFails:true}).api.lang,'ru');
+  assert.equal(page({defaultLang:'browser',saved:'en',language:'ru-RU'}).api.lang,'en');
+  assert.equal(page({defaultLang:'browser',saved:'en',query:'?lang=ru'}).api.lang,'ru');
+  assert.equal(page({defaultLang:'browser',saved:'ru',hash:'#lang=en'}).api.lang,'en');
+  assert.equal(page({language:'de-DE'}).api.lang,'ru'); // Other product routes retain their behavior.
 });
 test('switch persists, updates explicit query and preserves the fragment', () => {
   const {api,context,writes}=page({query:'?lang=en',hash:'#devices?platform=ios'});

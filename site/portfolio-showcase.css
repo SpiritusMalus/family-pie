@@ -74,3 +74,16 @@
   .showcase-project figcaption{padding:12px 20px 0}
   .showcase-project .project-copy{padding:20px}
 }
+
+/* Readable evidence: focus the meal calculation; full native capture stays linked. */
+.showcase-project .driftora-proof{height:auto;min-height:480px;flex-direction:column;gap:20px;padding:24px}
+.showcase-project .screen-crop.native-shot{width:min(300px,100%);height:auto;aspect-ratio:3/4}
+.showcase-project .screen-crop.native-shot img{margin-top:-104%}
+.showcase-project .screen-notes{display:flex;gap:20px;max-width:100%;font-size:14px}
+.showcase-project .screen-notes p{flex:1;margin:0}
+.showcase-project .desktop-shot{height:auto;min-height:480px;padding:16px;object-fit:contain}
+.showcase-intro .intro>p.developer-about{font-size:16px;line-height:1.65;margin-top:18px}
+@media(max-width:700px){
+  .showcase-project .driftora-proof{min-height:0;padding:20px}
+  .showcase-project .desktop-shot{min-height:0;padding:12px}
+}
