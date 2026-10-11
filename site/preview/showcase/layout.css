@@ -77,7 +77,7 @@
 
 /* Readable evidence: focus the meal calculation; full native capture stays linked. */
 .showcase-project .driftora-proof{height:auto;min-height:480px;flex-direction:column;gap:20px;padding:24px}
-.showcase-project .screen-crop.native-shot{width:min(300px,100%);height:auto;aspect-ratio:3/4}
+.showcase-project .screen-crop.native-shot{width:min(300px,100%);height:auto;aspect-ratio:6/7}
 .showcase-project .screen-crop.native-shot img{margin-top:-104%}
 .showcase-project .screen-notes{display:flex;gap:20px;max-width:100%;font-size:14px}
 .showcase-project .screen-notes p{flex:1;margin:0}
