@@ -22,11 +22,6 @@
 .showcase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
 .showcase-project{display:flex;flex-direction:column;min-width:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
 .showcase-project figure{margin:0}
-.showcase-project .driftora-proof{height:324px;padding:20px;gap:32px}
-.showcase-project .screen-crop{width:148px;border-radius:14px}
-.showcase-project .screen-notes{max-width:145px;font-size:14px}
-.showcase-project .screen-notes p:last-child{margin-bottom:0}
-.showcase-project .desktop-shot{width:100%;height:324px;object-fit:contain;padding:20px;background:var(--stage);border:0;box-shadow:none}
 .showcase-project figcaption{padding:12px 24px 0;margin:0}
 .showcase-project .screen-link{font-size:13px}
 .showcase-project .project-copy{padding:20px 24px 24px;display:flex;flex-direction:column;flex:1}
@@ -36,7 +31,6 @@
 .showcase-project .project-copy .stack{font-size:13px;line-height:1.7;color:var(--quiet);margin:16px 0 0}
 .showcase-preview .contact{padding-block:48px 56px}
 .showcase-preview .contact h2{font-size:30px}
-.showcase-project .screen-crop.native-shot{height:100%;width:auto}
 @media(max-width:900px){
   .showcase-preview .wrap{width:calc(100% - 48px)}
   .showcase-intro{gap:28px;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);padding-block:40px}
@@ -44,9 +38,6 @@
   .showcase-intro .intro>p{font-size:18px}
   .maker-story{padding:24px}
   .showcase-grid{gap:20px}
-  .showcase-project .driftora-proof{gap:18px;padding:20px 16px}
-  .showcase-project .screen-crop{width:132px}
-  .showcase-project .screen-notes{font-size:12px;max-width:112px}
 }
 @media(max-width:700px){
   .showcase-preview .wrap{width:calc(100% - 40px)}
@@ -55,9 +46,6 @@
   .maker-portrait{justify-self:center;width:min(100%,280px)}
   .maker-story{grid-template-columns:1fr;gap:14px;padding:24px}
   .showcase-grid{grid-template-columns:1fr;gap:28px}
-  .showcase-project .driftora-proof{gap:28px;padding:24px;height:324px}
-  .showcase-project .screen-crop{width:140px}
-  .showcase-project .screen-notes{max-width:150px;font-size:13px}
   .showcase-work{padding-bottom:40px}
   .showcase-preview .contact{padding-block:36px 40px}
 }
@@ -67,23 +55,15 @@
   .intro-actions{gap:8px 20px}
   .intro-actions .text-link{font-size:16px}
   .maker-story{padding:20px}
-  .showcase-project .driftora-proof{height:300px;gap:18px;padding:20px 16px}
-  .showcase-project .screen-crop{width:130px}
-  .showcase-project .screen-notes{font-size:12px;max-width:110px}
-  .showcase-project .desktop-shot{height:300px;padding:16px}
   .showcase-project figcaption{padding:12px 20px 0}
   .showcase-project .project-copy{padding:20px}
 }
 
-/* Readable evidence: focus the meal calculation; full native capture stays linked. */
-.showcase-project .driftora-proof{height:auto;min-height:480px;flex-direction:column;gap:20px;padding:24px}
-.showcase-project .screen-crop.native-shot{width:min(300px,100%);height:auto;aspect-ratio:6/7}
-.showcase-project .screen-crop.native-shot img{margin-top:-104%}
-.showcase-project .screen-notes{display:flex;gap:20px;max-width:100%;font-size:14px}
-.showcase-project .screen-notes p{flex:1;margin:0}
-.showcase-project .desktop-shot{height:auto;min-height:480px;padding:16px;object-fit:contain}
 .showcase-intro .intro>p.developer-about{font-size:16px;line-height:1.65;margin-top:18px}
-@media(max-width:700px){
-  .showcase-project .driftora-proof{min-height:0;padding:20px}
-  .showcase-project .desktop-shot{min-height:0;padding:12px}
-}
+
+/* Matching 4:3 native details; original captures stay available through full-image links. */
+.showcase-project .project-screen{position:relative;display:block;width:calc(100% - 32px);height:auto;aspect-ratio:4/3;margin:16px 16px 0;overflow:hidden;border-radius:6px;background:#fafbf9}
+.showcase-project .project-screen img{display:block;width:100%;max-width:100%;height:100%;margin:0;padding:0;object-fit:cover;border:0;box-shadow:none}
+.showcase-project .native-shot img{object-position:center 72%}
+.showcase-project .lumen-screen img{position:absolute;width:190%;max-width:none;height:auto;left:-90%;top:-33.3333%;object-fit:initial}
+.showcase-project figcaption>span{display:block;min-height:3.4em}

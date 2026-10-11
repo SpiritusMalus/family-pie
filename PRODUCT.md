@@ -38,3 +38,6 @@ The owner confirms both displayed applications are his own work. Avoid singling 
 
 ## Reference-based copy refinement — 2026-10-11
 Owner rejects long dashes in author copy and asks to take useful presentation patterns from dev.cmde.ru. The retained black composition now has a concise capability description, a visible TypeScript/React Native/Swift/Python summary, and shorter purpose/behavior descriptions in both project cards. Author text, headings and portfolio metadata contain no long dashes. Personal origin remains on the cases; no third-party biography, work, imagery or outcomes are borrowed. Legal canon remains unchanged. Publication gate and missing LinkedIn destination remain independent.
+
+## Screenshot framing trial
+Owner selected matching 4:3 native screenshot details for the homepage/showcase work cards. Equal media dimensions, inset and caption structure replace the asymmetric phone specimen with annotations versus full desktop window. Driftora focuses on nutrition/portion review; Lumen focuses on the break timer/start controls. Original asset bytes and full-image new-tab links remain; case specimens retain their own larger layouts. Publication still requires approval of the rendered preview.

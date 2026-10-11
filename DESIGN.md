@@ -351,3 +351,6 @@ The generated Driftora legal/terms/privacy routes now reuse local Golos Text, th
 
 ## Reference presentation refinement — 2026-10-11
 The owner-selected dev.cmde.ru reference supplies direct capability copy, compact project purpose/behavior and visible technology summaries. The approved black canvas, portrait and two-card composition are preserved. A flat14px technology row in the introduction makes the verified application stack visible early. RU/EN author copy and portfolio metadata avoid long dashes. Reference biography, blue styling, service promises and projects are not imported. Legal punctuation/text is outside this author-copy change.
+
+## Matching screenshot frames trial
+Homepage and showcase use the same 4:3 viewport and 16px inset for both projects. Native imagery is cropped with object-fit rather than stretched; Driftora focuses the meal review and Lumen the break timer/start controls. Captions explicitly identify screen details and keep original full images accessible in a new tab. Remove the former Driftora-only annotations from these work cards to align caption and project-heading baselines. Case layouts are unchanged.
