@@ -48,3 +48,8 @@ The only portfolio motion is the small arrow shift on case-link hover when reduc
 The finish reviewer approved the replacement portfolio after the mobile Work/Contact row and the independently operable 44px full-screenshot links were resolved. This brief records that review status; it does not add browser, physical-device or deployment claims. Parent task evidence owns the exact checks and release receipt.
 
 No material visual finding or design decision remains open in the reviewed portfolio. Existing customer release limitations remain separate and retain their own surface briefs.
+
+
+## Owner-approved release update — 2026-10-11 Pacific
+
+The current root uses the exact approved black showcase composition: portrait beside Eugene Tihonenko's name/role/actions, a Family Pie story row, two image-first work cards, then contact. `site/portfolio-showcase.css` and `site/portfolio-showcase.js` specialize the root; case pages retain shared `portfolio.css` and `portfolio-theme.js`. Root canvas stays black regardless of the saved shared theme. Static/first-visit language is English, explicit URL/saved RU retained. `portfolio-screens.js` independently switches each actual matching native RU/EN capture and its full-image link, preserving choices across Back. Public selected portrait is `site/work/assets/eugene-portrait.png`; private original/taller experiments are excluded. This update supersedes earlier root layout/name/language/specimen descriptions. Existing broader contribution/hierarchy critique is a separate backlog; publication does not certify it resolved.
