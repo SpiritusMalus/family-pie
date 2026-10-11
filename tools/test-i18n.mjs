@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 
-function page({saved, query = '', hash = '', storageFails = false} = {}) {
+function page({saved, query = '', hash = '', storageFails = false, defaultLang} = {}) {
   const listeners = {}, writes = [];
   const context = {
     URL, URLSearchParams, navigator: {language: 'ru-RU'},
     location: {search: query, hash, href: 'https://family-pie.ru/test/' + query + hash},
     localStorage: {getItem() {if (storageFails) throw Error('blocked'); return saved;}, setItem(key,value) {if (storageFails) throw Error('blocked'); writes.push([key,value]);}},
     history: {replaceState(_state,_title,url) {context.url = url;}},
-    document: {documentElement: {hasAttribute() {return false;}}, addEventListener(name,fn) {listeners[name] = fn;}, querySelectorAll() {return [];}},
+    document: {documentElement: {hasAttribute() {return false;}, getAttribute(name) {return name === 'data-fp-default-lang' ? defaultLang : null;}}, addEventListener(name,fn) {listeners[name] = fn;}, querySelectorAll() {return [];}},
     CustomEvent: class {constructor(type,options) {this.type=type;this.detail=options.detail;}},
     dispatchEvent(event) {listeners[event.type]?.(event);},
   };
@@ -23,6 +23,13 @@ function page({saved, query = '', hash = '', storageFails = false} = {}) {
 test('explicit query and app fragment override the saved preference', () => {
   assert.equal(page({saved:'ru',query:'?lang=en'}).api.lang,'en');
   assert.equal(page({saved:'en',hash:'#api=https%3A%2F%2Frelodojo.app&token=test-only&lang=ru'}).api.lang,'ru');
+});
+test('English portfolio default respects explicit choices and leaves product defaults intact', () => {
+  assert.equal(page({defaultLang:'en'}).api.lang,'en');
+  assert.equal(page({defaultLang:'en',storageFails:true}).api.lang,'en');
+  assert.equal(page({defaultLang:'en',saved:'ru'}).api.lang,'ru');
+  assert.equal(page({defaultLang:'en',query:'?lang=ru'}).api.lang,'ru');
+  assert.equal(page().api.lang,'ru');
 });
 test('switch persists, updates explicit query and preserves the fragment', () => {
   const {api,context,writes}=page({query:'?lang=en',hash:'#devices?platform=ios'});
