@@ -29,6 +29,9 @@ The owner supplied dev.cmde.ru as a reference and approved the shown black showc
 Screenshot language buttons swap real matching RU/EN captures independently of the page language, synchronize full-image links, and preserve choices on Back navigation. The public display name is exactly Eugene Tihonenko. Customer/payment/legal routes and native apps remain separate from this static-site release.
 
 ## Portfolio feedback preview — 2026-10-11
-Larger meal-calculation fragments and macOS images preserve original full captures through new-tab links. Initial locale follows supported browser preferences; explicit/saved selection wins. Russian uses applications for a computer. The factual introduction explains interface/backend/data-storage work and owner-confirmed Driftora authorship. LinkedIn destination is awaiting the owner’s exact URL. Publication remains gated on approval of the rendered preview.
+Larger meal-calculation fragments and macOS images preserve original full captures through new-tab links. Initial locale follows supported browser preferences; explicit/saved selection wins. Russian uses applications for a computer. The factual introduction explains interface/backend/data-storage work across the portfolio. LinkedIn destination is awaiting the owner’s exact URL. Publication remains gated on approval of the rendered preview.
 
 Driftora's three generated legal routes share the portfolio's black/Golos/coral visual language in this preview; legal text is unchanged. The common generator preserves ReloDojo's current shell. Browser fallback English is now owner-confirmed. Publication and the exact LinkedIn URL are still pending.
+
+## Owner wording correction — 2026-10-11
+The owner confirms both displayed applications are his own work. Avoid singling out Driftora with “made it myself”; the introduction describes full-stack work across applications, and the case describes actual behavior. Personal origin/use remains; no unsupported additional biography is added.
