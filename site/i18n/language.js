@@ -8,7 +8,13 @@
   let saved;
   try { saved = localStorage.getItem('fp_lang'); } catch { /* In-memory preference still works. */ }
   const pageDefault = document.documentElement.getAttribute?.('data-fp-default-lang');
-  let lang = [fragment, query, saved, pageDefault].find(valid) || ((navigator.language || 'ru').startsWith('en') ? 'en' : 'ru');
+  // Portfolio opt-in: first supported browser language, English fallback.
+  // Explicit URLs and a visitor's saved selection always take precedence.
+  const browserLang = (navigator.languages?.length ? navigator.languages : [navigator.language || ''])
+    .map(value => String(value).toLowerCase().split('-')[0]).find(valid) || 'en';
+  const fallback = pageDefault === 'browser' ? browserLang
+    : ((navigator.language || 'ru').startsWith('en') ? 'en' : 'ru');
+  let lang = [fragment, query, saved, pageDefault].find(valid) || fallback;
   const dictionary = window.FP_EN || {};
   const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const patterns = (window.FP_PATTERNS || []).map(([source, target, nested]) => {

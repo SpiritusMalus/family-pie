@@ -1,0 +1,72 @@
+/* Driftora legal documents share the Family Pie portfolio's visual language. */
+:root{--paper:#000000;--stage:#151719;color-scheme:dark}
+.legal-page{line-height:1.65}
+.topbar{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--rule)}
+.topbar-in{width:min(1100px,calc(100% - 80px));margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:center;padding-block:18px}
+.home{display:inline-flex;align-items:center;gap:10px;justify-self:start;min-height:44px;text-decoration:none;font-size:16px;font-weight:600}
+.tabs{grid-column:1/-1;grid-row:2;display:flex;flex-wrap:wrap;gap:8px 24px;border-top:1px solid var(--rule);padding-top:12px}
+.tab{font:inherit;font-size:16px;min-height:44px;padding:8px 0;border:0;background:none;color:var(--quiet);cursor:pointer;text-align:start}
+.tab[aria-selected=true]{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:8px}
+.tab:hover{color:var(--accent)}
+.topbar .spacer{display:none}
+.topbar .langtoggle{grid-column:2;grid-row:1}
+.legal-page .langtoggle button.on{color:var(--ink);background:none}
+.legal-page .wrap{width:min(1100px,calc(100% - 80px));display:grid;grid-template-columns:220px minmax(0,1fr);gap:64px;align-items:start;padding-block:48px 80px}
+.doc{display:contents}
+.doc[hidden]{display:none}
+.toc{grid-column:1;position:sticky;top:176px;font-size:14px}
+.toc-h{font-weight:500;color:var(--ink);margin-bottom:16px}
+.toc a{display:flex;gap:10px;min-height:44px;align-items:baseline;padding-block:8px;text-decoration:none;color:var(--quiet);line-height:1.5}
+.toc a:hover,.toc a.active{color:var(--accent)}
+.toc-no{flex:none;font-size:12px;color:var(--quiet)}
+.doc-main{grid-column:2;min-width:0;max-width:70ch;overflow-wrap:anywhere}
+.legal-page h1{font-size:clamp(30px,3.6vw,46px);margin:0 0 20px}
+.meta{font-size:14px;color:var(--quiet);margin-bottom:24px}
+.meta p{margin:4px 0}
+.disclaimer{border:1px solid var(--rule);border-radius:6px;padding:20px 24px;margin-bottom:32px;font-size:16px;color:var(--quiet)}
+.disclaimer p{margin:0}
+.disclaimer p+p{margin-top:12px}
+.doc-body{padding:0}
+.lead{font-size:18px}
+.sec{padding-top:36px;scroll-margin-top:176px}
+.sec h2{font-size:25px;margin:0 0 16px;display:flex;gap:14px;align-items:baseline}
+.sec-no{font-size:14px;color:var(--quiet);font-weight:400;flex:none}
+.doc-body p,.doc-body li{font-size:18px;overflow-wrap:anywhere}
+.doc-body p{margin:0}
+.doc-body p+p{margin-top:16px}
+.sec ul{margin:16px 0 0;padding-left:24px}
+.sec li{margin:8px 0}
+.doc-body a{color:var(--accent)}
+code{font-family:monospace;font-size:.92em;background:var(--stage);padding:2px 5px;border-radius:3px;overflow-wrap:anywhere}
+mark.ph{background:#ffe9a8;color:#6a5320;border-radius:3px;padding:0 4px;font-weight:600}
+.pending{border:1px solid var(--rule);border-radius:6px;padding:32px;color:var(--quiet)}
+.pending h2{font-size:25px;color:var(--ink)}
+.foot{width:min(1100px,calc(100% - 80px));margin-inline:auto;padding-block:28px;border-top:1px solid var(--rule);font-size:13px;color:var(--quiet);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px 24px}
+.foot a{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
+@media(max-width:900px){
+  .topbar-in,.legal-page .wrap,.foot{width:calc(100% - 48px)}
+  .legal-page .wrap{gap:36px;grid-template-columns:180px minmax(0,1fr)}
+}
+@media(max-width:760px){
+  .topbar-in,.legal-page .wrap,.foot{width:calc(100% - 40px)}
+  .legal-page .wrap{grid-template-columns:1fr;gap:0;padding-block:32px 48px}
+  .toc{display:none}
+  .doc-main{grid-column:1}
+  .doc-body p,.doc-body li{font-size:17px}
+  .disclaimer{padding:18px 20px}
+}
+@media(max-width:420px){
+  .topbar-in,.legal-page .wrap,.foot{width:calc(100% - 32px)}
+  .tabs{gap:8px 16px}
+  .tab{font-size:14px}
+  .sec h2{font-size:22px;gap:10px}
+  .topbar .langtoggle button{min-width:44px;height:44px}
+}
+@media print{
+  :root{--paper:#fff;--ink:#000;--quiet:#333;--accent:#000}
+  .topbar,.toc,.foot{display:none}
+  .legal-page .wrap{display:block;width:100%;padding:0}
+  .doc-main{max-width:none}
+  .disclaimer{border-color:#aaa}
+  mark.ph{background:none;color:#000}
+}
