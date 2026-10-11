@@ -35,3 +35,6 @@ Driftora's three generated legal routes share the portfolio's black/Golos/coral 
 
 ## Owner wording correction — 2026-10-11
 The owner confirms both displayed applications are his own work. Avoid singling out Driftora with “made it myself”; the introduction describes full-stack work across applications, and the case describes actual behavior. Personal origin/use remains; no unsupported additional biography is added.
+
+## Reference-based copy refinement — 2026-10-11
+Owner rejects long dashes in author copy and asks to take useful presentation patterns from dev.cmde.ru. The retained black composition now has a concise capability description, a visible TypeScript/React Native/Swift/Python summary, and shorter purpose/behavior descriptions in both project cards. Author text, headings and portfolio metadata contain no long dashes. Personal origin remains on the cases; no third-party biography, work, imagery or outcomes are borrowed. Legal canon remains unchanged. Publication gate and missing LinkedIn destination remain independent.

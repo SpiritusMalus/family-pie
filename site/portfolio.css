@@ -26,3 +26,6 @@
 /* Larger calculation fragment on the detailed case, linked to the original. */
 .case-media .screen-crop.native-shot{width:min(360px,100%);aspect-ratio:6/7}
 .case-media .screen-crop.native-shot img{margin-top:-104%}
+
+/* Compact technology summary, following the reference's direct project presentation. */
+.developer-stack{display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;margin:18px 0 0;padding:0;font-size:14px;line-height:1.6;color:var(--quiet)}
