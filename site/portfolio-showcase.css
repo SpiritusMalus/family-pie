@@ -19,10 +19,10 @@
 .maker-story p{font-size:16px;color:var(--quiet);line-height:1.65;margin:0;max-width:68ch}
 .showcase-work{padding-block:0 56px;scroll-margin-top:24px}
 .showcase-work>h2{font-size:30px;margin:0 0 24px}
-.showcase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
-.showcase-project{display:flex;flex-direction:column;min-width:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.showcase-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.showcase-project{display:flex;flex-direction:column;min-width:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:#111111}
 .showcase-project figure{margin:0}
-.showcase-project figcaption{padding:12px 24px 0;margin:0}
+.showcase-project .screenshot-source{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%)}
 .showcase-project .screen-link{font-size:13px}
 .showcase-project .project-copy{padding:20px 24px 24px;display:flex;flex-direction:column;flex:1}
 .showcase-project h3{font-size:30px;margin:0 0 16px}
@@ -55,15 +55,19 @@
   .intro-actions{gap:8px 20px}
   .intro-actions .text-link{font-size:16px}
   .maker-story{padding:20px}
-  .showcase-project figcaption{padding:12px 20px 0}
+  .showcase-project .screen-details{padding-inline:20px}
   .showcase-project .project-copy{padding:20px}
 }
 
 .showcase-intro .intro>p.developer-about{font-size:16px;line-height:1.65;margin-top:18px}
 
-/* Matching 4:3 native details; original captures stay available through full-image links. */
-.showcase-project .project-screen{position:relative;display:block;width:calc(100% - 32px);height:auto;aspect-ratio:4/3;margin:16px 16px 0;overflow:hidden;border-radius:6px;background:#fafbf9}
+/* Reference project presentation: full-bleed wide preview, followed directly by title/copy. */
+.showcase-project .project-screen{position:relative;display:block;width:100%;height:auto;aspect-ratio:16/9;margin:0;overflow:hidden;border-radius:0;background:#fafbf9;box-shadow:none}
 .showcase-project .project-screen img{display:block;width:100%;max-width:100%;height:100%;margin:0;padding:0;object-fit:cover;border:0;box-shadow:none}
-.showcase-project .native-shot img{object-position:center 72%}
-.showcase-project .lumen-screen img{position:absolute;width:190%;max-width:none;height:auto;left:-90%;top:-33.3333%;object-fit:initial}
-.showcase-project figcaption>span{display:block;min-height:3.4em}
+.showcase-project .native-shot img{object-position:center 64%}
+.showcase-project .lumen-screen img{object-position:center 36%}
+.showcase-project .project-screen:focus-visible{outline-offset:-5px}
+.showcase-project .screen-details{margin-top:auto;padding:0 24px 20px}
+.showcase-project .screen-details .screen-language{margin-top:0}
+.showcase-project .screen-link{font-size:13px}
+@media(max-width:420px){.showcase-project .screen-details{padding-inline:20px}}
