@@ -30,3 +30,5 @@ Screenshot language buttons swap real matching RU/EN captures independently of t
 
 ## Portfolio feedback preview — 2026-10-11
 Larger meal-calculation fragments and macOS images preserve original full captures through new-tab links. Initial locale follows supported browser preferences; explicit/saved selection wins. Russian uses applications for a computer. The factual introduction explains interface/backend/data-storage work and owner-confirmed Driftora authorship. LinkedIn destination is awaiting the owner’s exact URL. Publication remains gated on approval of the rendered preview.
+
+Driftora's three generated legal routes share the portfolio's black/Golos/coral visual language in this preview; legal text is unchanged. The common generator preserves ReloDojo's current shell. Browser fallback English is now owner-confirmed. Publication and the exact LinkedIn URL are still pending.

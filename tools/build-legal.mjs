@@ -169,6 +169,7 @@ function page(product, initialDoc, models, rawLinks) {
   const id = product.id, accent = product.accent, accentText = product.accentText || product.accent;
   const titleByDoc = { terms: { ru: 'Оферта', en: 'Terms of Use' }, privacy: { ru: 'Политика конфиденциальности', en: 'Privacy Policy' } };
   const defLang = product.appLanguage || 'ru';
+  const portfolioLegal = id === 'driftora';
   const pageTitleEn = `${product.name} — ${initialDoc === 'terms' ? 'Terms of Use' : initialDoc === 'privacy' ? 'Privacy Policy' : 'Legal'}`;
 
   // build all four columns
@@ -193,7 +194,10 @@ function page(product, initialDoc, models, rawLinks) {
 <meta property="og:description" content="${esc(product.name)} — ${initialDoc === 'privacy' ? 'privacy policy' : 'terms of use'}. Central legal host for the family-pie app studio.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://family-pie.ru/${id}/${initialDoc}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+${portfolioLegal ? `<link rel="stylesheet" href="/vpn/fonts.css">
+<link rel="stylesheet" href="/portfolio.css">
+<link rel="stylesheet" href="/social-footer.css">
+<link rel="stylesheet" href="/legal.css">` : `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/social-footer.css">
@@ -271,13 +275,13 @@ function page(product, initialDoc, models, rawLinks) {
     .home .pielogo{transition:none}
     .home:hover .pielogo{transform:none}
   }
-</style>
+</style>`}
 <script src="/i18n/language.js"></script>
 </head>
-<body>
+<body${portfolioLegal ? ' class="legal-page"' : ''}>
 <header class="topbar">
   <div class="topbar-in">
-    <a class="home" href="/" aria-label="family-pie — studio home"><svg class="pielogo" width="26" height="26" viewBox="0 0 48 48" aria-hidden="true"><path d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#0E8A30"></path><path d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A"></path><path d="M24,24 L43.05,35 A22,22 0 0 1 24,46 Z" fill="#E3A52C"></path><path d="M24,24 L24,46 A22,22 0 0 1 4.95,35 Z" fill="#E8E1D3"></path><path d="M24,24 L4.95,35 A22,22 0 0 1 4.95,13 Z" fill="#E2DACB"></path><path d="M24,24 L4.95,13 A22,22 0 0 1 24,2 Z" fill="#EDE7DA"></path><circle cx="24" cy="24" r="22" fill="none" stroke="#F4F1EA" stroke-width="2.4"></circle><line x1="24" y1="24" x2="24" y2="2" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="43.05" y2="13" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="43.05" y2="35" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="24" y2="46" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="4.95" y2="35" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="4.95" y2="13" stroke="#F4F1EA" stroke-width="2.4"></line></svg>family-pie</a>
+    <a class="home" href="/" aria-label="family-pie — studio home">${portfolioLegal ? '<svg class="pie" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14"/><path class="slice" d="M16 16V2a14 14 0 0 1 12.1 7Z"/><path d="M16 2v28M3.9 9l24.2 14M3.9 23 28.1 9"/></svg>' : '<svg class="pielogo" width="26" height="26" viewBox="0 0 48 48" aria-hidden="true"><path d="M24,24 L24,2 A22,22 0 0 1 43.05,13 Z" fill="#0E8A30"></path><path d="M24,24 L43.05,13 A22,22 0 0 1 43.05,35 Z" fill="#D8513A"></path><path d="M24,24 L43.05,35 A22,22 0 0 1 24,46 Z" fill="#E3A52C"></path><path d="M24,24 L24,46 A22,22 0 0 1 4.95,35 Z" fill="#E8E1D3"></path><path d="M24,24 L4.95,35 A22,22 0 0 1 4.95,13 Z" fill="#E2DACB"></path><path d="M24,24 L4.95,13 A22,22 0 0 1 24,2 Z" fill="#EDE7DA"></path><circle cx="24" cy="24" r="22" fill="none" stroke="#F4F1EA" stroke-width="2.4"></circle><line x1="24" y1="24" x2="24" y2="2" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="43.05" y2="13" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="43.05" y2="35" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="24" y2="46" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="4.95" y2="35" stroke="#F4F1EA" stroke-width="2.4"></line><line x1="24" y1="24" x2="4.95" y2="13" stroke="#F4F1EA" stroke-width="2.4"></line></svg>'}family-pie</a>
     <div class="tabs" role="tablist" aria-label="Documents">
       <button class="tab" role="tab" data-tab="terms"   id="tab-terms"   aria-controls="panel" aria-selected="false">${T[defLang].terms}</button>
       <button class="tab" role="tab" data-tab="privacy" id="tab-privacy" aria-controls="panel" aria-selected="false">${T[defLang].privacy}</button>
@@ -301,8 +305,8 @@ ${cols}
 </footer>
 
 <noscript>
-  <div style="max-width:720px;margin:0 auto;padding:24px 22px;font-family:Manrope,sans-serif">
-    <p style="margin-bottom:10px;color:#6b655c">${T[defLang].rawText}:</p>
+  <div style="max-width:720px;margin:0 auto;padding:24px 22px;font-family:${portfolioLegal ? 'Golos Text' : 'Manrope'},sans-serif">
+    <p style="margin-bottom:10px;color:${portfolioLegal ? 'var(--quiet)' : '#6b655c'}">${T[defLang].rawText}:</p>
     <p style="line-height:2">${rawNoscript}</p>
   </div>
 </noscript>
@@ -337,7 +341,7 @@ ${cols}
           var a = links[en.target.id]; if (a) a.classList.add('active');
         }
       });
-    }, { rootMargin:'-82px 0px -55% 0px', threshold:0 });
+    }, { rootMargin:'-${portfolioLegal ? 176 : 82}px 0px -55% 0px', threshold:0 });
     col.querySelectorAll('.sec').forEach(function(sec){ spy.observe(sec); });
   }
 
@@ -349,7 +353,7 @@ ${cols}
       t.textContent = TAB_LABEL[lang][t.getAttribute('data-tab')];
     });
     document.querySelectorAll('.langtoggle button').forEach(function(b){ var on=b.getAttribute('data-lang')===lang; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on?'true':'false'); });
-    document.documentElement.lang = lang;
+${portfolioLegal ? "    document.getElementById('panel').setAttribute('aria-labelledby', 'tab-' + doc);\n" : ''}    document.documentElement.lang = lang;
     document.title = ${JSON.stringify(product.name)} + ' — ' + TAB_LABEL[lang][doc] + ' — family-pie';
     document.querySelector('.langtoggle').setAttribute('aria-label', lang === 'en' ? 'Language' : 'Язык');
     document.querySelector('.tabs').setAttribute('aria-label', lang === 'en' ? 'Documents' : 'Документы');
@@ -374,7 +378,7 @@ ${cols}
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('.toc a'); if (!a) return;
     e.preventDefault();
-    var el = document.getElementById(a.getAttribute('href').slice(1));
+    ${portfolioLegal ? "var col = activeCol(); var el = col && col.querySelector(a.getAttribute('href'));" : "var el = document.getElementById(a.getAttribute('href').slice(1));"}
     var smooth = !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
     if (el) el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block:'start' });
   });
