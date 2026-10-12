@@ -224,5 +224,67 @@ grammardojo.ru, www.grammardojo.ru {
 	}
 }
 
+# Separate customer storefront. Only VPN/Sufler public pages are built here;
+# authentication and payment recovery keep the established origin.
+family-spy.ru, www.family-spy.ru {
+	encode zstd gzip
+	root * /var/www/family-products/site
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
+		Cache-Control "no-cache"
+	}
+	@existing_customer_flow path /vpn/cabinet /vpn/cabinet/* /vpn/admin /vpn/admin/* /sufler/buy /sufler/buy/*
+	handle @existing_customer_flow {
+		header Cache-Control "no-store"
+		redir https://family-pie.ru{uri} temporary
+	}
+	# Fixed read-only public price endpoints. Never forward visitor credentials.
+	@vpn_public_plan {
+		method GET HEAD
+		path /public-plans/vpn
+	}
+	handle @vpn_public_plan {
+		rewrite * /vpn/api/plans
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:8796 {
+			method GET
+			header_up -Cookie
+			header_up -Authorization
+			header_up -Origin
+		}
+	}
+	@sufler_public_plan {
+		method GET HEAD
+		path /public-plans/sufler
+	}
+	handle @sufler_public_plan {
+		rewrite * /billing/plan
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:8776 {
+			method GET
+			header_up -Cookie
+			header_up -Authorization
+			header_up -Origin
+		}
+	}
+	@build_metadata path /.customer-build
+	handle @build_metadata {
+		respond 404
+	}
+	handle {
+		try_files {path} {path}/ {path}.html
+		file_server
+	}
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}
+
 # Host-owned sites survive application deploys.
 import /etc/caddy/local-sites/*.caddy

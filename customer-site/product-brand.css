@@ -1,0 +1,6 @@
+/* Customer product pages retain their product UI and omit employer-profile links. */
+.site-header .brand,.site-footer .brand{letter-spacing:normal}
+.fp-social{display:none}
+header .langtoggle{display:flex}
+/* Two price columns cannot contain the existing discount row at 320px. */
+@media(max-width:420px){.plans{grid-template-columns:minmax(0,1fr)}}
