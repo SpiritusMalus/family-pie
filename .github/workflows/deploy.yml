@@ -15,9 +15,11 @@ on:
     branches: [main]
     paths:
       - 'site/**'
+      - 'customer-site/**'
       - 'content/**'
       - 'data/**'
       - 'tools/build-legal.mjs'
+      - 'tools/build-customer-site.mjs'
       - 'Caddyfile'
       - 'tools/vps/fp-deploy-caddy.sh'
       - '.github/workflows/deploy.yml'
@@ -41,6 +43,7 @@ jobs:
           node-version: '22'
       - run: node --check tools/build-legal.mjs && node tools/build-legal.mjs
       - run: test -s site/index.html
+      - run: node tools/build-customer-site.mjs && node --test tools/test-customer-site.mjs
       - name: Test site language and appearance
         run: node --test tools/test-i18n.mjs tools/test-home-theme.mjs tools/test-portfolio.mjs tools/test-vpn-shell.mjs tools/test-vpn-payment-return.mjs tools/test-vpn-telegram-link.mjs
       - name: Test VPN service core
@@ -61,10 +64,13 @@ jobs:
       - name: Build legal pages from content/
         run: node tools/build-legal.mjs
 
+      - name: Build the separate customer storefront
+        run: node tools/build-customer-site.mjs
+
       - name: Stamp deployed revision
         env:
           RELEASE_SHA: ${{ github.sha }}
-        run: node -e 'require("fs").writeFileSync("site/release.json",JSON.stringify({revision:process.env.RELEASE_SHA})+"\n")'
+        run: node -e 'for(const root of ["site","customer-site/dist"])require("fs").writeFileSync(root+"/release.json",JSON.stringify({revision:process.env.RELEASE_SHA})+"\n")'
 
       - name: Deploy site/ to VPS (rsync over SSH, exact mirror)
         uses: easingthemes/ssh-deploy@v6.0.3
@@ -76,6 +82,17 @@ jobs:
           SOURCE: 'site/'
           ARGS: '-rlptDvz --delete'
           EXCLUDE: '.git/, .github/'
+
+      - name: Deploy customer storefront to its separate web root
+        uses: easingthemes/ssh-deploy@v6.0.3
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+          TARGET: '/var/www/family-products/site/'
+          SOURCE: 'customer-site/dist/'
+          ARGS: '-rlptDvz --delete'
+          EXCLUDE: '.customer-build'
 
       # Ship the Caddyfile too: scp it into a deploy-owned staging dir, then run the
       # root-owned wrapper (scoped sudo) which validates, installs to
@@ -106,6 +123,8 @@ jobs:
           # Prove this revision reached the public origin, not merely that an old page is healthy.
           curl --fail --silent --show-error --max-time 15 "https://family-pie.ru/release.json?revision=$RELEASE_SHA" > /tmp/family-release.json
           node -e 'const r=require("/tmp/family-release.json");if(r.revision!==process.env.RELEASE_SHA)process.exit(1)'
+          curl --fail --silent --show-error --retry 8 --retry-delay 5 --retry-all-errors --max-time 15 "https://family-spy.ru/release.json?revision=$RELEASE_SHA" > /tmp/customer-release.json
+          node -e 'const r=require("/tmp/customer-release.json");if(r.revision!==process.env.RELEASE_SHA)process.exit(1)'
           # final status after following redirects (expects 200)
           code() { curl -s -o /dev/null -w '%{http_code}' -L --max-time 15 "$1"; }
           # raw status without following (to assert a redirect)
@@ -113,6 +132,14 @@ jobs:
 
           for url in \
             'https://family-pie.ru/' \
+            'https://family-spy.ru/' \
+            'https://family-spy.ru/vpn/' \
+            'https://family-spy.ru/sufler/' \
+            'https://family-spy.ru/sufler/setup/' \
+            'https://family-spy.ru/vpn/terms/' \
+            'https://family-spy.ru/vpn/privacy/' \
+            'https://family-spy.ru/sufler/terms/' \
+            'https://family-spy.ru/sufler/privacy/' \
             'https://family-pie.ru/work/driftora/' \
             'https://family-pie.ru/work/lumen-rest/' \
             'https://family-pie.ru/rest_lumen/' \
