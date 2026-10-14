@@ -37,7 +37,7 @@ export function smtpPurchaseSender(env=process.env,createTransport){
 Количество устройств не ограничено.
 
 Открой кабинет, чтобы добавить подключение в Happ или получить ссылку и QR-код:
-https://family-pie.ru/vpn/cabinet/#home
+${env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru'}/vpn/cabinet/#home
 
 Актуальный статус подписки всегда доступен в кабинете. Повторно платить не нужно.
 Кассовый чек — отдельный документ от платёжного сервиса.

@@ -2,8 +2,8 @@ import {readFileSync} from 'node:fs';
 import {YooKassaReader} from './yookassa.mjs';
 export function paymentUrl(value){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||!['yoomoney.ru','yookassa.ru'].some(h=>u.hostname===h||u.hostname.endsWith('.'+h)))throw new Error('Unexpected payment page');return u.href;}
 export class Billing {
- constructor(store,{shopId,secret,testMode=false,receipt=true,vatCode=1,taxSystemCode=null,paymentMode='full_prepayment',request=fetch}={}){
-  this.store=store;this.request=request;this.config={shopId,secret,testMode,receipt,vatCode,taxSystemCode,paymentMode};
+ constructor(store,{origin='https://family-pie.ru',shopId,secret,testMode=false,receipt=true,vatCode=1,taxSystemCode=null,paymentMode='full_prepayment',request=fetch}={}){
+  this.origin=origin;this.store=store;this.request=request;this.config={shopId,secret,testMode,receipt,vatCode,taxSystemCode,paymentMode};
   this.reader=shopId&&secret?new YooKassaReader({shopId,secret,testMode,request}):null;
   for(const [name,type] of [['confirmation_url','TEXT'],['receipt_email','TEXT'],['checked_at','INTEGER NOT NULL DEFAULT 0'],['refund_request','TEXT'],['refund_id','TEXT'],['refund_requested_at','INTEGER']])if(!store.db.prepare('PRAGMA table_info(orders)').all().some(x=>x.name===name))store.db.exec(`ALTER TABLE orders ADD COLUMN ${name} ${type}`);
  }
@@ -19,7 +19,7 @@ export class Billing {
   if(this.store.clock()-order.created_at>23*3600_000)throw new Error('Заказ устарел. Создай новый');
   this.store.db.prepare('UPDATE orders SET receipt_email=? WHERE id=?').run(email,order.id);
   const c=this.config,amount={value:(order.price_minor/100).toFixed(2),currency:'RUB'},description=`Family VPN — ${order.days} дней`;
-  const payload={amount,capture:true,description,metadata:{product:'family-vpn',order_id:order.id},confirmation:{type:'redirect',return_url:'https://family-pie.ru/vpn/cabinet/#plans?order='+order.id}};
+  const payload={amount,capture:true,description,metadata:{product:'family-vpn',order_id:order.id},confirmation:{type:'redirect',return_url:this.origin+'/vpn/cabinet/#plans?order='+order.id}};
   if(c.receipt){payload.receipt={customer:{email},items:[{description,quantity:'1.00',amount,vat_code:c.vatCode,payment_subject:'service',payment_mode:c.paymentMode}]};if(c.taxSystemCode)payload.receipt.tax_system_code=c.taxSystemCode;}
   const response=await this.request('https://api.yookassa.ru/v3/payments',{method:'POST',headers:{Authorization:`Basic ${Buffer.from(c.shopId+':'+c.secret).toString('base64')}`,'Content-Type':'application/json','Idempotence-Key':order.id},body:JSON.stringify(payload),signal:AbortSignal.timeout(12000),redirect:'error'});
   if(!response.ok)throw new Error('Не удалось создать платёж. Повтори позже');
