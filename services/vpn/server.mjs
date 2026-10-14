@@ -11,8 +11,8 @@ import { GoogleLogin,googleConfig as readGoogleConfig,googleReturnPath } from '.
 import {EmailLogin,smtpSender,smtpPurchaseSender} from './email.mjs';
 import {PurchaseMail} from './purchase-mail.mjs';
 import {PushNotifications} from './push.mjs';
-export function createApp({store,origin='https://family-pie.ru',additionalOrigins=[],secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={}}){
- const users=new Accounts(store),attempts=new Map();let passwordOperations=0;
+export function createApp({store,origin='https://family-spy.ru',additionalOrigins=[],publicSubscriptionOrigin=null,secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={}}){
+ const users=new Accounts(store,{publicSubscriptionOrigin}),attempts=new Map();let passwordOperations=0;
  const cabinet=new Cabinet(store,{origin}),billing=new Billing(store,{...paymentConfig,origin});
  const passkeys=new Passkeys(store,users,origin);
  const google=new GoogleLogin(store,users,{...googleConfig,origin});
@@ -170,7 +170,7 @@ if(process.argv[1]?.endsWith('/server.mjs')){
  if(!process.env.VPN_DATABASE_PATH)throw new Error('Private database path required');
  const store=new VpnStore(process.env.VPN_DATABASE_PATH);
  const pushConfig=process.env.VPN_PUSH_CONFIG_FILE?JSON.parse((await import('node:fs')).readFileSync(process.env.VPN_PUSH_CONFIG_FILE,'utf8')):{};
- const {server,billing,push}=createApp({store,origin:process.env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru',additionalOrigins:(process.env.VPN_ADDITIONAL_ORIGINS||'https://family-pie.ru').split(',').map(value=>value.trim()).filter(Boolean),revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig});
+ const {server,billing,push}=createApp({store,origin:process.env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru',additionalOrigins:(process.env.VPN_ADDITIONAL_ORIGINS||'').split(',').map(value=>value.trim()).filter(Boolean),publicSubscriptionOrigin:process.env.VPN_SUBSCRIPTION_ORIGIN||null,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig});
  const purchaseMail=new PurchaseMail(store,{send:smtpPurchaseSender()});purchaseMail.recover();
  const reconcile=setInterval(()=>{billing.reconcile().catch(()=>{});push.tick().catch(()=>{});purchaseMail.tick().catch(()=>{});},30000);reconcile.unref();
  purchaseMail.tick().catch(()=>{});
