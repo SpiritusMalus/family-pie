@@ -11,9 +11,10 @@ import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'site');
+const portfolioPreview=process.env.PORTFOLIO_PREVIEW==='1';
+const ROOT = portfolioPreview ? (await (await import('./build-portfolio-site.mjs')).buildPortfolioSite()).output : resolve(dirname(fileURLToPath(import.meta.url)), '..', 'site');
 const PORT = Number(process.argv[2]) || 8100;
-const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript',
+const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2',
   '.json': 'application/json', '.svg': 'image/svg+xml', '.md': 'text/markdown; charset=utf-8',
   '.xml': 'application/xml', '.txt': 'text/plain; charset=utf-8', '.png': 'image/png',
   '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg' };
@@ -24,6 +25,10 @@ async function tryFile(p) {
 }
 
 createServer(async (req, res) => {
+  const requestURL=new URL(req.url,'http://localhost');
+  if(portfolioPreview&&/^\/vpn\/api(?:\/|$)/.test(requestURL.pathname)) {res.writeHead(410,{'Cache-Control':'no-store'});return res.end('Use https://family-spy.ru/vpn/');}
+  if(portfolioPreview&&requestURL.pathname==='/vpn/sw.js') {res.writeHead(200,{'Content-Type':'text/javascript','Cache-Control':'no-store'});return res.end(await readFile(resolve(ROOT,'retire-customer-worker.js')));}
+  if(portfolioPreview&&/^\/(vpn|sufler)(\/|$)/.test(requestURL.pathname)) {res.writeHead(301,{Location:'https://family-spy.ru'+requestURL.pathname+requestURL.search});return res.end();}
   const url = decodeURIComponent(req.url.split('?')[0]);
   const base = resolve(ROOT, '.' + url);
   if (!base.startsWith(ROOT)) { res.writeHead(403); return res.end('forbidden'); }
