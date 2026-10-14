@@ -1,6 +1,6 @@
 import {randomBytes,createHash,randomUUID} from 'node:crypto';
 const DAY=86400_000,hash=x=>createHash('sha256').update(x).digest('hex');
-const CABINET='https://family-pie.ru/vpn/cabinet/';
+const CABINET='https://family-spy.ru/vpn/cabinet/';
 const BIND_HELP='Чтобы увидеть свою подписку, привяжи Telegram в кабинете: Настройки → Telegram → Подключить. После запуска бота вернись в кабинет и подтверди привязку.\n'+CABINET+'#settings';
 export const botCommands=[
  {command:'menu',description:'Открыть меню'},
@@ -104,7 +104,7 @@ export class TelegramStore {
  next(){for(const job of this.db.prepare("SELECT * FROM telegram_outbox WHERE state='pending' AND ready_at<=? ORDER BY created_at,rowid LIMIT 100").all(this.clock())){
  if(job.account_id){const current=this.db.prepare('SELECT s.*,l.chat_id,l.enabled AS notifications,l.generation,i.enabled AS account_enabled FROM managed_subscriptions s JOIN telegram_links l USING(account_id) JOIN identities i USING(account_id) WHERE s.account_id=?').get(job.account_id);const left=job.expiry-this.clock();const stage=left<=0?'expired':left<=DAY?'1d':left<=3*DAY?'3d':null;
  if(!current||!current.account_enabled||!current.notifications||current.deleted||current.unlimited||current.sync_state!=='synced'||current.expires_at!==job.expiry||current.chat_id!==job.chat_id||current.generation!==job.generation||stage!==job.stage||left<-7*DAY||left>0&&!current.enabled){this.db.prepare("UPDATE telegram_outbox SET state='canceled' WHERE id=?").run(job.id);continue;}
- job.text=(job.stage==='expired'?'Подписка Family VPN закончилась.':job.stage==='1d'?'До окончания подписки Family VPN осталось меньше суток.':'Подписка Family VPN скоро закончится.')+'\nДата окончания: '+new Date(job.expiry).toISOString().replace('T',' ').slice(0,16)+' UTC.\nУправление подпиской: https://family-pie.ru/vpn/cabinet/\n/stop — отключить уведомления';}
+ job.text=(job.stage==='expired'?'Подписка Family VPN закончилась.':job.stage==='1d'?'До окончания подписки Family VPN осталось меньше суток.':'Подписка Family VPN скоро закончится.')+'\nДата окончания: '+new Date(job.expiry).toISOString().replace('T',' ').slice(0,16)+' UTC.\nУправление подпиской: https://family-spy.ru/vpn/cabinet/\n/stop — отключить уведомления';}
  return job;}return null;}
  recover(){this.db.prepare("UPDATE telegram_outbox SET state='uncertain' WHERE state='sending'").run();}
 }

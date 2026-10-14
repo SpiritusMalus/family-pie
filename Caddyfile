@@ -77,6 +77,13 @@ family-pie.ru {
 		Cache-Control "no-cache"
 	}
 
+	# New checkouts use the customer origin. Existing return pages remain available
+	# for payments created before the move, whose recovery ID is in old storage.
+	@legacy_sufler_checkout path /sufler/buy /sufler/buy/
+	handle @legacy_sufler_checkout {
+		redir https://family-spy.ru{uri} temporary
+	}
+
 	# Authenticated VPN cabinet API; service is isolated on loopback.
 	handle /vpn/api/* {
 		header Cache-Control "no-store"
@@ -224,9 +231,13 @@ grammardojo.ru, www.grammardojo.ru {
 	}
 }
 
-# Separate customer storefront. Only VPN/Sufler public pages are built here;
-# authentication and payment recovery keep the established origin.
-family-spy.ru, www.family-spy.ru {
+# Complete customer site with same-origin VPN and Sufler billing APIs.
+# Legacy Family Pie account/payment paths remain available for old sessions and keys.
+www.family-spy.ru {
+	redir https://family-spy.ru{uri} permanent
+}
+
+family-spy.ru {
 	encode zstd gzip
 	root * /var/www/family-products/site
 	header {
@@ -238,10 +249,18 @@ family-spy.ru, www.family-spy.ru {
 		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
 		Cache-Control "no-cache"
 	}
-	@existing_customer_flow path /vpn/cabinet /vpn/cabinet/* /vpn/admin /vpn/admin/* /sufler/buy /sufler/buy/*
-	handle @existing_customer_flow {
+	handle /vpn/api/* {
 		header Cache-Control "no-store"
-		redir https://family-pie.ru{uri} temporary
+		reverse_proxy 127.0.0.1:8796
+	}
+	@sufler_customer_api path /sufler/api/billing/plan /sufler/api/billing/checkout /sufler/api/billing/result
+	handle @sufler_customer_api {
+		uri strip_prefix /sufler/api
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:8776 {
+			header_up -Cookie
+			header_up -Authorization
+		}
 	}
 	# Fixed read-only public price endpoints. Never forward visitor credentials.
 	@vpn_public_plan {

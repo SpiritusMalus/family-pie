@@ -11,11 +11,15 @@ import { GoogleLogin,googleConfig as readGoogleConfig,googleReturnPath } from '.
 import {EmailLogin,smtpSender,smtpPurchaseSender} from './email.mjs';
 import {PurchaseMail} from './purchase-mail.mjs';
 import {PushNotifications} from './push.mjs';
-export function createApp({store,origin='https://family-pie.ru',secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={}}){
+export function createApp({store,origin='https://family-pie.ru',additionalOrigins=[],secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={}}){
  const users=new Accounts(store),attempts=new Map();let passwordOperations=0;
- const cabinet=new Cabinet(store),billing=new Billing(store,paymentConfig);
+ const cabinet=new Cabinet(store,{origin}),billing=new Billing(store,{...paymentConfig,origin});
  const passkeys=new Passkeys(store,users,origin);
  const google=new GoogleLogin(store,users,{...googleConfig,origin});
+ const origins=new Set([origin,...additionalOrigins]);
+ for(const value of origins){const u=new URL(value);if(u.origin!==value||!['https:','http:'].includes(u.protocol))throw new Error('Invalid public origin');}
+ const contexts=new Map([[origin,{passkeys,google}]]);
+ for(const value of additionalOrigins)contexts.set(value,{passkeys:new Passkeys(store,users,value),google:new GoogleLogin(store,users,{...googleConfig,origin:value})});
  const emailLogin=new EmailLogin(store,users,{send:sendEmail});
  const push=new PushNotifications(store,pushConfig);
  const savedPlans=cabinet.plans();if(savedPlans.length)store.plans=new Map(savedPlans.map(p=>[String(p.days),Object.freeze({...p})]));
@@ -26,6 +30,10 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
  const recent=s=>{if(!users.db.prepare('SELECT 1 FROM session_auth WHERE token_hash=? AND verified_at>?').get(s.token_hash,Date.now()-300000))throw new Error('Повтори вход перед изменением способов входа');};
  const server=createServer(async(req,res)=>{
   try{
+   const forwarded=String(req.headers['x-forwarded-host']||req.headers.host||'');
+   const requestOrigin=req.headers.origin||[...origins].find(value=>new URL(value).host===forwarded)||origin;
+   const context=contexts.get(requestOrigin)||contexts.get(origin);
+   const {passkeys,google}=context;
    const path=new URL(req.url,origin).pathname;
    if(path==='/vpn/api/health'&&req.method==='GET')return send(res,200,{service:'family-vpn-cabinet',revision});
    if(path==='/vpn/api/plans'&&req.method==='GET')return send(res,200,{plans:[...store.plans.values()],available:billing.ready()&&store.plans.size>0,testMode:billing.config.testMode});
@@ -33,11 +41,11 @@ export function createApp({store,origin='https://family-pie.ru',secure=true,revi
    if(path==='/vpn/api/google/start'&&req.method==='GET'){const q=new URL(req.url,origin).searchParams,next=googleReturnPath(q.get('next'),origin),existing=users.session(token(req));if(!google.ready()){res.writeHead(302,{'Location':'/vpn/cabinet/auth/?google_error=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}if(existing?.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль'});if(existing){try{recent(existing);}catch{res.writeHead(302,{'Location':'/vpn/cabinet/auth/?reauth=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}}const s=google.start(existing,next);res.writeHead(302,{'Location':s.url,'Cache-Control':'no-store','Set-Cookie':`vpn_google=${s.state}; Path=/vpn/api/google/; HttpOnly; SameSite=Lax; ${secure?'Secure; ':''}Max-Age=300`});return res.end();}
    if(path==='/vpn/api/google/callback'&&req.method==='GET'){const q=new URL(req.url,origin).searchParams,c=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_google='))?.slice(11),next=google.returnPath(q.get('state'),c);try{const s=await google.finish(q.get('state'),c,q.get('code'));cookie(res,s.token);res.writeHead(302,{'Location':s.identity.role==='admin'&&s.next==='/vpn/cabinet/'?'/vpn/admin/':s.next,'Cache-Control':'no-store'});return res.end();}catch{res.writeHead(302,{'Location':'/vpn/cabinet/auth/?google_error=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}}
    if(path==='/vpn/api/passkeys/login/options'&&req.method==='POST'){
-    if(req.headers.origin!==origin)return send(res,403,{error:'Источник запроса не разрешён'});return send(res,200,await passkeys.options());
+    if(!origins.has(req.headers.origin))return send(res,403,{error:'Источник запроса не разрешён'});return send(res,200,await passkeys.options());
    }
    const webhook=path==='/vpn/api/billing/webhook'&&req.method==='POST';
    const mutation=req.method!=='GET';
-   if(mutation&&!webhook&&req.headers.origin!==origin)return send(res,403,{error:'Источник запроса не разрешён'});
+   if(mutation&&!webhook&&!origins.has(req.headers.origin))return send(res,403,{error:'Источник запроса не разрешён'});
    if(path==='/vpn/api/support/attachment'&&mutation&&!users.session(token(req)))return send(res,401,{error:'Войди в аккаунт'});
    let body={};
    if(mutation){if(!String(req.headers['content-type']).startsWith('application/json'))return send(res,415,{error:'Ожидается JSON'});
@@ -162,7 +170,7 @@ if(process.argv[1]?.endsWith('/server.mjs')){
  if(!process.env.VPN_DATABASE_PATH)throw new Error('Private database path required');
  const store=new VpnStore(process.env.VPN_DATABASE_PATH);
  const pushConfig=process.env.VPN_PUSH_CONFIG_FILE?JSON.parse((await import('node:fs')).readFileSync(process.env.VPN_PUSH_CONFIG_FILE,'utf8')):{};
- const {server,billing,push}=createApp({store,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig});
+ const {server,billing,push}=createApp({store,origin:process.env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru',additionalOrigins:(process.env.VPN_ADDITIONAL_ORIGINS||'https://family-pie.ru').split(',').map(value=>value.trim()).filter(Boolean),revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig});
  const purchaseMail=new PurchaseMail(store,{send:smtpPurchaseSender()});purchaseMail.recover();
  const reconcile=setInterval(()=>{billing.reconcile().catch(()=>{});push.tick().catch(()=>{});purchaseMail.tick().catch(()=>{});},30000);reconcile.unref();
  purchaseMail.tick().catch(()=>{});
