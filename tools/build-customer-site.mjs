@@ -5,8 +5,8 @@ import {fileURLToPath} from 'node:url';
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const customerRedirects = [];
 export const publicPlans = Object.freeze({
-  '/public-plans/vpn':'https://family-pie.ru/vpn/api/plans',
-  '/public-plans/sufler':'https://hub.146-103-120-137.sslip.io/sufler-license/billing/plan'
+  '/public-plans/vpn':'https://family-spy.ru/vpn/api/plans',
+  '/public-plans/sufler':'https://family-spy.ru/sufler/api/billing/plan'
 });
 export function canonicalCustomerFlow(path) {
   return customerRedirects.some(prefix => path === prefix || path.startsWith(prefix + '/'));
@@ -31,6 +31,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
   for (const file of ['index.html','customer.css','customer.js']) await cp(resolve(project,'customer-site',file),resolve(output,file));
   const dictionary=resolve(output,'i18n/en.js');
   await writeFile(dictionary,(await readFile(dictionary,'utf8')).replaceAll('· family-pie"','· Family Spy"')+'\nwindow.FP_EN["Подписка, подключение и помощь — в твоём личном кабинете."] = "Your subscription, connection and support are in your account.";\nwindow.FP_EN["Ключ, созданный на старом сайте?"] = "Have a passkey from the previous site?";\nwindow.FP_EN["Войти со старым ключом"] = "Use an existing passkey";\nwindow.FP_EN["Выбери подписку"] = "Choose a plan";\nwindow.FP_EN["Аккаунт:"] = "Account:";\nwindow.FP_EN["Личный кабинет Family VPN."] = "Family VPN account.";\nwindow.FP_EN["Ожидаем оплату"] = "Awaiting payment";\nwindow.FP_EN["Выбрать тариф"] = "Choose a plan";\nwindow.FP_EN["Маршруты в твоём профиле"] = "Connection routes in your profile";\nwindow.FP_EN["Личная подписка содержит доступные пути подключения. После импорта выбери маршрут в VPN-приложении. Проверить свою сеть можно в разделе «Диагностика»."] = "Your subscription includes the available connection routes. After importing it, choose a route in your VPN app. You can check your connection under Diagnostics.";\nwindow.FP_EN[". Здесь можно войти прежним логином и паролем и добавить новый ключ в настройках."] = ". You can also use your existing username and password here, then add a new passkey in Settings.";\n');
+  await writeFile(dictionary,(await readFile(dictionary,'utf8'))+'\nwindow.FP_EN["Ключ входа со старого сайта привязан к прежнему домену. Войди здесь по логину и паролю или подтверждённой почте, затем добавь новый ключ в настройках."] = "Passkeys from the previous site are tied to that domain. Sign in here with your username and password or verified email, then add a new passkey in Settings.";\n');
   await cp(resolve(project,'site/social-footer.css'),resolve(output,'social-footer.css'));
   await cp(resolve(project,'customer-site/product-brand.css'),resolve(output,'product-brand.css'));
   let count=0;
@@ -49,7 +50,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
         html=html.replace(/<a href="\/">family-pie<\/a>/g,'<a href="/">family-spy</a>');
         html=html.replaceAll('Студия Family Pie','Family Spy').replaceAll('Проект Family Pie · 2026','Family Spy · 2026');
         html=html.replace('</head>','<link rel="stylesheet" href="/product-brand.css"><script src="/customer.js" defer></script></head>');
-        if(path===resolve(output,'vpn/cabinet/auth/index.html'))html=html.replace('</main>','<p class="muted" style="max-width:42rem;margin:1rem auto">Ключ, созданный на старом сайте? <a href="https://family-pie.ru/vpn/cabinet/auth/">Войти со старым ключом</a>. Здесь можно войти прежним логином и паролем и добавить новый ключ в настройках.</p></main>');
+        if(path===resolve(output,'vpn/cabinet/auth/index.html'))html=html.replace('</main>','<p class="muted" style="max-width:42rem;margin:1rem auto">Ключ входа со старого сайта привязан к прежнему домену. Войди здесь по логину и паролю или подтверждённой почте, затем добавь новый ключ в настройках.</p></main>');
         await writeFile(path,html);count++;
       }
     }

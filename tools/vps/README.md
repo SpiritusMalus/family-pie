@@ -1,6 +1,6 @@
 # VPS automation — Caddyfile auto-deploy
 
-The GitHub Actions deploy (`.github/workflows/deploy.yml`) rsyncs `site/` to the
+The GitHub Actions deploy (`.github/workflows/deploy.yml`) builds `portfolio-site/dist/` from `site/` and rsyncs it to the
 web root **and** ships the repo `Caddyfile` to `/etc/caddy/Caddyfile` + reloads
 Caddy — so a change to routing now goes live on push to `main`, with no manual
 SSH step. Prod always equals `main`.
@@ -39,7 +39,7 @@ visudo -cf /etc/sudoers.d/fp-deploy-caddy   # must print: parsed OK
 
 ## How a deploy runs after setup
 
-1. CI rebuilds legal pages and rsyncs `site/` to the web root (exact mirror).
+1. CI rebuilds legal pages and both artifacts. The portfolio artifact excludes `vpn/` and `sufler/`; their complete pages are delivered only to the separate Family Spy web root. Shared portfolio fonts and portal artwork live in `assets/`. CI rsyncs the portfolio artifact to the web root (exact mirror), removing old product files there.
 2. CI rsyncs the repo `Caddyfile` to `/var/www/family-pie/caddy-staging/`.
 3. CI runs `sudo /usr/local/bin/fp-deploy-caddy`, which:
    - `caddy validate`s the staged config,

@@ -24,6 +24,11 @@ test('standalone customer artifact includes account/payment pages without portfo
   const checkout=await readFile(resolve(output,'sufler/buy/index.html'),'utf8');
   assert.match(checkout,/var API = '\/sufler\/api'/);
   assert.doesNotMatch(checkout,/hub\.146-103|LinkedIn/);
+  const auth=await readFile(resolve(output,'vpn/cabinet/auth/index.html'),'utf8');
+  assert.doesNotMatch(auth,/href="https:\/\/family-pie\.ru/);
+  assert.match(auth,/Ключ входа со старого сайта привязан к прежнему домену/);
+  const dictionary=await readFile(resolve(output,'i18n/en.js'),'utf8');
+  assert.match(dictionary,/Sign in here with your username and password or verified email/);
   assert.match(home,/Сначала|Поможем с подключением и настройкой/);
   assert.doesNotMatch(home,/100%|полная анонимность|вернём деньги|uptime|24\/7/i);
 });
@@ -41,6 +46,6 @@ test('customer-flow aliases retain only intended account/payment URL boundaries'
 });
 test('plan proxies are a fixed public read-only allowlist',()=>{
   assert.deepEqual(Object.keys(publicPlans),['/public-plans/vpn','/public-plans/sufler']);
-  assert.equal(publicPlans['/public-plans/vpn'],'https://family-pie.ru/vpn/api/plans');
-  assert.equal(publicPlans['/public-plans/sufler'],'https://hub.146-103-120-137.sslip.io/sufler-license/billing/plan');
+  assert.equal(publicPlans['/public-plans/vpn'],'https://family-spy.ru/vpn/api/plans');
+  assert.equal(publicPlans['/public-plans/sufler'],'https://family-spy.ru/sufler/api/billing/plan');
 });

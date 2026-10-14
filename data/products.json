@@ -130,6 +130,7 @@
     },
     {
       "id": "sufler",
+      "siteOrigin": "https://family-spy.ru",
       "order": 3,
       "name": "Sufler",
       "iconId": "sufler",
@@ -164,6 +165,7 @@
     },
     {
       "id": "vpn",
+      "siteOrigin": "https://family-spy.ru",
       "order": 4,
       "name": "Family VPN",
       "iconId": "vpn",

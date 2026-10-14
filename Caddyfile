@@ -77,17 +77,30 @@ family-pie.ru {
 		Cache-Control "no-cache"
 	}
 
-	# New checkouts use the customer origin. Existing return pages remain available
-	# for payments created before the move, whose recovery ID is in old storage.
-	@legacy_sufler_checkout path /sufler/buy /sufler/buy/
-	handle @legacy_sufler_checkout {
-		redir https://family-spy.ru{uri} temporary
-	}
-
-	# Authenticated VPN cabinet API; service is isolated on loopback.
-	handle /vpn/api/* {
+	# Keep the provider's existing callback functional; it is not a customer page.
+	# All browser account and payment flows now use the customer origin.
+	handle /vpn/api/billing/webhook {
 		header Cache-Control "no-store"
+		header X-Robots-Tag "noindex, nofollow"
 		reverse_proxy 127.0.0.1:8796
+	}
+	@retired_vpn_api path /vpn/api /vpn/api/*
+	handle @retired_vpn_api {
+		header Cache-Control "no-store"
+		header X-Robots-Tag "noindex, nofollow"
+		respond "Use https://family-spy.ru/vpn/" 410
+	}
+	# An old installed worker must receive a same-origin retirement script.
+	# Redirecting the script itself would leave the previous cached worker active.
+	handle /vpn/sw.js {
+		header Cache-Control "no-store"
+		header X-Robots-Tag "noindex, nofollow"
+		rewrite * /retire-customer-worker.js
+		file_server
+	}
+	@retired_product_pages path /vpn /vpn/* /sufler /sufler/*
+	handle @retired_product_pages {
+		redir https://family-spy.ru{uri} permanent
 	}
 
 	# Rebrand HealthRoutine→Driftora: the legal host path moved

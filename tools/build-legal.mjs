@@ -433,6 +433,8 @@ for (const path of ['/work/driftora/', '/work/lumen-rest/']) {
   urls.push({ loc: `https://family-pie.ru${path}`, freq: 'monthly', pri: '0.8' });
 }
 for (const p of products) {
+  // Customer-only products are published and indexed on their own origin.
+  if (p.siteOrigin && p.siteOrigin !== 'https://family-pie.ru') continue;
   if (p.landingUrl) urls.push({ loc: `https://family-pie.ru${p.landingUrl}`, freq: 'monthly', pri: '0.8' });
   if (p.id === 'sufler') urls.push({ loc: 'https://family-pie.ru/sufler/setup/', freq: 'monthly', pri: '0.6' });
   if (!p.legal) continue;
