@@ -181,7 +181,7 @@ function page(product, initialDoc, models, rawLinks) {
       `<a href="${rawLinks[d][lng]}">${titleByDoc[d][lng]} (${T[lng].langName})</a>`)).join(' · ');
 
   return `<!DOCTYPE html>
-<html lang="${defLang}">
+<html lang="${defLang}" data-appearance="legal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -273,6 +273,8 @@ function page(product, initialDoc, models, rawLinks) {
   }
 </style>
 <script src="/i18n/language.js"></script>
+<link rel="stylesheet" href="/appearance.css">
+<script src="/appearance.js"></script>
 </head>
 <body>
 <header class="topbar">

@@ -5,10 +5,6 @@
   const $$ = (s) => [...document.querySelectorAll(s)];
   const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
   const store = (key, value) => { try { localStorage.setItem(key, value); } catch { /* Preferences remain usable without storage. */ } };
-  function theme(value) { document.body.classList.toggle('light', value === 'light'); store('family-vpn-theme-v3', value); const select = $('#appearance'); if (select) select.value = value; }
-  theme(read('family-vpn-theme-v3') || 'dark');
-  $$('[data-theme]').forEach(btn => btn.addEventListener('click', () => theme(document.body.classList.contains('light') ? 'dark' : 'light')));
-  $('#appearance')?.addEventListener('change', e => theme(e.target.value));
   $('[data-menu]')?.addEventListener('click', e => { const button = e.currentTarget; const open = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(open)); $('#navigation').classList.toggle('open', open); });
   $$('#navigation a').forEach(a => a.addEventListener('click', () => { $('#navigation').classList.remove('open'); $('[data-menu]').setAttribute('aria-expanded', 'false'); }));
   const guideData = {
