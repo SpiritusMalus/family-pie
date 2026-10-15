@@ -261,6 +261,13 @@ family-spy.ru {
 		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
 		Cache-Control "no-cache"
 	}
+	# Public native packages are outside the deploy artifact's rsync --delete root.
+	@sufler_download path /sufler/download/Sufler-Setup-0.2.0-x64.exe /sufler/download/Sufler-0.2.0-x64-portable.exe /sufler/download/Sufler-0.2.0-arm64.dmg /sufler/download/Sufler-0.2.0-x64.dmg /sufler/download/SHA256SUMS.txt /sufler/download/release.json
+	handle @sufler_download {
+		root * /var/www/sufler-downloads/current
+		uri strip_prefix /sufler/download
+		file_server
+	}
 	handle /vpn/api/* {
 		header Cache-Control "no-store"
 		reverse_proxy 127.0.0.1:8796

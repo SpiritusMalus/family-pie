@@ -49,3 +49,13 @@ test('plan proxies are a fixed public read-only allowlist',()=>{
   assert.equal(publicPlans['/public-plans/vpn'],'https://family-spy.ru/vpn/api/plans');
   assert.equal(publicPlans['/public-plans/sufler'],'https://family-spy.ru/sufler/api/billing/plan');
 });
+
+// Canonical downloads stay on the product domain; bytes are served from the
+// dedicated versioned native release root, outside generated artifact cleanup.
+test('customer download links use only the native release host path',async()=>{
+ for(const route of ['site/sufler/index.html','site/sufler/setup/index.html']){
+  const html=await readFile(route,'utf8');
+  assert.doesNotMatch(html,/github\.com\/SpiritusMalus\/family-pie\/releases\/download/);
+  for(const name of ['Sufler-Setup-0.2.0-x64.exe','Sufler-0.2.0-arm64.dmg','Sufler-0.2.0-x64.dmg','SHA256SUMS.txt'])assert.ok(html.includes('/sufler/download/'+name));
+ }
+});
