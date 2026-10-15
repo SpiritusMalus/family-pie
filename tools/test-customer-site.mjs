@@ -15,7 +15,7 @@ test('standalone customer artifact includes account/payment pages without portfo
   const sufler=await readFile(resolve(output,'sufler/index.html'),'utf8');
   assert.doesNotMatch(sufler,/fp-social|linkedin\.com/);
   assert.match(sufler,/https:\/\/family-spy\.ru\/sufler\//);
-  assert.match(sufler,/releases\/download\/sufler-v0\.2\.0\//);
+  assert.match(sufler,/href="\/sufler\/download\/Sufler-Setup-0\.2\.0-x64\.exe"/);
   for(const route of ['sufler/index.html','sufler/setup/index.html','sufler/terms/index.html','sufler/privacy/index.html']) {
     const html=await readFile(resolve(output,route),'utf8');
     assert.match(html,/<a class="brand"[^>]*>family-spy <span>\/ Sufler<\/span>/,route);
