@@ -1,6 +1,6 @@
 /* Owner-selected dark / red portal identity; /vpn/ scope only. */
 :root{--bg:#090d13;--panel:#131b24;--fg:#f1eee7;--muted:#a5b0ba;--line:#303942;--accent:#ff746c;--ink:#261516;--radius:6px;color-scheme:dark}
-body.light{--bg:#f7f6f3;--panel:#eeece8;--fg:#202731;--muted:#59636d;--line:#d1ccc7;--accent:#a52f32;--ink:#fff;color-scheme:light}
+:root.light,body.light{--bg:#f7f6f3;--panel:#eeece8;--fg:#202731;--muted:#59636d;--line:#d1ccc7;--accent:#a52f32;--ink:#fff;color-scheme:light}
 body{font-family:'Golos Text',sans-serif;font-size:16px;isolation:isolate}
 body:before,body:after{content:'';position:fixed;top:18%;height:64vh;width:2px;background:#fff0ec;border-radius:4px;box-shadow:0 0 6px 2px #ff534e,0 0 25px 7px #ef282e,0 0 70px 15px #c71629,0 0 140px 26px #a9112438;pointer-events:none;z-index:-1}
 body:before{left:0}body:after{right:0}body.is-cabinet:before,body.is-cabinet:after{opacity:.34}body.light:before,body.light:after{opacity:.1}

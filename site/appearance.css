@@ -1,0 +1,46 @@
+/* Older document and checkout templates share the saved site appearance. */
+:root { color-scheme: dark; }
+:root.light { color-scheme: light; }
+:root[data-appearance="fixed-dark"] { color-scheme: dark; }
+html { background-color: var(--bg, var(--paper, #000)); }
+
+:root[data-appearance="legal"]:not(.light),
+:root[data-appearance="checkout"]:not(.light) {
+  --bg: #000;
+  --screen: #000;
+  --surface: #13171c;
+  --surface2: #1b2229;
+  --paper: #13171c;
+  --ink: #f3f4f5;
+  --ink2: #c5cbd1;
+  --ink3: #b4bdc6;
+  --muted: #b4bdc6;
+  --subtle: #b4bdc6;
+  --line: #41464c;
+  --line2: #41464c;
+  --accent-text: #ff9d88;
+  --accent-press: #ff9d88;
+  --accent-soft: #32201d;
+  --ok: #8ed4ad;
+  --bad: #ffad9f;
+  --bad-soft: #32201d;
+}
+:root[data-appearance="legal"]:not(.light) { --accent: #a52f32; }
+:root[data-appearance="legal"]:not(.light) .topbar { background: #000; }
+:root[data-appearance="legal"]:not(.light) .tabs,
+:root[data-appearance="legal"]:not(.light) code { background: #23282e; }
+:root[data-appearance="legal"]:not(.light) .doc-body p,
+:root[data-appearance="legal"]:not(.light) .doc-body li,
+:root[data-appearance="legal"]:not(.light) .lead { color: var(--ink); }
+:root[data-appearance="legal"]:not(.light) .disclaimer { background: #191c20; border-color: #b7b0a3; color: #f1c27d; }
+:root[data-appearance="legal"]:not(.light) mark.ph { background: #191c20; color: #f1c27d; }
+:root[data-appearance="legal"]:not(.light) .langtoggle button.on { background: var(--ink); color: var(--bg); }
+
+:root[data-appearance="checkout"]:not(.light) .note.warn { background: #191c20; color: #f1c27d; }
+
+@media print {
+  :root[data-appearance="legal"]:not(.light), :root[data-appearance="legal"].light { color-scheme: light !important; --ink: #111; --muted: #444; --line: #aaa; --paper: #fff; --bg: #fff; }
+  :root[data-appearance="legal"] .doc-body p,
+  :root[data-appearance="legal"] .doc-body li,
+  :root[data-appearance="legal"] .lead { color: #111; }
+}

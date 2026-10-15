@@ -156,3 +156,7 @@ Product covers and primary buttons share the small panel radius. Covers clip the
 - **Don't** introduce a combined headline, shared purchase CTA or visual bundle of the two independent products.
 - **Don't** turn the illustrative prompt into purported app evidence or invent testimonials, results or service guarantees.
 - **Don't** apply the storefront stylesheet across existing cabinet, purchase or product interfaces.
+
+
+## Product appearance persistence — 2026-10-15
+Customer product pages now load the same saved appearance before paint. Dark is the default and invalid-value fallback. An explicit VPN light selection also reaches Sufler's landing, setup, legal and payment/recovery pages, which now have a full dark palette and retain the prior light palette. Fixed-black storefront composition stays black without writing over that preference. Root-shared appearance.js/css are part of the generated customer artifact, including its 404 and cached offline page. Product layout, content, API/account/payment logic and download targets are unchanged.
