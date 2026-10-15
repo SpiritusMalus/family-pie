@@ -56,7 +56,7 @@ family-pie.ru {
 		# CSP without them serves the whole site in fallback type. The stylesheet is a
 		# style-src; the font files it then pulls are a font-src — both are needed, and
 		# omitting either breaks it silently in the browser rather than loudly here.
-		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://food.family-pie.ru https://hub.146-103-120-137.sslip.io; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://food.family-pie.ru; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
 		X-Frame-Options "DENY"
 		Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
 
@@ -77,8 +77,8 @@ family-pie.ru {
 		Cache-Control "no-cache"
 	}
 
-	# Keep the provider's existing callback functional; it is not a customer page.
-	# All browser account and payment flows now use the customer origin.
+	# Temporary provider compatibility only. The owner cannot access YooKassa
+	# yet; retire this after its notification URL is verified on family-spy.ru.
 	handle /vpn/api/billing/webhook {
 		header Cache-Control "no-store"
 		header X-Robots-Tag "noindex, nofollow"
@@ -244,8 +244,7 @@ grammardojo.ru, www.grammardojo.ru {
 	}
 }
 
-# Complete customer site with same-origin VPN and Sufler billing APIs.
-# Legacy Family Pie account/payment paths remain available for old sessions and keys.
+# Complete customer site with same-origin VPN, Sufler billing and native APIs.
 www.family-spy.ru {
 	redir https://family-spy.ru{uri} permanent
 }
@@ -262,6 +261,13 @@ family-spy.ru {
 		Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'"
 		Cache-Control "no-cache"
 	}
+	# Public native packages are outside the deploy artifact's rsync --delete root.
+	@sufler_download path /sufler/download/Sufler-Setup-0.2.0-x64.exe /sufler/download/Sufler-0.2.0-x64-portable.exe /sufler/download/Sufler-0.2.0-arm64.dmg /sufler/download/Sufler-0.2.0-x64.dmg /sufler/download/SHA256SUMS.txt /sufler/download/release.json
+	handle @sufler_download {
+		root * /var/www/sufler-downloads/current
+		uri strip_prefix /sufler/download
+		file_server
+	}
 	handle /vpn/api/* {
 		header Cache-Control "no-store"
 		reverse_proxy 127.0.0.1:8796
@@ -271,6 +277,20 @@ family-spy.ru {
 		uri strip_prefix /sufler/api
 		header Cache-Control "no-store"
 		reverse_proxy 127.0.0.1:8776 {
+			header_up -Cookie
+			header_up -Authorization
+		}
+	}
+	# Native clients send device/lease headers, never the owner's provider key.
+	# Keep an exact route allowlist; stream answers as the backend emits them.
+	@sufler_native_api path /sufler/api/health /sufler/api/v1/managed-status /sufler/api/v1/status /sufler/api/v1/start /sufler/api/v1/beat /sufler/api/v1/stop /sufler/api/v1/activate /sufler/api/v1/chat/completions
+	handle @sufler_native_api {
+		uri strip_prefix /sufler/api
+		header Cache-Control "no-store"
+		header X-Robots-Tag "noindex, nofollow"
+		reverse_proxy 127.0.0.1:8776 {
+			# text/event-stream flushes immediately with the default transport,
+			# while normal cancellation still reaches the upstream.
 			header_up -Cookie
 			header_up -Authorization
 		}
@@ -315,6 +335,33 @@ family-spy.ru {
 	handle_errors {
 		rewrite * /404.html
 		file_server
+	}
+}
+
+# Subscription delivery uses the same private identities and upstream.
+# Existing TLS at the loopback upstream is verified with its current certificate;
+# old installed subscription links keep using their compatibility route.
+sub.family-spy.ru {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Robots-Tag "noindex, nofollow"
+		Cache-Control "no-store"
+		Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
+		-Server
+	}
+	@subscription path /sub/*
+	handle @subscription {
+		reverse_proxy https://127.0.0.1:2097 {
+			header_up -Cookie
+			header_up -Authorization
+			transport http {
+				tls_server_name sub.family-pie.ru
+			}
+		}
+	}
+	handle {
+		respond 404
 	}
 }
 

@@ -106,7 +106,7 @@ def main():
   for key in ['uuid','subId','flow','expiryTime','enable','limitIp']:
    if readback[key]!=client[key]:raise RuntimeError('Panel read-back mismatch')
   if created:
-   app.execute('UPDATE managed_subscriptions SET panel_login=?,profile_url=? WHERE account_id=?',(name,'https://sub.family-pie.ru/sub/'+readback['subId'],job['account_id']));app.commit()
+   app.execute('UPDATE managed_subscriptions SET panel_login=?,profile_url=? WHERE account_id=?',(name,'https://sub.family-spy.ru/sub/'+readback['subId'],job['account_id']));app.commit()
   synchronize(app,created)
   # Guard the current website revision: newer edits retain pending state.
   state='synced' if managed['allow_unlimited'] or _payments.entitlement(app,job['account_id'])['expires'] else 'awaiting_payment'

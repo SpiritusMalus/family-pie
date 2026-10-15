@@ -15,7 +15,7 @@ test('standalone customer artifact includes account/payment pages without portfo
   const sufler=await readFile(resolve(output,'sufler/index.html'),'utf8');
   assert.doesNotMatch(sufler,/fp-social|linkedin\.com/);
   assert.match(sufler,/https:\/\/family-spy\.ru\/sufler\//);
-  assert.match(sufler,/releases\/download\/sufler-v0\.2\.0\//);
+  assert.match(sufler,/href="\/sufler\/download\/Sufler-Setup-0\.2\.0-x64\.exe"/);
   for(const route of ['sufler/index.html','sufler/setup/index.html','sufler/terms/index.html','sufler/privacy/index.html']) {
     const html=await readFile(resolve(output,route),'utf8');
     assert.match(html,/<a class="brand"[^>]*>family-spy <span>\/ Sufler<\/span>/,route);
@@ -48,4 +48,14 @@ test('plan proxies are a fixed public read-only allowlist',()=>{
   assert.deepEqual(Object.keys(publicPlans),['/public-plans/vpn','/public-plans/sufler']);
   assert.equal(publicPlans['/public-plans/vpn'],'https://family-spy.ru/vpn/api/plans');
   assert.equal(publicPlans['/public-plans/sufler'],'https://family-spy.ru/sufler/api/billing/plan');
+});
+
+// Canonical downloads stay on the product domain; bytes are served from the
+// dedicated versioned native release root, outside generated artifact cleanup.
+test('customer download links use only the native release host path',async()=>{
+ for(const route of ['site/sufler/index.html','site/sufler/setup/index.html']){
+  const html=await readFile(route,'utf8');
+  assert.doesNotMatch(html,/github\.com\/SpiritusMalus\/family-pie\/releases\/download/);
+  for(const name of ['Sufler-Setup-0.2.0-x64.exe','Sufler-0.2.0-arm64.dmg','Sufler-0.2.0-x64.dmg','SHA256SUMS.txt'])assert.ok(html.includes('/sufler/download/'+name));
+ }
 });

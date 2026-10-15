@@ -1,5 +1,6 @@
 import { randomBytes,createHash,scrypt as derive,timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
+import {subscriptionURL,subscriptionOrigin} from './subscription-url.mjs';
 const scrypt=promisify(derive), sha=x=>createHash('sha256').update(x).digest('hex');
 export const temporaryPassword=()=>randomBytes(18).toString('base64url');
 export async function passwordHash(password) {
@@ -15,7 +16,8 @@ export async function checkPassword(password,hash) {
  return encoded?.length===128&&timingSafeEqual(key,Buffer.from(encoded,'hex'));
 }
 export class Accounts {
- constructor(store,{clock=Date.now}={}) {
+ constructor(store,{clock=Date.now,publicSubscriptionOrigin=null}={}) {
+  this.publicSubscriptionOrigin=subscriptionOrigin(publicSubscriptionOrigin);
   this.store=store;this.db=store.db;this.clock=clock;this.dummyHash=passwordHash(temporaryPassword());
   this.db.exec(`CREATE TABLE IF NOT EXISTS identities(account_id TEXT PRIMARY KEY REFERENCES accounts(id),
    login TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'user', must_change INTEGER NOT NULL DEFAULT 1, enabled INTEGER NOT NULL DEFAULT 1);
@@ -84,7 +86,7 @@ export class Accounts {
   });return this.newSession(accountId);
  }
  list(){return this.db.prepare('SELECT identities.account_id,login,role,must_change,identities.enabled AS account_enabled,managed_subscriptions.* FROM identities JOIN managed_subscriptions USING(account_id) ORDER BY login').all().map(({profile_url,...x})=>x);}
- subscription(accountId){const s=this.db.prepare('SELECT * FROM managed_subscriptions WHERE account_id=?').get(accountId);if(!s)return {active:false};const paid=this.store.subscription(accountId),required=!s.allow_unlimited&&!paid.expiresAt&&this.identity(accountId)?.role==='user';return {...s,sync_state:!s.allow_unlimited&&paid.active&&s.sync_state==='awaiting_payment'?'pending':s.sync_state,profile_url:required?null:s.profile_url,payment_required:Boolean(required),payment_confirmed:paid.active,paid_expires_at:paid.expiresAt,active:Boolean(!s.deleted&&s.enabled&&(s.unlimited||s.expires_at>this.clock())&&(s.allow_unlimited||paid.active))};}
+ subscription(accountId){const s=this.db.prepare('SELECT * FROM managed_subscriptions WHERE account_id=?').get(accountId);if(!s)return {active:false};const paid=this.store.subscription(accountId),required=!s.allow_unlimited&&!paid.expiresAt&&this.identity(accountId)?.role==='user';return {...s,sync_state:!s.allow_unlimited&&paid.active&&s.sync_state==='awaiting_payment'?'pending':s.sync_state,profile_url:required?null:subscriptionURL(s.profile_url,this.publicSubscriptionOrigin),payment_required:Boolean(required),payment_confirmed:paid.active,paid_expires_at:paid.expiresAt,active:Boolean(!s.deleted&&s.enabled&&(s.unlimited||s.expires_at>this.clock())&&(s.allow_unlimited||paid.active))};}
  edit(actor,id,patch){
   if(this.identity(actor)?.role!=='admin')throw new Error('Forbidden');
   return this.store.transaction(()=>this.editInternal(actor,id,patch));

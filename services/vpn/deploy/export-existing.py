@@ -22,7 +22,7 @@ def export(panel_path,config_path,output_path):
   if not re.fullmatch(r'[A-Za-z0-9_-]+',r['sub_id']):raise ValueError('Unsupported profile identifier')
   expires=r['expiry_time'];devices=r['limit_ip']
   if expires<0 or not 0<=devices<=1000:raise ValueError('Unsupported existing limits')
-  records.append(dict(login=login,panelLogin=login,profileUrl='https://sub.family-pie.ru/sub/'+r['sub_id'],expiresAt=expires,unlimited=expires==0,enabled=bool(r['enable']),devices=devices))
+  records.append(dict(login=login,panelLogin=login,profileUrl='https://sub.family-spy.ru/sub/'+r['sub_id'],expiresAt=expires,unlimited=expires==0,enabled=bool(r['enable']),devices=devices))
  if len(by_name)!=len(records):raise ValueError('Profile inventory count mismatch')
  fd=os.open(output_path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
  with os.fdopen(fd,'w') as f:json.dump(records,f,ensure_ascii=False)
