@@ -37,3 +37,5 @@ The local preview is served by `tools/serve-customer-site.mjs`, defaulting to `h
 Owner follow-up, 2026-10-16: replace vague “talking points” homepage copy with “answer prompt”; keep only the existing support email in the homepage footer. The customer build injects an explicit “All Family Spy products” home link above VPN navigation, including account/auth/legal pages; sticky product headers retain it on scroll. Existing Family Pie source pages are unchanged.
 
 Owner refinement, 2026-10-16: homepage footer is reduced to the existing support@family-pie.ru mailto link only. Remove the footer wordmark, copyright, legal navigation and Deepgram setup reminder. Keep the established support section, product page navigation, legal bodies/routes and native/backend behavior intact. This supersedes earlier footer-layout descriptions.
+
+The VPN figure starts directly with Android/Windows/support selectors; omit the redundant visible “Account screens” heading. Retain the screenshots, captions and accessible screen-selection group.

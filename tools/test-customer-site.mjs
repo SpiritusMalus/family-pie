@@ -81,7 +81,7 @@ test('product evidence ships real image bytes without portal or private fixture 
     }
   }
   const home=await readFile(resolve(output,'index.html'),'utf8');
-  assert.doesNotMatch(home,/demo-play|Короткое демо|После оплаты|Выбираешь подписку/);
+  assert.doesNotMatch(home,/demo-play|Короткое демо|После оплаты|Выбираешь подписку|Экраны кабинета|Account screens/);
   assert.equal((home.match(/data-frame="/g)||[]).length,5);
   const vpn=home.match(/<section id="vpn"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(vpn,/href="\/vpn\/(terms|privacy)\//);
