@@ -62,7 +62,7 @@ figure{margin:0}
 .support-note{font-size:14px;color:var(--quiet);margin-top:28px}
 .footer-legal{display:flex;flex-wrap:wrap;gap:8px 24px}
 .footer-legal a{display:inline-flex;align-items:center;min-height:44px}
-.site-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 28px;border-top:1px solid var(--rule);padding-block:24px 32px;color:var(--quiet);font-size:13px}
+.site-footer{display:grid;gap:20px;border-top:1px solid var(--rule);padding-block:24px 32px;color:var(--quiet);font-size:13px}
 @media(max-width:900px){.wrap{width:calc(100% - 48px)}.product{gap:32px;padding-block:48px}.support-products{gap:32px}}
 @media(max-width:700px){.wrap{width:calc(100% - 40px)}.site-header{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding-block:12px}.site-header nav{grid-column:1/-1;grid-row:2;justify-content:space-between;margin:0;gap:16px}.langtoggle{grid-column:2;grid-row:1}.product{grid-template-columns:1fr;gap:28px;padding-block:40px}.support{padding-block:36px 40px}.support-products{grid-template-columns:1fr;gap:28px}.site-footer{align-items:flex-start;flex-direction:column;gap:8px}}
 @media(max-width:420px){.wrap{width:calc(100% - 32px)}.product-copy h2{font-size:36px}.product-actions{gap:8px 20px}}
@@ -82,3 +82,8 @@ figure{margin:0}
  .product-copy .price{margin-top:4px}
  .product-copy .try-note,.product-actions,.product-legal{margin-top:0}
 }
+
+.footer-meta{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.footer-documents{display:grid;grid-template-columns:1fr 1fr;gap:24px 48px;align-items:start}
+.footer-note{max-width:65ch;margin:0 0 4px}
+@media(max-width:700px){.footer-documents{grid-template-columns:1fr;gap:20px}.footer-meta{flex-wrap:wrap}}

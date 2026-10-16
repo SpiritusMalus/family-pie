@@ -21,6 +21,11 @@ test('standalone customer artifact includes account/payment pages without portfo
     assert.match(html,/<a class="brand"[^>]*>family-spy <span>\/ Sufler<\/span>/,route);
     assert.doesNotMatch(html,/<a class="brand"[^>]*>family-pie/,route);
   }
+  for(const route of ['vpn/index.html','vpn/cabinet/index.html','vpn/cabinet/auth/index.html','vpn/terms/index.html','vpn/privacy/index.html']) {
+    const html=await readFile(resolve(output,route),'utf8');
+    assert.match(html,/<nav class="customer-home"[\s\S]*?<a href="\/">/,route);
+    assert.match(html,/data-en="All Family Spy products"/,route);
+  }
   const checkout=await readFile(resolve(output,'sufler/buy/index.html'),'utf8');
   assert.match(checkout,/var API = '\/sufler\/api'/);
   assert.doesNotMatch(checkout,/hub\.146-103|LinkedIn/);
@@ -82,6 +87,12 @@ test('product evidence ships real image bytes without portal or private fixture 
   assert.doesNotMatch(vpn,/href="\/vpn\/(terms|privacy)\//);
   const footer=home.match(/<footer[\s\S]*?<\/footer>/)[0];
   assert.match(footer,/href="\/vpn\/terms\//);assert.match(footer,/href="\/vpn\/privacy\//);
+  const suflerSection=home.match(/<section id="sufler"[\s\S]*?<\/section>/)[0];
+  assert.doesNotMatch(suflerSection,/Скачай приложение|href="\/sufler\/(terms|privacy)\//);
+  assert.match(footer,/Скачай приложение, добавь свой ключ Deepgram/);
+  assert.match(footer,/Download the app, add your own Deepgram key/);
+  assert.match(footer,/href="\/sufler\/terms\//);assert.match(footer,/href="\/sufler\/privacy\//);
+  assert.doesNotMatch(home,/опорные мысли|Опорные мысли/);
   assert.doesNotMatch(home,/<a class="screen-(link|view)"/);
   assert.match(home,/Показать вопрос/);assert.match(home,/Показать подсказку/);
 });
