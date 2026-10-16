@@ -59,6 +59,7 @@ typography:
     lineHeight: 1.6
 rounded:
   panels: "6px"
+  screen-selector: "4px"
 spacing:
   compact: "16px"
   mobile-content: "20px"
@@ -89,7 +90,7 @@ components:
 
 **Creative North Star: "Two Independent Product Stages"**
 
-The customer homepage adapts the owner-approved black, Golos Text and coral composition into consecutive, full-width product sections. Family VPN and Sufler each have their own name, factual purpose, price, primary action and legal links. Thin neutral rules and sentence-case type separate the offers; the products supply their own imagery.
+The customer homepage adapts the owner-approved black, Golos Text and coral composition into consecutive, full-width product sections. Family VPN and Sufler each have their own name, factual purpose, price, primary action and legal destinations. VPN legal links live in the footer. Thin neutral rules and sentence-case type separate the offers; the products supply their own imagery.
 
 This document governs the customer storefront sources and their generated customer product pages. The builder replaces the VPN landing artwork and Sufler mock prompt with the corresponding interface captures; the remaining product UI keeps its established styling. `product-brand.css` styles those evidence figures and stacks VPN tariffs in one column at 420px and below, where the original two-column discount rows overflowed. The repository-root DESIGN.md remains the portfolio's separate authority.
 
@@ -97,14 +98,14 @@ This document governs the customer storefront sources and their generated custom
 - Fixed black canvas, one coral action color and local Golos Text.
 - Independent product sections with text beside media and a direct product action.
 - Actual VPN cabinet captures from a demo account and source-rendered Sufler interface captures from a prepared interview.
-- Inspectable full-size images and manually selectable, click-start finite demonstrations.
+- Inspectable full-size images and clearly named manual screen selectors.
 - RU/EN copy and compact controls with visible keyboard focus.
 
 ## Colors
 
 ### Primary
 
-- **Storefront Coral** (`accent`) identifies each product's primary button, support destinations, demo playback action and focus outline.
+- **Storefront Coral** (`accent`) identifies each product's primary button, support destinations, selected screen control and focus outline.
 
 ### Neutral
 
@@ -127,13 +128,13 @@ The centered container is `min(1100px, calc(100% - 80px))`. Total horizontal ins
 
 The desktop header is one row with an 80px minimum height: brand left, Family VPN/Sufler/Help anchor navigation and language controls right. At 700px it becomes a two-row grid, with the navigation spanning the lower row. The first visible offer is Family VPN; Sufler follows in its own section. There is no shared introduction, service-choice CTA or side-by-side catalog grid.
 
-Each desktop product section uses text/media columns of `.78fr 1.35fr`, a 48px gap and 64px vertical padding. At 900px it becomes one column with a 28px gap and 48px padding; its media is at most 760px wide. At 700px the section has a 16px gap and 40px padding. Mobile CSS places title → purpose → price → actions → media before the remaining descriptive, setup and legal copy. The DOM retains the product copy followed by its figure. Screenshot links keep a 10:7 frame and contain the entire image without cropping. Product copy has no enclosing card padding. Desktop price lines have a 24px minimum height and 24px top margin; action and legal rows follow with a 16px top margin. Mobile price spacing reduces to 4px and action, setup and legal top margins reset.
+Each desktop product section uses text/media columns of `.78fr 1.35fr`, a 48px gap and 64px vertical padding. At 900px it becomes one column with a 28px gap and 48px padding; its media is at most 760px wide. At 700px the section has a 16px gap and 40px padding. Mobile CSS places title → purpose → price → actions → media before the remaining descriptive, setup and legal copy. The DOM retains the product copy followed by its figure. Screenshot containers keep a 10:7 frame and contain the entire image without cropping. Product copy has no enclosing card padding. Desktop price lines have a 24px minimum height and 24px top margin; action and legal rows follow with a 16px top margin. Mobile price spacing reduces to 4px and action, setup and legal top margins reset.
 
 Support has its own heading and separate VPN/Sufler articles in equal columns with a 64px gap, reduced to 32px at 900px. At 700px the articles become one column with a 28px gap. The shared privacy reminder follows them. The footer contains only the brand text and copyright, aligned apart on desktop and stacked at 700px. Product and support anchor destinations have a 24px scroll margin.
 
 ## Elevation & Depth
 
-The shell is flat: no card shadows, glass or floating chrome. Section rules and framed screenshots establish separation. The storefront has no continuously animated media. Demos start only on click, advance through three still frames at three-second intervals, and stop after nine seconds. Hidden tabs stop playback; reduced motion replaces timed playback with a manual next-screen action and disables smooth page scrolling.
+The shell is flat: no card shadows, glass or floating chrome. Section rules and framed screenshots establish separation. Screen changes happen only after an explicit selection; no timed playback remains. Reduced motion disables smooth page scrolling.
 
 ## Shapes
 
@@ -145,9 +146,9 @@ Screenshot frames and primary buttons share the small panel radius. Both screens
 
 **Navigation and language.** Header, brand, language, product-action, legal and support controls have a 44px minimum hit height; primary buttons retain 48px. Language buttons also have a 44px minimum width; the selected language uses primary ink and an underline 6px below the text. The toggle is revealed by JavaScript, while default RU content remains readable without it. Header links target `#vpn`, `#sufler` and `#support` directly.
 
-**Product sections.** Each section keeps its name, independent purpose, dynamic price, product actions and terms/privacy links together. VPN media shows Android and Windows connection instructions and support in the actual cabinet using a demo account. Sufler media shows start, interviewer question and talking points in the application interface, rendered from source with a prepared interview. Provenance stays visible, including that the captured interface is Russian in either storefront language.
+**Product sections.** Each section keeps its name, independent purpose, dynamic price, product actions together. VPN terms/privacy links live in the footer; Sufler retains its inline links. VPN media shows Android and Windows connection instructions and support in the actual cabinet using a demo account. Sufler media compares the interviewer question and talking points in the application interface, rendered from source with a prepared interview. Provenance stays visible, including that the captured interface is Russian in either storefront language.
 
-**Screenshot demonstrations.** Each homepage figure starts still, supports manual frame selection and opens the selected original image through both the image link and a labelled full-size link. Selected steps use primary ink and an underline, with `aria-pressed` state. The coral playback control starts a finite three-frame sequence, toggles to pause while playing and stops after nine seconds. Manual selection, a hidden tab, reduced-motion preference change or an image failure stops playback. Reduced motion uses a manual next-screen control. Descriptions announce changes politely. Controls are hidden without JavaScript; the initial image, provenance and original-image links remain usable. A failed image reveals a message pointing to its original; selecting another frame provides another recovery path. Generated product landings show a static capture and provenance with a link to the original image.
+**Screenshot examples.** Manual selectors sit above the image. VPN uses Android, Windows and support choices. Sufler uses a visible interview-example heading, a prepared question and explicit “Show question” / “Show prompt” controls. Selected controls use coral fill, black text and `aria-pressed`; inactive controls have a neutral border. Screens have no click action. Only the separate “Enlarge screen” link opens the selected original. Captions and alt text change together and descriptions announce changes politely. A failed image exposes recovery text and another screen can be selected. Controls are hidden without JavaScript while the default image and enlargement link remain available. Generated product landings keep their existing static linked capture.
 
 **Product support.** Separate titled articles describe a connection problem for VPN and an audio problem for Sufler. Each has its own existing support destination. The shared note asks visitors not to send passwords, their Deepgram key or a call recording.
 
@@ -156,7 +157,7 @@ Screenshot frames and primary buttons share the small panel radius. Both screens
 ## Do's and Don'ts
 
 - **Do** apply this shell to the customer storefront and keep generated product identities intact.
-- **Do** keep each product's purpose, price, actions and legal links together in its own section.
+- **Do** keep purpose, price and actions together; put VPN legal destinations in the footer.
 - **Do** keep screenshot provenance, full-size inspection and manual controls readable on mobile.
 - **Do** start demos only after a click and honor reduced motion and hidden-tab stops.
 - **Do** show prices from the public service source or leave the useful pricing destination visible.
@@ -164,3 +165,7 @@ Screenshot frames and primary buttons share the small panel radius. Both screens
 - **Don't** introduce a combined headline, shared purchase CTA or visual bundle of the two independent products.
 - **Don't** present prepared interview captures as live audio recognition, native-device acceptance, customer evidence or guaranteed results.
 - **Don't** apply the storefront stylesheet across existing cabinet, purchase or product interfaces.
+
+
+<!-- Scoped owner revision, 2026-10-16: manual screen selection -->
+The homepage uses explicit manual screen selectors above each image, with a 1px neutral border and 4px radius; the selected screen uses coral fill and black text. VPN has Android, Windows and support choices. Sufler uses the visible heading “Interview example”, the prepared interview question, and “Show question” / “Show prompt” buttons. Its question text is 20px with 1.5 line height. No timed playback control remains. The image itself has no click action; only the separate “Enlarge screen” link opens the current original. VPN terms/privacy links are grouped in the wrapping footer navigation. These owner-requested refinements retain the surrounding black/Golos/coral system and existing touch targets.

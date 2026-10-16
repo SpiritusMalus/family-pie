@@ -14,6 +14,7 @@ They are neither generated illustrations nor screenshots of customer records.
   microphone, call, model request or owner's app profile was used.
 
 The interface language is Russian; both website languages say so explicitly.
-Screens open at their original dimensions from the homepage. The homepage demo
-advances these still frames only after the visitor presses the demo control.
+Screens open at their original dimensions from the homepage. The homepage changes still frames only after the visitor selects a labelled screen.
+The before-listening Sufler capture is retained as an existing public asset; the
+current homepage compares only the interviewer question and talking points.
 Native application, paid-flow and physical VPN acceptance are outside this change.
