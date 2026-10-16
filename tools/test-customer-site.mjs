@@ -86,12 +86,11 @@ test('product evidence ships real image bytes without portal or private fixture 
   const vpn=home.match(/<section id="vpn"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(vpn,/href="\/vpn\/(terms|privacy)\//);
   const footer=home.match(/<footer[\s\S]*?<\/footer>/)[0];
-  assert.match(footer,/href="\/vpn\/terms\//);assert.match(footer,/href="\/vpn\/privacy\//);
+  assert.match(footer,/href="mailto:support@family-pie\.ru"/);
+  assert.equal((footer.match(/<a /g)||[]).length,1);
+  assert.doesNotMatch(footer,/Условия|Данные|Deepgram|©|class="brand"/);
   const suflerSection=home.match(/<section id="sufler"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(suflerSection,/Скачай приложение|href="\/sufler\/(terms|privacy)\//);
-  assert.match(footer,/Скачай приложение, добавь свой ключ Deepgram/);
-  assert.match(footer,/Download the app, add your own Deepgram key/);
-  assert.match(footer,/href="\/sufler\/terms\//);assert.match(footer,/href="\/sufler\/privacy\//);
   assert.doesNotMatch(home,/опорные мысли|Опорные мысли/);
   assert.doesNotMatch(home,/<a class="screen-(link|view)"/);
   assert.match(home,/Показать вопрос/);assert.match(home,/Показать подсказку/);
