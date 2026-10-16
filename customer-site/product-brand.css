@@ -11,3 +11,13 @@ header .langtoggle{display:flex}
 .customer-evidence img{display:block;width:100%;height:auto;border:1px solid var(--line,#41464c);border-radius:6px}
 .customer-evidence figcaption{font:13px/1.6 'Golos Text',sans-serif;color:var(--muted,#b4bdc6);margin-top:12px}
 .preview.customer-evidence{max-width:760px;margin:48px auto 0}
+
+/* Explicit route from the VPN product/account pages to the shared storefront. */
+.customer-home{border-bottom:1px solid var(--line,#41464c);font-size:14px}
+.customer-home a{display:inline-flex;align-items:center;gap:10px;min-height:44px;color:var(--fg,#f3f4f5);text-decoration:none}
+.customer-home a:hover{text-decoration:underline;text-underline-offset:4px}
+.customer-home a:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:3px}
+.customer-home svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}
+
+html:has(.customer-home){scroll-padding-top:144px}
+@media(max-width:600px){html:has(.customer-home){scroll-padding-top:176px}}

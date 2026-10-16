@@ -58,6 +58,11 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
         html=html.replaceAll('aria-label="family-pie: на главную"','aria-label="Family Spy"');
         html=html.replace(/<a href="\/">family-pie<\/a>/g,'<a href="/">family-spy</a>');
         html=html.replaceAll('Студия Family Pie','Family Spy').replaceAll('Проект Family Pie · 2026','Family Spy · 2026');
+        if(relative(output,path).replaceAll('\\','/').startsWith('vpn/')) {
+          const home='<nav class="customer-home" aria-label="Family Spy"><div class="wrap"><a href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"/></svg><span data-ru="Все продукты Family Spy" data-en="All Family Spy products">Все продукты Family Spy</span></a></div></nav>';
+          // Keep the return route visible with the existing sticky product header.
+          html=html.includes('<header class="nav">') ? html.replace('<header class="nav">','<header class="nav">'+home) : html.replace(/<body([^>]*)>/,'<body$1>'+home);
+        }
         html=html.replace('</head>','<link rel="stylesheet" href="/product-brand.css"><script src="/customer.js" defer></script></head>');
         if(path===resolve(output,'vpn/cabinet/auth/index.html'))html=html.replace('</main>','<p class="muted" style="max-width:42rem;margin:1rem auto">Ключ входа со старого сайта привязан к прежнему домену. Войди здесь по логину и паролю или подтверждённой почте, затем добавь новый ключ в настройках.</p></main>');
         await writeFile(path,html);count++;
