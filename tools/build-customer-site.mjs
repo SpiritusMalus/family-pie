@@ -29,6 +29,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
     }
   });
   for (const file of ['index.html','customer.css','customer.js']) await cp(resolve(project,'customer-site',file),resolve(output,file));
+  await cp(resolve(project,'customer-site/media'),resolve(output,'media'),{recursive:true});
   const dictionary=resolve(output,'i18n/en.js');
   await writeFile(dictionary,(await readFile(dictionary,'utf8')).replaceAll('· family-pie"','· Family Spy"')+'\nwindow.FP_EN["Подписка, подключение и помощь — в твоём личном кабинете."] = "Your subscription, connection and support are in your account.";\nwindow.FP_EN["Ключ, созданный на старом сайте?"] = "Have a passkey from the previous site?";\nwindow.FP_EN["Войти со старым ключом"] = "Use an existing passkey";\nwindow.FP_EN["Выбери подписку"] = "Choose a plan";\nwindow.FP_EN["Аккаунт:"] = "Account:";\nwindow.FP_EN["Личный кабинет Family VPN."] = "Family VPN account.";\nwindow.FP_EN["Ожидаем оплату"] = "Awaiting payment";\nwindow.FP_EN["Выбрать тариф"] = "Choose a plan";\nwindow.FP_EN["Маршруты в твоём профиле"] = "Connection routes in your profile";\nwindow.FP_EN["Личная подписка содержит доступные пути подключения. После импорта выбери маршрут в VPN-приложении. Проверить свою сеть можно в разделе «Диагностика»."] = "Your subscription includes the available connection routes. After importing it, choose a route in your VPN app. You can check your connection under Diagnostics.";\nwindow.FP_EN[". Здесь можно войти прежним логином и паролем и добавить новый ключ в настройках."] = ". You can also use your existing username and password here, then add a new passkey in Settings.";\n');
   await writeFile(dictionary,(await readFile(dictionary,'utf8'))+'\nwindow.FP_EN["Ключ входа со старого сайта привязан к прежнему домену. Войди здесь по логину и паролю или подтверждённой почте, затем добавь новый ключ в настройках."] = "Passkeys from the previous site are tied to that domain. Sign in here with your username and password or verified email, then add a new passkey in Settings.";\n');
@@ -42,6 +43,14 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
       else if(item.name.endsWith('.html') && path !== resolve(output,'index.html')) {
         let html=await readFile(path,'utf8');
         html=html.replace(/<div class="fp-social">[\s\S]*?<\/div>/g,'');
+        if(path===resolve(output,'vpn/index.html')) {
+          html=html.replace('<script src="/vpn/portal.js" defer></script>','');
+          html=html.replace(/<div class="hero-art"><canvas[\s\S]*?<\/canvas><\/div>/,'<figure class="hero-art customer-evidence"><a href="/media/vpn-android.jpg" target="_blank" rel="noopener"><img src="/media/vpn-android.jpg" width="1120" height="780" alt="Кабинет Family VPN: инструкция Android" data-ru="Кабинет Family VPN: инструкция Android" data-en="Family VPN account: Android guide" data-copy-attr="alt"></a><figcaption data-ru="Настоящий кабинет. Демо-аккаунт, интерфейс на русском." data-en="Actual account interface in Russian, using a demo account.">Настоящий кабинет. Демо-аккаунт, интерфейс на русском.</figcaption></figure>');
+        }
+        if(path===resolve(output,'sufler/index.html')) {
+          html=html.replace(/<div class="preview" id="about"[\s\S]*?<\/div>\s*<\/section>/,'<figure class="preview customer-evidence" id="about"><a href="/media/sufler-answer.jpg" target="_blank" rel="noopener"><img src="/media/sufler-answer.jpg" width="760" height="560" alt="Sufler: короткая подсказка к ответу" data-ru="Sufler: короткая подсказка к ответу" data-en="Sufler: short talking points" data-copy-attr="alt"></a><figcaption data-ru="Интерфейс приложения на русском. Подготовленный пример собеседования." data-en="Actual app interface in Russian. Prepared interview example.">Интерфейс приложения на русском. Подготовленный пример собеседования.</figcaption></figure></section>');
+        }
+
         html=html.replaceAll('https://family-pie.ru/sufler/','https://family-spy.ru/sufler/');
         html=html.replaceAll("'https://hub.146-103-120-137.sslip.io/sufler-license'","'/sufler/api'");
         html=html.replaceAll('· family-pie</title>','· Family Spy</title>');
