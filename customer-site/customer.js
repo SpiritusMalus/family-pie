@@ -36,13 +36,32 @@
     if (vpn && vpnPlan) vpn.textContent = lang() === 'en' ? `${vpnPlan.priceMinor / 100} RUB for ${vpnPlan.days} days` : `${vpnPlan.priceMinor / 100} ₽ за ${vpnPlan.days} дней`;
     if (sufler && suflerPlan) sufler.textContent = lang() === 'en' ? `30 minutes free, then ${Number(suflerPlan.amount)} RUB for ${suflerPlan.days} days` : `30 минут бесплатно, затем ${Number(suflerPlan.amount)} ₽ за ${suflerPlan.days} дней`;
     const rate = Number(document.querySelector('.vpn-pricing')?.dataset.usdRub);
+    const months = {30:1,90:3,180:6,365:12};
+    const format = value => new Intl.NumberFormat(lang() === 'en' ? 'en-US' : 'ru-RU', {maximumFractionDigits:2}).format(value);
+    const rubles = value => lang() === 'en' ? `${format(value)} RUB` : `${format(value)} ₽`;
+    const bestPlan = vpnPlans.length > 1 && vpnPlans.reduce((best, p) =>
+      p.priceMinor / months[p.days] < best.priceMinor / months[best.days] ? p : best);
     document.querySelectorAll('[data-vpn-plan]').forEach(card => {
       const plan = vpnPlans.find(p => p.days === Number(card.dataset.vpnPlan));
       if (!plan) return;
       const amount = card.querySelector('.vpn-plan-amount'), usd = card.querySelector('.vpn-plan-usd');
-      const rub = new Intl.NumberFormat(lang() === 'en' ? 'en-US' : 'ru-RU').format(plan.priceMinor / 100);
-      amount.textContent = lang() === 'en' ? `${rub} RUB` : `${rub} ₽`;
+      const monthly = card.querySelector('.vpn-plan-monthly'), unit = card.querySelector('.vpn-plan-unit');
+      const saving = card.querySelector('.vpn-plan-saving'), best = card.querySelector('.vpn-plan-best');
+      monthly.textContent = rubles(plan.priceMinor / 100 / months[plan.days]);
+      monthly.hidden = unit.hidden = false;
+      amount.textContent = (lang() === 'en' ? 'Total ' : 'Всего ') + rubles(plan.priceMinor / 100);
       card.classList.add('has-price');
+      card.dataset.best = String(bestPlan === plan && plan.days !== 30);
+      best.hidden = card.dataset.best !== 'true';
+      if (vpnPlan && Number.isSafeInteger(vpnPlan.priceMinor * months[plan.days])) {
+        const saved = (vpnPlan.priceMinor * months[plan.days] - plan.priceMinor) / 100;
+        saving.textContent = plan.days === 30
+          ? (lang() === 'en' ? 'Base plan' : 'Базовый тариф')
+          : saved > 0 ? (lang() === 'en' ? 'Save ' : 'Экономия ') + rubles(saved)
+          : (lang() === 'en' ? 'No savings vs base plan' : 'Без экономии к базовому тарифу');
+        saving.hidden = false;
+        saving.dataset.positive = String(saved > 0);
+      }
       if (Number.isFinite(rate) && rate > 0) {
         usd.textContent = `≈ US$${(plan.priceMinor / 100 / rate).toFixed(2)}`;
         usd.hidden = false;

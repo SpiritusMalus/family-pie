@@ -134,8 +134,10 @@ test('pricing uses validated public RUB plans and the disclosed USD reference ra
  const run=async data=>{
   const price={textContent:'fallback'};
   const cards=[30,90,180,365].map(days=>{
-   const amount={textContent:'fallback'},usd={hidden:true,textContent:''};
-   return {dataset:{vpnPlan:String(days)},classList:{add(){}},amount,usd,querySelector:key=>key==='.vpn-plan-amount'?amount:usd};
+   const node=()=>({hidden:true,textContent:'',dataset:{}});
+   const amount={textContent:'fallback'},usd=node(),monthly=node(),unit=node(),saving=node(),best=node();
+   const nodes={'.vpn-plan-amount':amount,'.vpn-plan-usd':usd,'.vpn-plan-monthly':monthly,'.vpn-plan-unit':unit,'.vpn-plan-saving':saving,'.vpn-plan-best':best};
+   return {dataset:{vpnPlan:String(days)},classList:{add(){}},amount,usd,monthly,unit,saving,best,querySelector:key=>nodes[key]};
   });
   const events={};const context={document:{documentElement:{classList:{add(){}}},
    getElementById:id=>id==='vpn-price'?price:null,querySelector:()=>({dataset:{usdRub:'83.6177'}}),
@@ -147,12 +149,19 @@ test('pricing uses validated public RUB plans and the disclosed USD reference ra
   for(let i=0;i<8;i++)await Promise.resolve();
   return {price,cards,context,events};
  };
- const valid={available:true,testMode:false,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:-1},{days:180,priceMinor:'140000'},{days:365,priceMinor:250000}]};
+ const valid={available:true,testMode:false,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:80000},{days:180,priceMinor:140000},{days:365,priceMinor:250000}]};
  const h=await run(valid);
  assert.equal(h.price.textContent,'300 ₽ за 30 дней');
  assert.equal(h.cards[0].usd.textContent,'≈ US$3.59');assert.equal(h.cards[3].usd.textContent,'≈ US$29.90');
- assert.equal(h.cards[1].usd.hidden,true);assert.equal(h.cards[2].amount.textContent,'fallback');
- h.context.window.FPi18n.lang='en';h.events['fp-languagechange']();assert.equal(h.price.textContent,'300 RUB for 30 days');assert.equal(h.cards[0].amount.textContent,'300 RUB');
+ assert.equal(h.cards[0].monthly.textContent,'300 ₽');assert.equal(h.cards[1].monthly.textContent,'266,67 ₽');
+ assert.equal(h.cards[2].saving.textContent,'Экономия 400 ₽');assert.equal(h.cards[3].monthly.textContent,'208,33 ₽');assert.equal(h.cards[3].saving.textContent,'Экономия 1\u00a0100 ₽');
+ assert.equal(h.cards[3].best.hidden,false);assert.ok(h.cards.slice(0,3).every(c=>c.best.hidden));
+ const changed=await run({...valid,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:24000},{days:365,priceMinor:250000}]});
+ assert.equal(changed.cards[1].best.hidden,false);assert.equal(changed.cards[3].best.hidden,true);
+ const badAmounts=await run({...valid,plans:[valid.plans[0],{days:90,priceMinor:-1},{days:180,priceMinor:'140000'}]});
+ assert.equal(badAmounts.cards[1].usd.hidden,true);assert.equal(badAmounts.cards[2].monthly.hidden,true);
+ const missingBase=await run({...valid,plans:[valid.plans[1],valid.plans[3]]});assert.ok(missingBase.cards.every(c=>c.saving.hidden));
+ h.context.window.FPi18n.lang='en';h.events['fp-languagechange']();assert.equal(h.price.textContent,'300 RUB for 30 days');assert.equal(h.cards[0].amount.textContent,'Total 300 RUB');assert.equal(h.cards[3].saving.textContent,'Save 1,100 RUB');
  for(const data of [{...valid,available:false},{...valid,testMode:true},{...valid,plans:null},{...valid,plans:[{days:30,priceMinor:0}]}]){
   const bad=await run(data);assert.equal(bad.price.textContent,'fallback');assert.ok(bad.cards.every(c=>c.usd.hidden));
  }
