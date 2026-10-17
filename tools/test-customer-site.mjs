@@ -108,7 +108,7 @@ async function demoHarness({broken=false}={}) {
   const elements={'.demo-screen':image,'.original-link':full,'.demo-description':caption,'.screen-error':failure,'.demo-controls':controls};
   const root={querySelector:key=>elements[key],querySelectorAll:()=>frames};
   const document={documentElement:{classList:{add(){}}},
-    querySelectorAll(selector){return selector==='[data-demo]'?[root]:selector==='[data-ru][data-en]'?[image,caption]:[];},getElementById(){return null;}};
+    querySelectorAll(selector){return selector==='[data-demo]'?[root]:selector==='[data-ru][data-en]'?[image,caption]:[];},getElementById(){return null;},querySelector(){return null;}};
   const events={};let scheduled=0;
   const context={document,window:{FPi18n:{lang:'ru'}},setTimeout(){scheduled++;},setInterval(){scheduled++;},
     addEventListener:(event,fn)=>events[event]=fn,location:{origin:'https://example.test'},URL,WeakMap};
@@ -126,4 +126,34 @@ test('failed images offer recovery and manual selection can recover even from a 
   const h=await demoHarness({broken:true});assert.equal(h.failure.hidden,false);assert.equal(h.image.hidden,true);
   h.frames[1].listeners.click();h.image.listeners.load();assert.equal(h.image.hidden,false);assert.equal(h.failure.hidden,true);
   h.image.listeners.error();assert.equal(h.image.hidden,true);assert.equal(h.failure.hidden,false);assert.equal(h.scheduled,0);
+});
+
+// USD is an estimate only; unavailable/test/malformed plans must not become offers.
+test('pricing uses validated public RUB plans and the disclosed USD reference rate',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const run=async data=>{
+  const price={textContent:'fallback'};
+  const cards=[30,90,180,365].map(days=>{
+   const amount={textContent:'fallback'},usd={hidden:true,textContent:''};
+   return {dataset:{vpnPlan:String(days)},classList:{add(){}},amount,usd,querySelector:key=>key==='.vpn-plan-amount'?amount:usd};
+  });
+  const events={};const context={document:{documentElement:{classList:{add(){}}},
+   getElementById:id=>id==='vpn-price'?price:null,querySelector:()=>({dataset:{usdRub:'83.6177'}}),
+   querySelectorAll:selector=>selector==='[data-vpn-plan]'?cards:[]},
+   window:{FPi18n:{lang:'ru'}},addEventListener:(e,fn)=>events[e]=fn,
+   location:{origin:'https://example.test'},URL,WeakMap,
+   fetch:async()=>({ok:true,json:async()=>data})};
+  runInNewContext(await readFile('customer-site/customer.js','utf8'),context);
+  for(let i=0;i<8;i++)await Promise.resolve();
+  return {price,cards,context,events};
+ };
+ const valid={available:true,testMode:false,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:-1},{days:180,priceMinor:'140000'},{days:365,priceMinor:250000}]};
+ const h=await run(valid);
+ assert.equal(h.price.textContent,'300 ₽ за 30 дней');
+ assert.equal(h.cards[0].usd.textContent,'≈ US$3.59');assert.equal(h.cards[3].usd.textContent,'≈ US$29.90');
+ assert.equal(h.cards[1].usd.hidden,true);assert.equal(h.cards[2].amount.textContent,'fallback');
+ h.context.window.FPi18n.lang='en';h.events['fp-languagechange']();assert.equal(h.price.textContent,'300 RUB for 30 days');assert.equal(h.cards[0].amount.textContent,'300 RUB');
+ for(const data of [{...valid,available:false},{...valid,testMode:true},{...valid,plans:null},{...valid,plans:[{days:30,priceMinor:0}]}]){
+  const bad=await run(data);assert.equal(bad.price.textContent,'fallback');assert.ok(bad.cards.every(c=>c.usd.hidden));
+ }
 });
