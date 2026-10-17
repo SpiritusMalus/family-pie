@@ -40,17 +40,8 @@ figure{margin:0}
 .demo-screen{display:block;width:100%;height:100%;object-fit:contain}
 .screen-error{padding:28px;color:var(--quiet)}
 .screen-error:not([hidden]){display:block}
-.product-demo figcaption{margin-top:16px}
-.demo-description{font-size:15px;line-height:1.6;min-height:48px}
 .demo-title{font-size:20px;letter-spacing:-.025em;margin-bottom:12px}
 .demo-question{font-size:20px;line-height:1.5;margin-bottom:16px;max-width:45ch}
-.demo-controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.demo-controls[hidden]{display:none}
-.demo-steps{display:flex;flex-wrap:wrap;gap:8px}
-.demo-controls button{border:1px solid var(--rule);border-radius:4px;background:transparent;color:var(--ink);cursor:pointer;min-height:44px;padding:8px 14px;font-size:14px}
-.demo-steps button[aria-pressed=true]{color:var(--paper);background:var(--accent);border-color:var(--accent)}
-.demo-controls button:hover{border-color:var(--accent)}
-.original-link{display:inline-flex;align-items:center;min-height:44px;font-size:13px;color:var(--quiet)}
 .product-copy .try-note{font-size:14px;margin-top:20px}
 .support{padding-block:48px 56px;scroll-margin-top:24px}
 .support h2{font-size:30px;margin-bottom:28px}
@@ -66,7 +57,7 @@ figure{margin:0}
 
 @media(min-width:701px){.product-copy{padding-top:4px}}
 @media(max-width:900px) and (min-width:701px){.product{grid-template-columns:1fr;gap:28px}.product-copy{max-width:65ch}.product-demo{max-width:760px;width:100%}}
-@media(max-width:700px){.demo-description{min-height:0}.demo-controls{align-items:flex-start}.screen-view{aspect-ratio:10/7}}
+@media(max-width:700px){.screen-view{aspect-ratio:10/7}}
 @media(max-width:700px){
  .product{gap:16px}
  .product-copy{display:contents}
@@ -108,7 +99,7 @@ figure{margin:0}
 .vpn-device-arrow{margin-left:auto;color:var(--quiet)}
 .vpn-devices a:focus-visible{border-color:var(--accent);background:#211b19;color:var(--ink)}
 .vpn-devices a:focus-visible .vpn-icon{color:var(--accent)}
-.button:active,.demo-controls button:active{transform:translateY(1px)}
+.button:active{transform:translateY(1px)}
 @media(hover:hover){
  .vpn-features li:hover{background:#191719}
  .vpn-features li:hover .vpn-icon-box{border-color:var(--accent);background:#36241f;box-shadow:0 0 22px #ff9d881a}

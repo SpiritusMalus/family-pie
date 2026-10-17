@@ -5,26 +5,12 @@
   let vpnPlans = [];
   const lang = () => window.FPi18n?.lang === 'en' ? 'en' : 'ru';
   const originals = new WeakMap();
-  document.querySelectorAll('[data-demo]').forEach(root => {
-    const frames = [...root.querySelectorAll('[data-frame]')];
+  document.querySelectorAll('[data-static-screen]').forEach(root => {
     const image = root.querySelector('.demo-screen');
-    const full = root.querySelector('.original-link');
-    const caption = root.querySelector('.demo-description');
     const failure = root.querySelector('.screen-error');
-    function show(index) {
-      const frame = frames[index];
-      image.dataset.ru = frame.dataset.altRu;image.dataset.en = frame.dataset.altEn;
-      caption.dataset.ru = frame.dataset.captionRu;caption.dataset.en = frame.dataset.captionEn;
-      caption.textContent = caption.dataset[lang()];
-      image.alt = image.dataset[lang()];full.href = frame.dataset.src;
-      image.hidden = false;failure.hidden = true;image.src = frame.dataset.src;
-      frames.forEach((button,i) => button.setAttribute('aria-pressed',String(i === index)));
-    }
-    frames.forEach((button,i) => button.addEventListener('click',() => show(i)));
-    image.addEventListener('error',() => {image.hidden = true;failure.hidden = false;});
-    image.addEventListener('load',() => {image.hidden = false;failure.hidden = true;});
-    root.querySelector('.demo-controls').hidden = false;
-    if(image.complete && !image.naturalWidth){image.hidden=true;failure.hidden=false;}
+    image.addEventListener('error', () => {image.hidden = true;failure.hidden = false;});
+    image.addEventListener('load', () => {image.hidden = false;failure.hidden = true;});
+    if (image.complete && !image.naturalWidth) {image.hidden = true;failure.hidden = false;}
   });
   function render() {
     document.querySelectorAll('[data-ru][data-en]').forEach(node => {
