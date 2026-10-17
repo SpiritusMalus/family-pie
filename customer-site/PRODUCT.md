@@ -51,3 +51,5 @@ Owner Sufler simplification, 2026-10-17: homepage Sufler has exactly one action,
 Owner Sufler copy reduction, 2026-10-17: homepage keeps only Sufler, one purpose sentence, live trial/price, a single Download and try action and the static answer image. Remove the detailed listening/platform/Deepgram paragraph and separate visible example heading/question. Product download/setup pages retain requirements and instructions. Figure retains a translated accessible label and image alt; image failure recovery remains. Remove unused example-heading/question CSS. This supersedes earlier homepage labelled-question/detail requirements; no pricing, VPN, support, footer or product-flow changes.
 
 Owner wording refinement: use “Твой помощник на собеседовании.” / “Your interview assistant.” as the single homepage purpose phrase.
+
+Owner wording refinement: remove the possessive; use “Помощник на собеседовании.” / “Interview assistant.”.
