@@ -35,7 +35,8 @@ test('standalone customer artifact includes account/payment pages without portfo
   const dictionary=await readFile(resolve(output,'i18n/en.js'),'utf8');
   assert.match(dictionary,/Sign in here with your username and password or verified email/);
   assert.doesNotMatch(home,/Демо-аккаунт/);
-  assert.match(home,/Подготовленный пример собеседования/);
+  assert.match(home,/Пример собеседования/);
+  assert.doesNotMatch(home,/vpn-pricing-basis|vpn-currency-note|demo-provenance|support-note/);
   assert.doesNotMatch(home,/100%|полная анонимность|вернём деньги|uptime|24\/7/i);
 });
 test('artifact rebuild refuses to erase unmanaged files or the portfolio source',async t=>{
@@ -153,7 +154,7 @@ test('pricing uses validated public RUB plans and the disclosed USD reference ra
  const h=await run(valid);
  assert.equal(h.price.textContent,'300 ₽ за 30 дней');
  assert.equal(h.cards[0].usd.textContent,'≈ US$3.59');assert.equal(h.cards[3].usd.textContent,'≈ US$29.90');
- assert.equal(h.cards[0].monthly.textContent,'300 ₽');assert.equal(h.cards[1].monthly.textContent,'266,67 ₽');
+ assert.equal(h.cards[0].saving.hidden,true);assert.equal(h.cards[0].monthly.textContent,'300 ₽');assert.equal(h.cards[1].monthly.textContent,'266,67 ₽');
  assert.equal(h.cards[2].saving.textContent,'Экономия 400 ₽');assert.equal(h.cards[3].monthly.textContent,'208,33 ₽');assert.equal(h.cards[3].saving.textContent,'Экономия 1\u00a0100 ₽');
  assert.equal(h.cards[3].best.hidden,false);assert.ok(h.cards.slice(0,3).every(c=>c.best.hidden));
  const changed=await run({...valid,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:24000},{days:365,priceMinor:250000}]});

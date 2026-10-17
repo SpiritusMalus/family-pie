@@ -55,11 +55,8 @@
       best.hidden = card.dataset.best !== 'true';
       if (vpnPlan && Number.isSafeInteger(vpnPlan.priceMinor * months[plan.days])) {
         const saved = (vpnPlan.priceMinor * months[plan.days] - plan.priceMinor) / 100;
-        saving.textContent = plan.days === 30
-          ? (lang() === 'en' ? 'Base plan' : 'Базовый тариф')
-          : saved > 0 ? (lang() === 'en' ? 'Save ' : 'Экономия ') + rubles(saved)
-          : (lang() === 'en' ? 'No savings vs base plan' : 'Без экономии к базовому тарифу');
-        saving.hidden = false;
+        saving.textContent = saved > 0 ? (lang() === 'en' ? 'Save ' : 'Экономия ') + rubles(saved) : '';
+        saving.hidden = saved <= 0;
         saving.dataset.positive = String(saved > 0);
       }
       if (Number.isFinite(rate) && rate > 0) {

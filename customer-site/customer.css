@@ -42,7 +42,6 @@ figure{margin:0}
 .screen-error:not([hidden]){display:block}
 .product-demo figcaption{margin-top:16px}
 .demo-description{font-size:15px;line-height:1.6;min-height:48px}
-.demo-provenance{font-size:13px;line-height:1.6;color:var(--quiet);margin-top:4px}
 .demo-title{font-size:20px;letter-spacing:-.025em;margin-bottom:12px}
 .demo-question{font-size:20px;line-height:1.5;margin-bottom:16px;max-width:45ch}
 .demo-controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
@@ -59,7 +58,6 @@ figure{margin:0}
 .support-products h3{font-size:20px;margin-bottom:12px}
 .support-products p{font-size:16px;max-width:65ch;color:var(--quiet)}
 .support-products a{min-height:44px;display:inline-flex;align-items:center;color:var(--accent);margin-top:12px}
-.support-note{font-size:14px;color:var(--quiet);margin-top:28px}
 .site-footer{border-top:1px solid var(--rule);padding-block:24px 32px;color:var(--quiet);font-size:13px}
 @media(max-width:900px){.wrap{width:calc(100% - 48px)}.product{gap:32px;padding-block:48px}.support-products{gap:32px}}
 @media(max-width:700px){.wrap{width:calc(100% - 40px)}.site-header{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding-block:12px}.site-header nav{grid-column:1/-1;grid-row:2;justify-content:space-between;margin:0;gap:16px}.langtoggle{grid-column:2;grid-row:1}.product{grid-template-columns:1fr;gap:28px;padding-block:40px}.support{padding-block:36px 40px}.support-products{grid-template-columns:1fr;gap:28px}}
@@ -151,9 +149,6 @@ figure{margin:0}
 .vpn-plan[data-best=true] .vpn-plan-action{background:var(--accent);color:var(--paper);border-color:var(--accent)}
 .vpn-plan[data-best=true] .vpn-plan-action span:last-child{color:var(--paper)}
 .vpn-plan-action:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
-.vpn-pricing-basis,.vpn-currency-note{font-size:12px;line-height:1.8;color:var(--quiet);max-width:100ch}
-.vpn-pricing-basis{margin-top:20px}.vpn-currency-note{margin-top:4px}
-.vpn-currency-note a{text-decoration:underline;text-underline-offset:3px}
 @media(hover:hover){.vpn-plan:hover{border-color:#a36d60}.vpn-plan[data-best=true]:hover{border-color:var(--accent)}.vpn-plan-action:hover{text-decoration:none;background:#36241f;border-color:var(--accent)}.vpn-plan[data-best=true] .vpn-plan-action:hover{background:#ffb39f}}
 @media(prefers-reduced-motion:no-preference){.vpn-plan,.vpn-plan-action{transition:background-color .18s ease,border-color .18s ease}}
 @media(max-width:1050px){.vpn-plan{padding:26px 16px 16px}.vpn-plan-monthly{font-size:28px}.vpn-plan-action{font-size:12px;padding:12px 8px}.vpn-plan-best{left:10px;font-size:10px}}
