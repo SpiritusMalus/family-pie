@@ -40,8 +40,6 @@ figure{margin:0}
 .demo-screen{display:block;width:100%;height:100%;object-fit:contain}
 .screen-error{padding:28px;color:var(--quiet)}
 .screen-error:not([hidden]){display:block}
-.demo-title{font-size:20px;letter-spacing:-.025em;margin-bottom:12px}
-.demo-question{font-size:20px;line-height:1.5;margin-bottom:16px;max-width:45ch}
 .product-copy .try-note{font-size:14px;margin-top:20px}
 .support{padding-block:48px 56px;scroll-margin-top:24px}
 .support h2{font-size:30px;margin-bottom:28px}

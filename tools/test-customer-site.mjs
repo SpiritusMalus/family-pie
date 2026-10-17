@@ -35,7 +35,7 @@ test('standalone customer artifact includes account/payment pages without portfo
   const dictionary=await readFile(resolve(output,'i18n/en.js'),'utf8');
   assert.match(dictionary,/Sign in here with your username and password or verified email/);
   assert.doesNotMatch(home,/Демо-аккаунт/);
-  assert.match(home,/Пример собеседования/);
+  assert.doesNotMatch(home,/Пример собеседования|demo-question|Для Windows и macOS\. Нужен свой ключ/);
   assert.doesNotMatch(home,/vpn-pricing-basis|vpn-currency-note|demo-provenance|support-note/);
   assert.doesNotMatch(home,/100%|полная анонимность|вернём деньги|uptime|24\/7/i);
 });
