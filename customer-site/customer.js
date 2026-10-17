@@ -2,28 +2,15 @@
   'use strict';
   document.documentElement.classList.add('js');
   let vpnPlan, suflerPlan;
+  let vpnPlans = [];
   const lang = () => window.FPi18n?.lang === 'en' ? 'en' : 'ru';
   const originals = new WeakMap();
-  document.querySelectorAll('[data-demo]').forEach(root => {
-    const frames = [...root.querySelectorAll('[data-frame]')];
+  document.querySelectorAll('[data-static-screen]').forEach(root => {
     const image = root.querySelector('.demo-screen');
-    const full = root.querySelector('.original-link');
-    const caption = root.querySelector('.demo-description');
     const failure = root.querySelector('.screen-error');
-    function show(index) {
-      const frame = frames[index];
-      image.dataset.ru = frame.dataset.altRu;image.dataset.en = frame.dataset.altEn;
-      caption.dataset.ru = frame.dataset.captionRu;caption.dataset.en = frame.dataset.captionEn;
-      caption.textContent = caption.dataset[lang()];
-      image.alt = image.dataset[lang()];full.href = frame.dataset.src;
-      image.hidden = false;failure.hidden = true;image.src = frame.dataset.src;
-      frames.forEach((button,i) => button.setAttribute('aria-pressed',String(i === index)));
-    }
-    frames.forEach((button,i) => button.addEventListener('click',() => show(i)));
-    image.addEventListener('error',() => {image.hidden = true;failure.hidden = false;});
-    image.addEventListener('load',() => {image.hidden = false;failure.hidden = true;});
-    root.querySelector('.demo-controls').hidden = false;
-    if(image.complete && !image.naturalWidth){image.hidden=true;failure.hidden=false;}
+    image.addEventListener('error', () => {image.hidden = true;failure.hidden = false;});
+    image.addEventListener('load', () => {image.hidden = false;failure.hidden = true;});
+    if (image.complete && !image.naturalWidth) {image.hidden = true;failure.hidden = false;}
   });
   function render() {
     document.querySelectorAll('[data-ru][data-en]').forEach(node => {
@@ -34,6 +21,35 @@
     const vpn = document.getElementById('vpn-price'), sufler = document.getElementById('sufler-price');
     if (vpn && vpnPlan) vpn.textContent = lang() === 'en' ? `${vpnPlan.priceMinor / 100} RUB for ${vpnPlan.days} days` : `${vpnPlan.priceMinor / 100} ₽ за ${vpnPlan.days} дней`;
     if (sufler && suflerPlan) sufler.textContent = lang() === 'en' ? `30 minutes free, then ${Number(suflerPlan.amount)} RUB for ${suflerPlan.days} days` : `30 минут бесплатно, затем ${Number(suflerPlan.amount)} ₽ за ${suflerPlan.days} дней`;
+    const rate = Number(document.querySelector('.vpn-pricing')?.dataset.usdRub);
+    const months = {30:1,90:3,180:6,365:12};
+    const format = value => new Intl.NumberFormat(lang() === 'en' ? 'en-US' : 'ru-RU', {maximumFractionDigits:2}).format(value);
+    const rubles = value => lang() === 'en' ? `${format(value)} RUB` : `${format(value)} ₽`;
+    const bestPlan = vpnPlans.length > 1 && vpnPlans.reduce((best, p) =>
+      p.priceMinor / months[p.days] < best.priceMinor / months[best.days] ? p : best);
+    document.querySelectorAll('[data-vpn-plan]').forEach(card => {
+      const plan = vpnPlans.find(p => p.days === Number(card.dataset.vpnPlan));
+      if (!plan) return;
+      const amount = card.querySelector('.vpn-plan-amount'), usd = card.querySelector('.vpn-plan-usd');
+      const monthly = card.querySelector('.vpn-plan-monthly'), unit = card.querySelector('.vpn-plan-unit');
+      const saving = card.querySelector('.vpn-plan-saving'), best = card.querySelector('.vpn-plan-best');
+      monthly.textContent = rubles(plan.priceMinor / 100 / months[plan.days]);
+      monthly.hidden = unit.hidden = false;
+      amount.textContent = (lang() === 'en' ? 'Total ' : 'Всего ') + rubles(plan.priceMinor / 100);
+      card.classList.add('has-price');
+      card.dataset.best = String(bestPlan === plan && plan.days !== 30);
+      best.hidden = card.dataset.best !== 'true';
+      if (vpnPlan && Number.isSafeInteger(vpnPlan.priceMinor * months[plan.days])) {
+        const saved = (vpnPlan.priceMinor * months[plan.days] - plan.priceMinor) / 100;
+        saving.textContent = saved > 0 ? (lang() === 'en' ? 'Save ' : 'Экономия ') + rubles(saved) : '';
+        saving.hidden = saved <= 0;
+        saving.dataset.positive = String(saved > 0);
+      }
+      if (Number.isFinite(rate) && rate > 0) {
+        usd.textContent = `≈ US$${(plan.priceMinor / 100 / rate).toFixed(2)}`;
+        usd.hidden = false;
+      }
+    });
     document.querySelectorAll('a[href]').forEach(link => {
       const value = originals.get(link) || link.getAttribute('href');
       if (!value.startsWith('/') || value.startsWith('//')) return;
@@ -48,8 +64,10 @@
   addEventListener('fp-languagechange', render);
   render();
   if (document.getElementById('vpn-price')) fetch('/public-plans/vpn', {cache:'no-store'}).then(r => {if (!r.ok) throw Error();return r.json();}).then(data => {
-    const plan = data.available === true && data.testMode === false && data.plans?.find(p => p.days === 30 && Number.isSafeInteger(p.priceMinor) && p.priceMinor > 0);
-    if (plan) {vpnPlan = plan;render();}
+    if (data.available !== true || data.testMode !== false || !Array.isArray(data.plans)) return;
+    vpnPlans = data.plans.filter(p => p && [30,90,180,365].includes(p.days) && Number.isSafeInteger(p.priceMinor) && p.priceMinor > 0);
+    vpnPlan = vpnPlans.find(p => p.days === 30);
+    render();
   }).catch(() => {});
   if (document.getElementById('sufler-price')) fetch('/public-plans/sufler', {cache:'no-store'}).then(r => {if (!r.ok) throw Error();return r.json();}).then(plan => {
     if (plan.enabled === true && plan.currency === 'RUB' && /^\d+\.\d{2}$/.test(plan.amount) && Number.isFinite(Number(plan.amount)) && Number(plan.amount) > 0 && Number.isSafeInteger(plan.days) && plan.days > 0) {suflerPlan = plan;render();}

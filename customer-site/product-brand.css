@@ -9,7 +9,6 @@ header .langtoggle{display:flex}
 .customer-evidence{margin:0;min-height:0;aspect-ratio:auto}
 .customer-evidence a{display:block}
 .customer-evidence img{display:block;width:100%;height:auto;border:1px solid var(--line,#41464c);border-radius:6px}
-.customer-evidence figcaption{font:13px/1.6 'Golos Text',sans-serif;color:var(--muted,#b4bdc6);margin-top:12px}
 .preview.customer-evidence{max-width:760px;margin:48px auto 0}
 
 /* Explicit route from the VPN product/account pages to the shared storefront. */
