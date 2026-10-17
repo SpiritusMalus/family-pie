@@ -34,7 +34,7 @@ test('standalone customer artifact includes account/payment pages without portfo
   assert.match(auth,/Ключ входа со старого сайта привязан к прежнему домену/);
   const dictionary=await readFile(resolve(output,'i18n/en.js'),'utf8');
   assert.match(dictionary,/Sign in here with your username and password or verified email/);
-  assert.match(home,/Демо-аккаунт/);
+  assert.doesNotMatch(home,/Демо-аккаунт/);
   assert.match(home,/Подготовленный пример собеседования/);
   assert.doesNotMatch(home,/100%|полная анонимность|вернём деньги|uptime|24\/7/i);
 });
@@ -82,7 +82,7 @@ test('product evidence ships real image bytes without portal or private fixture 
   }
   const home=await readFile(resolve(output,'index.html'),'utf8');
   assert.doesNotMatch(home,/demo-play|Короткое демо|После оплаты|Выбираешь подписку|Экраны кабинета|Account screens/);
-  assert.equal((home.match(/data-frame="/g)||[]).length,5);
+  assert.equal((home.match(/data-frame="/g)||[]).length,2);
   const vpn=home.match(/<section id="vpn"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(vpn,/href="\/vpn\/(terms|privacy)\//);
   const footer=home.match(/<footer[\s\S]*?<\/footer>/)[0];
