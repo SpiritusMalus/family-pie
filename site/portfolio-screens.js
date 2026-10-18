@@ -10,13 +10,13 @@
   const pairs = [...document.querySelectorAll('[data-screen-pair]')].map(figure => ({
     figure,
     image: figure.querySelector('[data-screen-ru-src][data-screen-en-src]'),
-    link: figure.querySelector('[data-screen-link]'),
+    links: [...figure.querySelectorAll('[data-screen-link]')],
     buttons: [...figure.querySelectorAll('[data-screen-language]')],
     status: figure.querySelector('[data-screen-status]'),
     preference: savedLanguage(figure.querySelector('[data-screen-ru-src]')),
     shown: figure.dataset.screenLang || 'ru',
     request: 0
-  })).filter(pair => pair.image && pair.link);
+  })).filter(pair => pair.image && pair.links.length);
 
   function finish(pair, lang) {
     pair.shown = lang;
@@ -33,7 +33,7 @@
     const src = pair.image.dataset[lang === 'en' ? 'screenEnSrc' : 'screenRuSrc'];
     const request = ++pair.request;
     if (pair.image.getAttribute('src') === src && pair.image.complete && pair.image.naturalWidth) {
-      pair.link.href = src;
+      pair.links.forEach(link => { link.href = src; });
       finish(pair, lang);
       return;
     }
@@ -58,7 +58,7 @@
       pair.image.src = src;
       pair.image.width = capture.naturalWidth;
       pair.image.height = capture.naturalHeight;
-      pair.link.href = src;
+      pair.links.forEach(link => { link.href = src; });
       finish(pair, lang);
     };
     capture.src = src;
