@@ -34,8 +34,9 @@ test('standalone customer artifact includes account/payment pages without portfo
   assert.match(auth,/Ключ входа со старого сайта привязан к прежнему домену/);
   const dictionary=await readFile(resolve(output,'i18n/en.js'),'utf8');
   assert.match(dictionary,/Sign in here with your username and password or verified email/);
-  assert.match(home,/Демо-аккаунт/);
-  assert.match(home,/Подготовленный пример собеседования/);
+  assert.doesNotMatch(home,/Демо-аккаунт/);
+  assert.doesNotMatch(home,/Пример собеседования|demo-question|Для Windows и macOS\. Нужен свой ключ/);
+  assert.doesNotMatch(home,/vpn-pricing-basis|vpn-currency-note|demo-provenance|support-note/);
   assert.doesNotMatch(home,/100%|полная анонимность|вернём деньги|uptime|24\/7/i);
 });
 test('artifact rebuild refuses to erase unmanaged files or the portfolio source',async t=>{
@@ -81,50 +82,74 @@ test('product evidence ships real image bytes without portal or private fixture 
     }
   }
   const home=await readFile(resolve(output,'index.html'),'utf8');
-  assert.doesNotMatch(home,/demo-play|Короткое демо|После оплаты|Выбираешь подписку/);
-  assert.equal((home.match(/data-frame="/g)||[]).length,5);
+  assert.doesNotMatch(home,/demo-play|Короткое демо|После оплаты|Выбираешь подписку|Экраны кабинета|Account screens/);
+  assert.equal((home.match(/data-frame="/g)||[]).length,0);
   const vpn=home.match(/<section id="vpn"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(vpn,/href="\/vpn\/(terms|privacy)\//);
   const footer=home.match(/<footer[\s\S]*?<\/footer>/)[0];
-  assert.match(footer,/href="\/vpn\/terms\//);assert.match(footer,/href="\/vpn\/privacy\//);
+  assert.match(footer,/href="mailto:support@family-pie\.ru"/);
+  assert.equal((footer.match(/<a /g)||[]).length,1);
+  assert.doesNotMatch(footer,/Условия|Данные|Deepgram|©|class="brand"/);
   const suflerSection=home.match(/<section id="sufler"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(suflerSection,/Скачай приложение|href="\/sufler\/(terms|privacy)\//);
-  assert.match(footer,/Скачай приложение, добавь свой ключ Deepgram/);
-  assert.match(footer,/Download the app, add your own Deepgram key/);
-  assert.match(footer,/href="\/sufler\/terms\//);assert.match(footer,/href="\/sufler\/privacy\//);
   assert.doesNotMatch(home,/опорные мысли|Опорные мысли/);
   assert.doesNotMatch(home,/<a class="screen-(link|view)"/);
-  assert.match(home,/Показать вопрос/);assert.match(home,/Показать подсказку/);
+  assert.doesNotMatch(suflerSection,/<button|Как настроить|Показать вопрос|Показать подсказку|original-link/);
+  assert.equal((suflerSection.match(/<a /g)||[]).length,1);
+  assert.match(suflerSection,/href="\/sufler\/#download"/);
+  assert.match(suflerSection,/src="\/media\/sufler-answer\.jpg"/);
 });
 
-// Test manual selection and recovery without accounts, APIs or a running clock.
-async function demoHarness({broken=false}={}) {
-  const {runInNewContext}=await import('node:vm');
-  const node=(dataset={})=>({dataset,hidden:false,complete:true,naturalWidth:760,attrs:{},listeners:{},textContent:'',
-    setAttribute(key,value){this.attrs[key]=value;},getAttribute(key){return this.attrs[key]||'';},
-    addEventListener(event,fn){this.listeners[event]=fn;}});
-  const image=node({copyAttr:'alt'});image.naturalWidth=broken?0:760;image.src='/media/frame-0.jpg';
-  const full=node(),caption=node(),failure=node(),controls=node();full.href=image.src;
-  const frames=[0,1].map(i=>node({src:`/media/frame-${i}.jpg`,altRu:`Экран ${i}`,altEn:`Screen ${i}`,captionRu:`Шаг ${i}`,captionEn:`Step ${i}`}));
-  const elements={'.demo-screen':image,'.original-link':full,'.demo-description':caption,'.screen-error':failure,'.demo-controls':controls};
-  const root={querySelector:key=>elements[key],querySelectorAll:()=>frames};
-  const document={documentElement:{classList:{add(){}}},
-    querySelectorAll(selector){return selector==='[data-demo]'?[root]:selector==='[data-ru][data-en]'?[image,caption]:[];},getElementById(){return null;}};
-  const events={};let scheduled=0;
-  const context={document,window:{FPi18n:{lang:'ru'}},setTimeout(){scheduled++;},setInterval(){scheduled++;},
-    addEventListener:(event,fn)=>events[event]=fn,location:{origin:'https://example.test'},URL,WeakMap};
-  runInNewContext(await readFile('customer-site/customer.js','utf8'),context);
-  return {image,full,caption,failure,frames,context,events,get scheduled(){return scheduled;}};
-}
-test('manual example changes only after selection and preserves the original link across language changes',async()=>{
-  const h=await demoHarness();assert.equal(h.scheduled,0);assert.equal(h.image.src,'/media/frame-0.jpg');
-  h.frames[1].listeners.click();assert.equal(h.image.src,'/media/frame-1.jpg');assert.equal(h.full.href,h.image.src);
-  assert.equal(h.frames[1].attrs['aria-pressed'],'true');assert.equal(h.frames[0].attrs['aria-pressed'],'false');
-  h.context.window.FPi18n.lang='en';h.events['fp-languagechange']();assert.equal(h.image.attrs.alt,'Screen 1');assert.equal(h.caption.textContent,'Step 1');assert.equal(h.full.href,'/media/frame-1.jpg');
-  h.frames[0].listeners.click();assert.equal(h.image.alt,'Screen 0');assert.equal(h.scheduled,0);
+// Static evidence recovers from a failed image without adding another homepage action.
+test('static Sufler image exposes an error and recovers on load, including cached failures',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ for(const broken of [false,true]){
+  const image={hidden:false,complete:true,naturalWidth:broken?0:760,listeners:{},addEventListener(e,fn){this.listeners[e]=fn;}};
+  const failure={hidden:true};
+  const root={querySelector:key=>key==='.demo-screen'?image:failure};
+  const document={documentElement:{classList:{add(){}}},querySelectorAll:key=>key==='[data-static-screen]'?[root]:[],querySelector:()=>null,getElementById:()=>null};
+  runInNewContext(await readFile('customer-site/customer.js','utf8'),{document,window:{FPi18n:{lang:'ru'}},addEventListener(){},URL,WeakMap});
+  assert.equal(image.hidden,broken);assert.equal(failure.hidden,!broken);
+  image.listeners.error();assert.equal(image.hidden,true);assert.equal(failure.hidden,false);
+  image.listeners.load();assert.equal(image.hidden,false);assert.equal(failure.hidden,true);
+ }
 });
-test('failed images offer recovery and manual selection can recover even from a cached failure',async()=>{
-  const h=await demoHarness({broken:true});assert.equal(h.failure.hidden,false);assert.equal(h.image.hidden,true);
-  h.frames[1].listeners.click();h.image.listeners.load();assert.equal(h.image.hidden,false);assert.equal(h.failure.hidden,true);
-  h.image.listeners.error();assert.equal(h.image.hidden,true);assert.equal(h.failure.hidden,false);assert.equal(h.scheduled,0);
+
+// USD is an estimate only; unavailable/test/malformed plans must not become offers.
+test('pricing uses validated public RUB plans and the USD reference rate',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const run=async data=>{
+  const price={textContent:'fallback'};
+  const cards=[30,90,180,365].map(days=>{
+   const node=()=>({hidden:true,textContent:'',dataset:{}});
+   const amount={textContent:'fallback'},usd=node(),monthly=node(),unit=node(),saving=node(),best=node();
+   const nodes={'.vpn-plan-amount':amount,'.vpn-plan-usd':usd,'.vpn-plan-monthly':monthly,'.vpn-plan-unit':unit,'.vpn-plan-saving':saving,'.vpn-plan-best':best};
+   return {dataset:{vpnPlan:String(days)},classList:{add(){}},amount,usd,monthly,unit,saving,best,querySelector:key=>nodes[key]};
+  });
+  const events={};const context={document:{documentElement:{classList:{add(){}}},
+   getElementById:id=>id==='vpn-price'?price:null,querySelector:()=>({dataset:{usdRub:'83.6177'}}),
+   querySelectorAll:selector=>selector==='[data-vpn-plan]'?cards:[]},
+   window:{FPi18n:{lang:'ru'}},addEventListener:(e,fn)=>events[e]=fn,
+   location:{origin:'https://example.test'},URL,WeakMap,
+   fetch:async()=>({ok:true,json:async()=>data})};
+  runInNewContext(await readFile('customer-site/customer.js','utf8'),context);
+  for(let i=0;i<8;i++)await Promise.resolve();
+  return {price,cards,context,events};
+ };
+ const valid={available:true,testMode:false,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:80000},{days:180,priceMinor:140000},{days:365,priceMinor:250000}]};
+ const h=await run(valid);
+ assert.equal(h.price.textContent,'300 ₽ за 30 дней');
+ assert.equal(h.cards[0].usd.textContent,'≈ US$3.59');assert.equal(h.cards[3].usd.textContent,'≈ US$29.90');
+ assert.equal(h.cards[0].saving.hidden,true);assert.equal(h.cards[0].monthly.textContent,'300 ₽');assert.equal(h.cards[1].monthly.textContent,'266,67 ₽');
+ assert.equal(h.cards[2].saving.textContent,'Экономия 400 ₽');assert.equal(h.cards[3].monthly.textContent,'208,33 ₽');assert.equal(h.cards[3].saving.textContent,'Экономия 1\u00a0100 ₽');
+ assert.equal(h.cards[3].best.hidden,false);assert.ok(h.cards.slice(0,3).every(c=>c.best.hidden));
+ const changed=await run({...valid,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:24000},{days:365,priceMinor:250000}]});
+ assert.equal(changed.cards[1].best.hidden,false);assert.equal(changed.cards[3].best.hidden,true);
+ const badAmounts=await run({...valid,plans:[valid.plans[0],{days:90,priceMinor:-1},{days:180,priceMinor:'140000'}]});
+ assert.equal(badAmounts.cards[1].usd.hidden,true);assert.equal(badAmounts.cards[2].monthly.hidden,true);
+ const missingBase=await run({...valid,plans:[valid.plans[1],valid.plans[3]]});assert.ok(missingBase.cards.every(c=>c.saving.hidden));
+ h.context.window.FPi18n.lang='en';h.events['fp-languagechange']();assert.equal(h.price.textContent,'300 RUB for 30 days');assert.equal(h.cards[0].amount.textContent,'Total 300 RUB');assert.equal(h.cards[3].saving.textContent,'Save 1,100 RUB');
+ for(const data of [{...valid,available:false},{...valid,testMode:true},{...valid,plans:null},{...valid,plans:[{days:30,priceMinor:0}]}]){
+  const bad=await run(data);assert.equal(bad.price.textContent,'fallback');assert.ok(bad.cards.every(c=>c.usd.hidden));
+ }
 });
