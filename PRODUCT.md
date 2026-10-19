@@ -41,3 +41,7 @@ Homepage and showcase preview use a short service-first headline, project-scroll
 The homepage copy may be shorter while the full existing case explanations remain available. No new product, client claim, price, experience metric or capability is invented. Public display name remains Eugene Tihonenko; English default and explicit/saved Russian choices remain unchanged. The actual two-project selection is retained, with no invented third grid item.
 
 This new preview is not yet approved for publication. PR108 also includes the already requested inline-only screenshot behavior on both sites. All changes require approval of the latest shown cumulative preview plus green CI before main integration/publication. Other held PRs remain independent.
+
+## Portfolio copy
+
+Use plain, concrete descriptions in RU and EN: name the application, its purpose and the actions it supports. Driftora recognizes food in photos, calculates calories and macros, supports portion review, and records workouts and walking. Lumen + REST provides break reminders and screen brightness/color controls, with platform details retained on its case page. Keep personal motivation and implementation detail on the case pages rather than repeating a generic development-services introduction. Biography copy must use owner-supplied facts; never infer a career history, clients or experience from the reference author.
