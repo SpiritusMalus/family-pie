@@ -43,3 +43,7 @@ Portfolio routes keep English static/first-visit copy; explicit URL and saved Ru
 **State: APPROVED FOR RELEASE.** The owner explicitly approved the latest shown cumulative preview fbfc600a9875083dc84f032e9899ab0970e70728 on 2026-10-19. It supersedes the 2026-10-11 black-showcase composition. Integrate through the established reviewed main CI route; verified deployment status belongs to the project release journal.
 
 An independent finish review found no material visual issues and readiness for preview. Exact visual, functional and preservation evidence is recorded in the existing project journal. This documentation describes the built preview and does not establish device or deployment acceptance.
+
+## Portrait balance follow-up (preview)
+
+Owner asks for a larger About portrait and text shifted right after the PR108 release. Desktop portrait208px, gap40px;900px breakpoint176/28;760px breakpoint128/24;420px stacks a160px portrait above the text. Preserve original portrait bytes/crop and all copy/controls. This new scoped change is PREVIEW and has not been approved for publication; prior approval applies to the already published PR108 layout.

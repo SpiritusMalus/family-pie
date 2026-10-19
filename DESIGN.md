@@ -353,3 +353,7 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 - **Don't** present personal motivations as achieved weight loss or clinical benefit.
 - **Don't** describe existing Android/macOS image assets as fresh device or cross-platform acceptance.
 - **Don't** let the portfolio replacement remove direct product, download, legal or purchase routes.
+
+### Portrait/text balance refinement (preview)
+
+The About portrait is208px square with a40px gap to the text on desktop. At900px and below it uses176px/28px, then128px/24px at760px. At420px and below the portrait becomes160px and stacks above full-width text. The image bytes, crop, biography and disclosure behavior remain unchanged. This scoped refinement follows the owner’s proportion feedback after PR108 and requires approval of its own rendered preview before publication.

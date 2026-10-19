@@ -21,8 +21,8 @@
 .maker-story summary:focus-visible{outline:3px solid var(--accent);outline-offset:-6px;border-radius:var(--card-radius)}
 .maker-story summary svg{width:20px;height:20px;fill:none;stroke:var(--quiet);stroke-width:1.6}
 .maker-story[open] summary svg{transform:rotate(180deg)}
-.maker-body{display:grid;grid-template-columns:112px minmax(0,1fr);gap:24px;padding:0 24px 24px;align-items:center}
-.maker-portrait{width:112px;margin:0}
+.maker-body{display:grid;grid-template-columns:208px minmax(0,1fr);gap:40px;padding:0 24px 24px;align-items:center}
+.maker-portrait{width:208px;max-width:100%;margin:0}
 .maker-portrait img{width:100%;aspect-ratio:1;object-fit:cover;object-position:62% 45%;border-radius:12px}
 .maker-body h2{font-size:22px;line-height:1.25;margin:0 0 8px}
 .maker-body p{font-size:14px;color:var(--quiet);line-height:1.6;margin:0;max-width:75ch}
@@ -60,6 +60,8 @@
  .showcase-preview .wrap{width:calc(100% - 48px)}
  .showcase-intro{gap:28px;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
  .intro-capabilities{padding:20px;gap:14px}
+ .maker-body{grid-template-columns:176px minmax(0,1fr);gap:28px}
+ .maker-portrait{width:176px}
  .showcase-project .driftora-proof{padding-inline:20px;gap:20px}
  .showcase-project .screen-notes{font-size:13px}
 }
@@ -71,8 +73,8 @@
  .intro-capabilities{grid-template-columns:1fr 1fr;gap:14px 20px;padding:18px}
  .intro-capabilities li{font-size:13px;gap:8px}
  .maker-story{margin-bottom:28px}
- .maker-body{grid-template-columns:80px minmax(0,1fr);gap:16px;padding:0 20px 20px;align-items:start}
- .maker-portrait{width:80px}
+ .maker-body{grid-template-columns:128px minmax(0,1fr);gap:24px;padding:0 20px 20px;align-items:start}
+ .maker-portrait{width:128px}
  .maker-body h2{font-size:18px}
  .maker-body .family-note{grid-column:1/-1}
  .showcase-grid{grid-template-columns:1fr;gap:24px}
@@ -88,7 +90,7 @@
  .intro-capabilities{grid-template-columns:1fr;gap:10px;padding:16px}
  .maker-story summary{padding-inline:20px}
  .maker-body{grid-template-columns:1fr}
- .maker-portrait{width:80px}
+ .maker-portrait{width:160px}
  .project-heading{padding:20px}
  .project-heading h3{font-size:24px}
  .showcase-project .project-copy{padding:16px 20px 20px}
