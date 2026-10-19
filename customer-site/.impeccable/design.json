@@ -1,0 +1,383 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-19T20:13:41.289456+00:00",
+  "title": "Design System: Family Spy",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Black Canvas",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Primary Ink",
+        "tonalRamp": [
+          "oklch(15.00% 0.00171 247.84)",
+          "oklch(26.43% 0.00171 247.84)",
+          "oklch(37.86% 0.00171 247.84)",
+          "oklch(49.29% 0.00171 247.84)",
+          "oklch(60.71% 0.00171 247.84)",
+          "oklch(72.14% 0.00171 247.84)",
+          "oklch(83.57% 0.00171 247.84)",
+          "oklch(95.00% 0.00171 247.84)"
+        ]
+      },
+      "quiet": {
+        "role": "neutral",
+        "displayName": "Quiet Text",
+        "tonalRamp": [
+          "oklch(15.00% 0.01620 248.03)",
+          "oklch(26.43% 0.01620 248.03)",
+          "oklch(37.86% 0.01620 248.03)",
+          "oklch(49.29% 0.01620 248.03)",
+          "oklch(60.71% 0.01620 248.03)",
+          "oklch(72.14% 0.01620 248.03)",
+          "oklch(83.57% 0.01620 248.03)",
+          "oklch(95.00% 0.01620 248.03)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Quiet Rule",
+        "tonalRamp": [
+          "oklch(15.00% 0.01071 254.00)",
+          "oklch(26.43% 0.01071 254.00)",
+          "oklch(37.86% 0.01071 254.00)",
+          "oklch(49.29% 0.01071 254.00)",
+          "oklch(60.71% 0.01071 254.00)",
+          "oklch(72.14% 0.01071 254.00)",
+          "oklch(83.57% 0.01071 254.00)",
+          "oklch(95.00% 0.01071 254.00)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Storefront Coral",
+        "tonalRamp": [
+          "oklch(15.00% 0.12173 32.87)",
+          "oklch(26.43% 0.12173 32.87)",
+          "oklch(37.86% 0.12173 32.87)",
+          "oklch(49.29% 0.12173 32.87)",
+          "oklch(60.71% 0.12173 32.87)",
+          "oklch(72.14% 0.12173 32.87)",
+          "oklch(83.57% 0.12173 32.87)",
+          "oklch(95.00% 0.12173 32.87)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Hover Coral",
+        "tonalRamp": [
+          "oklch(15.00% 0.09375 35.34)",
+          "oklch(26.43% 0.09375 35.34)",
+          "oklch(37.86% 0.09375 35.34)",
+          "oklch(49.29% 0.09375 35.34)",
+          "oklch(60.71% 0.09375 35.34)",
+          "oklch(72.14% 0.09375 35.34)",
+          "oklch(83.57% 0.09375 35.34)",
+          "oklch(95.00% 0.09375 35.34)"
+        ]
+      },
+      "screen-field": {
+        "role": "neutral",
+        "displayName": "Screen Field",
+        "tonalRamp": [
+          "oklch(15.00% 0.00694 258.37)",
+          "oklch(26.43% 0.00694 258.37)",
+          "oklch(37.86% 0.00694 258.37)",
+          "oklch(49.29% 0.00694 258.37)",
+          "oklch(60.71% 0.00694 258.37)",
+          "oklch(72.14% 0.00694 258.37)",
+          "oklch(83.57% 0.00694 258.37)",
+          "oklch(95.00% 0.00694 258.37)"
+        ]
+      },
+      "action-rule": {
+        "role": "neutral",
+        "displayName": "Action Rule",
+        "tonalRamp": [
+          "oklch(15.00% 0.01101 258.36)",
+          "oklch(26.43% 0.01101 258.36)",
+          "oklch(37.86% 0.01101 258.36)",
+          "oklch(49.29% 0.01101 258.36)",
+          "oklch(60.71% 0.01101 258.36)",
+          "oklch(72.14% 0.01101 258.36)",
+          "oklch(83.57% 0.01101 258.36)",
+          "oklch(95.00% 0.01101 258.36)"
+        ]
+      },
+      "action-hover": {
+        "role": "neutral",
+        "displayName": "Action Hover",
+        "tonalRamp": [
+          "oklch(15.00% 0.01544 39.25)",
+          "oklch(26.43% 0.01544 39.25)",
+          "oklch(37.86% 0.01544 39.25)",
+          "oklch(49.29% 0.01544 39.25)",
+          "oklch(60.71% 0.01544 39.25)",
+          "oklch(72.14% 0.01544 39.25)",
+          "oklch(83.57% 0.01544 39.25)",
+          "oklch(95.00% 0.01544 39.25)"
+        ]
+      },
+      "ambient-coral": {
+        "role": "primary",
+        "displayName": "Ambient Coral",
+        "tonalRamp": [
+          "oklch(15.00% 0.12173 32.87)",
+          "oklch(26.43% 0.12173 32.87)",
+          "oklch(37.86% 0.12173 32.87)",
+          "oklch(49.29% 0.12173 32.87)",
+          "oklch(60.71% 0.12173 32.87)",
+          "oklch(72.14% 0.12173 32.87)",
+          "oklch(83.57% 0.12173 32.87)",
+          "oklch(95.00% 0.12173 32.87)"
+        ]
+      },
+      "icon-glow": {
+        "role": "primary",
+        "displayName": "Icon Glow",
+        "tonalRamp": [
+          "oklch(15.00% 0.12173 32.87)",
+          "oklch(26.43% 0.12173 32.87)",
+          "oklch(37.86% 0.12173 32.87)",
+          "oklch(49.29% 0.12173 32.87)",
+          "oklch(60.71% 0.12173 32.87)",
+          "oklch(72.14% 0.12173 32.87)",
+          "oklch(83.57% 0.12173 32.87)",
+          "oklch(95.00% 0.12173 32.87)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Two-line Family VPN hero name."
+      },
+      "display-mobile": {
+        "displayName": "Display Mobile",
+        "purpose": "Family VPN name at 700px and below."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Capabilities, pricing and devices headings."
+      },
+      "product-title": {
+        "displayName": "Product Title",
+        "purpose": "Sufler name."
+      },
+      "support-title": {
+        "displayName": "Support Title",
+        "purpose": "Support section heading."
+      },
+      "feature-title": {
+        "displayName": "Feature Title",
+        "purpose": "Capability headings."
+      },
+      "feature-title-mobile": {
+        "displayName": "Feature Title Mobile",
+        "purpose": "Capability headings at 700px and below."
+      },
+      "feature-title-narrow": {
+        "displayName": "Feature Title Narrow",
+        "purpose": "Capability headings at 420px and below."
+      },
+      "plan-title": {
+        "displayName": "Plan Title",
+        "purpose": "Wide-screen offer durations."
+      },
+      "plan-title-mobile": {
+        "displayName": "Plan Title Mobile",
+        "purpose": "Offer durations at 600px and below."
+      },
+      "plan-monthly": {
+        "displayName": "Plan Monthly",
+        "purpose": "Monthly RUB amount on wide screens."
+      },
+      "plan-monthly-compact": {
+        "displayName": "Plan Monthly Compact",
+        "purpose": "Monthly RUB amount at 1050px and below before the mobile override."
+      },
+      "plan-monthly-mobile": {
+        "displayName": "Plan Monthly Mobile",
+        "purpose": "Monthly RUB amount at 600px and below."
+      },
+      "purpose": {
+        "displayName": "Purpose",
+        "purpose": "VPN purpose sentence."
+      },
+      "purpose-mobile": {
+        "displayName": "Purpose Mobile",
+        "purpose": "VPN purpose at 700px and below."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Support copy and base body text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Price details, savings and secondary controls."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "USD estimate and footer."
+      },
+      "language-control": {
+        "displayName": "Language Control",
+        "purpose": "Language buttons, exploration cue and desktop best label."
+      },
+      "best-label-mobile": {
+        "displayName": "Best Label Mobile",
+        "purpose": "Mobile best-price label."
+      }
+    },
+    "shadows": [
+      {
+        "name": "capability-icon-hover",
+        "value": "drop-shadow(0 0 5px #ff9d8844)",
+        "purpose": "Icon filter only on hover-capable devices; no raised card shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-duration",
+        "value": ".18s",
+        "purpose": "Action color/border and icon color/filter transitions only without reduced motion."
+      },
+      {
+        "name": "state-easing",
+        "value": "ease",
+        "purpose": "Existing state-transition easing."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-desktop",
+        "value": "1050px"
+      },
+      {
+        "name": "tablet",
+        "value": "900px"
+      },
+      {
+        "name": "mobile-header",
+        "value": "700px"
+      },
+      {
+        "name": "mobile-offers",
+        "value": "600px"
+      },
+      {
+        "name": "narrow-mobile",
+        "value": "420px"
+      },
+      {
+        "name": "short-viewport-height",
+        "value": "720px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Existing VPN plan or Sufler download action.",
+      "html": "<a class=\"ds-primary\" href=\"#vpn-pricing\">Choose a plan</a>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:14px 28px;background:var(--accent,#ff9d88);color:var(--paper,#000);border-radius:6px;font-weight:500;text-decoration:none;font-family:'Golos Text',sans-serif;}.ds-primary:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(hover:hover){.ds-primary:hover{background:#ffb39f;text-decoration:none}}@media(prefers-reduced-motion:no-preference){.ds-primary{transition:background-color .18s ease}}"
+    },
+    {
+      "name": "Plan Action",
+      "kind": "button",
+      "refersTo": "plan-action",
+      "description": "Non-featured duration-specific account destination.",
+      "html": "<a class=\"ds-plan-action\" href=\"/vpn/cabinet/#plans?period=30\"><span>Choose 30 days</span><span aria-hidden=\"true\">↗</span></a>",
+      "css": ".ds-plan-action{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:48px;padding:12px;border:1px solid #53575d;border-radius:6px;font-size:13px;line-height:1.4;white-space:nowrap;text-decoration:none;color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-plan-action span:last-child{color:var(--accent,#ff9d88)}.ds-plan-action:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(hover:hover){.ds-plan-action:hover{background:#241b18;border-color:var(--accent,#ff9d88)}}@media(prefers-reduced-motion:no-preference){.ds-plan-action{transition:background-color .18s ease,border-color .18s ease}}"
+    },
+    {
+      "name": "Best Plan Action",
+      "kind": "button",
+      "refersTo": "plan-action-best",
+      "description": "Filled action reserved for the validated non-base lowest monthly offer.",
+      "html": "<a class=\"ds-plan-action ds-best\" href=\"/vpn/cabinet/#plans?period=365\"><span>Choose 365 days</span><span aria-hidden=\"true\">↗</span></a>",
+      "css": ".ds-plan-action{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:48px;padding:12px;border:1px solid #53575d;border-radius:6px;font-size:13px;line-height:1.4;white-space:nowrap;text-decoration:none;color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-plan-action span:last-child{color:var(--accent,#ff9d88)}.ds-plan-action:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(hover:hover){.ds-plan-action:hover{background:#241b18;border-color:var(--accent,#ff9d88)}}@media(prefers-reduced-motion:no-preference){.ds-plan-action{transition:background-color .18s ease,border-color .18s ease}}.ds-best{background:var(--accent,#ff9d88);color:var(--paper,#000);border-color:var(--accent,#ff9d88)}.ds-best span:last-child{color:var(--paper,#000)}@media(hover:hover){.ds-best:hover{background:#ffb39f}}"
+    },
+    {
+      "name": "Language Controls",
+      "kind": "custom",
+      "refersTo": "language-button",
+      "description": "Unfilled RU/EN controls with an underlined selected language.",
+      "html": "<div class=\"ds-language\" role=\"group\" aria-label=\"Language\"><button type=\"button\" aria-pressed=\"true\">RU</button><button type=\"button\" aria-pressed=\"false\">EN</button></div>",
+      "css": ".ds-language{display:flex;gap:4px}.ds-language button{display:inline-flex;align-items:center;min-width:44px;min-height:44px;padding:8px;border:0;background:none;color:var(--quiet,#b4bdc6);cursor:pointer;font-size:12px;font-family:'Golos Text',sans-serif;}.ds-language button[aria-pressed=true]{color:var(--ink,#f3f4f5);text-decoration:underline;text-underline-offset:6px}.ds-language button:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}"
+    },
+    {
+      "name": "Storefront Navigation",
+      "kind": "nav",
+      "description": "Direct independent product and support anchors.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navigation\"><a href=\"#vpn\">Family VPN</a><a href=\"#sufler\">Sufler</a><a href=\"#support\">Help</a></nav>",
+      "css": ".ds-nav{display:flex;gap:28px;font-family:'Golos Text',sans-serif;}.ds-nav a{display:inline-flex;align-items:center;min-height:44px;color:var(--ink,#f3f4f5);text-decoration:none}.ds-nav a:hover{text-decoration:underline;text-underline-offset:4px}.ds-nav a:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(max-width:700px){.ds-nav{justify-content:space-between;gap:12px;font-size:14px}}"
+    },
+    {
+      "name": "Native Mobile Offer",
+      "kind": "custom",
+      "description": "Top-rule disclosure; all source offers start open and mobile JavaScript initializes the first offer. No invented prices in this fallback snippet.",
+      "html": "<details class=\"ds-offer\" open><summary><span>30 days</span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5v14\"/></svg></summary><div><p>See account pricing</p><a href=\"/vpn/cabinet/#plans?period=30\">Choose 30 days ↗</a></div></details>",
+      "css": ".ds-offer{border-top:1px solid var(--rule,#292d32);color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-offer summary{display:flex;align-items:center;gap:16px;min-height:88px;padding:20px 0;list-style:none;cursor:pointer;font-size:22px;font-weight:600;letter-spacing:-.025em}.ds-offer summary::-webkit-details-marker{display:none}.ds-offer summary span{flex:1}.ds-offer summary svg{width:20px;height:20px;color:var(--quiet,#b4bdc6)}.ds-offer[open] summary svg{transform:rotate(45deg)}.ds-offer summary:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}.ds-offer>div{padding:0 0 24px}.ds-offer p{margin:0 0 16px;color:var(--quiet,#b4bdc6);font-size:14px}.ds-offer a{display:flex;align-items:center;min-height:48px;padding:12px 16px;border:1px solid #53575d;border-radius:6px;color:var(--ink,#f3f4f5);text-decoration:none;font-size:14px}.ds-offer a:hover{background:#241b18;border-color:var(--accent,#ff9d88)}.ds-offer a:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}"
+    },
+    {
+      "name": "Platform Destination",
+      "kind": "custom",
+      "description": "Unboxed icon and label into the existing device instructions.",
+      "html": "<a class=\"ds-device\" href=\"/vpn/cabinet/#devices?platform=windows\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17.8 20l-12-1.5c-1-.1-1.8-.9-1.8-1.9V7.4c0-1 .8-1.8 1.8-1.9l12-1.5c1.2-.1 2.2.8 2.2 1.9V18c0 1.2-1.1 2.1-2.2 1.9zM12 5v14M4 12h16\"/></svg><span>Windows</span></a>",
+      "css": ".ds-device{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:112px;padding:16px 8px;color:var(--ink,#f3f4f5);font-size:14px;text-decoration:none;font-family:'Golos Text',sans-serif;}.ds-device svg{width:32px;height:32px;color:var(--quiet,#b4bdc6)}.ds-device:hover{text-decoration:underline;text-underline-offset:4px}.ds-device:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(hover:hover){.ds-device:hover svg{color:var(--accent,#ff9d88)}}@media(prefers-reduced-motion:no-preference){.ds-device svg{transition:color .18s ease}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Two Independent Product Stages",
+    "overview": "The customer storefront keeps the owner-approved black canvas, local Golos Text and coral actions. Large, tightly set names and generous empty space give each independent product a clear offer. Small rectangular controls, quiet rules and open content keep the shell direct; actual product imagery retains its own appearance.\n\nThis document owns the customer storefront's implemented visual system. The direction comment in customer-site/index.html and its surface brief own the homepage composition. Generated VPN and Sufler pages retain their established product UI, legal content and operational flows; product-brand.css supplies only the customer-specific adjustments. The repository-root DESIGN.md and .impeccable/design.json remain the portfolio's separate authority.",
+    "keyCharacteristics": [
+      "Fixed black canvas, one coral action family and local Golos Text.",
+      "Large product typography, generous spacing and small rectangular actions.",
+      "Open capabilities, thin-rule pricing and unboxed device destinations.",
+      "Inline product captures, RU/EN controls and visible keyboard focus."
+    ],
+    "rules": [
+      {
+        "name": "The Customer Scope Rule",
+        "body": "Use the storefront palette on the customer shell; preserve the existing product palettes and the separate portfolio authority.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat Boundary Rule",
+        "body": "Use spacing and thin rules to organize offers; keep ambient light static and avoid raised card surfaces.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** preserve black, Golos Text, coral actions and the existing Family Spy mark.",
+      "**Do** keep each independent offer and its next action clear; the homepage footer contains only the support email.",
+      "**Do** keep all four plan destinations, validated dynamic amounts and useful price fallback.",
+      "**Do** use native mobile disclosures and retain readable initially open offers without JavaScript.",
+      "**Do** retain inline Sufler imagery, translated alt text, image recovery and visible focus.",
+      "**Do** preserve the existing product, download, account, setup, legal and support destinations."
+    ],
+    "donts": [
+      "**Don't** turn the customer shell into the portfolio or introduce a joint subscription or bundle claim.",
+      "**Don't** replace the established rectangular controls with pills or borrow the reference site's coffee-shop identity.",
+      "**Don't** reintroduce stepped tariffs, enclosing capability panels or boxed device tiles into this homepage composition.",
+      "**Don't** add autoplay, moving ambient effects, invented screenshots, customer evidence or product guarantees.",
+      "**Don't** add screenshot-opening links, a modal, a viewer route or a new-tab image action.",
+      "**Don't** apply the homepage stylesheet to the existing cabinet, payment or native interfaces."
+    ]
+  }
+}

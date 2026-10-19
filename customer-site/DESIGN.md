@@ -1,53 +1,118 @@
 ---
-name: Family Spy — customer storefront
-description: Black Golos Text storefront for Family VPN and Sufler, with coral actions and preserved product identities.
+name: "Family Spy — customer storefront"
+description: "Black Golos Text storefront for independent Family VPN and Sufler offers, with coral actions and quiet boundaries."
 colors:
   paper: "#000"
   ink: "#f3f4f5"
   quiet: "#b4bdc6"
-  rule: "#41464c"
+  rule: "#292d32"
   accent: "#ff9d88"
+  accent-hover: "#ffb39f"
   screen-field: "#101215"
+  action-rule: "#53575d"
+  action-hover: "#241b18"
+  ambient-coral: "#ff9d8810"
+  icon-glow: "#ff9d8844"
 typography:
   display:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "clamp(36px, 4.2vw, 54px)"
+    fontSize: "clamp(72px, 10.4vw, 144px)"
+    fontWeight: 700
+    lineHeight: 0.94
+    letterSpacing: "-0.04em"
+  display-mobile:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "clamp(72px, 16vw, 104px)"
+    fontWeight: 700
+    lineHeight: 0.94
+    letterSpacing: "-0.04em"
+  headline:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "clamp(36px, 4.5vw, 56px)"
     fontWeight: 600
     lineHeight: 1.15
     letterSpacing: "-0.035em"
-  headline:
+  product-title:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "clamp(48px, 5.5vw, 72px)"
+    fontWeight: 600
+    lineHeight: 1.15
+    letterSpacing: "-0.035em"
+  support-title:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "32px"
+    fontWeight: 600
+    lineHeight: 1.15
+    letterSpacing: "-0.035em"
+  feature-title:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: "-0.025em"
+  feature-title-mobile:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "18px"
+    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: "-0.025em"
+  feature-title-narrow:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "16px"
+    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: "-0.025em"
+  plan-title:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "24px"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.025em"
+  plan-title-mobile:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "22px"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.025em"
+  plan-monthly:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "32px"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-0.035em"
+  plan-monthly-compact:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "28px"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-0.035em"
+  plan-monthly-mobile:
     fontFamily: "Golos Text, sans-serif"
     fontSize: "30px"
     fontWeight: 600
-    lineHeight: 1.15
+    lineHeight: 1.2
     letterSpacing: "-0.035em"
-  subheading:
+  purpose:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "20px"
-    fontWeight: 600
-    lineHeight: 1.15
-    letterSpacing: "-0.035em"
-  lead:
-    fontFamily: "Golos Text, sans-serif"
-    fontSize: "20px"
+    fontSize: "22px"
     fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.5
+  purpose-mobile:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "18px"
+    fontWeight: 400
+    lineHeight: 1.5
   body:
     fontFamily: "Golos Text, sans-serif"
     fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.6
-  price:
+  label:
     fontFamily: "Golos Text, sans-serif"
     fontSize: "14px"
     fontWeight: 400
     lineHeight: 1.6
-  screen-caption:
-    fontFamily: "Golos Text, sans-serif"
-    fontSize: "15px"
-    fontWeight: 400
-    lineHeight: 1.6
-  provenance:
+  small:
     fontFamily: "Golos Text, sans-serif"
     fontSize: "13px"
     fontWeight: 400
@@ -57,23 +122,46 @@ typography:
     fontSize: "12px"
     fontWeight: 400
     lineHeight: 1.6
+  best-label-mobile:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "11px"
+    fontWeight: 500
+    lineHeight: 1.5
 rounded:
   panels: "6px"
-  screen-selector: "4px"
 spacing:
+  small: "8px"
+  control: "12px"
   compact: "16px"
-  mobile-content: "20px"
+  copy: "20px"
   content: "24px"
-  product-gap: "28px"
-  header-gap: "32px"
-  section-end: "56px"
-  section-start: "64px"
+  plan-gap: "28px"
+  section-gap: "32px"
+  column-gap: "40px"
+  heading-gap: "48px"
+  product-gap: "64px"
+  section-mobile: "72px"
+  section-tablet: "80px"
+  benefits-start: "100px"
+  device-end: "104px"
+  section: "120px"
 components:
   button-primary:
     backgroundColor: "{colors.accent}"
     textColor: "{colors.paper}"
     rounded: "{rounded.panels}"
-    padding: "12px 22px"
+    padding: "14px 28px"
+  button-primary-hover:
+    backgroundColor: "{colors.accent-hover}"
+  plan-action:
+    textColor: "{colors.ink}"
+    rounded: "{rounded.panels}"
+    padding: "12px"
+  plan-action-best:
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.paper}"
+    rounded: "{rounded.panels}"
+    padding: "12px"
   language-button:
     textColor: "{colors.quiet}"
     padding: "8px"
@@ -82,6 +170,9 @@ components:
     padding: "8px"
   support-link:
     textColor: "{colors.accent}"
+  screen-frame:
+    backgroundColor: "{colors.screen-field}"
+    rounded: "{rounded.panels}"
 ---
 
 # Design System: Family Spy
@@ -90,105 +181,106 @@ components:
 
 **Creative North Star: "Two Independent Product Stages"**
 
-The customer homepage adapts the owner-approved black, Golos Text and coral composition into consecutive, full-width product sections. Family VPN and Sufler each have their own name, factual purpose, price, primary action and legal destinations. The homepage footer contains only the support email. Thin neutral rules and sentence-case type separate the offers; the products supply their own imagery.
+The customer storefront keeps the owner-approved black canvas, local Golos Text and coral actions. Large, tightly set names and generous empty space give each independent product a clear offer. Small rectangular controls, quiet rules and open content keep the shell direct; actual product imagery retains its own appearance.
 
-This document governs the customer storefront sources and their generated customer product pages. The builder replaces the VPN landing artwork and Sufler mock prompt with the corresponding interface captures; the remaining product UI keeps its established styling. `product-brand.css` styles those evidence figures and stacks VPN tariffs in one column at 420px and below, where the original two-column discount rows overflowed. The repository-root DESIGN.md remains the portfolio's separate authority.
+This document owns the customer storefront's implemented visual system. The direction comment in customer-site/index.html and its surface brief own the homepage composition. Generated VPN and Sufler pages retain their established product UI, legal content and operational flows; product-brand.css supplies only the customer-specific adjustments. The repository-root DESIGN.md and .impeccable/design.json remain the portfolio's separate authority.
 
 **Key Characteristics:**
-- Fixed black canvas, one coral action color and local Golos Text.
-- Independent product sections with text beside media and a direct product action.
-- Actual VPN cabinet captures from a demo account and source-rendered Sufler interface captures from a prepared interview.
-- Inspectable full-size images and clearly named manual screen selectors.
-- RU/EN copy and compact controls with visible keyboard focus.
+- Fixed black canvas, one coral action family and local Golos Text.
+- Large product typography, generous spacing and small rectangular actions.
+- Open capabilities, thin-rule pricing and unboxed device destinations.
+- Inline product captures, RU/EN controls and visible keyboard focus.
 
 ## Colors
 
+The palette keeps the storefront black and quiet, with coral marking actions and a restrained ambient presence. The frontmatter is normative.
+
 ### Primary
 
-- **Storefront Coral** (`accent`) identifies each product's primary button, support destinations, selected screen control and focus outline.
+- **Storefront Coral** (`accent`) marks primary actions, positive savings, the validated best-plan treatment, capability icons, support links and focus outlines.
+- **Hover Coral** (`accent-hover`) brightens filled actions on hover-capable devices.
+- **Ambient Coral** (`ambient-coral`) is the faint static hero light; **Icon Glow** (`icon-glow`) is the limited capability-icon hover filter.
 
 ### Neutral
 
-- **Black Canvas** (`paper`) is the page background and primary button ink. The homepage has no light-theme control.
-- **Primary Ink** (`ink`) carries headings, navigation and product-purpose lines; **Quiet Text** (`quiet`) carries descriptions, prices, labels, legal links and the footer.
-- **Thin Rule** (`rule`) separates the header, full-width product sections and footer, and frames the screenshot links.
-- **Screen Field** (`screen-field`) fills the screenshot frame around contained interface captures. Product colors stay inside their own images.
+- **Black Canvas** (`paper`) is the homepage background and filled-action ink. There is no homepage theme control.
+- **Primary Ink** (`ink`) carries product names, section headings and navigation; **Quiet Text** (`quiet`) carries secondary copy, price details and footer text.
+- **Quiet Rule** (`rule`) separates the header, product sections and footer and supplies each tariff's top edge.
+- **Screen Field** (`screen-field`) fills the inline Sufler frame around the contained capture.
+- **Action Rule** (`action-rule`) outlines non-featured tariff actions; **Action Hover** (`action-hover`) gives those links a dark coral hover field.
+
+**The Customer Scope Rule.** Use the storefront palette on the customer shell; preserve the existing product palettes and the separate portfolio authority.
 
 ## Typography
 
-Display, body and the `family-spy` wordmark use local Golos Text from `/vpn/fonts.css`, with a sans-serif fallback. Headings are semibold, closely tracked and balanced; body copy keeps an open inherited line height.
+**Display and Body Font:** local Golos Text from `/vpn/fonts.css`, with a sans-serif fallback. The Family Spy wordmark uses the same family.
 
-The display token serves each product name, fixed at 36px at 420px and below. The support heading uses headline; its product subheadings use subheading. Each product's purpose uses lead and remains 20px on mobile. Descriptions and support copy use body and are bounded to 65ch. The page-level Family Spy h1 is visually hidden; there is no visible combined offer heading.
+The VPN name is bold, tightly tracked and deliberately split into two lines. Section and Sufler headings are semibold; factual body copy remains regular with an open line height. The page-level Family Spy h1 is visually hidden. No additional visible combined-offer heading is present.
 
-Screenshot descriptions use screen-caption; provenance and full-size links use provenance. Demo controls are 14px, language controls use the existing language-control size, legal links are 14px and the footer is 13px. Both product figures have descriptions and provenance captions. These media and control roles do not replace the body hierarchy. Screenshot text belongs to the captured product UI, rather than a new storefront type scale.
+The `display` and `display-mobile` roles serve the VPN name. `headline` serves capability, pricing and device section headings. `product-title` serves Sufler and reaches its minimum on narrow screens. `support-title` serves the support heading. Capability titles use `feature-title`, reducing through its two mobile roles; support article titles retain the existing 20px semibold heading treatment. Purpose copy uses the purpose roles for VPN; Sufler's purpose retains the body line height and reduces to the feature-title size on mobile.
+
+`plan-title` and its mobile role identify durations. The three monthly roles keep numeric emphasis across the wide, compact-desktop and mobile layouts. Numeric prices use tabular figures. Totals, units and savings use `label`; USD estimates and footer use `small`; language and exploration controls use `language-control`. The best-price label uses that small control size on desktop and `best-label-mobile` on mobile. Tariff actions are small on wide screens, compact-control sized below the narrow-desktop breakpoint, and label-sized in the two-column and mobile layouts.
 
 ## Layout
 
-The centered container is `min(1100px, calc(100% - 80px))`. Total horizontal inset becomes 48px at 900px, 40px at 700px and 32px at 420px. These correspond to side gutters of 40, 24, 20 and 16px.
+The centered container is `min(1100px, calc(100% - 80px))`. Side gutters are 40px on wide screens, 24px at 900px, 20px at 700px and 16px at 420px. The desktop header has an 80px minimum height. At 700px it becomes a two-row grid with brand and languages above the full navigation row.
 
-The desktop header is one row with an 80px minimum height: brand left, Family VPN/Sufler/Help anchor navigation and language controls right. At 700px it becomes a two-row grid, with the navigation spanning the lower row. The first visible offer is Family VPN; Sufler follows in its own section. There is no shared introduction, service-choice CTA or side-by-side catalog grid.
+The VPN introduction is centered and fills at least the viewport minus the header. It uses `100svh` and a desktop minimum of `calc(100svh - 80px)`, changing to `calc(100svh - 120px)` on mobile. A static signal mark leads the two-line product name, purpose, public price and plan/account actions. Content starts below the introduction. The small exploration anchor sits near its bottom and is hidden when viewport height is at most 720px; the intro then uses reduced vertical padding.
 
-Each desktop product section uses text/media columns of `.78fr 1.35fr`, a 48px gap and 64px vertical padding. At 900px it becomes one column with a 28px gap and 48px padding; its media is at most 760px wide. At 700px the section has a 16px gap and 40px padding. Mobile CSS places title → purpose → price → actions → media before the remaining descriptive, setup and legal copy. The DOM retains the product copy followed by its figure. Screenshot containers keep a 10:7 frame and contain the entire image without cropping. Product copy has no enclosing card padding. Desktop price lines have a 24px minimum height and 24px top margin; action and legal rows follow with a 16px top margin. Mobile price spacing reduces to 4px and action, setup and legal top margins reset.
+Capabilities have four open columns with a 40px gap, becoming two columns with a 32px gap at 900px. They retain two columns on narrow screens, with smaller heading type and compact gaps. The later pricing row uses four equal-width, top-rule offers and a 28px gap; at 900px it becomes two columns. At 600px it becomes a single native disclosure list. Each wide-screen offer has the same minimum body height and a bottom-aligned action. No stepped offsets or enclosing pricing cards remain.
 
-Support has its own heading and separate VPN/Sufler articles in equal columns with a 64px gap, reduced to 32px at 900px. At 700px the articles become one column with a 28px gap. The shared privacy reminder follows them. The footer contains a single unboxed support email link with a 44px minimum hit height; the top rule and quiet type keep it separate from the support section. Product and support anchor destinations have a 24px scroll margin.
+Six unboxed platform links follow pricing. Their grid uses six columns on desktop, three at 900px and two at 420px. Each destination has a centered platform icon and label. Wide targets have a 112px minimum height, reducing to 100px on the narrowest layout.
+
+Sufler retains its separate text/image section: `.78fr 1.35fr` columns, 64px gap and 120px vertical padding. At 900px it stacks with an image width of at most 760px; padding reduces to 80px, then 72px at 700px. Its copy is limited to the name, single purpose phrase, price/trial and one download action. The static answer capture follows in the DOM and keeps its 10:7 frame with the full image contained.
+
+Support uses two columns with a 64px gap, reduced to 32px at 900px and stacked at 700px. The footer remains one support-email link beneath a thin rule. Product/support anchors retain 24px scroll margins; capability and pricing destinations use 40px. Breakpoint and motion details live in the customer-owned sidecar.
 
 ## Elevation & Depth
 
-The shell is flat: no card shadows, glass or floating chrome. Section rules and framed screenshots establish separation. Screen changes happen only after an explicit selection; no timed playback remains. Reduced motion disables smooth page scrolling.
+The shell has no card shadows, glass or floating chrome. Spacing, thin boundaries and typographic contrast provide structure. The hero's radial coral light is static, behind its content and non-interactive. On hover-capable devices, only capability icons receive the existing subtle drop-shadow; platform icons and actions change color or background. There is no automatic playback or animated ambient background. State transitions last 180ms only when reduced motion is not requested; reduced motion also disables smooth scrolling.
+
+**The Flat Boundary Rule.** Use spacing and thin rules to organize offers; keep ambient light static and avoid raised card surfaces.
 
 ## Shapes
 
-Screenshot frames and primary buttons share the small panel radius. Both screenshot frames have a thin border and contain the full capture. Full-width product sections use a bottom rule rather than an enclosing card. The compact header brand combines text with a 26px outlined circular SVG; it is not a portrait or personal badge. Other links and language controls stay unboxed.
+Primary actions, tariff actions and screenshot frames use the small panel radius from the frontmatter. They remain rectangular, matching the small-corner geometry of the selected composition reference. The coral signal mark and existing outlined circular Family Spy SVG are icons, not a pill-control system. Capabilities and platform links have no enclosing panel or icon-box background. Tariffs have only a top rule, with the last mobile tariff also closing the list with a bottom rule. Best pricing changes that top rule to coral. Other navigation, language and support links remain unboxed.
 
 ## Components
 
-**Primary actions.** Each product has its own coral button with black text, medium weight and a 48px minimum height. VPN links to its service and plans; Sufler links to download and trial. Account/setup links sit beside the relevant primary action. Hover follows the shared underline treatment; no scale, lift or glow is added.
+**Primary actions.** Coral fill, black text, medium weight and a 52px minimum height. The VPN action scrolls to pricing; its separate account link retains the existing cabinet destination. Sufler has exactly one action, Download and try, into `/sufler/#download`. Hover-capable devices use the lighter coral fill. Actions do not scale or lift.
 
-**Navigation and language.** Header, brand, language, product-action, legal and support controls have a 44px minimum hit height; primary buttons retain 48px. Language buttons also have a 44px minimum width; the selected language uses primary ink and an underline 6px below the text. The toggle is revealed by JavaScript, while default RU content remains readable without it. Header links target `#vpn`, `#sufler` and `#support` directly.
+**Navigation and language.** The header retains the Family Spy mark, direct VPN/Sufler/Help anchors and RU/EN controls. Navigation and languages have 44px minimum targets; languages also have 44px minimum widths. Selected language uses primary ink and an underline offset by 6px. JavaScript reveals the language buttons; default Russian copy and links remain available without it.
 
-**Product sections.** Each section keeps its name, independent purpose, dynamic price, product actions together. Legal destinations and setup instructions remain on the product pages; the homepage footer has only the support email. VPN media shows Android and Windows connection instructions and support in the actual cabinet using a demo account. Sufler media compares the interviewer question and talking points in the application interface, rendered from source with a prepared interview. Provenance stays visible, including that the captured interface is Russian in either storefront language.
+**Capabilities.** Four concise factual headings and consistent Tabler line icons describe the existing offer. The icons use a 1.6 stroke. Their wrapper supplies layout space, without a border or colored fill. Content has a default cursor. The limited icon glow is a hover response, not evidence of clickability.
 
-**Screenshot examples.** Manual selectors sit above the image. VPN uses Android, Windows and support choices. Sufler uses a visible interview-example heading, a prepared question and explicit “Show question” / “Show prompt” controls. Selected controls use coral fill, black text and `aria-pressed`; inactive controls have a neutral border. Screens have no click action. Only the separate “Enlarge screen” link opens the selected original. Captions and alt text change together and descriptions announce changes politely. A failed image exposes recovery text and another screen can be selected. Controls are hidden without JavaScript while the default image and enlargement link remain available. Generated product landings keep their existing static linked capture.
+**Pricing.** Native details contain the four 30/90/180/365-day offers. With JavaScript, desktop keeps every offer open and removes summaries from tab order; mobile at 600px and below begins with 30 days open and uses an exclusive `vpn-offers` group. At most one mobile offer is open; the native control may also close it. Switching back to desktop opens all offers, while the last chosen duration is retained for a later mobile layout. Without JavaScript all offers are initially open and useful account-pricing links remain visible.
 
-**Product support.** Separate titled articles describe a connection problem for VPN and an audio problem for Sufler. Each has its own existing support destination. The shared note asks visitors not to send passwords, their Deepgram key or a call recording.
+Each validated amount supplies the monthly equivalent, full RUB total and approximate USD total. Positive absolute savings use the available 30-day base; missing base pricing omits savings. The best treatment requires multiple validated offers and a non-base lowest monthly offer. It uses the factual label, coral top rule and filled action. No popularity badge or manufactured discount is added. Product data rules and the dated exchange reference are recorded in PRODUCT.md; their explanatory paragraphs are not marketing copy.
 
-**Links and focus.** Links underline on hover with a 4px offset. Keyboard focus uses a 2px coral outline with a 5px offset. The skip link becomes visible on focus. Support links use coral; secondary product destinations use primary ink and legal destinations use quiet text.
+**Device links.** Android, iPhone/iPad, Windows, macOS, Linux and Smart TV continue to the existing cabinet instructions and retain the chosen platform through sign-in. Each unboxed link keeps a large hit area. Decorative arrows remain hidden in the implemented layout.
+
+**Inline product evidence.** The homepage shows only the static Sufler answer capture, with translated figure label and alt text. Its image is not a link. Load failure shows the existing short recovery text and a later successful load restores the image. There are no screenshot selectors, provenance paragraphs, enlargement actions or separate viewers on the homepage. Generated VPN and Sufler landings retain their static inline evidence images and existing product context.
+
+**Support and footer.** Separate named articles retain the existing VPN cabinet-support destination and Sufler mail destination. They keep practical connection/audio help copy. The footer contains only the existing `support@family-pie.ru` mail link. The removed reminder and footer legal navigation do not return; product legal pages remain reachable through their existing product flows.
+
+**Links and focus.** Text links underline on hover with a 4px offset. Keyboard focus on links, buttons and summaries uses a 2px coral outline with a 5px offset. The skip link becomes visible on focus. Support links use coral, account links primary ink and price details quiet text.
 
 ## Do's and Don'ts
 
-- **Do** apply this shell to the customer storefront and keep generated product identities intact.
-- **Do** keep purpose, price and actions together; keep the homepage footer limited to the existing support email.
-- **Do** keep screenshot provenance, full-size inspection and manual controls readable on mobile.
-- **Do** start demos only after a click and honor reduced motion and hidden-tab stops.
-- **Do** show prices from the public service source or leave the useful pricing destination visible.
-- **Don't** add the portfolio's portrait, biography, employer links or job-contact section to this surface.
-- **Don't** introduce a combined headline, shared purchase CTA or visual bundle of the two independent products.
-- **Don't** present prepared interview captures as live audio recognition, native-device acceptance, customer evidence or guaranteed results.
-- **Don't** apply the storefront stylesheet across existing cabinet, purchase or product interfaces.
+### Do:
 
+- **Do** preserve black, Golos Text, coral actions and the existing Family Spy mark.
+- **Do** keep each independent offer and its next action clear; the homepage footer contains only the support email.
+- **Do** keep all four plan destinations, validated dynamic amounts and useful price fallback.
+- **Do** use native mobile disclosures and retain readable initially open offers without JavaScript.
+- **Do** retain inline Sufler imagery, translated alt text, image recovery and visible focus.
+- **Do** preserve the existing product, download, account, setup, legal and support destinations.
 
-<!-- Scoped owner revision, 2026-10-16: manual screen selection -->
-The homepage uses explicit manual screen selectors above each image, with a 1px neutral border and 4px radius; the selected screen uses coral fill and black text. VPN has Android, Windows and support choices. Sufler uses the visible heading “Interview example”, the prepared interview question, and “Show question” / “Show prompt” buttons. Its question text is 20px with 1.5 line height. No timed playback control remains. The image itself has no click action; only the separate “Enlarge screen” link opens the current original. The homepage footer contains only the existing support email. These owner-requested refinements retain the surrounding black/Golos/coral system and existing touch targets.
+### Don't:
 
-Owner follow-up, 2026-10-16: replace vague “talking points” homepage copy with “answer prompt”; keep only the existing support email in the homepage footer. The customer build injects an explicit “All Family Spy products” home link above VPN navigation, including account/auth/legal pages; sticky product headers retain it on scroll. Existing Family Pie source pages are unchanged.
-
-Owner refinement, 2026-10-16: homepage footer is reduced to the existing support@family-pie.ru mailto link only. Remove the footer wordmark, copyright, legal navigation and Deepgram setup reminder. Keep the established support section, product page navigation, legal bodies/routes and native/backend behavior intact. This supersedes earlier footer-layout descriptions.
-
-Owner refinement, 2026-10-17: replace the homepage VPN gallery with an offer heading, price/actions, a unified four-column capability strip and six device instruction links. Preserve black/Golos/coral identity, existing logo, routes and Sufler example. Desktop features use organizing rules on a #101214 surface; tablet uses two columns and narrow mobile uses one compact icon/text column. Icons are Tabler Icons 3.35.0 (MIT, media/tabler-icons-LICENSE.txt), consistently 1.6 stroke. Coral icon frames and the owner-requested soft glow respond on hover-capable devices. Actual links have matching focus styling and 52px minimum targets; content tiles retain a default cursor. Transitions are 180ms only when reduced motion is not requested. Six device links use 6/3/2 columns; narrow screens omit decorative arrows. Existing radius scale: 6px containers/actions, 4px demo selectors. Design dials for this scoped preserve redesign: variance 5, motion 3, density 4. No new theme, dependency, fake product art, autoplay, account data or marketing guarantees. This supersedes the earlier homepage VPN screen-selector descriptions.
-
-The homepage plan cards rise in 24px steps on desktop, align purchase actions on one baseline, use two columns on tablet and a compact single-column price/action layout on narrow mobile. No popularity badge or invented discount. Actual RUB prices are primary; approximate US$ values are secondary with a dated linked exchange-rate note. The owner chose a USD comparison only, explicitly declining a new payment integration.
-
-Owner refinement, 2026-10-17: supersede stair-step tariffs with equal-height aligned cards. Show duration, monthly equivalent (1/3/6/12 months for30/90/180/365 days), full RUB total, approximate USD total and absolute savings versus the30-day base for the same comparison duration. Display the calculation basis. Use the live validated public plan set to identify the lowest monthly rate; only that offer receives the best-monthly-price label, coral border and filled action. Current365-day plan is208.33RUB/month, total2500RUB, saving1100RUB versus12base periods. If base pricing is unavailable, omit savings; do not manufacture a best value from a single offer. Preserve existing factual capabilities/icon glow, dated USD note, Sufler/support/mail-only footer and product/legal/backend sources. No staircase offsets at any breakpoint. Tablet2columns, narrow mobile1compact column. This supersedes earlier stepped layout notes.
-
-Owner copy cleanup, 2026-10-17: remove homepage calculation/FX explanation paragraphs, screenshot/source/language provenance, redundant Sufler example narration, base-plan label and unsolicited support reminder. Accessible example status remains concise and visually hidden; visible controls and interview-example heading explain the flow. Shorten Sufler copy while retaining Windows/macOS and own Deepgram key requirement. Remove generated VPN/Sufler marketing-image provenance captions. Preserve ≈US$ total estimates, rate/date in source/maintainer context, factual monthly/savings/best-value calculations and core product/setup/legal/error content. Hide non-positive savings instead of labelling the base tariff or narrating no savings. Existing black/Golos/coral visual system/icon glow retained. Public marketing copy does not need internal verification or implementation notes; this supersedes prior requirements for visible basis/provenance paragraphs.
-
-Owner Sufler simplification, 2026-10-17: homepage Sufler has exactly one action, Download and try, linking to the existing /sufler/#download product flow. Setup remains inside that product page through its existing setup sections/link. Remove the homepage setup link, manual question/prompt selectors and enlargement action. Show the static answer capture immediately beside the labelled interview question, with descriptive alt text. Keep image failure/load recovery without another action. Remove unused manual-demo JS/CSS and replace obsolete selector tests with static-image recovery coverage. No new download/setup/backend flow and no change to VPN offers, icon glow, pricing or mail footer. This supersedes all earlier homepage Sufler manual-selector/enlargement descriptions.
-
-Owner Sufler copy reduction, 2026-10-17: homepage keeps only Sufler, one purpose sentence, live trial/price, a single Download and try action and the static answer image. Remove the detailed listening/platform/Deepgram paragraph and separate visible example heading/question. Product download/setup pages retain requirements and instructions. Figure retains a translated accessible label and image alt; image failure recovery remains. Remove unused example-heading/question CSS. This supersedes earlier homepage labelled-question/detail requirements; no pricing, VPN, support, footer or product-flow changes.
-
-Owner wording refinement: use “Твой помощник на собеседовании.” / “Your interview assistant.” as the single homepage purpose phrase.
-
-Owner wording refinement: remove the possessive; use “Помощник на собеседовании.” / “Interview assistant.”.
-
-
-Owner screenshot behavior, 2026-10-19 (latest direction): remove separate full-screenshot opening everywhere on Family Pie and Family Spy. Screenshots remain inline; remove enlargement links and image anchors. Keep portfolio RU/EN screenshot selection, cached choice and load/failure recovery without depending on an enlargement link. No modal, separate viewer route, screenshot CTA or new tab. This supersedes the earlier same-day tab/viewer request. The homepage Sufler download CTA and existing copy/prices/layout remain unchanged. Preview approval still applies before publication.
+- **Don't** turn the customer shell into the portfolio or introduce a joint subscription or bundle claim.
+- **Don't** replace the established rectangular controls with pills or borrow the reference site's coffee-shop identity.
+- **Don't** reintroduce stepped tariffs, enclosing capability panels or boxed device tiles into this homepage composition.
+- **Don't** add autoplay, moving ambient effects, invented screenshots, customer evidence or product guarantees.
+- **Don't** add screenshot-opening links, a modal, a viewer route or a new-tab image action.
+- **Don't** apply the homepage stylesheet to the existing cabinet, payment or native interfaces.
