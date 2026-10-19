@@ -1,31 +1,17 @@
-/* Compare real captures without changing the language of the page. */
+/* Keep real captures synchronized with the page language. */
 (() => {
   'use strict';
-  function savedLanguage(image) {
-    try {
-      const value = sessionStorage.getItem('fp_screen_lang:' + image?.dataset.screenRuSrc);
-      return value === 'ru' || value === 'en' ? value : null;
-    } catch { return null; }
-  }
   const pairs = [...document.querySelectorAll('[data-screen-pair]')].map(figure => ({
     figure,
     image: figure.querySelector('[data-screen-ru-src][data-screen-en-src]'),
-    buttons: [...figure.querySelectorAll('[data-screen-language]')],
     status: figure.querySelector('[data-screen-status]'),
-    preference: savedLanguage(figure.querySelector('[data-screen-ru-src]')),
-    shown: figure.dataset.screenLang || 'ru',
     request: 0
   })).filter(pair => pair.image);
 
   function finish(pair, lang) {
-    pair.shown = lang;
     pair.figure.dataset.screenLang = lang;
     pair.figure.removeAttribute('aria-busy');
-    pair.buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.screenLanguage === lang)));
     pair.status.textContent = '';
-    if (pair.preference) {
-      try { sessionStorage.setItem('fp_screen_lang:' + pair.image.dataset.screenRuSrc, lang); } catch { /* Switching also works without storage. */ }
-    }
   }
 
   function show(pair, lang) {
@@ -43,11 +29,10 @@
       clearTimeout(timeout);
       if (request !== pair.request) return;
       pair.request++;
-      pair.preference = pair.shown;
       pair.figure.removeAttribute('aria-busy');
-      pair.status.textContent = window.FPi18n?.lang === 'en'
-        ? 'Couldn’t load this screenshot. Try the language button again.'
-        : 'Не удалось загрузить скриншот. Нажмите кнопку языка ещё раз.';
+      pair.status.textContent = lang === 'en'
+        ? 'Couldn’t load the screenshot. Select RU or EN at the top of the page to try again.'
+        : 'Не удалось загрузить скриншот. Нажмите RU или EN вверху страницы, чтобы повторить.';
     }
     capture.onerror = fail;
     capture.onload = () => {
@@ -61,13 +46,8 @@
     capture.src = src;
   }
 
-  pairs.forEach(pair => pair.buttons.forEach(button => {
-    button.addEventListener('click', () => {
-      pair.preference = button.dataset.screenLanguage;
-      show(pair, pair.preference);
-    });
-  }));
-  const render = () => pairs.forEach(pair => show(pair, pair.preference || window.FPi18n?.lang || 'ru'));
+  const render = () => pairs.forEach(pair => show(pair, window.FPi18n?.lang === 'ru' ? 'ru' : 'en'));
   window.addEventListener('fp-languagechange', render);
+  window.addEventListener('pageshow', render);
   render();
 })();

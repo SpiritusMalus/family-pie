@@ -35,39 +35,70 @@ test('denied storage still allows repeated switches and cached-page return',()=>
   a.events.click();assert.equal(a.root.light,true);assert.equal(a.attrs['aria-pressed'],'true');
 });
 
-function inlineScreens() {
-  const events={},captures=[],stored=new Map(),status={textContent:''};
-  const image={src:'/work/assets/screen-en.png',complete:true,naturalWidth:1080,dataset:{screenRuSrc:'/work/assets/screen-ru.png',screenEnSrc:'/work/assets/screen-en.png'},getAttribute(key){return this[key];}};
-  const buttons=['ru','en'].map(lang=>({dataset:{screenLanguage:lang},setAttribute(key,value){this[key]=value;},addEventListener(_event,fn){this.click=fn;}}));
-  const figure={dataset:{screenLang:'en'},setAttribute(){},removeAttribute(){},querySelector:key=>key==='[data-screen-ru-src][data-screen-en-src]'||key==='[data-screen-ru-src]'?image:key==='[data-screen-status]'?status:null,querySelectorAll:()=>buttons};
-  const context={document:{querySelectorAll:()=>[figure]},window:{FPi18n:{lang:'en'},addEventListener:(event,fn)=>events[event]=fn},sessionStorage:{getItem:key=>stored.get(key),setItem:(key,value)=>stored.set(key,value)},Image:class{constructor(){captures.push(this);this.naturalWidth=1080;this.naturalHeight=2400;}},setTimeout:()=>1,clearTimeout(){}};
+function inlineScreens({lang='en',count=1}={}) {
+  const events={},captures=[],timers=new Map(),writes=[];
+  let timerId=0;
+  const pairs=Array.from({length:count},(_,i)=>{
+    const status={textContent:''};
+    const image={src:`/screen-${i}-en.png`,complete:true,naturalWidth:1080,dataset:{screenRuSrc:`/screen-${i}-ru.png`,screenEnSrc:`/screen-${i}-en.png`},getAttribute(key){return this[key];}};
+    const figure={dataset:{screenLang:'en'},setAttribute(){},removeAttribute(){},querySelector:key=>key==='[data-screen-ru-src][data-screen-en-src]'?image:key==='[data-screen-status]'?status:null};
+    return {image,figure,status};
+  });
+  const context={document:{querySelectorAll:()=>pairs.map(p=>p.figure)},window:{FPi18n:{lang},addEventListener:(event,fn)=>events[event]=fn},sessionStorage:{getItem:()=> 'en',setItem:(...args)=>writes.push(args)},Image:class{constructor(){captures.push(this);this.naturalWidth=1080;this.naturalHeight=2400;}},setTimeout:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id)};
   vm.runInNewContext(readFileSync('site/portfolio-screens.js','utf8'),context);
-  return {image,buttons,figure,captures,status,stored,context,events};
+  const choose=lang=>{context.window.FPi18n.lang=lang;events['fp-languagechange']();};
+  return {pairs,captures,timers,writes,events,context,choose,...pairs[0]};
 }
 
-test('inline screenshot selection works without enlargement links and retains the loaded image on failure',()=>{
+test('one page language changes every screenshot and ignores obsolete image preferences',()=>{
+  const a=inlineScreens({lang:'ru',count:2});
+  assert.equal(a.captures.length,2);
+  a.captures.forEach(c=>c.onload());
+  a.pairs.forEach((p,i)=>{assert.equal(p.image.src,`/screen-${i}-ru.png`);assert.equal(p.figure.dataset.screenLang,'ru');});
+  a.choose('en');a.captures.slice(2).forEach(c=>c.onload());
+  a.pairs.forEach((p,i)=>assert.equal(p.image.src,`/screen-${i}-en.png`));
+  assert.equal(a.writes.length,0);
+  a.context.window.FPi18n.lang='ru';a.events.pageshow();
+  a.captures.slice(4).forEach(c=>c.onload());
+  a.pairs.forEach(p=>assert.equal(p.figure.dataset.screenLang,'ru'));
+});
+
+test('failed image loads keep the last image and retry through the same page language choice',()=>{
   const a=inlineScreens();
-  assert.equal(a.buttons[1]['aria-pressed'],'true');
-  a.buttons[0].click();a.captures[0].onload();
-  assert.equal(a.image.src,'/work/assets/screen-ru.png');
-  assert.equal(a.buttons[0]['aria-pressed'],'true');
-  assert.equal(a.stored.get('fp_screen_lang:/work/assets/screen-ru.png'),'ru');
-  a.buttons[1].click();a.captures[1].onerror();
-  assert.equal(a.image.src,'/work/assets/screen-ru.png');
-  assert.equal(a.figure.dataset.screenLang,'ru');
-  assert.match(a.status.textContent,/Couldn’t load/);
-  a.buttons[1].click();a.captures[2].onload();
-  assert.equal(a.image.src,'/work/assets/screen-en.png');
+  a.choose('ru');a.captures[0].onload();
+  a.choose('en');a.captures[1].onerror();
+  assert.equal(a.image.src,'/screen-0-ru.png');
+  assert.match(a.status.textContent,/Couldn’t load.*RU or EN/);
+  a.choose('en');a.captures[2].onload();
+  assert.equal(a.image.src,'/screen-0-en.png');
   assert.equal(a.status.textContent,'');
 });
 
-test('late screenshot loads cannot replace the latest inline language choice',()=>{
+test('late screenshot loads cannot override a newer global language choice',()=>{
   const a=inlineScreens();
-  a.buttons[0].click();
-  a.buttons[1].click();
-  a.captures[0].onload();
-  assert.equal(a.image.src,'/work/assets/screen-en.png');
-  assert.equal(a.buttons[1]['aria-pressed'],'true');
+  a.choose('ru');a.choose('en');a.captures[0].onload();
+  assert.equal(a.image.src,'/screen-0-en.png');
+  assert.equal(a.figure.dataset.screenLang,'en');
+});
+
+test('timed-out screenshot requests cannot replace a retried capture',()=>{
+  const a=inlineScreens();
+  a.choose('ru');[...a.timers.values()][0]();
+  assert.match(a.status.textContent,/Не удалось/);
+  assert.equal(a.image.src,'/screen-0-en.png');
+  a.choose('ru');a.captures[1].onload();a.captures[0].onload();
+  assert.equal(a.image.src,'/screen-0-ru.png');
+  assert.equal(a.status.textContent,'');
+});
+
+test('all portfolio routes have only the common page-language buttons',()=>{
+  for(const path of ['site/index.html','site/preview/showcase/index.html','site/work/driftora/index.html','site/work/lumen-rest/index.html']) {
+    const html=readFileSync(path,'utf8');
+    assert.doesNotMatch(html,/screen-language|data-screen-language/);
+    assert.equal((html.match(/data-fp-lang="/g)||[]).length,2,path);
+    assert.match(html,/data-screen-ru-src=/);assert.match(html,/data-screen-en-src=/);
+    assert.doesNotMatch(html,/data-screen-link|href="\/screenshots\//);
+  }
 });
 
 test('reference-led homepage exposes project access before the optional author story',()=>{

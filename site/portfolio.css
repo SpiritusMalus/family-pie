@@ -9,11 +9,6 @@
 @media(prefers-reduced-motion:no-preference){.text-link .arrow{transition:transform .2s cubic-bezier(.16,1,.3,1)}.text-link:hover .arrow{transform:translateX(4px)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
-.screen-language{align-items:center;flex-wrap:wrap;gap:4px 14px;margin-top:10px;font-size:13px;color:var(--quiet)}
-.screen-language-buttons{display:flex;gap:4px}
-.screen-language button{min-height:44px;padding:8px 12px;border:1px solid transparent;border-radius:6px;background:none;cursor:pointer;font-size:14px;color:var(--quiet)}
-.screen-language button[aria-pressed=true]{border-color:var(--rule);color:var(--ink);text-decoration:underline;text-underline-offset:4px}
-.screen-language button:hover{color:var(--accent)}
 .screen-status{font-size:14px;line-height:1.55;margin:8px 0;color:var(--ink)}
 .screen-status:empty{display:none}
 .screen-crop.native-shot{aspect-ratio:9/20}

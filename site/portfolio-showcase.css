@@ -45,8 +45,6 @@
 .showcase-project .lumen-visual{padding:18px;background:linear-gradient(125deg,var(--project-gold),var(--project-brown))}
 .showcase-project .desktop-shot{width:100%;height:100%;object-fit:cover;object-position:top;border:0;border-radius:10px;box-shadow:none}
 .showcase-project figcaption{padding:12px 24px 0;margin:0;font-size:12px}
-.showcase-project .screen-language{margin-top:4px;gap:4px 12px;font-size:12px}
-.showcase-project .screen-language button{padding:8px 10px;font-size:13px;border-radius:10px}
 .showcase-project .project-copy{padding:16px 24px 22px;display:flex;flex-direction:column;flex:1}
 .showcase-project .project-copy>p{font-size:15px;line-height:1.6;max-width:65ch;margin:0 0 14px;color:var(--quiet)}
 .showcase-project .text-link{align-self:flex-start;margin-top:auto;font-size:16px}

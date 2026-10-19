@@ -21,14 +21,14 @@ The root and `/preview/showcase/` use soft charcoal, coral, subdued rounded fram
 
 The first viewport presents a short service headline, a bright My projects anchor to `#work`, a secondary contact action and the existing capability list. A compact native About disclosure follows with the actual portrait, name and the owner's career path and work preferences. Desktop starts open; JavaScript initially collapses it at 760px or below, and no-JavaScript content stays open/readable. Language changes preserve the visitor's open/closed choice. The real portrait remains `site/work/assets/eugene-portrait.png`.
 
-Two equal project cards follow. Each leads with project name and purpose → actual capture → source caption and independent screenshot-language controls → short personal explanation, case action and stack. Driftora's homepage crop focuses meal review, editable portion and nutrition-source detail. Lumen's upper settings crop shows lamp and timer controls. Two cards become one column at 760px; there is no invented third item. Contact closes the page with existing email, LinkedIn and one GitHub destination.
+Two equal project cards follow. Each leads with project name and purpose → actual capture → source caption → short personal explanation, case action and stack. Driftora's homepage crop focuses meal review, editable portion and nutrition-source detail. Lumen's upper settings crop shows lamp and timer controls. Two cards become one column at 760px; there is no invented third item. Contact closes the page with existing email, LinkedIn and one GitHub destination.
 
 ## Content and actions
 
 - Work and Contact navigate to the homepage sections; each project links to its real case page, `/work/driftora/` or `/work/lumen-rest/`.
 - The actual matching RU/EN Android image is an unsaved 100 g meal draft. The actual matching macOS image shows Lumen settings. Neither adds camera/speech-flow, physical-device or cross-platform acceptance claims.
 - Screenshots remain inline on the selected portfolio surfaces. No image anchor, full-screenshot CTA, separate viewer, modal or new tab remains. Case pages preserve full uncropped inline captures.
-- Screenshot-language choice is independent of page language, cached across Back navigation, and retains existing load/failure recovery through `portfolio-screens.js`.
+- The common page RU/EN choice changes text and all matching screenshot pairs together through `portfolio-screens.js`. There are no per-image controls or independent stored image choices. Preserve race, timeout and failed-load recovery; retry uses the same header control.
 - Case pages preserve their narrative/media composition and inspected implementation explanations. Footers retain cross-project and customer destinations, including `/driftora/legal` and `/rest_lumen/`.
 - No new product, client claim, price, experience metric, capability or outcome is introduced. Personal motivations do not establish achieved weight loss or clinical benefit.
 
@@ -47,3 +47,5 @@ An independent finish review found no material visual issues and readiness for p
 ## Portrait balance follow-up (preview)
 
 Owner asks for a larger About portrait and text shifted right after the PR108 release. Desktop portrait 208px, gap 40px; 900px breakpoint 176/28; 760px breakpoint 128/24; 420px stacks a 160px portrait above the text. Preserve original portrait bytes/crop and all copy/controls. This new scoped change is PREVIEW and has not been approved for publication; prior approval applies to the already published PR108 layout.
+
+The owner also adds unified page/screenshot language to this preview. It supersedes the previous independent screenshot-choice rule; publication still awaits approval of the complete new preview.
