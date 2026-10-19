@@ -44,8 +44,8 @@ Portfolio routes keep English static/first-visit copy; explicit URL and saved Ru
 
 An independent finish review found no material visual issues and readiness for preview. Exact visual, functional and preservation evidence is recorded in the existing project journal. This documentation describes the built preview and does not establish device or deployment acceptance.
 
-## Portrait balance follow-up (preview)
+## Portrait balance follow-up (owner approved2026-10-19)
 
-Owner asks for a larger About portrait and text shifted right after the PR108 release. Desktop portrait 208px, gap 40px; 900px breakpoint 176/28; 760px breakpoint 128/24; 420px stacks a 160px portrait above the text. Preserve original portrait bytes/crop and all copy/controls. This new scoped change is PREVIEW and has not been approved for publication; prior approval applies to the already published PR108 layout.
+Owner asks for a larger About portrait and text shifted right after the PR108 release. Desktop portrait 208px, gap 40px; 900px breakpoint 176/28; 760px breakpoint 128/24; 420px stacks a 160px portrait above the text. Preserve original portrait bytes/crop and all copy/controls. The owner explicitly approved the shown complete020fd6b portrait/language preview in PR109 on2026-10-19 with «публикуй». Publish through the established main CI route and verify deployment separately.
 
-The owner also adds unified page/screenshot language to this preview. It supersedes the previous independent screenshot-choice rule; publication still awaits approval of the complete new preview.
+The same approved preview unifies page/screenshot language. It supersedes the previous independent screenshot-choice rule; no per-image language preference remains.
