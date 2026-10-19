@@ -187,7 +187,7 @@ test('homepage keeps real offer actions and no-JavaScript details after the spac
  assert.match(hero,/id="vpn-title"/);assert.match(hero,/href="#vpn-pricing"/);assert.match(hero,/href="\/vpn\/cabinet\/"/);
  assert.doesNotMatch(hero,/<ul class="vpn-features"|data-vpn-plan=|platform=/);
  assert.ok(html.indexOf('id="vpn-features"')<html.indexOf('id="vpn-pricing"'));
- assert.ok(html.indexOf('id="vpn-pricing"')<html.indexOf('class="vpn-devices"'));
+ assert.ok(html.indexOf('id="vpn-pricing"')<html.search(/class="[^"]*\bvpn-devices\b[^"]*"/));
  for(const days of [30,90,180,365])assert.match(html,new RegExp('<details class="vpn-plan" data-vpn-plan="'+days+'" open>'));
  assert.equal((html.match(/class="vpn-plan-summary"/g)||[]).length,4);
  for(const platform of ['android','ios','windows','macos','linux','tv'])assert.ok(html.includes('#devices?platform='+platform));

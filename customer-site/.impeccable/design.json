@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-19T20:13:41.289456+00:00",
+  "generatedAt": "2026-10-19T20:27:33.010Z",
   "title": "Design System: Family Spy",
   "extensions": {
     "colorMeta": {
@@ -90,7 +90,7 @@
       },
       "screen-field": {
         "role": "neutral",
-        "displayName": "Screen Field",
+        "displayName": "Graphite Field",
         "tonalRamp": [
           "oklch(15.00% 0.00694 258.37)",
           "oklch(26.43% 0.00694 258.37)",
@@ -118,7 +118,7 @@
       },
       "action-hover": {
         "role": "neutral",
-        "displayName": "Action Hover",
+        "displayName": "Warm Comparison Field",
         "tonalRamp": [
           "oklch(15.00% 0.01544 39.25)",
           "oklch(26.43% 0.01544 39.25)",
@@ -162,31 +162,43 @@
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Two-line Family VPN hero name."
+        "purpose": "Broad single-line uppercase Family VPN hero name on desktop."
       },
       "display-mobile": {
         "displayName": "Display Mobile",
-        "purpose": "Family VPN name at 700px and below."
+        "purpose": "Stacked Family VPN name at 700px and below."
+      },
+      "display-mobile-vpn": {
+        "displayName": "Display Mobile Vpn",
+        "purpose": "Relative enlargement of the coral VPN word on mobile."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Capabilities, pricing and devices headings."
+        "purpose": "Pricing and device section headings."
+      },
+      "benefits-title": {
+        "displayName": "Benefits Title",
+        "purpose": "Compact capability-band heading."
       },
       "product-title": {
         "displayName": "Product Title",
-        "purpose": "Sufler name."
+        "purpose": "Large Sufler name."
+      },
+      "product-title-narrow": {
+        "displayName": "Product Title Narrow",
+        "purpose": "Sufler name at 420px and below."
       },
       "support-title": {
         "displayName": "Support Title",
         "purpose": "Support section heading."
       },
+      "support-subheading": {
+        "displayName": "Support Subheading",
+        "purpose": "Product names within support."
+      },
       "feature-title": {
         "displayName": "Feature Title",
-        "purpose": "Capability headings."
-      },
-      "feature-title-mobile": {
-        "displayName": "Feature Title Mobile",
-        "purpose": "Capability headings at 700px and below."
+        "purpose": "Concise connected capability headings."
       },
       "feature-title-narrow": {
         "displayName": "Feature Title Narrow",
@@ -206,11 +218,7 @@
       },
       "plan-monthly-compact": {
         "displayName": "Plan Monthly Compact",
-        "purpose": "Monthly RUB amount at 1050px and below before the mobile override."
-      },
-      "plan-monthly-mobile": {
-        "displayName": "Plan Monthly Mobile",
-        "purpose": "Monthly RUB amount at 600px and below."
+        "purpose": "Monthly RUB amount at 1050px and below."
       },
       "purpose": {
         "displayName": "Purpose",
@@ -220,9 +228,13 @@
         "displayName": "Purpose Mobile",
         "purpose": "VPN purpose at 700px and below."
       },
+      "product-purpose": {
+        "displayName": "Product Purpose",
+        "purpose": "Sufler purpose sentence."
+      },
       "body": {
         "displayName": "Body",
-        "purpose": "Support copy and base body text."
+        "purpose": "Support copy, VPN live price and wide-screen plan totals."
       },
       "label": {
         "displayName": "Label",
@@ -230,7 +242,7 @@
       },
       "small": {
         "displayName": "Small",
-        "purpose": "USD estimate and footer."
+        "purpose": "Mobile USD estimate and footer."
       },
       "language-control": {
         "displayName": "Language Control",
@@ -243,9 +255,14 @@
     },
     "shadows": [
       {
+        "name": "sufler-image",
+        "value": "0 16px 32px #0004",
+        "purpose": "Contained depth on the actual Sufler capture inside its graphite surround."
+      },
+      {
         "name": "capability-icon-hover",
         "value": "drop-shadow(0 0 5px #ff9d8844)",
-        "purpose": "Icon filter only on hover-capable devices; no raised card shadow."
+        "purpose": "Existing icon filter on hover-capable devices; the band and comparator stay flat."
       }
     ],
     "motion": [
@@ -330,26 +347,41 @@
     {
       "name": "Native Mobile Offer",
       "kind": "custom",
-      "description": "Top-rule disclosure; all source offers start open and mobile JavaScript initializes the first offer. No invented prices in this fallback snippet.",
-      "html": "<details class=\"ds-offer\" open><summary><span>30 days</span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5v14\"/></svg></summary><div><p>See account pricing</p><a href=\"/vpn/cabinet/#plans?period=30\">Choose 30 days ↗</a></div></details>",
-      "css": ".ds-offer{border-top:1px solid var(--rule,#292d32);color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-offer summary{display:flex;align-items:center;gap:16px;min-height:88px;padding:20px 0;list-style:none;cursor:pointer;font-size:22px;font-weight:600;letter-spacing:-.025em}.ds-offer summary::-webkit-details-marker{display:none}.ds-offer summary span{flex:1}.ds-offer summary svg{width:20px;height:20px;color:var(--quiet,#b4bdc6)}.ds-offer[open] summary svg{transform:rotate(45deg)}.ds-offer summary:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}.ds-offer>div{padding:0 0 24px}.ds-offer p{margin:0 0 16px;color:var(--quiet,#b4bdc6);font-size:14px}.ds-offer a{display:flex;align-items:center;min-height:48px;padding:12px 16px;border:1px solid #53575d;border-radius:6px;color:var(--ink,#f3f4f5);text-decoration:none;font-size:14px}.ds-offer a:hover{background:#241b18;border-color:var(--accent,#ff9d88)}.ds-offer a:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}"
+      "description": "A native disclosure within the shared graphite comparator; source starts open with useful account-pricing fallback.",
+      "html": "<div class=\"ds-offers\"><details class=\"ds-offer\" open><summary><span>30 days</span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><path d=\"M5 12h14M12 5v14\"/></svg></summary><div><p>See account pricing</p><a href=\"/vpn/cabinet/#plans?period=30\">Choose 30 days ↗</a></div></details></div>",
+      "css": ".ds-offers{background:var(--screen-field,#101215);border:1px solid var(--rule,#292d32);border-radius:6px;overflow:hidden}.ds-offer{padding:0 20px;color:var(--ink,#f3f4f5);font-family:'Golos Text',sans-serif;}.ds-offer summary{display:flex;align-items:center;gap:16px;min-height:88px;padding:20px 0;list-style:none;cursor:pointer;font-size:22px;font-weight:600;letter-spacing:-.025em}.ds-offer summary::-webkit-details-marker{display:none}.ds-offer summary span{flex:1}.ds-offer summary svg{width:20px;height:20px;color:var(--quiet,#b4bdc6)}.ds-offer[open] summary svg{transform:rotate(45deg)}.ds-offer summary:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}.ds-offer>div{padding:0 0 24px}.ds-offer p{margin:0 0 16px;color:var(--quiet,#b4bdc6);font-size:14px}.ds-offer a{display:flex;align-items:center;min-height:48px;padding:12px 16px;border:1px solid #53575d;border-radius:6px;color:var(--ink,#f3f4f5);text-decoration:none;font-size:14px}.ds-offer a:hover{background:#241b18;border-color:var(--accent,#ff9d88)}.ds-offer a:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}.ds-offer+.ds-offer{border-top:1px solid var(--rule,#292d32)}"
     },
     {
       "name": "Platform Destination",
       "kind": "custom",
       "description": "Unboxed icon and label into the existing device instructions.",
       "html": "<a class=\"ds-device\" href=\"/vpn/cabinet/#devices?platform=windows\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17.8 20l-12-1.5c-1-.1-1.8-.9-1.8-1.9V7.4c0-1 .8-1.8 1.8-1.9l12-1.5c1.2-.1 2.2.8 2.2 1.9V18c0 1.2-1.1 2.1-2.2 1.9zM12 5v14M4 12h16\"/></svg><span>Windows</span></a>",
-      "css": ".ds-device{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:112px;padding:16px 8px;color:var(--ink,#f3f4f5);font-size:14px;text-decoration:none;font-family:'Golos Text',sans-serif;}.ds-device svg{width:32px;height:32px;color:var(--quiet,#b4bdc6)}.ds-device:hover{text-decoration:underline;text-underline-offset:4px}.ds-device:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(hover:hover){.ds-device:hover svg{color:var(--accent,#ff9d88)}}@media(prefers-reduced-motion:no-preference){.ds-device svg{transition:color .18s ease}}"
+      "css": ".ds-device{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:96px;padding:12px 8px;color:var(--ink,#f3f4f5);font-size:14px;text-decoration:none;font-family:'Golos Text',sans-serif;}.ds-device svg{width:32px;height:32px;color:var(--quiet,#b4bdc6)}.ds-device:hover{text-decoration:underline;text-underline-offset:4px}.ds-device:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(hover:hover){.ds-device:hover svg{color:var(--accent,#ff9d88)}}@media(prefers-reduced-motion:no-preference){.ds-device svg{transition:color .18s ease}}@media(max-width:420px){.ds-device{font-size:13px;min-height:88px}}"
+    },
+    {
+      "name": "Account Action",
+      "kind": "button",
+      "refersTo": "account-action",
+      "description": "Quiet outlined account route beside the primary VPN action.",
+      "html": "<a class=\"ds-account\" href=\"/vpn/cabinet/\"><span>My account</span><span aria-hidden=\"true\">↗</span></a>",
+      "css": ".ds-account{display:inline-flex;align-items:center;gap:8px;min-height:52px;padding:12px 20px;border:1px solid #53575d;border-radius:6px;color:var(--ink,#f3f4f5);font:16px/1.6 \"Golos Text\",sans-serif;text-decoration:none}.ds-account>span:last-child{color:var(--quiet,#b4bdc6)}.ds-account:hover{text-decoration:underline;text-underline-offset:4px}.ds-account:focus-visible{outline:2px solid var(--accent,#ff9d88);outline-offset:5px}@media(hover:hover){.ds-account:hover>span:last-child{color:var(--accent,#ff9d88)}}"
+    },
+    {
+      "name": "Connected Capability Band",
+      "kind": "custom",
+      "description": "The four existing factual capabilities share horizontal rules and internal cell divisions.",
+      "html": "<ul class=\"ds-features\" aria-label=\"Возможности VPN\" data-ru=\"Возможности VPN\" data-en=\"VPN features\" data-copy-attr=\"aria-label\">\n<li><span class=\"ds-icon-box\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"> <path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/> <path d=\"M13 9a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1v-10z\" /> <path d=\"M18 8v-3a1 1 0 0 0 -1 -1h-13a1 1 0 0 0 -1 1v12a1 1 0 0 0 1 1h9\" /> <path d=\"M16 9h2\" /> </svg></span><h4 data-ru=\"Без лимита устройств\" data-en=\"No device limit\">Без лимита устройств</h4></li>\n<li><span class=\"ds-icon-box\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"> <path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/> <path d=\"M3.5 5.5l1.5 1.5l2.5 -2.5\" /> <path d=\"M3.5 11.5l1.5 1.5l2.5 -2.5\" /> <path d=\"M3.5 17.5l1.5 1.5l2.5 -2.5\" /> <path d=\"M11 6l9 0\" /> <path d=\"M11 12l9 0\" /> <path d=\"M11 18l9 0\" /> </svg></span><h4 data-ru=\"Понятное подключение\" data-en=\"Clear setup steps\">Понятное подключение</h4></li>\n<li><span class=\"ds-icon-box\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"> <path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/> <path d=\"M3 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0\" /> <path d=\"M19 7a2 2 0 1 0 0 -4a2 2 0 0 0 0 4z\" /> <path d=\"M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5\" /> </svg></span><h4 data-ru=\"Выбор маршрута\" data-en=\"Choose your route\">Выбор маршрута</h4></li>\n<li><span class=\"ds-icon-box\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"> <path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/> <path d=\"M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0\" /> <path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\" /> <path d=\"M15 15l3.35 3.35\" /> <path d=\"M9 15l-3.35 3.35\" /> <path d=\"M5.65 5.65l3.35 3.35\" /> <path d=\"M18.35 5.65l-3.35 3.35\" /> </svg></span><h4 data-ru=\"Помощь с настройкой\" data-en=\"Help with setup\">Помощь с настройкой</h4></li>\n    </ul>",
+      "css": ".ds-features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;list-style:none;padding:20px 0;margin:0;border-block:1px solid var(--rule,#292d32);color:var(--ink,#f3f4f5);font-family:\"Golos Text\",sans-serif}.ds-features li{display:flex;align-items:center;gap:16px;min-width:0;padding:8px 24px}.ds-features li:first-child{padding-left:0}.ds-features li+li{border-left:1px solid var(--rule,#292d32)}.ds-features .ds-icon-box{display:grid;align-items:center;width:32px;height:40px;flex-shrink:0;color:var(--accent,#ff9d88)}.ds-features .ds-icon{display:block;width:32px;height:32px;flex-shrink:0}.ds-features h4{font-size:17px;font-weight:600;line-height:1.4;letter-spacing:-.025em;max-width:17ch;margin:0}@media(hover:hover){.ds-features li:hover .ds-icon{filter:drop-shadow(0 0 5px #ff9d8844)}}@media(prefers-reduced-motion:no-preference){.ds-features .ds-icon{transition:filter .18s ease}}@media(max-width:900px){.ds-features{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-features li{padding:16px 20px}.ds-features li:nth-child(odd){padding-left:0;border-left:0}.ds-features li:nth-child(n+3){border-top:1px solid var(--rule,#292d32)}}@media(max-width:700px){.ds-features .ds-icon{width:28px;height:28px}}@media(max-width:420px){.ds-features li{display:block;padding:12px 12px 16px}.ds-features h4{font-size:16px}.ds-features .ds-icon-box{margin-bottom:8px}}"
     }
   ],
   "narrative": {
     "northStar": "Two Independent Product Stages",
-    "overview": "The customer storefront keeps the owner-approved black canvas, local Golos Text and coral actions. Large, tightly set names and generous empty space give each independent product a clear offer. Small rectangular controls, quiet rules and open content keep the shell direct; actual product imagery retains its own appearance.\n\nThis document owns the customer storefront's implemented visual system. The direction comment in customer-site/index.html and its surface brief own the homepage composition. Generated VPN and Sufler pages retain their established product UI, legal content and operational flows; product-brand.css supplies only the customer-specific adjustments. The repository-root DESIGN.md and .impeccable/design.json remain the portfolio's separate authority.",
+    "overview": "The customer storefront keeps the owner-approved black canvas, local Golos Text and coral actions. A broad graphite opening and connected comparison surface give related content a clear material boundary. Large product names, a compact capability band and small rectangular controls make each independent offer readable; actual product imagery retains its own appearance.\n\nThis document owns the customer storefront's implemented visual system. The direction comment in customer-site/index.html and its surface brief own the homepage composition. Generated VPN and Sufler pages retain their established product UI, legal content and operational flows; product-brand.css supplies only the customer-specific adjustments. The repository-root DESIGN.md and .impeccable/design.json remain the portfolio's separate authority.",
     "keyCharacteristics": [
-      "Fixed black canvas, one coral action family and local Golos Text.",
-      "Large product typography, generous spacing and small rectangular actions.",
-      "Open capabilities, thin-rule pricing and unboxed device destinations.",
-      "Inline product captures, RU/EN controls and visible keyboard focus."
+      "Black canvas and graphite fields, one coral emphasis family and local Golos Text.",
+      "Broad uppercase VPN lockup on desktop, stacked on mobile, with the VPN word in coral.",
+      "Connected capability band and pricing comparator, followed by quiet unboxed device destinations.",
+      "Deliberate inline Sufler image stage, RU/EN controls and visible keyboard focus."
     ],
     "rules": [
       {
@@ -358,13 +390,13 @@
         "section": "colors"
       },
       {
-        "name": "The Flat Boundary Rule",
-        "body": "Use spacing and thin rules to organize offers; keep ambient light static and avoid raised card surfaces.",
+        "name": "The Grouped Surface Rule",
+        "body": "Group related offers in one quiet field, use thin internal divisions and reserve image depth for the Sufler capture.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** preserve black, Golos Text, coral actions and the existing Family Spy mark.",
+      "**Do** preserve black, graphite, Golos Text, coral emphasis and the existing Family Spy mark.",
       "**Do** keep each independent offer and its next action clear; the homepage footer contains only the support email.",
       "**Do** keep all four plan destinations, validated dynamic amounts and useful price fallback.",
       "**Do** use native mobile disclosures and retain readable initially open offers without JavaScript.",
@@ -374,7 +406,7 @@
     "donts": [
       "**Don't** turn the customer shell into the portfolio or introduce a joint subscription or bundle claim.",
       "**Don't** replace the established rectangular controls with pills or borrow the reference site's coffee-shop identity.",
-      "**Don't** reintroduce stepped tariffs, enclosing capability panels or boxed device tiles into this homepage composition.",
+      "**Don't** fragment the connected comparator into detached cards or restore stepped tariffs and boxed device tiles.",
       "**Don't** add autoplay, moving ambient effects, invented screenshots, customer evidence or product guarantees.",
       "**Don't** add screenshot-opening links, a modal, a viewer route or a new-tab image action.",
       "**Don't** apply the homepage stylesheet to the existing cabinet, payment or native interfaces."
