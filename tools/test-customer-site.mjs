@@ -73,6 +73,8 @@ test('product evidence ships real image bytes without portal or private fixture 
   const {output}=await buildCustomerSite(directory);
   for(const route of ['index.html','vpn/index.html','sufler/index.html']) {
     const html=await readFile(resolve(output,route),'utf8');
+    assert.doesNotMatch(html,/data-screen-link|href="\/screenshots\//);
+    for(const anchor of html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/g)) assert.doesNotMatch(anchor[0],/<img\b/,route);
     assert.doesNotMatch(html,/<canvas|src="[^"]*portal\.js|class="prompt-example"|class="preview-answer"/);
     assert.doesNotMatch(html,/PreviewPassword|DEMO_NOT_A_REAL_KEY|localhost:816|user-fixture/);
     for(const match of html.matchAll(/(?:src|data-src)="(\/media\/[^"]+)"/g)) {
@@ -93,35 +95,15 @@ test('product evidence ships real image bytes without portal or private fixture 
   const suflerSection=home.match(/<section id="sufler"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(suflerSection,/Скачай приложение|href="\/sufler\/(terms|privacy)\//);
   assert.doesNotMatch(home,/опорные мысли|Опорные мысли/);
-  assert.doesNotMatch(home,/<a class="screen-link"/);
+  assert.doesNotMatch(home,/<a class="screen-(link|view)"/);
   assert.doesNotMatch(suflerSection,/<button|Как настроить|Показать вопрос|Показать подсказку|original-link/);
-  assert.equal((suflerSection.match(/<a /g)||[]).length,2);
+  assert.equal((suflerSection.match(/<a /g)||[]).length,1);
   assert.match(suflerSection,/href="\/sufler\/#download"/);
   assert.match(suflerSection,/src="\/media\/sufler-answer\.jpg"/);
+  await assert.rejects(access(resolve(output,'screenshots')));
 });
 
-test('screenshot links open standalone HTML views with the matching original, without JavaScript',async t=>{
-  const directory=await mkdtemp(resolve('customer-site/dist-test-'));
-  t.after(()=>rm(directory,{recursive:true,force:true}));
-  const {output}=await buildCustomerSite(directory);
-  for(const [route,id] of [['index.html','sufler-answer'],['sufler/index.html','sufler-answer'],['vpn/index.html','vpn-android']]) {
-    const html=await readFile(resolve(output,route),'utf8');
-    const link=html.match(/<a\b[^>]*href="\/screenshots\/[^\"]+"[^>]*>/)?.[0];
-    assert.ok(link,route);
-    assert.ok(link.includes(`href="/screenshots/${id}/"`),route);
-    assert.match(link,/target="_blank"/);
-    assert.match(link,/rel="noopener noreferrer"/);
-    assert.doesNotMatch(link,/onclick=/);
-    assert.match(link,/data-en="Enlarge .+ screenshot in a new tab"/);
-    const view=await readFile(resolve(output,'screenshots',id,'index.html'),'utf8');
-    assert.ok(view.includes(`src="/media/${id}.jpg"`));
-    assert.match(view,/max-width|customer\.css/);
-    assert.doesNotMatch(view,/<dialog|window\.open|onclick=|<iframe/);
-    await access(resolve(output,'media',id+'.jpg'));
-  }
-});
-
-// Static evidence recovers from a failed image, including when it is linked.
+// Static evidence recovers from a failed image without adding another homepage action.
 test('static Sufler image exposes an error and recovers on load, including cached failures',async()=>{
  const {runInNewContext}=await import('node:vm');
  for(const broken of [false,true]){

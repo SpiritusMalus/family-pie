@@ -45,10 +45,10 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
         html=html.replace(/<div class="fp-social">[\s\S]*?<\/div>/g,'');
         if(path===resolve(output,'vpn/index.html')) {
           html=html.replace('<script src="/vpn/portal.js" defer></script>','');
-          html=html.replace(/<div class="hero-art"><canvas[\s\S]*?<\/canvas><\/div>/,'<figure class="hero-art customer-evidence"><a href="/screenshots/vpn-android/" target="_blank" rel="noopener noreferrer" aria-label="Увеличить скриншот VPN в новой вкладке" data-ru="Увеличить скриншот VPN в новой вкладке" data-en="Enlarge VPN screenshot in a new tab" data-copy-attr="aria-label"><img src="/media/vpn-android.jpg" width="1120" height="780" alt="Кабинет Family VPN: инструкция Android" data-ru="Кабинет Family VPN: инструкция Android" data-en="Family VPN account: Android guide" data-copy-attr="alt"></a></figure>');
+          html=html.replace(/<div class="hero-art"><canvas[\s\S]*?<\/canvas><\/div>/,'<figure class="hero-art customer-evidence"><img src="/media/vpn-android.jpg" width="1120" height="780" alt="Кабинет Family VPN: инструкция Android" data-ru="Кабинет Family VPN: инструкция Android" data-en="Family VPN account: Android guide" data-copy-attr="alt"></figure>');
         }
         if(path===resolve(output,'sufler/index.html')) {
-          html=html.replace(/<div class="preview" id="about"[\s\S]*?<\/div>\s*<\/section>/,'<figure class="preview customer-evidence" id="about"><a href="/screenshots/sufler-answer/" target="_blank" rel="noopener noreferrer" aria-label="Увеличить скриншот Sufler в новой вкладке" data-ru="Увеличить скриншот Sufler в новой вкладке" data-en="Enlarge Sufler screenshot in a new tab" data-copy-attr="aria-label"><img src="/media/sufler-answer.jpg" width="760" height="560" alt="Sufler: короткая подсказка к ответу" data-ru="Sufler: короткая подсказка к ответу" data-en="Sufler: answer prompt" data-copy-attr="alt"></a></figure></section>');
+          html=html.replace(/<div class="preview" id="about"[\s\S]*?<\/div>\s*<\/section>/,'<figure class="preview customer-evidence" id="about"><img src="/media/sufler-answer.jpg" width="760" height="560" alt="Sufler: короткая подсказка к ответу" data-ru="Sufler: короткая подсказка к ответу" data-en="Sufler: answer prompt" data-copy-attr="alt"></figure></section>');
         }
 
         html=html.replaceAll('https://family-pie.ru/sufler/','https://family-spy.ru/sufler/');
@@ -70,24 +70,6 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
     }
   }
   await pages(output);
-  for (const screen of [
-    {id:'vpn-android',product:'Family VPN',route:'/vpn/',width:1120,height:780},
-    {id:'sufler-answer',product:'Sufler',route:'/sufler/',width:760,height:560}
-  ]) {
-    const directory=resolve(output,'screenshots',screen.id);
-    await mkdir(directory,{recursive:true});
-    await writeFile(resolve(directory,'index.html'),`<!doctype html>
-<html lang="ru" data-fp-default-lang="ru"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>${screen.product} · Family Spy</title>
-<link rel="stylesheet" href="/vpn/fonts.css"><link rel="stylesheet" href="/customer.css">
-<script src="/i18n/language.js"></script><script src="/customer.js" defer></script>
-</head><body class="screenshot-page">
-<nav><a href="${screen.route}" data-ru="Вернуться к ${screen.product}" data-en="Back to ${screen.product}">Вернуться к ${screen.product}</a><div class="langtoggle" role="group" aria-label="Язык" data-ru="Язык" data-en="Language" data-copy-attr="aria-label"><button type="button" data-fp-lang="ru" aria-pressed="true">RU</button><button type="button" data-fp-lang="en" aria-pressed="false">EN</button></div></nav>
-<main><img src="/media/${screen.id}.jpg" width="${screen.width}" height="${screen.height}" alt="${screen.product}"></main>
-</body></html>\n`);
-    count++;
-  }
   const accountScript=resolve(output,'vpn/account.js');
   await writeFile(accountScript,(await readFile(accountScript,'utf8')).replace("$('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;", "$('.preview-bar').replaceChildren(el('span','Аккаунт:'),document.createTextNode(' '+me.user.login+'. '),el('span','Личный кабинет Family VPN.'));") );
   // The existing service worker caches public shell assets only; account APIs stay network-only.

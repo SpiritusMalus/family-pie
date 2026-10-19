@@ -40,10 +40,6 @@ figure{margin:0}
 .demo-screen{display:block;width:100%;height:100%;object-fit:contain}
 .screen-error{padding:28px;color:var(--quiet)}
 .screen-error:not([hidden]){display:block}
-.screenshot-page{padding:24px}
-.screenshot-page nav{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px}
-.screenshot-page nav a{display:inline-flex;align-items:center;min-height:44px;color:var(--accent)}
-.screenshot-page img{display:block;max-width:100%;height:auto;margin-inline:auto}
 .product-copy .try-note{font-size:14px;margin-top:20px}
 .support{padding-block:48px 56px;scroll-margin-top:24px}
 .support h2{font-size:30px;margin-bottom:28px}

@@ -14,7 +14,9 @@ test('portfolio delivery excludes customer files and keeps independent working a
     const html=await readFile(resolve(directory,path),'utf8');
     assert.doesNotMatch(html,/(?:src|href)=["']\/(?:vpn|sufler)(?:\/|["'])/,path);
     assert.match(html,/href="\/assets\/fonts.css"/,path);
+    assert.doesNotMatch(html,/data-screen-link|class="screen-link"|href="\/screenshots\//,path);
   }
+  await assert.rejects(access(resolve(directory,'screenshots')));
   const fonts=await readFile(resolve(directory,'assets/fonts.css'),'utf8');
   for(const path of fonts.matchAll(/url\(\/(.*?)\)/g))await access(resolve(directory,path[1]));
   assert.deepEqual(await readFile(resolve(directory,'assets/portal.js')),await readFile('site/vpn/portal.js'));

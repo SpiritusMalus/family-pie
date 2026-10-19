@@ -34,3 +34,38 @@ test('denied storage still allows repeated switches and cached-page return',()=>
   const a=appearance({denied:true});a.events.click();a.events.pageshow();assert.equal(a.root.light,false);
   a.events.click();assert.equal(a.root.light,true);assert.equal(a.attrs['aria-pressed'],'true');
 });
+
+function inlineScreens() {
+  const events={},captures=[],stored=new Map(),status={textContent:''};
+  const image={src:'/work/assets/screen-en.png',complete:true,naturalWidth:1080,dataset:{screenRuSrc:'/work/assets/screen-ru.png',screenEnSrc:'/work/assets/screen-en.png'},getAttribute(key){return this[key];}};
+  const buttons=['ru','en'].map(lang=>({dataset:{screenLanguage:lang},setAttribute(key,value){this[key]=value;},addEventListener(_event,fn){this.click=fn;}}));
+  const figure={dataset:{screenLang:'en'},setAttribute(){},removeAttribute(){},querySelector:key=>key==='[data-screen-ru-src][data-screen-en-src]'||key==='[data-screen-ru-src]'?image:key==='[data-screen-status]'?status:null,querySelectorAll:()=>buttons};
+  const context={document:{querySelectorAll:()=>[figure]},window:{FPi18n:{lang:'en'},addEventListener:(event,fn)=>events[event]=fn},sessionStorage:{getItem:key=>stored.get(key),setItem:(key,value)=>stored.set(key,value)},Image:class{constructor(){captures.push(this);this.naturalWidth=1080;this.naturalHeight=2400;}},setTimeout:()=>1,clearTimeout(){}};
+  vm.runInNewContext(readFileSync('site/portfolio-screens.js','utf8'),context);
+  return {image,buttons,figure,captures,status,stored,context,events};
+}
+
+test('inline screenshot selection works without enlargement links and retains the loaded image on failure',()=>{
+  const a=inlineScreens();
+  assert.equal(a.buttons[1]['aria-pressed'],'true');
+  a.buttons[0].click();a.captures[0].onload();
+  assert.equal(a.image.src,'/work/assets/screen-ru.png');
+  assert.equal(a.buttons[0]['aria-pressed'],'true');
+  assert.equal(a.stored.get('fp_screen_lang:/work/assets/screen-ru.png'),'ru');
+  a.buttons[1].click();a.captures[1].onerror();
+  assert.equal(a.image.src,'/work/assets/screen-ru.png');
+  assert.equal(a.figure.dataset.screenLang,'ru');
+  assert.match(a.status.textContent,/Couldn’t load/);
+  a.buttons[1].click();a.captures[2].onload();
+  assert.equal(a.image.src,'/work/assets/screen-en.png');
+  assert.equal(a.status.textContent,'');
+});
+
+test('late screenshot loads cannot replace the latest inline language choice',()=>{
+  const a=inlineScreens();
+  a.buttons[0].click();
+  a.buttons[1].click();
+  a.captures[0].onload();
+  assert.equal(a.image.src,'/work/assets/screen-en.png');
+  assert.equal(a.buttons[1]['aria-pressed'],'true');
+});
