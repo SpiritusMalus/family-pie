@@ -40,6 +40,6 @@ Portfolio routes keep English static/first-visit copy; explicit URL and saved Ru
 
 ## Verification and unresolved decisions
 
-**State: PREVIEW — not approved for publication and not asserted live.** This current 2026-10-19 refinement supersedes the homepage composition described in the 2026-10-11 approved black-showcase record. The historical approval does not approve this cumulative preview. Publication still requires approval of the latest shown result and green CI through the established route.
+**State: APPROVED FOR RELEASE.** The owner explicitly approved the latest shown cumulative preview fbfc600a9875083dc84f032e9899ab0970e70728 on 2026-10-19. It supersedes the 2026-10-11 black-showcase composition. Integrate through the established reviewed main CI route; verified deployment status belongs to the project release journal.
 
 An independent finish review found no material visual issues and readiness for preview. Exact visual, functional and preservation evidence is recorded in the existing project journal. This documentation describes the built preview and does not establish device or deployment acceptance.

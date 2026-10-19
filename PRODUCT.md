@@ -24,7 +24,7 @@ Lumen + REST's native Mac timer/display integration and separate Python/PySide6 
 
 ## Approved homepage release
 
-The owner supplied dev.cmde.ru as a reference and approved the shown black showcase for production on 2026-10-11 Pacific. The production composition approved on that date serves `/`: name/role/actions beside the selected portrait, a short Family Pie story row, two image-first work cards, then contact. The current branch prepares the reference-led refinement described below. `/preview/showcase/` retains the matching comparison page with noindex. The public portrait is `site/work/assets/eugene-portrait.png`, byte-identical to the approved evening-light edit. Original and rejected taller variants plus private review screenshots remain outside public Git.
+The owner supplied dev.cmde.ru as a reference and approved the shown black showcase for production on 2026-10-11 Pacific. The production composition approved on that date serves `/`: name/role/actions beside the selected portrait, a short Family Pie story row, two image-first work cards, then contact. The owner approved the reference-led refinement described below for publication on 2026-10-19. `/preview/showcase/` retains the matching comparison page with noindex. The public portrait is `site/work/assets/eugene-portrait.png`, byte-identical to the approved evening-light edit. Original and rejected taller variants plus private review screenshots remain outside public Git.
 
 Screenshot language buttons swap real matching RU/EN captures independently of the page language, preserve choices on Back navigation and recover from failed loads. Screenshots remain inline, with no full-image link. The public display name is exactly Eugene Tihonenko. Customer/payment/legal routes and native apps remain separate from this static-site release.
 
@@ -40,7 +40,7 @@ Homepage and showcase preview use a short service-first headline, project-scroll
 
 The homepage copy may be shorter while the full existing case explanations remain available. No new product, client claim, price, experience metric or capability is invented. Public display name remains Eugene Tihonenko; English default and explicit/saved Russian choices remain unchanged. The actual two-project selection is retained, with no invented third grid item.
 
-This new preview is not yet approved for publication. PR108 also includes the already requested inline-only screenshot behavior on both sites. All changes require approval of the latest shown cumulative preview plus green CI before main integration/publication. Other held PRs remain independent.
+The owner approved the latest shown cumulative preview fbfc600a9875083dc84f032e9899ab0970e70728 on 2026-10-19 with an explicit production instruction. PR108 also includes the requested inline-only screenshot behavior on both sites. Integrate through the established reviewed main CI route; deployment evidence is recorded separately in the project release journal. Other held PRs remain independent.
 
 ## Portfolio copy
 
