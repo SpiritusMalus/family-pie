@@ -9,7 +9,7 @@ related_targets: ["route:/","route:/work/driftora","route:/work/lumen-rest","sit
 
 ## Scope and visitor mode
 
-**Experience** at `/`: an employer quickly understands what Eugene Tihonenko builds, jumps to two real projects, inspects their application evidence and reaches his contact destinations. The two `/work/` case pages support **Read** within the existing portfolio world. Author voice stays first-person singular in RU/EN; the public English name is exactly Eugene Tihonenko.
+**Experience** at `/`: a product team or entrepreneur quickly understands what Eugene Tihonenko builds, jumps to two real projects, inspects their application evidence and reaches his contact destinations. The two `/work/` case pages support **Read** within the existing portfolio world. Author voice stays first-person singular in RU/EN; the public English name is exactly Eugene Tihonenko.
 
 Customer-facing VPN, Lumen product, purchase, download and legal routes keep their own content, styles and behavior. The employer-facing selection remains Driftora and Lumen + REST; `data/products.json` remains the complete legal/product catalog.
 

@@ -5,7 +5,7 @@
 web
 
 ## Product Purpose
-Family Pie is Eugene Tihonenko's website. Its homepage addresses employers considering a full-stack developer. Driftora and Lumen + REST are the selected work: each has a case page explaining its purpose and implementation, with existing application screens. The developer's name, role and contact are visible. His full-stack scope includes websites, mobile and desktop applications, and backend services.
+Family Pie is Eugene Tihonenko's website. Its primary audience is product teams considering a full-stack developer; its secondary audience is entrepreneurs seeking client development. The owner explicitly seeks a team role while considering client projects and developing personal apps in his free time. Driftora and Lumen + REST are the selected work: each has a case page explaining its purpose and implementation, with existing application screens. The developer's name, role and contact are visible. His full-stack scope includes websites, mobile and desktop applications, and backend services.
 
 The site's separate product, download, legal and purchase routes serve application users. Removing a project from the employer-facing selection does not remove its service or direct routes.
 
