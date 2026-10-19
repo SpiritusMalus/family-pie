@@ -5,6 +5,26 @@
   let vpnPlans = [];
   const lang = () => window.FPi18n?.lang === 'en' ? 'en' : 'ru';
   const originals = new WeakMap();
+  // Native radio selection changes a real setup destination, never connection state.
+  const devicePlatforms = new Map([['windows', 'Windows'], ['android', 'Android'], ['tv', 'Smart TV']]);
+  const deviceScenes = [];
+  document.querySelectorAll('[data-device-scene]').forEach(scene => {
+    const choices = [...scene.querySelectorAll('input[name="hero-device"]')];
+    const setup = scene.querySelector('[data-device-setup]');
+    const name = scene.querySelector('[data-device-name]');
+    if (!choices.length || !setup || !name) return;
+    const selectDevice = () => {
+      const selected = choices.find(choice => choice.checked && devicePlatforms.has(choice.value));
+      if (!selected) return;
+      scene.dataset.activeDevice = selected.value;
+      name.textContent = devicePlatforms.get(selected.value);
+      const destination = `/vpn/cabinet/#devices?platform=${selected.value}`;
+      originals.set(setup, destination);
+      setup.setAttribute('href', `/vpn/cabinet/?lang=${lang()}#devices?platform=${selected.value}`);
+    };
+    choices.forEach(choice => choice.addEventListener('change', selectDevice));
+    deviceScenes.push(selectDevice);
+  });
   document.querySelectorAll('[data-static-screen]').forEach(root => {
     const image = root.querySelector('.demo-screen');
     const failure = root.querySelector('.screen-error');
@@ -12,12 +32,40 @@
     image.addEventListener('load', () => {image.hidden = false;failure.hidden = true;});
     if (image.complete && !image.naturalWidth) {image.hidden = true;failure.hidden = false;}
   });
+  // Native details remain fully open without JS. Mobile exposes one offer at a time.
+  const offers = [...document.querySelectorAll('details[data-vpn-plan]')];
+  if (offers.length) {
+    const narrow = window.matchMedia('(max-width:600px)');
+    let selected = offers[0].dataset.vpnPlan;
+    const arrange = () => {
+      offers.forEach(offer => offer.removeAttribute('name'));
+      offers.forEach(offer => {
+        offer.open = !narrow.matches || offer.dataset.vpnPlan === selected;
+        if (narrow.matches) offer.setAttribute('name', 'vpn-offers');
+        const summary = offer.querySelector('summary');
+        summary.tabIndex = narrow.matches ? 0 : -1;
+      });
+    };
+    offers.forEach(offer => {
+      offer.querySelector('summary').addEventListener('click', event => {
+        if (!narrow.matches) event.preventDefault();
+      });
+      offer.addEventListener('toggle', () => {
+        if (!narrow.matches || !offer.open) return;
+        selected = offer.dataset.vpnPlan;
+        offers.forEach(other => {if (other !== offer) other.open = false;});
+      });
+    });
+    arrange();
+    narrow.addEventListener('change', arrange);
+  }
   function render() {
     document.querySelectorAll('[data-ru][data-en]').forEach(node => {
       const value = node.dataset[lang()];
       if (node.dataset.copyAttr) node.setAttribute(node.dataset.copyAttr, value);
       else if (node.textContent !== value) node.textContent = value;
     });
+    deviceScenes.forEach(selectDevice => selectDevice());
     const vpn = document.getElementById('vpn-price'), sufler = document.getElementById('sufler-price');
     if (vpn && vpnPlan) vpn.textContent = lang() === 'en' ? `${vpnPlan.priceMinor / 100} RUB for ${vpnPlan.days} days` : `${vpnPlan.priceMinor / 100} ₽ за ${vpnPlan.days} дней`;
     if (sufler && suflerPlan) sufler.textContent = lang() === 'en' ? `30 minutes free, then ${Number(suflerPlan.amount)} RUB for ${suflerPlan.days} days` : `30 минут бесплатно, затем ${Number(suflerPlan.amount)} ₽ за ${suflerPlan.days} дней`;
@@ -33,6 +81,8 @@
       const amount = card.querySelector('.vpn-plan-amount'), usd = card.querySelector('.vpn-plan-usd');
       const monthly = card.querySelector('.vpn-plan-monthly'), unit = card.querySelector('.vpn-plan-unit');
       const saving = card.querySelector('.vpn-plan-saving'), best = card.querySelector('.vpn-plan-best');
+      const overview = card.querySelector('.vpn-plan-overview');
+      if (overview) overview.textContent = rubles(plan.priceMinor / 100);
       monthly.textContent = rubles(plan.priceMinor / 100 / months[plan.days]);
       monthly.hidden = unit.hidden = false;
       amount.textContent = (lang() === 'en' ? 'Total ' : 'Всего ') + rubles(plan.priceMinor / 100);
