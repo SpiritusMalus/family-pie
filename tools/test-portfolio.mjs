@@ -34,3 +34,65 @@ test('denied storage still allows repeated switches and cached-page return',()=>
   const a=appearance({denied:true});a.events.click();a.events.pageshow();assert.equal(a.root.light,false);
   a.events.click();assert.equal(a.root.light,true);assert.equal(a.attrs['aria-pressed'],'true');
 });
+
+function inlineScreens() {
+  const events={},captures=[],stored=new Map(),status={textContent:''};
+  const image={src:'/work/assets/screen-en.png',complete:true,naturalWidth:1080,dataset:{screenRuSrc:'/work/assets/screen-ru.png',screenEnSrc:'/work/assets/screen-en.png'},getAttribute(key){return this[key];}};
+  const buttons=['ru','en'].map(lang=>({dataset:{screenLanguage:lang},setAttribute(key,value){this[key]=value;},addEventListener(_event,fn){this.click=fn;}}));
+  const figure={dataset:{screenLang:'en'},setAttribute(){},removeAttribute(){},querySelector:key=>key==='[data-screen-ru-src][data-screen-en-src]'||key==='[data-screen-ru-src]'?image:key==='[data-screen-status]'?status:null,querySelectorAll:()=>buttons};
+  const context={document:{querySelectorAll:()=>[figure]},window:{FPi18n:{lang:'en'},addEventListener:(event,fn)=>events[event]=fn},sessionStorage:{getItem:key=>stored.get(key),setItem:(key,value)=>stored.set(key,value)},Image:class{constructor(){captures.push(this);this.naturalWidth=1080;this.naturalHeight=2400;}},setTimeout:()=>1,clearTimeout(){}};
+  vm.runInNewContext(readFileSync('site/portfolio-screens.js','utf8'),context);
+  return {image,buttons,figure,captures,status,stored,context,events};
+}
+
+test('inline screenshot selection works without enlargement links and retains the loaded image on failure',()=>{
+  const a=inlineScreens();
+  assert.equal(a.buttons[1]['aria-pressed'],'true');
+  a.buttons[0].click();a.captures[0].onload();
+  assert.equal(a.image.src,'/work/assets/screen-ru.png');
+  assert.equal(a.buttons[0]['aria-pressed'],'true');
+  assert.equal(a.stored.get('fp_screen_lang:/work/assets/screen-ru.png'),'ru');
+  a.buttons[1].click();a.captures[1].onerror();
+  assert.equal(a.image.src,'/work/assets/screen-ru.png');
+  assert.equal(a.figure.dataset.screenLang,'ru');
+  assert.match(a.status.textContent,/Couldn’t load/);
+  a.buttons[1].click();a.captures[2].onload();
+  assert.equal(a.image.src,'/work/assets/screen-en.png');
+  assert.equal(a.status.textContent,'');
+});
+
+test('late screenshot loads cannot replace the latest inline language choice',()=>{
+  const a=inlineScreens();
+  a.buttons[0].click();
+  a.buttons[1].click();
+  a.captures[0].onload();
+  assert.equal(a.image.src,'/work/assets/screen-en.png');
+  assert.equal(a.buttons[1]['aria-pressed'],'true');
+});
+
+test('reference-led homepage exposes project access before the optional author story',()=>{
+  for(const path of ['site/index.html','site/preview/showcase/index.html']) {
+    const html=readFileSync(path,'utf8'),main=html.match(/<main[\s\S]*?<\/main>/)[0];
+    assert.ok(main.indexOf('href="#work"')<main.indexOf('data-maker'),path);
+    assert.match(main,/<details class="maker-story" data-maker open>/);
+    assert.equal((main.match(/class="showcase-project"/g)||[]).length,2);
+    for(const card of main.matchAll(/<article class="showcase-project">[\s\S]*?<\/article>/g)) {
+      assert.ok(card[0].indexOf('<h3>')<card[0].indexOf('<figure'),path);
+      assert.doesNotMatch(card[0],/data-screen-link|href="\/screenshots\//);
+    }
+    assert.match(main,/href="\/work\/driftora\/"/);
+    assert.match(main,/href="\/work\/lumen-rest\/"/);
+  }
+});
+
+test('author story starts collapsed only on mobile and language changes preserve the user choice',()=>{
+  for(const mobile of [false,true]) {
+    const maker={open:true},events={};
+    const context={document:{querySelector:()=>maker,querySelectorAll:()=>[]},matchMedia:()=>({matches:mobile}),window:{FPi18n:{lang:'en'},addEventListener:(name,fn)=>events[name]=fn}};
+    vm.runInNewContext(readFileSync('site/portfolio.js','utf8'),context);
+    assert.equal(maker.open,!mobile);
+    maker.open=!maker.open;
+    context.window.FPi18n.lang='ru';events['fp-languagechange']();
+    assert.equal(maker.open,mobile);
+  }
+});

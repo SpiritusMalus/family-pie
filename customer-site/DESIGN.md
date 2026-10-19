@@ -189,3 +189,6 @@ Owner Sufler copy reduction, 2026-10-17: homepage keeps only Sufler, one purpose
 Owner wording refinement: use “Твой помощник на собеседовании.” / “Your interview assistant.” as the single homepage purpose phrase.
 
 Owner wording refinement: remove the possessive; use “Помощник на собеседовании.” / “Interview assistant.”.
+
+
+Owner screenshot behavior, 2026-10-19 (latest direction): remove separate full-screenshot opening everywhere on Family Pie and Family Spy. Screenshots remain inline; remove enlargement links and image anchors. Keep portfolio RU/EN screenshot selection, cached choice and load/failure recovery without depending on an enlargement link. No modal, separate viewer route, screenshot CTA or new tab. This supersedes the earlier same-day tab/viewer request. The homepage Sufler download CTA and existing copy/prices/layout remain unchanged. Preview approval still applies before publication.

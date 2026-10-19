@@ -73,6 +73,8 @@ test('product evidence ships real image bytes without portal or private fixture 
   const {output}=await buildCustomerSite(directory);
   for(const route of ['index.html','vpn/index.html','sufler/index.html']) {
     const html=await readFile(resolve(output,route),'utf8');
+    assert.doesNotMatch(html,/data-screen-link|href="\/screenshots\//);
+    for(const anchor of html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/g)) assert.doesNotMatch(anchor[0],/<img\b/,route);
     assert.doesNotMatch(html,/<canvas|src="[^"]*portal\.js|class="prompt-example"|class="preview-answer"/);
     assert.doesNotMatch(html,/PreviewPassword|DEMO_NOT_A_REAL_KEY|localhost:816|user-fixture/);
     for(const match of html.matchAll(/(?:src|data-src)="(\/media\/[^"]+)"/g)) {
@@ -98,6 +100,7 @@ test('product evidence ships real image bytes without portal or private fixture 
   assert.equal((suflerSection.match(/<a /g)||[]).length,1);
   assert.match(suflerSection,/href="\/sufler\/#download"/);
   assert.match(suflerSection,/src="\/media\/sufler-answer\.jpg"/);
+  await assert.rejects(access(resolve(output,'screenshots')));
 });
 
 // Static evidence recovers from a failed image without adding another homepage action.

@@ -2,54 +2,44 @@
 version: 1
 slug: "site-index-html"
 primary_target: "site/index.html"
-related_targets: ["route:/","route:/work/driftora","route:/work/lumen-rest","site/work/driftora/index.html","site/work/lumen-rest/index.html","site/portfolio.css","site/portfolio-theme.js","site/portfolio.js","site/work/assets/driftora-review.png","site/rest_lumen/assets/settings-macos.png","site/rest_lumen/assets/reminder-macos.png","site/vpn/fonts.css","site/i18n/language.js"]
+related_targets: ["route:/","route:/work/driftora","route:/work/lumen-rest","site/work/driftora/index.html","site/work/lumen-rest/index.html","site/portfolio.css","site/portfolio-theme.js","site/portfolio.js","site/work/assets/driftora-review.png","site/rest_lumen/assets/settings-macos.png","site/rest_lumen/assets/reminder-macos.png","site/vpn/fonts.css","site/i18n/language.js","route:/preview/showcase","site/portfolio-showcase.css","site/portfolio-showcase.js","site/portfolio-screens.js","site/preview/showcase/index.html","site/preview/showcase/layout.css","site/work/assets/eugene-portrait.png","site/work/assets/driftora-review-ru.png","site/work/assets/driftora-review-en.png","site/work/assets/lumen-settings-ru.jpg","site/work/assets/lumen-settings-en.jpg"]
 ---
 
 # Family Pie developer portfolio and work pages
 
 ## Scope and visitor mode
 
-**Experience** at `/`: an employer meets Evgeny Tikhonenko, inspects Driftora and Lumen + REST, follows the implementation stories and reaches his contact destinations. The two `/work/` case pages support **Read** within the same portfolio world. The visible author voice is first-person singular in RU/EN.
+**Experience** at `/`: a product team or entrepreneur quickly understands what Eugene Tihonenko builds, jumps to two real projects, inspects their application evidence and reaches his contact destinations. The two `/work/` case pages support **Read** within the existing portfolio world. Author voice stays first-person singular in RU/EN; the public English name is exactly Eugene Tihonenko.
 
-This replaces the previous homepage catalog/portal surface. It does not change the customer-facing VPN, Lumen product, purchase, download or legal routes. `data/products.json` remains the complete product/legal catalog; the employer-facing work selection contains two applications.
+Customer-facing VPN, Lumen product, purchase, download and legal routes keep their own content, styles and behavior. The employer-facing selection remains Driftora and Lumen + REST; `data/products.json` remains the complete legal/product catalog.
 
 ## Direction and memorable moment
 
-The built world is a neutral working-screen specimen: local Golos Text, flat light/dark paper and ink, restrained coral links, thin dividers and actual Android/macOS application images with adjacent explanations. `site/portfolio.css` is the visual implementation authority; `portfolio-theme.js` and `portfolio.js` own scoped appearance and native bilingual rendering. The old homepage's `home.css`, `home-theme.js`, catalog accordion and portal artwork no longer define this surface.
+The owner explicitly chose the dev.cmde.ru pattern: prominent immediate access to projects, a compact introduction to the maker, colorful previews and softer boundaries. This refines the incumbent Golos/coral identity. The first body comment in `site/index.html` and its comparison page is the direction contract.
 
-The homepage begins with the compact pie mark and `family-pie` wordmark, Evgeny's name and full-stack role. A short secondary paragraph explains his developer-brings-a-pie image; using an application is like taking a bite. Driftora follows with his daily food logging, workouts/walking, the calorie/voice-input need behind its creation, sole authorship, technical stack, and a cropped review screen beside portion/source notes. Lumen follows with his reason for movement and eye-rest breaks, its consent-based timer behavior, platform stack and existing macOS settings screen. Contact closes the page with email, LinkedIn and one GitHub link. The attribution footer does not repeat it. The role statement covers websites, mobile and desktop apps, and backend services.
+The root and `/preview/showcase/` use soft charcoal, coral, subdued rounded frames and green/amber capture stages. `site/portfolio-showcase.css` specializes shared `portfolio.css`; the comparison route imports the same CSS through `preview/showcase/layout.css`. The root stays fixed dark without changing the saved shared appearance preference. Case pages keep their existing light/dark palette, grid and content.
 
-On desktop, Driftora has copy left/media right and Lumen media left/copy right. Mobile stacks each project with copy before media. Work and Contact remain available in the header's second row beneath the brand and preference controls.
+The first viewport presents a short service headline, a bright My projects anchor to `#work`, a secondary contact action and the existing capability list. A compact native About disclosure follows with the actual portrait, name and the owner's career path and work preferences. Desktop starts open; JavaScript initially collapses it at 760px or below, and no-JavaScript content stays open/readable. Language changes preserve the visitor's open/closed choice. The real portrait remains `site/work/assets/eugene-portrait.png`.
 
-Both case pages begin with All work, the application name, purpose and stack. Narrative sits beside application media on desktop; media comes before the narrative on mobile. Driftora opens with why he started it and his current personal use, then explains authorship, photo/draft/review/local-save flow, portion recalculation and nutrition-source attribution. Lumen explains motivation, break consent, screen restoration and separate platform integration. These are the built content structure, not global component rules.
+Two equal project cards follow. Each leads with project name and purpose → actual capture → source caption and independent screenshot-language controls → short personal explanation, case action and stack. Driftora's homepage crop focuses meal review, editable portion and nutrition-source detail. Lumen's upper settings crop shows lamp and timer controls. Two cards become one column at 760px; there is no invented third item. Contact closes the page with existing email, LinkedIn and one GitHub destination.
 
 ## Content and actions
 
-- Work and Contact point to the homepage sections from all three portfolio routes.
-- Each homepage project links to its real case page: `/work/driftora/` and `/work/lumen-rest/`.
-- Every displayed specimen has a visible `Открыть полный скриншот` / `View full screenshot` link with a 44px minimum height. It is an ordinary same-tab link to the original image; browser Back returns to the page. There is no lightbox or new-tab promise.
-- The Driftora image is the existing composed Android store asset with text input, visibly labelled accordingly. It is not a new device capture or camera-flow acceptance evidence.
-- Lumen uses the existing actual macOS settings and reminder images. These do not establish fresh physical-device or cross-platform acceptance.
-- Case footers retain cross-project links and existing customer destinations: `/driftora/legal` and `/rest_lumen/`.
-- Contact uses the existing email, LinkedIn and GitHub destinations. Personal motivations do not claim achieved weight loss or clinical benefit.
+- Work and Contact navigate to the homepage sections; each project links to its real case page, `/work/driftora/` or `/work/lumen-rest/`.
+- The actual matching RU/EN Android image is an unsaved 100 g meal draft. The actual matching macOS image shows Lumen settings. Neither adds camera/speech-flow, physical-device or cross-platform acceptance claims.
+- Screenshots remain inline on the selected portfolio surfaces. No image anchor, full-screenshot CTA, separate viewer, modal or new tab remains. Case pages preserve full uncropped inline captures.
+- Screenshot-language choice is independent of page language, cached across Back navigation, and retains existing load/failure recovery through `portfolio-screens.js`.
+- Case pages preserve their narrative/media composition and inspected implementation explanations. Footers retain cross-project and customer destinations, including `/driftora/legal` and `/rest_lumen/`.
+- No new product, client claim, price, experience metric, capability or outcome is introduced. Personal motivations do not establish achieved weight loss or clinical benefit.
 
 ## Behavior and constraints
 
-Use the built desktop/mobile grid, captions, full-image links and sticky desktop case media without inventing a carousel, modal or screenshot viewer. Screens remain native application evidence. Keep the two selected apps and readable explanations; the complete legal catalog stays separate.
+The compact hero, author disclosure and project-card composition are homepage-specific. The scoped container is 1100px maximum, card gap 24px and principal panel radius 16px. Gutters adapt at 900px, 760px and 420px. The shared mobile Work/Contact navigation row remains visible; keyboard focus and the skip link remain usable. The project CTA is a real anchor. The only added motion is its small arrow response when reduced motion is not requested.
 
-`portfolio-theme.js` shares `family-vpn-theme-v3` with the site, honors a saved light/dark preference and otherwise follows system appearance. It updates pressed state and document color scheme, responds to storage and page-return events, and retains a complete palette in both appearances. Shared customer theme/style files remain unchanged. Without JavaScript, readable Russian copy and destination links remain available in the static dark fallback; preference controls are hidden.
-
-RU/EN shares `fp_lang` and `/i18n/language.js`. Native `data-ru` / `data-en` rendering updates text and declared copy attributes; `fp-languagechange` updates selected buttons. Preserve the existing language selection across customer and legal navigation.
-
-The only portfolio motion is the small arrow shift on case-link hover when reduced motion is not requested. Keyboard focus uses the accent outline; the skip link reaches the main content. Keep mobile navigation visible and screenshot links independently operable.
+Portfolio routes keep English static/first-visit copy; explicit URL and saved Russian choices remain authoritative through `fp_lang`, `/i18n/language.js` and native `data-ru` / `data-en` rendering. Visible and accessible names remain synchronized. Case-page appearance continues through `portfolio-theme.js` and `family-vpn-theme-v3`; customer styles and preferences stay separate. No-JavaScript copy, images, About content and destinations remain readable.
 
 ## Verification and unresolved decisions
 
-The finish reviewer approved the replacement portfolio after the mobile Work/Contact row and the independently operable 44px full-screenshot links were resolved. This brief records that review status; it does not add browser, physical-device or deployment claims. Parent task evidence owns the exact checks and release receipt.
+**State: APPROVED FOR RELEASE.** The owner explicitly approved the latest shown cumulative preview fbfc600a9875083dc84f032e9899ab0970e70728 on 2026-10-19. It supersedes the 2026-10-11 black-showcase composition. Integrate through the established reviewed main CI route; verified deployment status belongs to the project release journal.
 
-No material visual finding or design decision remains open in the reviewed portfolio. Existing customer release limitations remain separate and retain their own surface briefs.
-
-
-## Owner-approved release update — 2026-10-11 Pacific
-
-The current root uses the exact approved black showcase composition: portrait beside Eugene Tihonenko's name/role/actions, a Family Pie story row, two image-first work cards, then contact. `site/portfolio-showcase.css` and `site/portfolio-showcase.js` specialize the root; case pages retain shared `portfolio.css` and `portfolio-theme.js`. Root canvas stays black regardless of the saved shared theme. Static/first-visit language is English, explicit URL/saved RU retained. `portfolio-screens.js` independently switches each actual matching native RU/EN capture and its full-image link, preserving choices across Back. Public selected portrait is `site/work/assets/eugene-portrait.png`; private original/taller experiments are excluded. This update supersedes earlier root layout/name/language/specimen descriptions. Existing broader contribution/hierarchy critique is a separate backlog; publication does not certify it resolved.
+An independent finish review found no material visual issues and readiness for preview. Exact visual, functional and preservation evidence is recorded in the existing project journal. This documentation describes the built preview and does not establish device or deployment acceptance.

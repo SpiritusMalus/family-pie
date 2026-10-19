@@ -1,6 +1,6 @@
 ---
 name: Family Pie — working-screen portfolio
-description: Neutral Golos Text portfolio with annotated application screens and preserved customer identities.
+description: Golos Text portfolio with a compact charcoal homepage preview, actual application screens and preserved case/customer identities.
 colors:
   paper: "#151719"
   ink: "#f3f4f5"
@@ -8,6 +8,14 @@ colors:
   rule: "#41464c"
   accent: "#ff9d88"
   stage: "#202429"
+  showcase-paper: "#111216"
+  showcase-quiet: "#bbc0ca"
+  showcase-rule: "#2c3038"
+  showcase-stage: "#191b20"
+  project-green: "#193f3b"
+  project-moss: "#15302f"
+  project-gold: "#57422f"
+  project-brown: "#2d241e"
   light-paper: "#fcfcfd"
   light-ink: "#20262e"
   light-quiet: "#56616d"
@@ -79,25 +87,25 @@ typography:
     lineHeight: 1.55
   showcase-display:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "clamp(36px, 4.2vw, 54px)"
+    fontSize: "clamp(30px, 3.2vw, 40px)"
     fontWeight: 600
     lineHeight: 1.12
     letterSpacing: "-0.035em"
   showcase-compact-display:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "40px"
+    fontSize: "36px"
     fontWeight: 600
     lineHeight: 1.12
   showcase-narrow-display:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "36px"
+    fontSize: "32px"
     fontWeight: 600
     lineHeight: 1.12
   showcase-summary:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "20px"
+    fontSize: "18px"
     fontWeight: 400
-    lineHeight: 1.65
+    lineHeight: 1.6
   showcase-body:
     fontFamily: "Golos Text, sans-serif"
     fontSize: "16px"
@@ -121,6 +129,9 @@ rounded:
   panels: "6px"
   screen: "14px"
   theme-control: "50%"
+  showcase-card: "16px"
+  showcase-portrait: "12px"
+  showcase-cta: "24px"
 spacing:
   control-gap: "12px"
   proof-gap: "24px"
@@ -157,10 +168,14 @@ components:
     textColor: "{colors.accent}"
   text-link-light:
     textColor: "{colors.light-accent}"
-  screen-link:
-    textColor: "{colors.accent}"
-  screen-link-light:
-    textColor: "{colors.light-accent}"
+  showcase-work-button:
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.showcase-paper}"
+    rounded: "{rounded.showcase-cta}"
+    padding: "12px 22px"
+  showcase-card:
+    backgroundColor: "{colors.showcase-stage}"
+    rounded: "{rounded.showcase-card}"
   screenshot-stage:
     backgroundColor: "{colors.stage}"
     padding: "28px"
@@ -175,19 +190,19 @@ components:
 
 **Creative North Star: "The Working-Screen Specimen"**
 
-The portfolio uses neutral surfaces, local Golos Text and restrained coral links to make actual applications easy to inspect. Large sentence-case headings and ample space separate the developer's voice from the application evidence. A cropped Android review screen sits beside short annotations; the macOS settings and reminder screens keep their native appearance.
+The portfolio uses neutral surfaces, local Golos Text and restrained coral links to make actual applications easy to inspect. Large sentence-case headings and ample space separate the developer's voice from the application evidence. A cropped Android review screen sits beside short annotations; the native macOS settings capture keeps its application appearance.
 
-Light and dark appearances share the same composition, rules and typography. Depth belongs to the application specimens; the surrounding page is flat, with thin dividers and direct text links. The six-slice Family Pie mark retains one coral segment, while its accompanying portfolio wordmark uses Golos Text.
+Case-page light and dark appearances share the same composition, rules and typography. The prepared homepage and comparison route add a scoped soft-charcoal, coral and colorful-stage treatment with compact rounded boundaries; their composition is recorded in the selected surface brief. The owner approved the shown cumulative refinement on 2026-10-19 for release through the established CI route. Publication is verified separately in the project release journal. On case pages, depth belongs to the application specimens; the surrounding shell is flat, with thin dividers and direct text links. The six-slice Family Pie mark retains one coral segment, while its accompanying portfolio wordmark uses Golos Text.
 
 **Key Characteristics:**
-- Neutral page and specimen surfaces in complete light and dark appearances.
+- Neutral case-page surfaces in complete light and dark appearances; a scoped fixed-dark homepage preview.
 - Golos Text throughout the portfolio, including its compact wordmark.
-- Actual application images with adjacent explanation, source labels and a path to the full image.
-- Flat section boundaries, generous reading space and restrained link motion.
+- Actual inline application images with adjacent explanation, source labels and independent screenshot-language controls.
+- Flat case-page boundaries, compact homepage frames and restrained link motion.
 
 ### Surface authority
 
-The portfolio world applies to `/`, `/work/driftora/` and `/work/lumen-rest/`. Its implementation authority is `site/portfolio.css`, `site/portfolio-theme.js` and `site/portfolio.js`. The homepage and work-page composition are recorded in the existing portfolio surface brief; they are not a catalog template for other routes.
+The portfolio world applies to `/`, `/work/driftora/` and `/work/lumen-rest/`. Shared case-page authority is `site/portfolio.css`, `site/portfolio-theme.js` and `site/portfolio.js`. The root and `/preview/showcase/` layer `site/portfolio-showcase.css` after the shared stylesheet; `site/preview/showcase/layout.css` imports that same scoped refinement. The homepage and work-page composition are recorded in the existing portfolio surface brief; they are not a catalog template for other routes.
 
 VPN retains the owner-selected original dark/red portal identity across its landing, authentication preview and cabinet. `site/vpn/portal-style.css` layers over its base stylesheet. `/driftora/subscription/` retains that customer portal identity through `site/home.css`, `site/home-theme.js` and its scoped purchase stylesheet. `/rest_lumen/` retains its own warm photographic identity. The shared customer styles and theme script are unchanged by the portfolio replacement.
 
@@ -199,12 +214,18 @@ The portfolio pairs neutral paper, ink and specimen surfaces with one coral acce
 
 ### Primary
 
-- **Portfolio Coral** (`accent` / `light-accent`) colors case links, full-image links, the pie segment and visible focus. Light appearance uses a deeper red to stay readable on the light paper.
+- **Portfolio Coral** (`accent` / `light-accent`) colors case links, the pie segment and visible focus. The scoped homepage also uses it for the prominent project-scroll button. Light appearance uses a deeper red to stay readable on the light paper.
 - **Portal Coral** (`vpn-primary` / `vpn-light-primary`) remains the VPN and Driftora purchase action color. Its existing dark/light hover tokens remain customer-specific.
 - **Lamp Amber** (`lumen-primary`) remains the warm action color on `/rest_lumen/`.
 
+### Secondary
+
+- **Project Green and Moss** (`project-green`, `project-moss`) form the homepage Driftora preview stage.
+- **Project Gold and Brown** (`project-gold`, `project-brown`) form the homepage Lumen preview stage. These stage accents do not replace case or customer palettes.
+
 ### Neutral
 
+- **Showcase Charcoal** (`showcase-paper`, `showcase-stage`, `showcase-rule`, `showcase-quiet`) supplies the scoped homepage canvas, raised tonal panels, subdued boundaries and secondary text; existing portfolio ink and coral are retained.
 - **Paper and Ink** (`paper`, `ink`, `light-paper`, `light-ink`) form the portfolio canvas and primary text.
 - **Quiet Text** (`quiet` / `light-quiet`) carries introductions, technical stacks, annotations and captions without fading the application evidence.
 - **Thin Rule** (`rule` / `light-rule`) separates header, projects, contact and footer; it also frames the theme control and desktop screenshots.
@@ -237,11 +258,11 @@ The portfolio type is sentence case, closely tracked in headings and open in par
 
 ## Layout
 
-The portfolio container is capped at (1180px), with (40px) side gutters on desktop, (20px) at widths up to (760px), and (16px) up to (420px). The desktop header is a single (90px minimum) row: brand on the left, Work/Contact and preference controls on the right. At (760px) it becomes a two-row grid: brand and controls above, Work and Contact below. The lower navigation row stays visible on mobile.
+The shared case-page container is capped at (1180px), with (40px) side gutters on desktop, (20px) at widths up to (760px), and (16px) up to (420px). The desktop header is a single (90px minimum) row: brand on the left, Work/Contact and preference controls on the right. At (760px) it becomes a two-row grid: brand and controls above, Work and Contact below. The lower navigation row stays visible on mobile.
 
-Homepage project rows sit between thin dividers. Driftora uses a text/media split of (1fr / 1.08fr) with a (64px) gap; Lumen uses (1.2fr / 1fr) and a (70px) gap, with media on the left. At (1000px) both gaps shrink to (36px). At (760px) the rows become one column, the Lumen copy returns before its image, and the gap is (30px).
+The root and comparison preview container is capped at (1100px), with (40px) desktop gutters, (24px) up to (900px), (20px) up to (760px), and (16px) up to (420px). Their header minimum is (72px), retaining the shared mobile navigation row. A tight service hero pairs copy and the primary project-scroll action with a capability list; a compact author disclosure follows. Two equal project cards use a (24px) gap, becoming one column at (760px). Project name and purpose precede capture, caption/language controls, then explanation and case action. Hero top/bottom padding is (40px / 32px) desktop and (30px / 24px) mobile. This local composition does not replace the case-page grid.
 
-The Android specimen pairs a fixed-ratio screen crop with brief side notes on a padded stage. Captions sit below their images and include an always-visible full-image link. Contact destinations wrap naturally, with enough vertical space to remain separate actions.
+Inline captions stay attached to the actual screens. No screenshot is a link and no separate enlargement action, viewer, modal or new tab is offered. Contact destinations wrap naturally, with enough vertical space to remain separate actions.
 
 Case pages use narrative and media columns of (1fr / 0.75fr), an (80px) gap and a (70ch) narrative limit. The gap becomes (40px) at (1000px). Media is sticky only from (960px), with a (28px) top offset. At (760px), the case becomes one column with media before the implementation narrative and a (32px) gap.
 
@@ -255,9 +276,11 @@ VPN keeps its asymmetric portal landing composition, existing sidebar, tabs, rou
 
 ## Elevation & Depth
 
-The portfolio page is flat. Thin rules and tonal specimen stages provide structure; only application images receive small shadows. The Android crop uses `0 14px 30px #0002`; desktop screenshots use `0 16px 36px #0001`. The page has no portal canvas or decorative edge-light layer.
+The shared case-page shell is flat. Thin rules and tonal specimen stages provide structure; only application images receive small shadows. The Android crop uses `0 14px 30px #0002`; desktop screenshots use `0 16px 36px #0001`. The page has no portal canvas or decorative edge-light layer.
 
-**The Specimen Depth Rule.** Keep the portfolio shell flat; use the existing image shadows to separate application evidence from its page.
+The scoped homepage uses a faint coral radial wash, tonal charcoal panels, quiet borders and green/amber gradient capture stages. Its Lumen capture has no shadow; card boundaries provide the separation.
+
+**The Specimen Depth Rule.** Keep the case-page shell flat; preserve application image depth there. Use the scoped homepage stage and border treatment only on its own surface.
 
 ### Preserved customer depth and motion
 
@@ -269,7 +292,9 @@ The Lumen product surface retains the owner-selected AI-generated photographic f
 
 ## Shapes
 
-Portfolio section boundaries and desktop image frames are square. The Android specimen is clipped to the `screen` radius at an aspect ratio of (760 / 1450); it crops the existing composed store asset rather than drawing a new device frame. The circular theme button uses the `theme-control` radius. Text links and language buttons have no enclosing capsule or filled card treatment. The six-slice pie mark remains a small outlined circle with one coral segment.
+Case-page section boundaries and desktop image frames retain their existing geometry. The Android crop uses the `screen` radius. The circular case theme button uses `theme-control`; shared text links and page-language buttons remain unfilled. The six-slice pie mark stays a small outlined circle with one coral segment.
+
+The homepage preview uses subdued rounded frames (`showcase-card`) for project cards, capabilities and the author disclosure. Its square portrait uses `showcase-portrait`; the primary coral project action uses `showcase-cta`. Capture clipping and compact screenshot-language buttons stay local to that layout. These local shapes do not replace case or customer radii.
 
 Customer geometry remains distinct: the established control radius is `controls`, the panel radius is `panels`, and thin cool borders remain part of the VPN and purchase identity. Lumen retains those shared control/panel radii within its own photographic and warm-color world.
 
@@ -277,25 +302,31 @@ Customer geometry remains distinct: the established control radius is `controls`
 
 ### Portfolio links
 
-Case links are medium-weight coral text with an inline (18px) arrow and a (44px) minimum height. When reduced motion is not requested, hover shifts the arrow (4px) over (.2s) with `cubic-bezier(.16,1,.3,1)`. The full-screenshot link is a separate coral text action, (14px) with a (44px) minimum height; it navigates to the existing image in the same tab. Browser Back returns to the portfolio. There is no lightbox.
+Case links are medium-weight coral text with an inline (18px) arrow and a (44px) minimum height. When reduced motion is not requested, hover shifts the arrow (4px) over (.2s) with `cubic-bezier(.16,1,.3,1)`. Screenshots remain inline with no enlargement action, image anchor, viewer or lightbox.
 
-All links and buttons retain the visible accent outline (3px) with a (5px) offset. The skip link becomes visible on focus and reaches the main content. Contact and back links remain ordinary working anchors. The attribution footer has no repeated social link; GitHub appears once in the homepage contact section.
+Shared links and buttons retain the visible accent outline (3px) with a (5px) offset; the homepage disclosure uses its inset focus treatment. The skip link becomes visible on focus and reaches the main content. Contact and back links remain ordinary working anchors. The attribution footer has no repeated social link; GitHub appears once in the homepage contact section.
 
 ### Portfolio preference controls and navigation
 
 RU/EN controls are unfilled compact buttons. The selected language uses ink and an underline; the other language uses quiet text. The theme button is a thin-bordered circle with a moon in dark appearance and a sun in light appearance. Controls are (44px) at regular widths and (38px) at the compact breakpoint. The final mobile header keeps Work and Contact in its second row, with (38px) minimum height for these navigation links.
 
-`portfolio-theme.js` shares the stored `family-vpn-theme-v3` key with the customer site, but implements the portfolio's own palette. Without a saved preference, JavaScript follows the system appearance. The choice updates the root light class, document color scheme and pressed state, persists when storage is available, and responds to storage, system and page-return changes. The static no-JavaScript fallback remains dark; preference controls are hidden, while copy and destination links remain available.
+On case pages, `portfolio-theme.js` shares the stored `family-vpn-theme-v3` key with the customer site, but implements the portfolio's own palette. Without a saved preference, JavaScript follows the system appearance. The choice updates the root light class, document color scheme and pressed state, persists when storage is available, and responds to storage, system and page-return changes. The static no-JavaScript fallback remains dark; preference controls are hidden, while copy and destination links remain available.
 
-All entry points continue to share `fp_lang` through `/i18n/language.js`: explicit app-fragment language → `?lang=` → saved preference → browser language. Portfolio text and accessibility/metadata attributes use native `data-ru` / `data-en` copy, `data-copy-attr` where needed, and `portfolio.js`; the selected button updates on `fp-languagechange`.
+The homepage and comparison preview remain fixed dark through `portfolio-showcase.js`, without reading or changing the shared theme preference. Their header has language controls without a theme button.
+
+All entry points continue to share `fp_lang` through `/i18n/language.js`. Portfolio routes use English for static/first-visit copy; explicit URL and saved Russian choices remain authoritative. Portfolio text and accessibility/metadata attributes use native `data-ru` / `data-en` copy, `data-copy-attr` where needed, and `portfolio.js`; the selected button updates on `fp-languagechange`.
 
 Existing Russian-first customer pages retain `data-fp-translate` and reviewed `/i18n/en.js` keys. Translation preserves markup, form values and application behavior. Include asynchronous states in the map; use `FPi18n.t()` for clipboard text and native dialogs, and exclude user-provided text with `data-fp-no-i18n`. Native bilingual renderers use the shared preference directly. Setup instructions may quote actual Russian control names alongside English explanations. UI localization does not change legal/business facts or external application/payment interfaces.
 
 ### Application specimens
 
-The homepage Android image is cropped to reading scale, with adjacent portion/source notes; the case reuses the same image at a larger width. Its caption identifies **Android, text input**. It is an existing composed store asset, not a fresh device capture or evidence of camera-flow acceptance. The macOS settings and reminder images are existing application screens, not new physical-device or cross-platform acceptance evidence. Each displayed image has a full-image link.
+The homepage preview crops the real matching RU/EN unsaved Android meal draft to its portion, nutrition and source details. The Lumen stage crops the matching native macOS settings capture from its top edge to include lamp and timer controls. Case pages retain the uncropped captures inline. These images do not establish camera/speech-flow, physical-device or cross-platform acceptance.
 
-Keep captions attached to their images, preserve their native application appearance, and keep the source labels visible in RU/EN. No portfolio card, badge or decorative mock interface replaces an application screenshot.
+Each screenshot pair has independent RU/EN controls through `portfolio-screens.js`; page-language changes do not override an explicit screenshot choice. Preserve cached choices on Back navigation and existing load/failure recovery. Captions and source labels remain visible; do not add a separate full-image destination.
+
+### Homepage preview controls
+
+The primary coral action is a real `#work` anchor with a (48px) minimum height. Its arrow moves (3px) over (.2s) only without reduced motion. The native About disclosure is open on desktop and initially collapsed by JavaScript at (760px) or below. Without JavaScript it stays open/readable. Language changes retain the visitor's current open/closed state. Name, actual portrait, career path and work preferences stay together in this compact block. Its summary has a (60px) minimum height and an inset focus outline. Public display name is exactly Eugene Tihonenko.
 
 ### Preserved customer controls
 
@@ -308,9 +339,9 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep portfolio paper, ink, quiet text, dividers and specimen stage coherent in both appearances.
+- **Do** keep case-page paper, ink, quiet text, dividers and specimen stage coherent in both appearances; keep the homepage charcoal override scoped.
 - **Do** use local Golos Text for the portfolio, including its compact Family Pie wordmark.
-- **Do** keep actual application screens, their source labels, adjacent explanations and full-image links readable.
+- **Do** keep actual inline application screens, source labels, adjacent explanations and independent screenshot-language choices readable.
 - **Do** retain Work and Contact in the mobile header's second row.
 - **Do** preserve shared language/theme preferences, visible keyboard focus and usable static links.
 - **Do** preserve VPN, Lumen product and Driftora purchase rules within their existing customer surfaces.
@@ -322,23 +353,3 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 - **Don't** present personal motivations as achieved weight loss or clinical benefit.
 - **Don't** describe existing Android/macOS image assets as fresh device or cross-platform acceptance.
 - **Don't** let the portfolio replacement remove direct product, download, legal or purchase routes.
-
-### Maker-story paragraph
-
-The homepage introduction includes the owner’s pie-sharing image after his role statement. `.intro .family-note` uses Golos Text at16px,1.65 line height, a66ch maximum measure and24px top spacing, with the existing quiet text color in both themes. This is a local supporting paragraph; it does not introduce another panel, display style or illustration. Selected-work copy and case introductions use his confirmed app motivation and current use.
-
-
-## Reference-led showcase layout preview
-
-`/preview/showcase/` is a separate review variant requested after the owner supplied dev.cmde.ru. It extends the existing neutral Golos/coral world rather than replacing the current homepage or work pages. A compact name/role/action group sits beside a real owner portrait; the confirmed pie-sharing story follows in a full-width row. Two image-first project cards show existing Android/macOS evidence before purpose, case links and stack. The topology becomes a single column below700px; the header keeps its mobile Work/Contact row.
-
-The local type steps above reflect this denser composition: display54px maximum (40px intermediate,36px narrow), summary20/18px, project/story/action16px, heading30px, stack/full-image label13px. Panel/control corners use existing6px, Android specimen existing14px. Repeated project cards represent two equivalent work destinations; no new capability claims, badges, testimonial or results are introduced. The owner now pins this review route to a pure-black canvas (#000000) for the page, brand story and screenshot stages. Light-theme switching is removed from this variant; a scoped appearance bootstrap enables JavaScript controls without reading or changing the shared appearance preference. Language controls, case/image destinations and arrow hover remain shared. Coral action, light text and existing neutral borders retain their roles. Actual app screenshot pixels remain source evidence. The owner supplied a real portrait, displayed through CSS square framing with object-position62%45%. The owner subsequently requested a dark-room lighting treatment: the preview now uses a sibling PNG edited with imagegen for soft side light and a subdued room. The original JPEG remains unchanged in private recovery. On mobile the name/role/actions precede a centered280px portrait and single-column brand story. The image is a local-only ignored asset, protected with the private recovery evidence; publishing it still requires approval of the shown result.
-
-These type steps intentionally belong only to the review route. They address hook-reported type-ramp gaps; no detector suppression is added. The pre-existing sidecar freshness warning is outside this scoped layout change and is not autonomously repaired. This variant is not owner approval to publish or to replace the main homepage.
-
-
-## Approved black homepage — 2026-10-11 Pacific
-
-The owner explicitly approved the shown showcase for production. Its existing composition now also serves `/`, using `portfolio-showcase.css` after shared `portfolio.css` and a minimal `portfolio-showcase.js` bootstrap. Pure black page/story/stage backgrounds, selected square evening portrait, coral actions, Golos Text and the desktop/mobile reading order remain the reviewed design. The canonical homepage is indexable; `/preview/showcase/` stays noindex. The approved evening image is published as `work/assets/eugene-portrait.png` without additional editing; original/taller experiments and review proof remain private. This section supersedes the earlier review-only/homepage-layout descriptions.
-
-The root is fixed dark; case-page light/dark switching and customer appearance preferences remain available independently. First-visit/static portfolio language is English with the exact preferred name Eugene Tihonenko; explicit URL/saved RU choices are retained. Both project images are matching real native RU/EN captures with independent screenshot-language controls and full-image links. Driftora shows an uncropped unsaved Android meal draft rather than the historical composed store asset; Lumen shows matching macOS settings rather than an unpaired reminder. No new authorship/outcome or native acceptance claim is added by publication.

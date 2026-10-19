@@ -45,10 +45,10 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
         html=html.replace(/<div class="fp-social">[\s\S]*?<\/div>/g,'');
         if(path===resolve(output,'vpn/index.html')) {
           html=html.replace('<script src="/vpn/portal.js" defer></script>','');
-          html=html.replace(/<div class="hero-art"><canvas[\s\S]*?<\/canvas><\/div>/,'<figure class="hero-art customer-evidence"><a href="/media/vpn-android.jpg" target="_blank" rel="noopener"><img src="/media/vpn-android.jpg" width="1120" height="780" alt="Кабинет Family VPN: инструкция Android" data-ru="Кабинет Family VPN: инструкция Android" data-en="Family VPN account: Android guide" data-copy-attr="alt"></a></figure>');
+          html=html.replace(/<div class="hero-art"><canvas[\s\S]*?<\/canvas><\/div>/,'<figure class="hero-art customer-evidence"><img src="/media/vpn-android.jpg" width="1120" height="780" alt="Кабинет Family VPN: инструкция Android" data-ru="Кабинет Family VPN: инструкция Android" data-en="Family VPN account: Android guide" data-copy-attr="alt"></figure>');
         }
         if(path===resolve(output,'sufler/index.html')) {
-          html=html.replace(/<div class="preview" id="about"[\s\S]*?<\/div>\s*<\/section>/,'<figure class="preview customer-evidence" id="about"><a href="/media/sufler-answer.jpg" target="_blank" rel="noopener"><img src="/media/sufler-answer.jpg" width="760" height="560" alt="Sufler: короткая подсказка к ответу" data-ru="Sufler: короткая подсказка к ответу" data-en="Sufler: answer prompt" data-copy-attr="alt"></a></figure></section>');
+          html=html.replace(/<div class="preview" id="about"[\s\S]*?<\/div>\s*<\/section>/,'<figure class="preview customer-evidence" id="about"><img src="/media/sufler-answer.jpg" width="760" height="560" alt="Sufler: короткая подсказка к ответу" data-ru="Sufler: короткая подсказка к ответу" data-en="Sufler: answer prompt" data-copy-attr="alt"></figure></section>');
         }
 
         html=html.replaceAll('https://family-pie.ru/sufler/','https://family-spy.ru/sufler/');
