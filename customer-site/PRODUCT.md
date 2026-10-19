@@ -53,3 +53,6 @@ Owner Sufler copy reduction, 2026-10-17: homepage keeps only Sufler, one purpose
 Owner wording refinement: use “Твой помощник на собеседовании.” / “Your interview assistant.” as the single homepage purpose phrase.
 
 Owner wording refinement: remove the possessive; use “Помощник на собеседовании.” / “Interview assistant.”.
+
+
+Owner screenshot behavior, 2026-10-19: everywhere on Family Spy, linked screenshots open a standalone HTML viewing page in a new tab with target="_blank" and rel="noopener noreferrer". Direct JPEG links can be intercepted by embedded image-preview UI, so use /screenshots/sufler-answer/ and /screenshots/vpn-android/. The homepage Sufler screenshot is now linked under this explicit owner request, superseding the previous non-clickable screenshot rule. Keep the single Download and try CTA, static capture, existing failed-image recovery and all pricing/copy unchanged. Viewer pages display the matching original image with a product return link, use the existing black/Golos/coral identity and remain usable without JavaScript. No modal, popup script or new native/backend behavior.
