@@ -156,3 +156,39 @@ test('pricing uses validated public RUB plans and the USD reference rate',async(
   const bad=await run(data);assert.equal(bad.price.textContent,'fallback');assert.ok(bad.cards.every(c=>c.usd.hidden));
  }
 });
+
+// The mobile disclosure preserves the chosen duration across locale and viewport changes.
+test('mobile offer disclosure keeps one choice and restores it after desktop or language changes',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const media={matches:false,addEventListener(type,fn){assert.equal(type,'change');this.change=fn;}};
+ const offers=[30,90,180,365].map(days=>{
+  const summary={tabIndex:0,listeners:{},addEventListener(type,fn){this.listeners[type]=fn;}};
+  return {dataset:{vpnPlan:String(days)},open:true,attributes:{},listeners:{},summary,
+   removeAttribute(name){delete this.attributes[name];},setAttribute(name,value){this.attributes[name]=value;},
+   querySelector:selector=>selector==='summary'?summary:null,addEventListener(type,fn){this.listeners[type]=fn;}};
+ });
+ const events={};
+ const context={document:{documentElement:{classList:{add(){}}},querySelectorAll:selector=>selector==='details[data-vpn-plan]'?offers:[],querySelector:()=>null,getElementById:()=>null},
+  window:{FPi18n:{lang:'ru'},matchMedia:()=>media},addEventListener:(type,fn)=>events[type]=fn,URL,WeakMap};
+ runInNewContext(await readFile('customer-site/customer.js','utf8'),context);
+ assert.ok(offers.every(o=>o.open&&o.summary.tabIndex===-1&&!o.attributes.name));
+ let prevented=false;offers[0].summary.listeners.click({preventDefault(){prevented=true;}});assert.ok(prevented);
+ media.matches=true;media.change();assert.deepEqual(offers.map(o=>o.open),[true,false,false,false]);
+ assert.ok(offers.every(o=>o.summary.tabIndex===0&&o.attributes.name==='vpn-offers'));
+ offers[2].open=true;offers[2].listeners.toggle();assert.deepEqual(offers.map(o=>o.open),[false,false,true,false]);
+ context.window.FPi18n.lang='en';events['fp-languagechange']();assert.deepEqual(offers.map(o=>o.open),[false,false,true,false]);
+ media.matches=false;media.change();assert.ok(offers.every(o=>o.open&&!o.attributes.name));
+ media.matches=true;media.change();assert.deepEqual(offers.map(o=>o.open),[false,false,true,false]);
+});
+
+test('homepage keeps real offer actions and no-JavaScript details after the spacious hero',async()=>{
+ const html=await readFile('customer-site/index.html','utf8');
+ const hero=html.match(/<div class="vpn-intro">([\s\S]*?)<div id="vpn-features"/)[1];
+ assert.match(hero,/id="vpn-title"/);assert.match(hero,/href="#vpn-pricing"/);assert.match(hero,/href="\/vpn\/cabinet\/"/);
+ assert.doesNotMatch(hero,/<ul class="vpn-features"|data-vpn-plan=|platform=/);
+ assert.ok(html.indexOf('id="vpn-features"')<html.indexOf('id="vpn-pricing"'));
+ assert.ok(html.indexOf('id="vpn-pricing"')<html.indexOf('class="vpn-devices"'));
+ for(const days of [30,90,180,365])assert.match(html,new RegExp('<details class="vpn-plan" data-vpn-plan="'+days+'" open>'));
+ assert.equal((html.match(/class="vpn-plan-summary"/g)||[]).length,4);
+ for(const platform of ['android','ios','windows','macos','linux','tv'])assert.ok(html.includes('#devices?platform='+platform));
+});
