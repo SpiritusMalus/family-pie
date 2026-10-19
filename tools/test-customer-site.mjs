@@ -181,11 +181,43 @@ test('mobile offer disclosure keeps one choice and restores it after desktop or 
  media.matches=true;media.change();assert.deepEqual(offers.map(o=>o.open),[false,false,true,false]);
 });
 
-test('homepage keeps real offer actions and no-JavaScript details after the spacious hero',async()=>{
+test('device choice keeps the selected setup route through locale changes',async()=>{
+ const {runInNewContext}=await import('node:vm');
+ const choices=['windows','android','tv'].map(value=>({value,checked:value==='android',listeners:{},addEventListener(type,fn){this.listeners[type]=fn;}}));
+ const setup={attributes:{href:'/vpn/cabinet/#devices?platform=windows'},getAttribute(name){return this.attributes[name];},setAttribute(name,value){this.attributes[name]=value;}};
+ const name={textContent:'Windows'};
+ const label={dataset:{ru:'Настроить',en:'Set up'},textContent:'Настроить'};
+ const scene={dataset:{activeDevice:'windows'},querySelectorAll:selector=>selector==='input[name="hero-device"]'?choices:[],querySelector:selector=>selector==='[data-device-setup]'?setup:selector==='[data-device-name]'?name:null};
+ const events={};
+ const context={document:{documentElement:{classList:{add(){}}},getElementById:()=>null,querySelector:()=>null,
+  querySelectorAll:selector=>selector==='[data-device-scene]'?[scene]:selector==='[data-ru][data-en]'?[label]:selector==='a[href]'?[setup]:[]},
+  window:{FPi18n:{lang:'ru'}},addEventListener:(type,fn)=>events[type]=fn,location:{origin:'https://family-spy.ru'},URL,WeakMap};
+ runInNewContext(await readFile('customer-site/customer.js','utf8'),context);
+ // Read native checked state on enhancement rather than forcing the static default.
+ assert.equal(scene.dataset.activeDevice,'android');assert.equal(name.textContent,'Android');
+ assert.equal(setup.attributes.href,'/vpn/cabinet/?lang=ru#devices?platform=android');
+ choices.forEach(choice=>choice.checked=choice.value==='tv');choices[2].listeners.change();
+ assert.equal(scene.dataset.activeDevice,'tv');assert.equal(name.textContent,'Smart TV');
+ assert.equal(setup.attributes.href,'/vpn/cabinet/?lang=ru#devices?platform=tv');
+ context.window.FPi18n.lang='en';events['fp-languagechange']();
+ assert.equal(label.textContent,'Set up');assert.equal(choices[2].checked,true);assert.equal(scene.dataset.activeDevice,'tv');
+ assert.equal(name.textContent,'Smart TV');assert.equal(setup.attributes.href,'/vpn/cabinet/?lang=en#devices?platform=tv');
+ choices.forEach(choice=>choice.checked=choice.value==='windows');choices[0].listeners.change();
+ assert.equal(name.textContent,'Windows');assert.equal(setup.attributes.href,'/vpn/cabinet/?lang=en#devices?platform=windows');
+ context.window.FPi18n.lang='ru';events['fp-languagechange']();
+ assert.equal(label.textContent,'Настроить');assert.equal(setup.attributes.href,'/vpn/cabinet/?lang=ru#devices?platform=windows');
+ assert.deepEqual(choices.map(choice=>choice.checked),[true,false,false]);
+});
+
+test('homepage keeps real offer actions, device fallback and no-JavaScript details',async()=>{
  const html=await readFile('customer-site/index.html','utf8');
- const hero=html.match(/<div class="vpn-intro">([\s\S]*?)<div id="vpn-features"/)[1];
+ const hero=html.slice(html.indexOf('<section id="vpn"'),html.indexOf('<div id="vpn-features"'));
  assert.match(hero,/id="vpn-title"/);assert.match(hero,/href="#vpn-pricing"/);assert.match(hero,/href="\/vpn\/cabinet\/"/);
- assert.doesNotMatch(hero,/<ul class="vpn-features"|data-vpn-plan=|platform=/);
+ assert.doesNotMatch(hero,/data-vpn-plan=|vpn-signal/);
+ assert.match(hero,/data-device-scene[^>]*data-active-device="windows"/);
+ assert.match(hero,/<input\b[^>]*name="hero-device"[^>]*value="windows"[^>]*checked/);
+ assert.match(hero,/data-device-setup[^>]*href="\/vpn\/cabinet\/#devices\?platform=windows"|href="\/vpn\/cabinet\/#devices\?platform=windows"[^>]*data-device-setup/);
+ for(const platform of ['windows','android','tv'])assert.match(hero,new RegExp('name="hero-device"[^>]*value="'+platform+'"'));
  assert.ok(html.indexOf('id="vpn-features"')<html.indexOf('id="vpn-pricing"'));
  assert.ok(html.indexOf('id="vpn-pricing"')<html.search(/class="[^"]*\bvpn-devices\b[^"]*"/));
  for(const days of [30,90,180,365])assert.match(html,new RegExp('<details class="vpn-plan" data-vpn-plan="'+days+'" open>'));

@@ -5,6 +5,26 @@
   let vpnPlans = [];
   const lang = () => window.FPi18n?.lang === 'en' ? 'en' : 'ru';
   const originals = new WeakMap();
+  // Native radio selection changes a real setup destination, never connection state.
+  const devicePlatforms = new Map([['windows', 'Windows'], ['android', 'Android'], ['tv', 'Smart TV']]);
+  const deviceScenes = [];
+  document.querySelectorAll('[data-device-scene]').forEach(scene => {
+    const choices = [...scene.querySelectorAll('input[name="hero-device"]')];
+    const setup = scene.querySelector('[data-device-setup]');
+    const name = scene.querySelector('[data-device-name]');
+    if (!choices.length || !setup || !name) return;
+    const selectDevice = () => {
+      const selected = choices.find(choice => choice.checked && devicePlatforms.has(choice.value));
+      if (!selected) return;
+      scene.dataset.activeDevice = selected.value;
+      name.textContent = devicePlatforms.get(selected.value);
+      const destination = `/vpn/cabinet/#devices?platform=${selected.value}`;
+      originals.set(setup, destination);
+      setup.setAttribute('href', `/vpn/cabinet/?lang=${lang()}#devices?platform=${selected.value}`);
+    };
+    choices.forEach(choice => choice.addEventListener('change', selectDevice));
+    deviceScenes.push(selectDevice);
+  });
   document.querySelectorAll('[data-static-screen]').forEach(root => {
     const image = root.querySelector('.demo-screen');
     const failure = root.querySelector('.screen-error');
@@ -45,6 +65,7 @@
       if (node.dataset.copyAttr) node.setAttribute(node.dataset.copyAttr, value);
       else if (node.textContent !== value) node.textContent = value;
     });
+    deviceScenes.forEach(selectDevice => selectDevice());
     const vpn = document.getElementById('vpn-price'), sufler = document.getElementById('sufler-price');
     if (vpn && vpnPlan) vpn.textContent = lang() === 'en' ? `${vpnPlan.priceMinor / 100} RUB for ${vpnPlan.days} days` : `${vpnPlan.priceMinor / 100} ₽ за ${vpnPlan.days} дней`;
     if (sufler && suflerPlan) sufler.textContent = lang() === 'en' ? `30 minutes free, then ${Number(suflerPlan.amount)} RUB for ${suflerPlan.days} days` : `30 минут бесплатно, затем ${Number(suflerPlan.amount)} ₽ за ${suflerPlan.days} дней`;

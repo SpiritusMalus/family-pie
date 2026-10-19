@@ -19,11 +19,12 @@
 </head>
 <body class="customer-home">
 <!--
-THESIS: Give each product room to make one clear offer before explaining it.
-OWN-WORLD: Owner-pinned black, Golos Text and coral. A broad graphite opening and connected pricing surface give the page its material; coral marks the VPN word and primary actions.
-STORY: Meet Family VPN, inspect its capabilities and real plans, then choose a device. Sufler has its own offer and actual capture.
-FIRST VIEWPORT: Full-width graphite field, signal mark, a broad single-line Family VPN lockup on desktop, readable purpose/price and plan/account actions. Mobile stacks the lockup. A compact capability band follows.
-FORM: Reference-led rhythm with stronger grouping: compact capability band, a contiguous four-offer comparator, quiet device links and a deliberate Sufler image stage. Existing facts, native mobile offers and product journeys remain.
+THESIS: One subscription belongs on the devices already in your life.
+OWN-WORLD: Owner-pinned black, Golos Text and coral. A left-aligned offer faces a physical device composition bearing Spy's own globe geometry. No borrowed Wi-Fi, coffee metaphor or fake connection state.
+STORY: Understand Family VPN, choose a real platform, compare duration rows, then continue through actual setup or subscription destinations. Sufler keeps its independent offer and real inline capture.
+FIRST VIEWPORT: Offer and actions on the left; layered Windows laptop, Android phone and Smart TV on the right. Native radio selection brings a device forward and updates its setup destination. Mobile follows offer, scene, controls.
+MOTION: Selecting a device explains depth and changes the useful destination. Bounded transform/opacity/shadow transitions, one clipped stage arrival, quick control feedback, no perpetual loops. Reduced motion shows the same final state immediately. No animation library or runtime API beyond existing local selection.
+FORM: An open capability band, four aligned price rows, quiet setup links and Sufler's actual image stage. Facts, public-price validation and native mobile offers remain.
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
 -->
 <a class="skip" href="#main" data-ru="К содержимому" data-en="Skip to content">К содержимому</a>
@@ -36,10 +37,30 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   <h1 class="visually-hidden">Family Spy</h1>
   <section id="vpn" class="vpn-product" aria-labelledby="vpn-title">
     <div class="vpn-intro">
-      <svg class="vpn-signal" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M8 23a38 38 0 0 1 48 0M17 34a24 24 0 0 1 30 0M26 45a10 10 0 0 1 12 0"/><circle cx="32" cy="55" r="3" fill="currentColor" stroke="none"/></svg>
+      <div class="vpn-copy">
       <div class="vpn-heading"><h2 id="vpn-title"><span>Family</span> <span>VPN</span></h2><p class="vpn-purpose" data-ru="Интернет на всех твоих устройствах." data-en="Internet on all your devices.">Интернет на всех твоих устройствах.</p></div>
       <div class="vpn-offer"><p class="vpn-price" id="vpn-price" role="status" data-ru="Тарифы на странице VPN" data-en="See plans on the VPN page">Тарифы на странице VPN</p><div class="product-actions"><a class="button" href="#vpn-pricing" data-ru="Выбрать подписку" data-en="Choose a plan">Выбрать подписку</a><a class="vpn-account" href="/vpn/cabinet/"><span data-ru="Личный кабинет" data-en="My account">Личный кабинет</span><span aria-hidden="true">↗</span></a></div></div>
     <a class="vpn-explore" href="#vpn-features"><span data-ru="Возможности" data-en="Features">Возможности</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 4v16m-5-5 5 5 5-5"/></svg></a>
+      </div>
+      <div class="device-scene" data-device-scene data-active-device="windows">
+        <div class="device-stage" aria-hidden="true">
+          <div class="device-art device-art--tv" data-device-art="tv">
+            <div class="device-frame"><div class="device-display"><svg viewBox="0 0 200 160" fill="none"><circle cx="140" cy="80" r="86"/><path d="M140-6v172M65 37l150 86M65 123 215 37"/></svg><span>Family VPN</span></div></div><div class="device-tv-stand"></div>
+          </div>
+          <div class="device-art device-art--laptop" data-device-art="windows">
+            <div class="device-frame"><div class="device-display"><svg viewBox="0 0 200 160" fill="none"><circle cx="140" cy="80" r="86"/><path d="M140-6v172M65 37l150 86M65 123 215 37"/></svg><span>Family VPN</span></div></div><div class="device-laptop-base"></div>
+          </div>
+          <div class="device-art device-art--phone" data-device-art="android">
+            <div class="device-frame"><div class="device-display"><svg viewBox="0 0 100 200" fill="none"><circle cx="80" cy="100" r="85"/><path d="M80 15v170M6 57l148 86M6 143 154 57"/></svg><span>Family<br>VPN</span></div></div>
+          </div>
+        </div>
+        <fieldset class="device-picker"><legend class="visually-hidden" data-ru="Устройство" data-en="Device">Устройство</legend>
+          <label class="device-option"><input class="visually-hidden" type="radio" name="hero-device" value="windows" checked><span>Windows</span></label>
+          <label class="device-option"><input class="visually-hidden" type="radio" name="hero-device" value="android"><span>Android</span></label>
+          <label class="device-option"><input class="visually-hidden" type="radio" name="hero-device" value="tv"><span>Smart TV</span></label>
+        </fieldset>
+        <a class="device-setup" data-device-setup href="/vpn/cabinet/#devices?platform=windows"><span data-ru="Настроить" data-en="Set up">Настроить</span> <span data-device-name>Windows</span><span aria-hidden="true">↗</span></a>
+      </div>
     </div>
     <div id="vpn-features" class="vpn-benefits wrap"><h3 data-ru="В одной подписке" data-en="One subscription">В одной подписке</h3>
     <ul class="vpn-features" aria-label="Возможности VPN" data-ru="Возможности VPN" data-en="VPN features" data-copy-attr="aria-label">

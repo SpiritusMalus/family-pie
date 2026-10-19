@@ -1,6 +1,6 @@
 ---
 name: "Family Spy — customer storefront"
-description: "Black and graphite Golos Text storefront for independent Family VPN and Sufler offers, with coral emphasis and connected surfaces."
+description: "Black and graphite Golos Text storefront with an own physical-device scene, coral actions and independent VPN and Sufler offers."
 colors:
   paper: "#000"
   ink: "#f3f4f5"
@@ -11,26 +11,37 @@ colors:
   screen-field: "#101215"
   action-rule: "#53575d"
   action-hover: "#241b18"
-  ambient-coral: "#ff9d881a"
-  icon-glow: "#ff9d8844"
+  ambient-coral: "#ff9d8812"
+  hardware-chassis: "#090b0e"
+  hardware-stroke: "#626a75"
+  hardware-display: "#20262e"
+  hardware-shadow: "#0008"
+  hardware-base-shadow: "#0006"
+  image-shadow: "#0004"
 typography:
   display:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "clamp(72px, 11vw, 128px)"
-    fontWeight: 700
+    fontSize: "clamp(64px, 7vw, 88px)"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-0.04em"
+  display-tablet:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "72px"
+    fontWeight: 600
     lineHeight: 1
     letterSpacing: "-0.04em"
   display-mobile:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "clamp(64px, 18vw, 96px)"
-    fontWeight: 700
+    fontSize: "clamp(48px, 9.6vw, 64px)"
+    fontWeight: 600
     lineHeight: 1
     letterSpacing: "-0.04em"
-  display-mobile-vpn:
+  display-narrow:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "1.28em"
-    fontWeight: 700
-    lineHeight: 0.94
+    fontSize: "48px"
+    fontWeight: 600
+    lineHeight: 1
     letterSpacing: "-0.04em"
   headline:
     fontFamily: "Golos Text, sans-serif"
@@ -94,7 +105,7 @@ typography:
     letterSpacing: "-0.025em"
   plan-monthly:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "36px"
+    fontSize: "32px"
     fontWeight: 600
     lineHeight: 1.2
     letterSpacing: "-0.035em"
@@ -106,10 +117,15 @@ typography:
     letterSpacing: "-0.035em"
   purpose:
     fontFamily: "Golos Text, sans-serif"
-    fontSize: "26px"
+    fontSize: "24px"
     fontWeight: 400
     lineHeight: 1.45
   purpose-mobile:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "22px"
+    fontWeight: 400
+    lineHeight: 1.45
+  purpose-narrow:
     fontFamily: "Golos Text, sans-serif"
     fontSize: "20px"
     fontWeight: 400
@@ -139,23 +155,54 @@ typography:
     fontSize: "12px"
     fontWeight: 400
     lineHeight: 1.6
-  best-label-mobile:
+  best-label:
     fontFamily: "Golos Text, sans-serif"
     fontSize: "11px"
     fontWeight: 500
     lineHeight: 1.4
+  hardware-label:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "18px"
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: "-0.035em"
+  hardware-phone-label:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: "-0.035em"
+  hardware-label-mobile:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "16px"
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: "-0.035em"
+  hardware-label-narrow:
+    fontFamily: "Golos Text, sans-serif"
+    fontSize: "14px"
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: "-0.035em"
 rounded:
   panels: "6px"
   screen-inner: "4px"
+  hardware-laptop: "12px"
+  hardware-phone: "24px"
+  hardware-phone-screen: "16px"
+  hardware-tv: "8px"
+  hardware-phone-narrow: "20px"
+  hardware-base-tip: "2px"
 spacing:
   small: "8px"
   control: "12px"
   compact: "16px"
   copy: "20px"
   content: "24px"
+  price-row: "28px"
   section-gap: "32px"
   column-gap: "40px"
-  heading-gap: "48px"
+  hero-gap: "48px"
   benefits-start: "56px"
   section-compact: "64px"
   section-mobile: "72px"
@@ -193,13 +240,18 @@ components:
     padding: "16px"
   account-action:
     textColor: "{colors.ink}"
-    rounded: "{rounded.panels}"
-    padding: "12px 20px"
-  pricing-comparator:
-    backgroundColor: "{colors.screen-field}"
-    rounded: "{rounded.panels}"
-  plan-best:
-    backgroundColor: "{colors.action-hover}"
+  device-option:
+    textColor: "{colors.quiet}"
+  device-option-selected:
+    textColor: "{colors.ink}"
+  hardware-frame:
+    backgroundColor: "{colors.hardware-chassis}"
+    rounded: "{rounded.hardware-laptop}"
+    padding: "12px 10px"
+  hardware-phone-frame:
+    backgroundColor: "{colors.hardware-chassis}"
+    rounded: "{rounded.hardware-phone}"
+    padding: "9px 6px"
 ---
 
 # Design System: Family Spy
@@ -208,109 +260,119 @@ components:
 
 **Creative North Star: "Two Independent Product Stages"**
 
-The customer storefront keeps the owner-approved black canvas, local Golos Text and coral actions. A broad graphite opening and connected comparison surface give related content a clear material boundary. Large product names, a compact capability band and small rectangular controls make each independent offer readable; actual product imagery retains its own appearance.
+The customer storefront keeps the owner-approved black canvas, local Golos Text and coral actions. A left-aligned VPN offer faces a physical laptop, phone and TV composition bearing Spy's own globe geometry. Device depth explains the selected platform, while factual price rows and quiet boundaries keep the next step clear. Sufler retains its independent offer and actual inline capture.
 
-This document owns the customer storefront's implemented visual system. The direction comment in customer-site/index.html and its surface brief own the homepage composition. Generated VPN and Sufler pages retain their established product UI, legal content and operational flows; product-brand.css supplies only the customer-specific adjustments. The repository-root DESIGN.md and .impeccable/design.json remain the portfolio's separate authority.
+This document owns the customer storefront's implemented visual system. The direction comment in customer-site/index.html and its surface brief own the homepage composition. Generated VPN and Sufler pages retain their established product UI, legal content and operational flows; product-brand.css supplies only customer-specific adjustments. The repository-root DESIGN.md and .impeccable/design.json remain the portfolio's separate authority.
 
 **Key Characteristics:**
 
-- Black canvas and graphite fields, one coral emphasis family and local Golos Text.
-- Broad uppercase VPN lockup on desktop, stacked on mobile, with the VPN word in coral.
-- Connected capability band and pricing comparator, followed by quiet unboxed device destinations.
-- Deliberate inline Sufler image stage, RU/EN controls and visible keyboard focus.
+- Black and graphite surfaces, coral emphasis and local Golos Text.
+- Asymmetric offer/device hero with native platform selection and a real setup destination.
+- Drawing-only hardware materials and corners, separate from the rectangular storefront controls.
+- Open capability band, four factual price rows, quiet device links and the unchanged Sufler stage.
+- Bounded selection and arrival motion, immediate reduced-motion states and no autoplay.
 
 ## Colors
 
-The black canvas alternates with graphite fields. Coral identifies the VPN word, primary actions and selected value; it also supplies a static ambient presence. The frontmatter is normative.
+Black and graphite support the actual offers; coral marks actions, device selection and factual value. The frontmatter is normative. The hardware token family belongs only to the decorative drawing.
 
 ### Primary
 
-- **Storefront Coral** (`accent`) marks the hero's VPN word, primary actions, positive savings, the validated best-price label, capability icons, support links and focus outlines.
-- **Hover Coral** (`accent-hover`) brightens filled actions on hover-capable devices.
-- **Ambient Coral** (`ambient-coral`) is the static hero light; **Icon Glow** (`icon-glow`) is the limited capability-icon hover filter.
+- **Storefront Coral** (`accent`) marks the VPN word, primary actions, selected hardware outline/radio underline, positive savings, best-price label, capability icons, support links and focus outlines.
+- **Hover Coral** (`accent-hover`) brightens filled actions on hover-capable devices. **Ambient Coral** (`ambient-coral`) supplies the static light behind the device side of the hero.
 
 ### Neutral
 
-- **Black Canvas** (`paper`) is the page background and filled-action ink. There is no homepage theme control.
-- **Primary Ink** (`ink`) carries product names, purpose copy, section headings and navigation; **Quiet Text** (`quiet`) carries secondary details, the live price and footer text.
-- **Quiet Rule** (`rule`) organizes the header, capability band, comparator cells, product sections and footer.
-- **Graphite Field** (`screen-field`) supplies the full-width VPN hero, contiguous pricing comparator and Sufler image surround.
-- **Action Rule** (`action-rule`) outlines the account and non-featured tariff actions. **Warm Comparison Field** (`action-hover`) fills the best offer and non-featured action hover state.
+- **Black Canvas** (`paper`) is the page background and filled-action ink. The homepage has no appearance control.
+- **Primary Ink** (`ink`) carries headings, purpose, navigation and selected device labels. **Quiet Text** (`quiet`) carries supporting prices, inactive controls and footer text.
+- **Quiet Rule** (`rule`) organizes the header, capability band, four price rows, product sections and footer; the laptop base also uses this existing color within the artwork.
+- **Graphite Field** (`screen-field`) supplies the full-width hero and Sufler image surround. Pricing remains on the black canvas.
+- **Action Rule** (`action-rule`) outlines non-featured tariff actions. **Action Hover** (`action-hover`) is their dark coral hover field; it does not fill a tariff row.
+- **Hardware Chassis**, **Hardware Edge** and **Hardware Screen** (`hardware-chassis`, `hardware-stroke`, `hardware-display`) are drawing-only materials. **Hardware Shadow** and **Hardware Base Shadow** supply their opacity; **Image Shadow** belongs to Sufler's actual capture. These are not additional UI surface colors.
 
-**The Customer Scope Rule.** Use the storefront palette on the customer shell; preserve the existing product palettes and the separate portfolio authority.
+**The Customer Scope Rule.** Use storefront tokens on the customer shell and drawing tokens only on the physical device artwork; preserve product and portfolio authorities.
 
 ## Typography
 
 **Display and Body Font:** local Golos Text from `/vpn/fonts.css`, with a sans-serif fallback. The Family Spy wordmark uses the same family.
 
-The desktop VPN name is a broad, bold, uppercase single-line lockup. The VPN word uses coral. At 700px and below the name stacks; its second word scales by the relative mobile VPN token. Section and Sufler headings are semibold, while purpose and body copy remain regular. The page-level Family Spy h1 stays visually hidden. There is no visible combined-offer heading.
+The VPN name is semibold and left-aligned, with Family above the coral VPN word on desktop. At 900px and below the two words sit inline; the tablet role then reduces through the mobile and narrow overrides. The current heading keeps its source capitalization, with no uppercase transformation. The page-level Family Spy h1 remains visually hidden. There is no visible combined-offer heading.
 
-The `display`, `display-mobile` and `display-mobile-vpn` roles govern the VPN name. `headline` serves pricing and device section headings; `benefits-title` serves the smaller capability-band heading. `product-title` serves Sufler, with the narrow override at 420px. Support has its own title and subheading roles. Capability titles use `feature-title`, reducing only on the narrowest layout.
+The display roles govern the VPN name. `headline` serves pricing and device headings; `benefits-title` serves the capability band. Sufler, support and concise capability headings retain their own roles. The VPN purpose reduces through the purpose roles; Sufler keeps `product-purpose`, reducing to 20px on mobile. VPN live price uses the body size.
 
-The `purpose` and `purpose-mobile` roles serve VPN's primary-ink sentence. Sufler uses `product-purpose` with the inherited body line height, reducing to 20px on mobile. The VPN live price uses the body size. `plan-title` and its mobile role identify durations. `plan-monthly` provides the large monthly amount, reducing through `plan-monthly-compact` at 1050px and below. Numeric prices use tabular figures. Wide-screen RUB totals use the body size and USD estimates use `label`; mobile uses label-sized RUB totals and small USD estimates. Units and savings use `label`; footer uses `small`; languages and the exploration cue use `language-control`. The best label is 12px with a 24px line height on desktop and uses `best-label-mobile` on mobile. Existing action typography and responsive sizes remain component-specific.
+`plan-title` and its mobile role identify durations. Monthly amounts use `plan-monthly`, reducing to `plan-monthly-compact` at 1050px. Numeric prices use tabular figures. Wide-screen RUB totals use body and USD estimates use label; mobile uses label-sized totals and small USD estimates. Units and savings use label. The factual best label uses its compact role at all widths. Languages use the language-control role, while exploration, device controls and setup destinations use label.
+
+Hardware-label roles are scoped to the Family VPN lettering inside the physical device drawing. Their tighter line height and size changes do not define body copy, control labels or a new application typography system.
 
 ## Layout
 
-The main element spans the viewport, allowing the hero field to reach both edges. The header, capabilities, pricing, devices, Sufler, support and footer each own their centered container. Its width is `min(1100px, calc(100% - 80px))`, with side gutters of 40px on wide screens, 24px at 900px, 20px at 700px and 16px at 420px. The desktop header has an 80px minimum height. At 700px it becomes a two-row grid with brand and languages above the full navigation row.
+The main element spans the viewport so the hero reaches both edges. The header and following content sections own centered containers of `min(1100px, calc(100% - 80px))`, with side gutters of 40px, 24px at 900px, 20px at 700px and 16px at 420px. The desktop header has an 80px minimum height; at 700px it becomes two rows with navigation below brand/languages.
 
-The full-width graphite introduction centers its signal, broad name, purpose, live price and plan/account actions. Desktop minimum height is `min(720px, calc(100svh - 80px))`, with 64px top and 88px bottom padding; its horizontal padding follows the 1100px content width. Mobile switches to `calc(100svh - 120px)`, stacked type and narrower padding. The signal is 88px wide on desktop and 56px on mobile. Static ambient coral sits toward the field's upper left. The exploration anchor stays near the bottom and hides at viewport heights of 720px or less; short viewports also reduce vertical padding.
+The graphite hero is an asymmetric `.9fr 1.1fr` grid with a 48px gap, a 660px minimum height, 64px top padding and 72px bottom padding. The offer, purpose, live price and plan/account actions sit left; the physical device scene sits right. Its ambient light stays behind the device side. The exploration destination is an ordinary inline link below the offer, not an absolute bottom cue. At 1050px the gap reduces to 32px. At 900px the hero becomes one column, loses its minimum height and uses 56px vertical padding: offer → scene → platform radios/setup link. At 700px padding becomes 40px above and 48px below, with a 24px gap; narrow screens use 16px side insets.
 
-The capability section starts 56px after the hero. Its compact four-column band uses shared top and bottom rules, zero grid gap and quiet internal dividers. Each cell places a line icon beside a short heading. At 900px it becomes a two-by-two band with the lower row divided horizontally; at 420px the icon moves above its heading within the same connected structure. Section padding reduces to 48px at 900px.
+The device stage is 380px high on desktop, 350px at 900px, 290px at 700px and 260px at 420px. Tablet scene width is at most 520px; mobile limits it to 420px. A laptop sits forward by default, with a TV behind and phone beside it. Selection changes transform, opacity, order and the selected outline within this local composition. At 420px the laptop is 84% wide with an 8% left inset and smaller base overhang; the phone has an 8% right inset to contain every selected pose on narrow screens. The stage is decorative and excluded from the accessibility tree; actual radios and setup links sit outside it.
 
-Pricing begins 88px after the band section, reducing to 72px at 900px and 64px at 700px. All four offers share a graphite comparator with a thin outer border, small corners and zero column gap. Quiet internal lines divide cells; the best offer uses a warm field. Offer cells use 32px top, 24px side and 24px bottom padding, with a 300px minimum body height and bottom-aligned actions. At 1050px side padding reduces to 20px. At 900px the shared comparator becomes two-by-two, keeping the same body minimum so all actions align. At 600px it becomes one native disclosure list with 20px cell insets and no minimum body height. At 420px and below, the monthly amount and its unit each span the cost grid; the RUB total and approximate USD amount share the third row. The RUB total has a 12px top margin, and both totals stay on one line.
+The capability section starts 56px after the hero, reducing to 48px at 900px. Its compact four-column band uses shared top/bottom rules, zero grid gap and quiet cell divisions. Each cell places an icon beside its heading. At 900px it becomes a two-by-two band with a horizontal lower-row division; at 420px icons move above headings.
 
-Six unboxed platform links follow in a tighter section, with 72px top and 64px bottom padding. Their grid uses six columns, three at 900px and two at 420px. Each destination has a centered icon and label with a 96px minimum target height, reducing to 88px on the narrowest layout. Device-section padding reduces to 64px at 900px and 56px at 700px.
+Pricing begins 88px after the capability section, reducing to 72px at 900px and 64px at 700px. Four horizontal rows use a top rule each and one closing bottom rule, without an enclosing filled panel. Desktop rows have a 144px duration column and a flexible body, a 32px gap and 28px vertical padding. The body aligns cost, savings and action in a flexible column plus 130px and 172px columns. The action is explicitly placed in the third column, retaining alignment when a row has no savings. Cost keeps monthly/unit beside RUB/USD totals. At 1050px duration narrows to 112px; the body uses cost/savings at left and a 168px action spanning both rows. At 600px each offer becomes a native disclosure with 16px side padding and an 88px summary target. There is no fixed tariff body minimum. At 420px monthly and unit span the cost grid; RUB/USD totals share the third row without wrapping, and the RUB total has a 12px top margin.
 
-Sufler has a separate `.7fr 1.3fr` text/image grid, 48px gap and 96px vertical padding. Its large title balances the actual capture in a graphite surround. At 900px the section stacks with a 40px gap and 80px padding; at 700px these become 32px and 72px. The image stage is at most 760px wide on the stacked layout. The surround has 16px padding, reducing to 12px at 420px. The inner capture uses its actual `760/560` aspect ratio, with the full image contained.
+Six unboxed platform links follow, in six columns, three at 900px and two at 420px. Their section uses 72px top and 64px bottom padding, reducing to 64px at 900px and 56px at 700px. Each icon/label target has a 96px minimum height, reducing to 88px on narrow screens.
 
-Support retains two columns with a 64px gap, reduced to 32px at 900px and stacked at 700px. The footer remains one support-email link beneath a thin rule. Product/support anchors retain 24px scroll margins; capability and pricing destinations use 40px. Breakpoint and motion details live in the customer-owned sidecar.
+Sufler retains its separate `.7fr 1.3fr` text/image grid, 48px gap and 96px padding. At 900px it stacks with a 40px gap and 80px padding; at 700px these become 32px and 72px. Its actual capture is at most 760px wide in the stacked layout. The graphite surround has 16px padding, or 12px at 420px; the inner capture keeps its actual `760/560` ratio and contains the full image.
+
+Support retains two columns with a 64px gap, reduced to 32px at 900px and stacked at 700px. The footer is one support-email link below a rule. Product/support anchors keep 24px scroll margins; capability and pricing destinations use 40px.
 
 ## Elevation & Depth
 
-The main structure uses tonal fields and internal rules without raised pricing cards, glass or floating chrome. The hero's radial coral light is static, behind content and non-interactive. Sufler's actual image receives a contained shadow inside its graphite stage; that media depth does not spread to the comparator or capabilities. On hover-capable devices, capability icons retain their limited drop-shadow while device icons and actions change color or background. State transitions last 180ms only when reduced motion is not requested; reduced motion also disables smooth scrolling. There is no autoplay or animated ambient background.
+Depth belongs to the physical hero drawing and the actual Sufler capture. Hardware frames and the laptop base cast contained shadows; Sufler retains its inner image shadow. Capabilities and price rows stay flat. Ambient coral remains static. Capability icons change to primary ink on hover; their active treatment has no glow.
 
-**The Grouped Surface Rule.** Group related offers in one quiet field, use thin internal divisions and reserve image depth for the Sufler capture.
+Motion is bounded and local: platform selection repositions devices over 500ms, with a quicker opacity change; the stage has one clipped 700ms arrival. Native radio underline, setup arrow, primary/price actions and device destinations have short control feedback. Hover-capable actions lift and press by a small amount; device links rise slightly. Interpolation and arrival are declared only when reduced motion is not requested. Reduced motion removes those transitions/arrival and smooth scrolling while retaining immediate selected and hover states. No device cycles itself, no ambient animation runs and no animation library or connection API is added.
+
+**The Device Depth Rule.** Use physical depth to identify the selected setup platform, never to imply an actual connected VPN session.
 
 ## Shapes
 
-Primary, account and tariff actions, the shared comparator and the Sufler surround use the small panel radius from the frontmatter. The inner screenshot uses the smaller screen radius. Controls remain rectangular. The coral signal and existing outlined circular Family Spy SVG are icons, not a pill-control system. The capability band has shared horizontal rules and cell divisions but no individually boxed tiles. Device destinations remain unboxed. The pricing outer border contains all offers; internal lines divide them and the best offer changes its field rather than adding a coral top edge. Other navigation, languages and support links remain unboxed.
+Storefront primary and tariff actions retain small rectangular panel corners. The account destination is an unboxed text link. The Sufler outer stage uses the same UI panel radius, with the smaller inner-screen radius. Price rows use rules, not panel corners; native radio choices use an underline, not pill or boxed tabs. Capability cells and the six device links remain unboxed.
+
+The hardware radius family belongs only to the CSS drawing: laptop body, TV, phone shell, phone screen, narrow phone override and the small upper laptop-base corners each follow their extracted tokens. The laptop base combines small upper corners with the laptop corner on its lower edge. The phone's physical silhouette can be rounder than any UI control. These drawing-only shapes do not authorize changing the storefront action radius. The SVGs inside the screens repeat the existing Spy globe geometry and product lettering, without fabricated application controls.
 
 ## Components
 
-**Primary and account actions.** Primary actions use coral fill, black text, medium weight and a 52px minimum height. The VPN primary action scrolls to pricing. Its separate account action uses a quiet outline, small corners and the same minimum height, with its established cabinet destination. Sufler keeps exactly one action, Download and try, into `/sufler/#download`. Hover-capable devices use the lighter coral primary fill; account hover changes its arrow color. Actions do not scale or lift.
+**Primary and account actions.** Coral primary actions retain black text, medium weight and a 52px minimum height. The VPN action scrolls to pricing; the separate unboxed account link retains its cabinet destination and minimum height. Sufler retains exactly one Download and try action into `/sufler/#download`. Hover-capable primary and tariff actions brighten or change field, lift slightly and press; those transitions are gated by motion preference.
 
-**Navigation and language.** The header retains the Family Spy mark, direct VPN/Sufler/Help anchors and RU/EN controls. Navigation and languages have 44px minimum targets; languages also have 44px minimum widths. Selected language uses primary ink and an underline offset by 6px. JavaScript reveals the language buttons; default Russian copy and links remain available without it.
+**Device scene and native controls.** Windows, Android and Smart TV are native radio choices with a fieldset/legend, a selected underline, visible focus and 44px targets. Windows is the default. Each change brings its physical device forward and updates the adjacent real setup destination, including platform and current page language. A language change keeps the currently checked platform; a reload begins from the source default, not a saved device preference. The device art is pointer-inert and aria-hidden. The control does not initiate or represent a VPN connection. Without JavaScript the picker is hidden, while the default Windows drawing and working setup link remain.
 
-**Capabilities.** The connected band contains four concise factual headings and consistent Tabler line icons with a 1.6 stroke. Icons are coral without individual border or fill. Their limited hover glow does not make the factual content clickable; content keeps a default cursor.
+**Navigation and language.** The header retains the Family Spy mark, direct VPN/Sufler/Help anchors and RU/EN controls. Navigation/languages have 44px minimum targets; languages also have 44px minimum widths. Selected language uses primary ink and an underline offset by 6px. JavaScript reveals languages while default Russian copy and destinations remain usable without it.
 
-**Pricing.** Native details contain all four 30/90/180/365-day offers inside the shared comparison field. With JavaScript, desktop keeps every offer open and removes summaries from tab order; mobile at 600px and below begins with 30 days open and uses an exclusive `vpn-offers` group. At most one mobile offer is open; the native control may also close it. Returning to desktop opens all offers, while the last selected duration is retained for a later mobile layout. Without JavaScript all offers are initially open and useful account-pricing links remain visible.
+**Capabilities.** Four concise factual headings use consistent coral Tabler line icons with 1.6 stroke. Their open band has no individual fill or box. Hover changes icon ink without implying a click destination; factual content retains a default cursor.
 
-Each validated amount supplies the monthly equivalent, full RUB total and approximate USD total. Positive absolute savings use the available 30-day base; missing base pricing omits savings. Best treatment requires multiple validated offers and a non-base lowest monthly offer. It uses the factual label, warm cell field and filled action. No popularity badge or manufactured discount is added. Product data rules and the dated exchange reference are recorded in PRODUCT.md; their explanatory paragraphs are not marketing copy.
+**Pricing.** Native details hold four 30/90/180/365-day rows. JavaScript keeps desktop offers open and removes summaries from tab order; at 600px and below 30 days is initially open in the exclusive `vpn-offers` group. At most one mobile offer is open, and it may also be closed. Returning to desktop opens all rows; the last chosen duration is retained when returning to mobile. Without JavaScript all rows start open with useful account-pricing links.
 
-**Device links.** Android, iPhone/iPad, Windows, macOS, Linux and Smart TV continue to the existing cabinet instructions and retain the selected platform through sign-in. Each unboxed link keeps its large target. Decorative arrows remain hidden.
+Validated prices retain monthly equivalents, full RUB totals, approximate USD totals and positive savings from the available 30-day base. Missing base pricing omits savings; valid longer offers may still render. Best treatment requires multiple validated offers and a non-base lowest monthly offer, using coral duration/label and the filled action. No tariff row receives a best-value background. Product data rules and the dated exchange snapshot remain in PRODUCT.md rather than public explanation paragraphs.
 
-**Inline product evidence.** The homepage shows the static Sufler answer capture inside its padded stage, with translated figure label and alt text. Its image is not a link. Load failure shows the existing short recovery text, and a later successful load restores the image. There are no screenshot selectors, provenance paragraphs, enlargement actions or separate viewers. Generated VPN and Sufler landings retain their static inline evidence images and established product context.
+**Device destinations.** Android, iPhone/iPad, Windows, macOS, Linux and Smart TV keep their existing cabinet instruction routes and selected platform through sign-in. Their quiet unboxed links gain brief hover feedback. This later six-platform list complements the three-platform hero interaction.
 
-**Support and footer.** Separate named articles retain the existing VPN cabinet-support destination and Sufler mail destination with practical connection/audio help copy. The footer contains only the existing `support@family-pie.ru` mail link. Removed reminders and footer legal navigation do not return; product legal pages remain reachable through their established flows.
+**Inline evidence, support and footer.** The actual Sufler answer capture stays inline with translated accessible text and load/failure recovery. No selectors, image-opening links, provenance paragraphs or viewer are introduced. Generated product evidence remains inline. Separate named support articles retain the VPN cabinet and Sufler email destinations with practical help copy. The footer contains only `support@family-pie.ru`; product legal pages remain reachable through established flows.
 
-**Links and focus.** Text links underline on hover with a 4px offset. Keyboard focus on links, buttons and summaries uses a 2px coral outline with a 5px offset. The skip link becomes visible on focus. Support links use coral, account text uses primary ink and price details quiet text.
+**Links and focus.** Text links underline on hover with a 4px offset. Links, buttons and summaries use a 2px coral focus outline with a 5px offset; the native radio label uses its source 4px focus offset. The skip link appears on focus. Links and radio choices retain their native semantics.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** preserve black, graphite, Golos Text, coral emphasis and the existing Family Spy mark.
-- **Do** keep each independent offer and its next action clear; the homepage footer contains only the support email.
-- **Do** keep all four plan destinations, validated dynamic amounts and useful price fallback.
-- **Do** use native mobile disclosures and retain readable initially open offers without JavaScript.
-- **Do** retain inline Sufler imagery, translated alt text, image recovery and visible focus.
-- **Do** preserve the existing product, download, account, setup, legal and support destinations.
+- **Do** preserve black, graphite, Golos Text, coral emphasis and the existing Spy globe geometry.
+- **Do** keep the radio-selected platform and its real setup destination coherent when the page language changes.
+- **Do** keep all four factual plan rows, validated amounts, monthly equivalents, approximate USD totals and useful fallback.
+- **Do** keep artwork colors, corners and labels scoped to the physical device drawing; UI controls retain their own shape scale.
+- **Do** honor reduced motion and retain static default-device and initially open plan destinations without JavaScript.
+- **Do** preserve the independent Sufler action, inline image recovery, support, mail-only footer and existing operational routes.
 
 ### Don't:
 
+- **Don't** display a fake connected state, live network data, automatic device cycling or an invented application interface.
 - **Don't** turn the customer shell into the portfolio or introduce a joint subscription or bundle claim.
-- **Don't** replace the established rectangular controls with pills or borrow the reference site's coffee-shop identity.
-- **Don't** fragment the connected comparator into detached cards or restore stepped tariffs and boxed device tiles.
-- **Don't** add autoplay, moving ambient effects, invented screenshots, customer evidence or product guarantees.
+- **Don't** apply phone-body corners or hardware colors to buttons, price rows or other storefront controls.
+- **Don't** restore stepped pricing, detached tariff cards, the preceding filled comparator or boxed device destinations.
+- **Don't** add perpetual motion, moving ambient effects, invented screenshots, customer evidence or product guarantees.
 - **Don't** add screenshot-opening links, a modal, a viewer route or a new-tab image action.
-- **Don't** apply the homepage stylesheet to the existing cabinet, payment or native interfaces.
+- **Don't** apply the homepage stylesheet to existing cabinet, payment or native interfaces.
