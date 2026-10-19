@@ -381,7 +381,7 @@
     "keyCharacteristics": [
       "Neutral case-page surfaces in complete light and dark appearances; a scoped fixed-dark homepage preview.",
       "Golos Text throughout the portfolio, including its compact wordmark.",
-      "Actual inline application images with adjacent explanation, source labels and independent screenshot-language controls.",
+      "Actual inline application images with adjacent explanation, source labels and the shared page-language control.",
       "Flat case-page boundaries, compact homepage frames and restrained link motion."
     ],
     "rules": [
@@ -404,7 +404,7 @@
     "dos": [
       "**Do** keep case-page paper, ink, quiet text, dividers and specimen stage coherent in both appearances; keep the homepage charcoal override scoped.",
       "**Do** use local Golos Text for the portfolio, including its compact Family Pie wordmark.",
-      "**Do** keep actual inline application screens, source labels, adjacent explanations and independent screenshot-language choices readable.",
+      "**Do** keep actual inline application screens, source labels, adjacent explanations and matching screenshot languages readable.",
       "**Do** retain Work and Contact in the mobile header's second row.",
       "**Do** preserve shared language/theme preferences, visible keyboard focus and usable static links.",
       "**Do** preserve VPN, Lumen product and Driftora purchase rules within their existing customer surfaces."

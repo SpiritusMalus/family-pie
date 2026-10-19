@@ -197,7 +197,7 @@ Case-page light and dark appearances share the same composition, rules and typog
 **Key Characteristics:**
 - Neutral case-page surfaces in complete light and dark appearances; a scoped fixed-dark homepage preview.
 - Golos Text throughout the portfolio, including its compact wordmark.
-- Actual inline application images with adjacent explanation, source labels and independent screenshot-language controls.
+- Actual inline application images with adjacent explanation, source labels and the shared page-language control.
 - Flat case-page boundaries, compact homepage frames and restrained link motion.
 
 ### Surface authority
@@ -260,7 +260,7 @@ The portfolio type is sentence case, closely tracked in headings and open in par
 
 The shared case-page container is capped at (1180px), with (40px) side gutters on desktop, (20px) at widths up to (760px), and (16px) up to (420px). The desktop header is a single (90px minimum) row: brand on the left, Work/Contact and preference controls on the right. At (760px) it becomes a two-row grid: brand and controls above, Work and Contact below. The lower navigation row stays visible on mobile.
 
-The root and comparison preview container is capped at (1100px), with (40px) desktop gutters, (24px) up to (900px), (20px) up to (760px), and (16px) up to (420px). Their header minimum is (72px), retaining the shared mobile navigation row. A tight service hero pairs copy and the primary project-scroll action with a capability list; a compact author disclosure follows. Two equal project cards use a (24px) gap, becoming one column at (760px). Project name and purpose precede capture, caption/language controls, then explanation and case action. Hero top/bottom padding is (40px / 32px) desktop and (30px / 24px) mobile. This local composition does not replace the case-page grid.
+The root and comparison preview container is capped at (1100px), with (40px) desktop gutters, (24px) up to (900px), (20px) up to (760px), and (16px) up to (420px). Their header minimum is (72px), retaining the shared mobile navigation row. A tight service hero pairs copy and the primary project-scroll action with a capability list; a compact author disclosure follows. Two equal project cards use a (24px) gap, becoming one column at (760px). Project name and purpose precede capture, caption, then explanation and case action. Hero top/bottom padding is (40px / 32px) desktop and (30px / 24px) mobile. This local composition does not replace the case-page grid.
 
 Inline captions stay attached to the actual screens. No screenshot is a link and no separate enlargement action, viewer, modal or new tab is offered. Contact destinations wrap naturally, with enough vertical space to remain separate actions.
 
@@ -294,7 +294,7 @@ The Lumen product surface retains the owner-selected AI-generated photographic f
 
 Case-page section boundaries and desktop image frames retain their existing geometry. The Android crop uses the `screen` radius. The circular case theme button uses `theme-control`; shared text links and page-language buttons remain unfilled. The six-slice pie mark stays a small outlined circle with one coral segment.
 
-The homepage preview uses subdued rounded frames (`showcase-card`) for project cards, capabilities and the author disclosure. Its square portrait uses `showcase-portrait`; the primary coral project action uses `showcase-cta`. Capture clipping and compact screenshot-language buttons stay local to that layout. These local shapes do not replace case or customer radii.
+The homepage preview uses subdued rounded frames (`showcase-card`) for project cards, capabilities and the author disclosure. Its square portrait uses `showcase-portrait`; the primary coral project action uses `showcase-cta`. Capture clipping stays local to that layout. These local shapes do not replace case or customer radii.
 
 Customer geometry remains distinct: the established control radius is `controls`, the panel radius is `panels`, and thin cool borders remain part of the VPN and purchase identity. Lumen retains those shared control/panel radii within its own photographic and warm-color world.
 
@@ -322,7 +322,7 @@ Existing Russian-first customer pages retain `data-fp-translate` and reviewed `/
 
 The homepage preview crops the real matching RU/EN unsaved Android meal draft to its portion, nutrition and source details. The Lumen stage crops the matching native macOS settings capture from its top edge to include lamp and timer controls. Case pages retain the uncropped captures inline. These images do not establish camera/speech-flow, physical-device or cross-platform acceptance.
 
-Each screenshot pair has independent RU/EN controls through `portfolio-screens.js`; page-language changes do not override an explicit screenshot choice. Preserve cached choices on Back navigation and existing load/failure recovery. Captions and source labels remain visible; do not add a separate full-image destination.
+Each screenshot pair follows the common page RU/EN choice through `portfolio-screens.js`. There are no per-image controls or independent image preferences. Initial load and restored pages use the active page language. Keep late-load, error and timeout recovery; a failed request retains the last loaded image and points to the header language control for retry. Captions and source labels remain visible; do not add a separate full-image destination.
 
 ### Homepage preview controls
 
@@ -341,7 +341,7 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 ### Do:
 - **Do** keep case-page paper, ink, quiet text, dividers and specimen stage coherent in both appearances; keep the homepage charcoal override scoped.
 - **Do** use local Golos Text for the portfolio, including its compact Family Pie wordmark.
-- **Do** keep actual inline application screens, source labels, adjacent explanations and independent screenshot-language choices readable.
+- **Do** keep actual inline application screens, source labels, adjacent explanations and matching screenshot languages readable.
 - **Do** retain Work and Contact in the mobile header's second row.
 - **Do** preserve shared language/theme preferences, visible keyboard focus and usable static links.
 - **Do** preserve VPN, Lumen product and Driftora purchase rules within their existing customer surfaces.
@@ -353,3 +353,7 @@ Driftora's purchase plans remain keyboard-operable radio buttons. Theme backgrou
 - **Don't** present personal motivations as achieved weight loss or clinical benefit.
 - **Don't** describe existing Android/macOS image assets as fresh device or cross-platform acceptance.
 - **Don't** let the portfolio replacement remove direct product, download, legal or purchase routes.
+
+### Portrait/text balance refinement (owner approved2026-10-19)
+
+The About portrait is 208px square with a 40px gap to the text on desktop. At 900px and below it uses 176px/28px, then 128px/24px at 760px. At 420px and below the portrait becomes 160px and stacks above full-width text. The image bytes, crop, biography and disclosure behavior remain unchanged. This scoped refinement follows the owner’s proportion feedback after PR108. The owner explicitly approved the shown complete020fd6b portrait/language preview in PR109 on2026-10-19; use the established main CI route and record deployment separately.
