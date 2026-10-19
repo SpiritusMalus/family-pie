@@ -326,7 +326,7 @@ Each screenshot pair has independent RU/EN controls through `portfolio-screens.j
 
 ### Homepage preview controls
 
-The primary coral action is a real `#work` anchor with a (48px) minimum height. Its arrow moves (3px) over (.2s) only without reduced motion. The native About disclosure is open on desktop and initially collapsed by JavaScript at (760px) or below. Without JavaScript it stays open/readable. Language changes retain the visitor's current open/closed state. Name, actual portrait and pie-sharing story stay together in this compact block. Its summary has a (60px) minimum height and an inset focus outline. Public display name is exactly Eugene Tihonenko.
+The primary coral action is a real `#work` anchor with a (48px) minimum height. Its arrow moves (3px) over (.2s) only without reduced motion. The native About disclosure is open on desktop and initially collapsed by JavaScript at (760px) or below. Without JavaScript it stays open/readable. Language changes retain the visitor's current open/closed state. Name, actual portrait, career path and work preferences stay together in this compact block. Its summary has a (60px) minimum height and an inset focus outline. Public display name is exactly Eugene Tihonenko.
 
 ### Preserved customer controls
 
