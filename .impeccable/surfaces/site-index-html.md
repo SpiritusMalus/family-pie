@@ -46,4 +46,4 @@ An independent finish review found no material visual issues and readiness for p
 
 ## Portrait balance follow-up (preview)
 
-Owner asks for a larger About portrait and text shifted right after the PR108 release. Desktop portrait208px, gap40px;900px breakpoint176/28;760px breakpoint128/24;420px stacks a160px portrait above the text. Preserve original portrait bytes/crop and all copy/controls. This new scoped change is PREVIEW and has not been approved for publication; prior approval applies to the already published PR108 layout.
+Owner asks for a larger About portrait and text shifted right after the PR108 release. Desktop portrait 208px, gap 40px; 900px breakpoint 176/28; 760px breakpoint 128/24; 420px stacks a 160px portrait above the text. Preserve original portrait bytes/crop and all copy/controls. This new scoped change is PREVIEW and has not been approved for publication; prior approval applies to the already published PR108 layout.
