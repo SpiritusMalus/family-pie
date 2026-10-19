@@ -18,6 +18,8 @@
       button.setAttribute('aria-pressed', String(button.dataset.fpLang === lang));
     }
   }
+  const maker = document.querySelector('[data-maker]');
+  if (maker && matchMedia('(max-width: 760px)').matches) maker.open = false;
   document.querySelectorAll('[data-fp-lang]').forEach(button => {
     button.addEventListener('click', () => window.FPi18n?.set(button.dataset.fpLang));
   });

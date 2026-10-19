@@ -69,3 +69,30 @@ test('late screenshot loads cannot replace the latest inline language choice',()
   assert.equal(a.image.src,'/work/assets/screen-en.png');
   assert.equal(a.buttons[1]['aria-pressed'],'true');
 });
+
+test('reference-led homepage exposes project access before the optional author story',()=>{
+  for(const path of ['site/index.html','site/preview/showcase/index.html']) {
+    const html=readFileSync(path,'utf8'),main=html.match(/<main[\s\S]*?<\/main>/)[0];
+    assert.ok(main.indexOf('href="#work"')<main.indexOf('data-maker'),path);
+    assert.match(main,/<details class="maker-story" data-maker open>/);
+    assert.equal((main.match(/class="showcase-project"/g)||[]).length,2);
+    for(const card of main.matchAll(/<article class="showcase-project">[\s\S]*?<\/article>/g)) {
+      assert.ok(card[0].indexOf('<h3>')<card[0].indexOf('<figure'),path);
+      assert.doesNotMatch(card[0],/data-screen-link|href="\/screenshots\//);
+    }
+    assert.match(main,/href="\/work\/driftora\/"/);
+    assert.match(main,/href="\/work\/lumen-rest\/"/);
+  }
+});
+
+test('author story starts collapsed only on mobile and language changes preserve the user choice',()=>{
+  for(const mobile of [false,true]) {
+    const maker={open:true},events={};
+    const context={document:{querySelector:()=>maker,querySelectorAll:()=>[]},matchMedia:()=>({matches:mobile}),window:{FPi18n:{lang:'en'},addEventListener:(name,fn)=>events[name]=fn}};
+    vm.runInNewContext(readFileSync('site/portfolio.js','utf8'),context);
+    assert.equal(maker.open,!mobile);
+    maker.open=!maker.open;
+    context.window.FPi18n.lang='ru';events['fp-languagechange']();
+    assert.equal(maker.open,mobile);
+  }
+});
