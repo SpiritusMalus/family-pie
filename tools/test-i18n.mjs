@@ -93,3 +93,12 @@ test('checkout language changes keep the selected plan and an in-flight payment 
   assert.equal(JSON.parse(calls.at(-1)[1].body).plan,'yearly');
   assert.ok(context.url.includes('token=test-only'));
 });
+
+test('subscription checkout summary and fields follow the common language',()=>{
+ const {api}=page({saved:'en'});
+ assert.equal(api.t('Email для чека'),'Receipt email');
+ assert.equal(api.t('Перейти к оплате'),'Continue to payment');
+ assert.equal(api.t('90 дней · 800,00 ₽'),'90 days · 800,00 ₽');
+ assert.equal(api.t('Подключение появится после подтверждения оплаты.'),'Your connection will appear once payment is confirmed.');
+ api.set('ru');assert.equal(api.t('90 дней · 800,00 ₽'),'90 дней · 800,00 ₽');
+});
