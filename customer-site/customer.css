@@ -31,8 +31,8 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.035em;line-height:1.15;text-wrap:ba
 .vpn-intro{position:relative;isolation:isolate;display:grid;grid-template-columns:.9fr 1.1fr;align-items:center;gap:48px;min-height:660px;padding:64px max(40px,calc((100% - 1100px)/2)) 72px;background:#101215}
 .vpn-intro::before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 85% 60%,#ff9d8812,transparent 60%)}
 .vpn-copy{min-width:0}
-.vpn-heading h2{font-size:clamp(64px,7vw,88px);line-height:1;letter-spacing:-.04em;margin-bottom:24px}
-.vpn-heading h2 span{display:block}.vpn-heading h2 span:last-child{color:var(--accent)}
+.vpn-heading :is(h1,h2){font-size:clamp(64px,7vw,88px);line-height:1;letter-spacing:-.04em;margin-bottom:24px}
+.vpn-heading :is(h1,h2) span{display:block}.vpn-heading :is(h1,h2) span:last-child{color:var(--accent)}
 .vpn-purpose{font-size:24px;line-height:1.45;color:var(--ink);max-width:25ch}
 .vpn-offer{margin-top:16px}
 .vpn-price{font-size:16px;min-height:26px;color:var(--quiet);font-variant-numeric:tabular-nums}
@@ -78,24 +78,24 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.035em;line-height:1.15;text-wrap:ba
 .device-setup>span:last-child{color:var(--accent);margin-left:7px}
 .vpn-benefits,.vpn-pricing,.vpn-devices{scroll-margin-top:40px}
 .vpn-benefits{padding-block:56px 0}
-.vpn-benefits>h3,.vpn-pricing>h3,.vpn-devices>h3{font-size:clamp(36px,4.5vw,56px);max-width:20ch;margin-bottom:48px}
-.vpn-benefits>h3{font-size:36px;margin-bottom:24px}
+.vpn-benefits>:is(h2,h3),.vpn-pricing>:is(h2,h3),.vpn-devices>:is(h2,h3){font-size:clamp(36px,4.5vw,56px);max-width:20ch;margin-bottom:48px}
+.vpn-benefits>:is(h2,h3){font-size:36px;margin-bottom:24px}
 .vpn-features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;list-style:none;padding:20px 0;margin:0;border-block:1px solid var(--rule)}
 .vpn-features li{display:flex;align-items:center;gap:16px;min-width:0;padding:8px 24px}.vpn-features li:first-child{padding-left:0}.vpn-features li+li{border-left:1px solid var(--rule)}
 .vpn-icon{display:block;width:24px;height:24px;flex-shrink:0}
 .vpn-icon-box{display:grid;align-items:center;width:32px;height:40px;flex-shrink:0;color:var(--accent)}
 .vpn-icon-box .vpn-icon{width:32px;height:32px}
-.vpn-features h4{font-size:17px;line-height:1.4;letter-spacing:-.025em;max-width:17ch}
+.vpn-features :is(h3,h4){font-size:17px;line-height:1.4;letter-spacing:-.025em;max-width:17ch}
 
 /* All four validated offers remain comparable on wide screens. */
 .vpn-pricing{margin-top:88px}
 .vpn-plans{border-bottom:1px solid var(--rule)}
 .vpn-plan{position:relative;display:grid;grid-template-columns:144px minmax(0,1fr);align-items:center;gap:32px;min-width:0;padding:28px 0;border-top:1px solid var(--rule)}
-.vpn-plan[data-best=true] h4{color:var(--accent)}
+.vpn-plan[data-best=true] :is(h3,h4){color:var(--accent)}
 .vpn-plan-summary{list-style:none;cursor:default}
 .vpn-plan-summary::-webkit-details-marker{display:none}
 .vpn-plan-summary::marker{content:""}
-.vpn-plan h4{font-size:24px;line-height:1.25;letter-spacing:-.025em}
+.vpn-plan :is(h3,h4){font-size:24px;line-height:1.25;letter-spacing:-.025em}
 .vpn-plan-best{color:var(--accent);font-size:11px;font-weight:500;line-height:1.4;margin-bottom:8px}
 .vpn-plan-overview,.vpn-plan-toggle{display:none}
 .vpn-plan-body{display:grid;grid-template-columns:minmax(0,1fr) 130px 172px;align-items:center;gap:24px;min-width:0}
@@ -171,7 +171,7 @@ figure{margin:0}
 @media(max-width:900px){
  .wrap{width:calc(100% - 48px)}
  .vpn-intro{grid-template-columns:1fr;min-height:0;padding:56px 24px;gap:32px}
- .vpn-copy{max-width:620px}.vpn-heading h2{display:flex;gap:.2em;font-size:72px}
+ .vpn-copy{max-width:620px}.vpn-heading :is(h1,h2){display:flex;gap:.2em;font-size:72px}
  .vpn-purpose{max-width:30ch}.vpn-explore{margin-top:16px}
  .device-scene{width:min(520px,100%);margin-inline:auto}.device-stage{height:350px}
  .device-art--laptop .device-frame{height:248px}.device-art--phone{width:126px;right:-1%}.device-art--phone .device-frame{height:254px}
@@ -185,22 +185,22 @@ figure{margin:0}
  .site-header{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding-block:12px}
  .site-header nav{grid-column:1/-1;grid-row:2;justify-content:space-between;margin:0;gap:12px;font-size:14px}
  .langtoggle{grid-column:2;grid-row:1}
- .vpn-intro{padding:40px 20px 48px;gap:24px}.vpn-heading h2{font-size:clamp(48px,9.6vw,64px)}
+ .vpn-intro{padding:40px 20px 48px;gap:24px}.vpn-heading :is(h1,h2){font-size:clamp(48px,9.6vw,64px)}
  .vpn-purpose{font-size:22px}.vpn-offer .product-actions{margin-top:20px}
  .device-scene{max-width:420px}.device-stage{height:290px}
  .device-art--laptop{top:72px}.device-art--laptop .device-frame{height:190px}
  .device-art--tv .device-frame{height:160px}.device-art--phone{top:90px;width:104px}.device-art--phone .device-frame{height:202px}
  .device-display>span{font-size:16px;left:12px;bottom:12px}.device-art--phone .device-display>span{font-size:18px}
  .device-picker{gap:24px;margin-top:12px}
- .vpn-benefits{padding-top:48px}.vpn-benefits>h3,.vpn-pricing>h3,.vpn-devices>h3{margin-bottom:32px}
- .vpn-features h4{font-size:17px}.vpn-icon-box .vpn-icon{width:28px;height:28px}
+ .vpn-benefits{padding-top:48px}.vpn-benefits>:is(h2,h3),.vpn-pricing>:is(h2,h3),.vpn-devices>:is(h2,h3){margin-bottom:32px}
+ .vpn-features :is(h3,h4){font-size:17px}.vpn-icon-box .vpn-icon{width:28px;height:28px}
  .vpn-pricing{margin-top:64px}.vpn-devices{padding-block:56px}
  .product{padding-block:72px;gap:32px}.product-copy .product-purpose{font-size:20px}
  .support{padding-block:56px 48px}.support-products{grid-template-columns:1fr;gap:32px}
 }
 @media(max-width:600px){
  .vpn-plan{display:block;padding:0 16px}.vpn-plan-summary{display:flex;align-items:center;gap:16px;min-height:88px;padding:20px 0;cursor:pointer}
- .vpn-plan-heading{flex:1;min-width:0}.vpn-plan h4{font-size:22px}
+ .vpn-plan-heading{flex:1;min-width:0}.vpn-plan :is(h3,h4){font-size:22px}
  .vpn-plan-best{font-size:11px;margin-bottom:4px}
  .vpn-plan-overview{display:block;font-size:14px;font-variant-numeric:tabular-nums;color:var(--quiet)}
  .vpn-plan[open] .vpn-plan-overview{visibility:hidden}
@@ -212,7 +212,7 @@ figure{margin:0}
 }
 @media(max-width:420px){
  .wrap{width:calc(100% - 32px)}
- .vpn-intro{padding-inline:16px}.vpn-heading h2{font-size:48px}
+ .vpn-intro{padding-inline:16px}.vpn-heading :is(h1,h2){font-size:48px}
  .vpn-purpose{font-size:20px}.vpn-offer .product-actions{gap:8px 20px}.vpn-offer .button{padding-inline:20px}.vpn-offer .vpn-account{font-size:14px}
  .device-stage{height:260px}.device-art--laptop{top:64px}.device-art--laptop .device-frame{height:158px;padding:8px}
  .device-art--laptop{width:84%;left:8%}.device-laptop-base{margin-inline:-8px}.device-art--phone{right:8%}
@@ -221,8 +221,13 @@ figure{margin:0}
  .device-display>span{font-size:14px;left:8px;bottom:12px}.device-picker{gap:24px}
  .vpn-plan-monthly,.vpn-plan-unit{grid-column:1/-1}
  .vpn-plan-amount{grid-column:1;grid-row:3;text-align:left;margin-top:12px;white-space:nowrap}.vpn-plan-usd{grid-column:2;grid-row:3;align-self:end;white-space:nowrap}
- .vpn-features li{display:block;padding:12px 12px 16px}.vpn-features h4{font-size:16px}.vpn-icon-box{margin-bottom:8px}
+ .vpn-features li{display:block;padding:12px 12px 16px}.vpn-features :is(h3,h4){font-size:16px}.vpn-icon-box{margin-bottom:8px}
  .vpn-devices ul{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.vpn-devices a{font-size:13px;min-height:88px}
  .product-demo{padding:12px}.product-copy h2{font-size:48px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.vpn-more{width:min(1100px,calc(100% - 80px));margin:0 auto;padding-bottom:56px}
+.vpn-more a{display:inline-flex;align-items:center;min-height:44px;color:var(--accent)}
+@media(max-width:700px){.vpn-more{width:calc(100% - 40px)}}
+@media(max-width:420px){.vpn-more{width:calc(100% - 32px)}}

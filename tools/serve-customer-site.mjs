@@ -8,11 +8,11 @@ const vpnQa=process.env.CUSTOMER_VPN_QA_API;
 if(vpnQa&&!/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(vpnQa))throw Error('Only a local synthetic API is allowed');
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2','.xml':'application/xml','.txt':'text/plain'};
 async function file(path) {try{return (await stat(path)).isFile()?path:null;}catch{return null;}}
-createServer(async(req,res)=>{
+const server=createServer(async(req,res)=>{
   try {
     const url=new URL(req.url,'http://localhost');
-    if(['/vpn','/vpn/','/vpn/index.html'].includes(url.pathname)){
-      res.writeHead(301,{Location:'/'+url.search+'#vpn'});return res.end();
+    if(['/vpn','/vpn/index.html'].includes(url.pathname)){
+      res.writeHead(301,{Location:'/vpn/'+url.search});return res.end();
     }
     if(vpnQa&&url.pathname.startsWith('/vpn/api/')){
       const headers={...req.headers,host:new URL(vpnQa).host};
@@ -35,4 +35,5 @@ createServer(async(req,res)=>{
     res.writeHead(target?200:404,{'Content-Type':mime[extname(target||'404.html')]||'application/octet-stream','Cache-Control':'no-cache'});
     res.end(req.method==='HEAD'?undefined:await readFile(target||resolve(root,'404.html')));
   }catch{res.writeHead(503,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end('{"error":"temporarily unavailable"}');}
-}).listen(port,'127.0.0.1',()=>console.log(`Family Spy preview: http://localhost:${port}/`));
+});
+server.listen(port,'127.0.0.1',()=>console.log(`Family Spy preview: http://localhost:${server.address().port}/`));

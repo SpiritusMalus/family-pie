@@ -9,11 +9,11 @@ test('standalone customer artifact includes account/payment pages without portfo
   t.after(()=>rm(directory,{recursive:true,force:true}));
   const {output}=await buildCustomerSite(directory);
   for(const path of ['index.html','vpn/terms/index.html','sufler/index.html','sufler/setup/index.html','sufler/privacy/index.html','i18n/language.js','vpn/fonts.css','vpn/cabinet/index.html','vpn/cabinet/auth/index.html','vpn/admin/index.html','sufler/buy/index.html','sufler/buy/done/index.html'])await access(resolve(output,path));
-  await assert.rejects(access(resolve(output,'vpn/index.html')));
+  await access(resolve(output,'vpn/index.html'));
   for(const path of ['work','preview','rest_lumen','driftora'])await assert.rejects(access(resolve(output,path)));
   const home=await readFile(resolve(output,'index.html'),'utf8');
   const sitemap=await readFile(resolve(output,'sitemap.xml'),'utf8');
-  assert.doesNotMatch(sitemap,/<loc>https:\/\/family-spy\.ru\/vpn\/<\/loc>/);
+  assert.match(sitemap,/<loc>https:\/\/family-spy\.ru\/vpn\/<\/loc>/);
   assert.match(sitemap,/<loc>https:\/\/family-spy\.ru\/vpn\/terms\/<\/loc>/);
   assert.doesNotMatch(home,/Eugene|Евгений|LinkedIn|SpiritusMalus|portrait/);
   const sufler=await readFile(resolve(output,'sufler/index.html'),'utf8');
