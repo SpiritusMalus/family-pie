@@ -1,5 +1,14 @@
 // Reviewed English copy; keys match the original Russian UI.
 window.FP_EN = {
+  "Подписка и подключение в личном кабинете. Помощь в Telegram.": "Your subscription and connection are in your account. Get help in Telegram.",
+  "Помощь в Telegram": "Help in Telegram",
+  "Помощь в Telegram без входа в кабинет": "Help in Telegram, no website sign-in needed",
+  "Написать в Telegram": "Message us in Telegram",
+  "Написать о Sufler в Telegram": "Sufler support in Telegram",
+  "Напиши боту. Вход в кабинет не нужен, ответ придёт в тот же чат.": "Message the bot. No website sign-in needed; we’ll reply in the same chat.",
+  "Обращения в кабинете": "Previous website conversations",
+  "Здесь можно прочитать прежние обращения и продолжить переписку. Новые вопросы отправляй боту.": "Read and continue your previous conversations here. Send new questions to the bot.",
+  "Не удалось загрузить прежние обращения. Обнови страницу или напиши боту.": "Could not load your previous conversations. Reload the page or message the bot.",
   "Windows 10 версии 2004 и новее: запустите скачанный файл .exe. Mac 14 и новее: откройте DMG и перенесите Sufler в «Программы». Установщики пока без цифровой подписи, поэтому система может попросить подтвердить открытие. Для Mac есть": "Windows 10 version 2004 or newer: run the downloaded .exe file. macOS 14 or newer: open the DMG and drag Sufler into Applications. Installers do not yet have verified publisher signatures, so your system may ask you to confirm opening them. For Mac, see",
   "На Windows окно можно скрыть от стандартного захвата. На Mac 14+ режим «чистый экран» передаёт рабочий стол без окон Sufler: в звонке выберите только окно «Рабочий экран». Для звука собеседника настройте BlackHole.": "On Windows, the window can be hidden from standard capture. On macOS 14+, “Clean screen” («чистый экран») shares the desktop without Sufler windows: select only the “Work screen” («Рабочий экран») window in your call. Set up BlackHole for the other person’s audio.",
   "Mac 14+:": "macOS 14+:",

@@ -1,5 +1,5 @@
 [Unit]
-Description=Family VPN opt-in subscription Telegram reminders
+Description=Family VPN Telegram support and opt-in subscription reminders
 After=network.target family-vpn.service
 StartLimitIntervalSec=300
 StartLimitBurst=3
