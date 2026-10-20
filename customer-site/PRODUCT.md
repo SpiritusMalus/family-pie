@@ -45,3 +45,7 @@ Both products open @family_pie_vpn_bot using support_vpn/support_sufler deep lin
 ## VPN search entry — preview status, 2026-10-20
 
 The `/vpn/` extension retains the approved storefront visual world. Its direction comment is included in generated `customer-site/dist/vpn/index.html`; source changes belong in the builder and source fragments. Review captures are `/Users/malum/Documents/Codex/2026-10-20/family-spy-vpn-search-preview/desktop-ru.jpg` and `mobile-ru.jpg` in the same directory. The owner explicitly approved publication of the shown e2e7a74 preview on 2026-10-20. Use the established reviewed static/Caddy main-CI route; actual integration, deployment and indexing evidence is recorded separately in the project journal. These artifacts do not establish production delivery, search indexing, paid purchase acceptance or backlink results.
+
+## IndexNow ownership proof
+
+The customer build may receive `CUSTOMER_INDEXNOW_KEY` from a protected deployment secret. It writes the validated UTF-8 root proof file without exposing the value in source, page HTML, robots or sitemap. The key and its file location stay in private operational context. URL notifications use the official Yandex IndexNow endpoint after public deployment; an accepted notification does not establish indexing or ranking. This optional build input leaves page and account behavior unchanged.

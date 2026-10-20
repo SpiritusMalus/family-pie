@@ -68,6 +68,8 @@ jobs:
         run: node tools/build-legal.mjs
 
       - name: Build the separate customer storefront
+        env:
+          CUSTOMER_INDEXNOW_KEY: ${{ secrets.CUSTOMER_INDEXNOW_KEY }}
         run: node tools/build-customer-site.mjs
 
       - name: Build the portfolio without customer product files

@@ -228,3 +228,16 @@ test('homepage keeps real offer actions, device fallback and no-JavaScript detai
  assert.equal((html.match(/class="vpn-plan-summary"/g)||[]).length,4);
  for(const platform of ['android','ios','windows','macos','linux','tv'])assert.ok(html.includes('#devices?platform='+platform));
 });
+
+test('IndexNow ownership proof is supplied explicitly and excluded from page content and sitemap',async t=>{
+ const directory=await mkdtemp(resolve('customer-site/dist-test-indexnow-'));
+ t.after(()=>rm(directory,{recursive:true,force:true}));
+ const fixture='test-indexnow-proof-1234567890';
+ await buildCustomerSite(directory,{indexNowKey:fixture});
+ assert.equal(await readFile(resolve(directory,fixture+'.txt'),'utf8'),fixture);
+ for(const path of ['index.html','vpn/index.html','sitemap.xml','robots.txt'])assert.ok(!(await readFile(resolve(directory,path),'utf8')).includes(fixture),path);
+ await buildCustomerSite(directory,{indexNowKey:''});
+ await assert.rejects(access(resolve(directory,fixture+'.txt')));
+ for(const invalid of ['../outside','short','a'.repeat(129),'proof/with/path'])await assert.rejects(buildCustomerSite(directory,{indexNowKey:invalid}),/Invalid IndexNow/);
+ await access(resolve(directory,'index.html'));
+});

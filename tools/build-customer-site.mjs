@@ -12,7 +12,9 @@ export const publicPlans = Object.freeze({
 export function canonicalCustomerFlow(path) {
   return customerRedirects.some(prefix => path === prefix || path.startsWith(prefix + '/'));
 }
-export async function buildCustomerSite(output = resolve(project, 'customer-site/dist')) {
+export async function buildCustomerSite(output = resolve(project, 'customer-site/dist'), {indexNowKey = process.env.CUSTOMER_INDEXNOW_KEY} = {}) {
+  // The ownership proof is supplied by protected CI configuration, never source.
+  if (indexNowKey && !/^[a-zA-Z0-9-]{8,128}$/.test(indexNowKey)) throw Error('Invalid IndexNow key configuration');
   output = resolve(output);
   if (output === project || output === resolve(project,'site') || !output.startsWith(project + '/')) throw Error('Refusing unsafe output path');
   const prepare = async () => {
@@ -23,6 +25,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
     await writeFile(resolve(output,'.customer-build'),'Family Spy generated static site\n');
   };
   await prepare();
+  if (indexNowKey) await writeFile(resolve(output,indexNowKey+'.txt'),indexNowKey,'utf8');
   for (const folder of ['vpn','sufler','i18n']) await cp(resolve(project,'site',folder),resolve(output,folder),{
     recursive:true,filter:source => {
       const path = relative(resolve(project,'site'),source).replaceAll('\\','/');
