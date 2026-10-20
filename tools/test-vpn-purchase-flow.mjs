@@ -100,3 +100,9 @@ test('switching language reformats cached history and checkout without another r
  const order={id,state:'canceled',days:180,price_minor:140000,created_at:Date.parse('2026-10-20T14:00:00Z')},f=fixture({orders:[order]});await f.ready;const count=f.calls.length;assert.match(f.query('.payment-order').textContent,/400,00/);
  f.window.FPi18n.lang='en';f.dispatch('fp-languagechange');assert.equal(f.calls.length,count);assert.match(f.query('.payment-order').textContent,/RUB\s*1,400\.00/);assert.match(f.query('.payment-order').textContent,/10\/20\/2026/);
 });
+
+test('switching languages reformats the ready overview expiry from the cached subscription',async()=>{
+ const f=fixture({subscription:{active:true,payment_confirmed:true,sync_state:'synced',expires_at:Date.parse('2027-04-18T17:00:00Z'),profile_url:'https://example.invalid/fixture-sub'}});await f.ready;const count=f.calls.length;assert.match(f.query('.subscription').textContent,/18\.04\.2027/);
+ f.window.FPi18n.lang='en';f.dispatch('fp-languagechange');await flush();assert.equal(f.calls.length,count);assert.match(f.query('.subscription').textContent,/4\/18\/2027/);
+ f.window.FPi18n.lang='ru';f.dispatch('fp-languagechange');await flush();assert.equal(f.calls.length,count);assert.match(f.query('.subscription').textContent,/18\.04\.2027/);assert.equal(f.root.all().find(n=>n.tagName==='A'&&n.textContent==='Настроить VPN').href,'#devices?platform=macos');
+});
