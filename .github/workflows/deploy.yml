@@ -70,6 +70,8 @@ jobs:
       - name: Build the separate customer storefront
         env:
           CUSTOMER_INDEXNOW_KEY: ${{ secrets.CUSTOMER_INDEXNOW_KEY }}
+          CUSTOMER_GOOGLE_SITE_VERIFICATION: ${{ secrets.CUSTOMER_GOOGLE_SITE_VERIFICATION }}
+          CUSTOMER_YANDEX_SITE_VERIFICATION: ${{ secrets.CUSTOMER_YANDEX_SITE_VERIFICATION }}
         run: node tools/build-customer-site.mjs
 
       - name: Build the portfolio without customer product files

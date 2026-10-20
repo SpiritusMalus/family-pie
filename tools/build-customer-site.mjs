@@ -12,9 +12,17 @@ export const publicPlans = Object.freeze({
 export function canonicalCustomerFlow(path) {
   return customerRedirects.some(prefix => path === prefix || path.startsWith(prefix + '/'));
 }
-export async function buildCustomerSite(output = resolve(project, 'customer-site/dist'), {indexNowKey = process.env.CUSTOMER_INDEXNOW_KEY} = {}) {
+export async function buildCustomerSite(output = resolve(project, 'customer-site/dist'), {
+  indexNowKey = process.env.CUSTOMER_INDEXNOW_KEY,
+  googleSiteVerification = process.env.CUSTOMER_GOOGLE_SITE_VERIFICATION,
+  yandexSiteVerification = process.env.CUSTOMER_YANDEX_SITE_VERIFICATION
+} = {}) {
   // The ownership proof is supplied by protected CI configuration, never source.
   if (indexNowKey && !/^[a-zA-Z0-9-]{8,128}$/.test(indexNowKey)) throw Error('Invalid IndexNow key configuration');
+  const siteProofs = [['google-site-verification',googleSiteVerification],['yandex-verification',yandexSiteVerification]];
+  for (const [name,value] of siteProofs) {
+    if (value != null && value !== '' && (typeof value !== 'string' || !/^[a-zA-Z0-9_-]{1,256}$/.test(value))) throw Error('Invalid '+name+' configuration');
+  }
   output = resolve(output);
   if (output === project || output === resolve(project,'site') || !output.startsWith(project + '/')) throw Error('Refusing unsafe output path');
   const prepare = async () => {
@@ -33,6 +41,11 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
     }
   });
   for (const file of ['index.html','customer.css','customer.js','vpn-search.css']) await cp(resolve(project,'customer-site',file),resolve(output,file));
+  const meta = siteProofs.filter(([,value]) => value).map(([name,value]) => `<meta name="${name}" content="${value}">`).join('');
+  if (meta) {
+    const home = resolve(output,'index.html');
+    await writeFile(home,(await readFile(home,'utf8')).replace('</head>',meta+'</head>'));
+  }
   await cp(resolve(project,'customer-site/media'),resolve(output,'media'),{recursive:true});
   const dictionary=resolve(output,'i18n/en.js');
   await writeFile(dictionary,(await readFile(dictionary,'utf8')).replaceAll('· family-pie"','· Family Spy"')+'\nwindow.FP_EN["Ключ, созданный на старом сайте?"] = "Have a passkey from the previous site?";\nwindow.FP_EN["Войти со старым ключом"] = "Use an existing passkey";\nwindow.FP_EN["Выбери подписку"] = "Choose a plan";\nwindow.FP_EN["Аккаунт:"] = "Account:";\nwindow.FP_EN["Личный кабинет Family VPN."] = "Family VPN account.";\nwindow.FP_EN["Ожидаем оплату"] = "Awaiting payment";\nwindow.FP_EN["Выбрать тариф"] = "Choose a plan";\nwindow.FP_EN["Маршруты в твоём профиле"] = "Connection routes in your profile";\nwindow.FP_EN["Личная подписка содержит доступные пути подключения. После импорта выбери маршрут в VPN-приложении. Проверить свою сеть можно в разделе «Диагностика»."] = "Your subscription includes the available connection routes. After importing it, choose a route in your VPN app. You can check your connection under Diagnostics.";\nwindow.FP_EN[". Здесь можно войти прежним логином и паролем и добавить новый ключ в настройках."] = ". You can also use your existing username and password here, then add a new passkey in Settings.";\n');

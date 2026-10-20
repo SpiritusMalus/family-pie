@@ -241,3 +241,22 @@ test('IndexNow ownership proof is supplied explicitly and excluded from page con
  for(const invalid of ['../outside','short','a'.repeat(129),'proof/with/path'])await assert.rejects(buildCustomerSite(directory,{indexNowKey:invalid}),/Invalid IndexNow/);
  await access(resolve(directory,'index.html'));
 });
+
+test('search-console verification stays in the head and does not change approved page content',async t=>{
+ const directory=await mkdtemp(resolve('customer-site/dist-test-verification-'));
+ t.after(()=>rm(directory,{recursive:true,force:true}));
+ await buildCustomerSite(directory,{googleSiteVerification:'',yandexSiteVerification:''});
+ const plain=await readFile(resolve(directory,'index.html'),'utf8');
+ await buildCustomerSite(directory,{googleSiteVerification:'Google_fixture-123',yandexSiteVerification:'Yandex_fixture_456'});
+ for(const page of ['index.html','vpn/index.html']){
+  const html=await readFile(resolve(directory,page),'utf8');
+  const head=html.slice(0,html.indexOf('</head>'));
+  assert.match(head,/<meta name="google-site-verification" content="Google_fixture-123">/);
+  assert.match(head,/<meta name="yandex-verification" content="Yandex_fixture_456">/);
+  assert.doesNotMatch(html.slice(html.indexOf('<body')),/Google_fixture|Yandex_fixture/);
+ }
+ const configured=await readFile(resolve(directory,'index.html'),'utf8');
+ assert.equal(configured.slice(configured.indexOf('<body')),plain.slice(plain.indexOf('<body')));
+ for(const value of ['"><script>','bad value','x'.repeat(257)])await assert.rejects(buildCustomerSite(directory,{googleSiteVerification:value}),/Invalid google-site-verification/);
+ await access(resolve(directory,'index.html'));
+});

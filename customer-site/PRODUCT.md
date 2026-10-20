@@ -49,3 +49,5 @@ The `/vpn/` extension retains the approved storefront visual world. Its directio
 ## IndexNow ownership proof
 
 The customer build may receive `CUSTOMER_INDEXNOW_KEY` from a protected deployment secret. It writes the validated UTF-8 root proof file without exposing the value in source, page HTML, robots or sitemap. The key and its file location stay in private operational context. URL notifications use the official Yandex IndexNow endpoint after public deployment; an accepted notification does not establish indexing or ranking. This optional build input leaves page and account behavior unchanged.
+
+Google Search Console and Yandex Webmaster ownership use their actual owner-session meta values through protected `CUSTOMER_GOOGLE_SITE_VERIFICATION` and `CUSTOMER_YANDEX_SITE_VERIFICATION` deploy inputs. Values are validated before output cleanup and added to the generated homepage head; the VPN landing inherits them. Keep them after ownership succeeds. Page body, pricing, account behavior and the visual identity remain unchanged; actual console verification and sitemap submission are recorded separately.
