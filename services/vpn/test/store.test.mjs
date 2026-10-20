@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { VpnStore } from '../store.mjs';
-import { YooKassaReader } from '../yookassa.mjs';
+import { YooKassaReader,ProviderUnavailableError } from '../yookassa.mjs';
 const DAY=86_400_000;
 function fixture(t) {
   let now=1_700_000_000_000;
@@ -105,7 +105,7 @@ for(const patch of [{recipient:{account_id:'wrong-shop'}},{test:false},{id:'othe
  });
 test('provider failure is retryable and changes no access',async t=>{
  const {store,user,payment}=fixture(t);const p=payment();const reader=new YooKassaReader({shopId:'test-shop',secret:'fixture',request:async()=>({ok:false})});
- await assert.rejects(reader.confirmPayment(store,p.id),/unavailable/);assert.equal(store.subscription(user.id).active,false);
+ await assert.rejects(reader.confirmPayment(store,p.id),ProviderUnavailableError);assert.equal(store.subscription(user.id).active,false);
 });
 
 test('failed job insert rolls back payment and grant atomically',t=>{

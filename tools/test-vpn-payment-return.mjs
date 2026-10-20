@@ -6,17 +6,18 @@ const code=readFileSync(new URL('../site/vpn/payment-return.js',import.meta.url)
 const id='01234567-89ab-4cde-8fab-0123456789ab';
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 function fixture({hash='#plans?order='+id,saved=null,state='paid',sub={active:true,payment_confirmed:true,sync_state:'synced'},failure=null}={}) {
- const listeners=new Map(),storage=new Map(saved?[['family-vpn-pending-order',saved]]:[]),messages=[],calls=[],routes=[];
+ const listeners=new Map(),storage=new Map(saved?[['family-vpn-purchase-v2',JSON.stringify({account:'fixture-account',days:180,order:saved})]]:[]),messages=[],calls=[],routes=[];
  let tick,cleared=false;
  const window={addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);},dispatchEvent:event=>listeners.get(event.type)?.(event)};
  const location={hash,pathname:'/vpn/cabinet/',search:''};
  const history={replaceState:(_a,_b,path)=>{routes.push(path);location.hash=path.slice(path.indexOf('#'));}};
  runInNewContext(code,{window,location,history,URLSearchParams,Event,sessionStorage:{getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},setInterval:fn=>{tick=fn;return 1;},clearInterval:()=>cleared=true});
- window.vpnPaymentReturn({api:async path=>{calls.push(path);if(failure)throw failure;return {order:{state}};},refreshOrders:async()=>{},refreshSubscription:async()=>{},getSubscription:()=>sub,status:text=>messages.push(text)});
+ window.vpnPurchaseIntent.bind('fixture-account');
+ window.vpnPaymentReturn({api:async path=>{calls.push(path);if(failure)throw failure;return {order:{id,state,days:180,price_minor:140000}};},refreshOrders:async()=>{},refreshSubscription:async()=>{},getSubscription:()=>sub,status:text=>messages.push(text)});
  return {window,location,messages,calls,routes,storage,get cleared(){return cleared;},tick:()=>tick(),setState:value=>state=value,setSub:value=>sub=value};
 }
 test('verified paid order opens ready connection and clears pending recovery',async()=>{
- const f=fixture({saved:id});await flush();assert.equal(f.location.hash,'#home');assert.equal(f.cleared,true);assert.equal(f.storage.size,0);assert.match(f.messages.at(-1),/подключение готово/);
+ const f=fixture({saved:id});await flush();assert.equal(f.location.hash,'#home');assert.equal(f.cleared,true);assert.equal(JSON.parse(f.storage.get('family-vpn-purchase-v2')).order,undefined);assert.match(f.messages.at(-1),/подключение готово/);
 });
 test('confirmed payment remains pending until physical provisioning completes',async()=>{
  const f=fixture({sub:{active:false,payment_confirmed:true,sync_state:'pending'}});await flush();assert.equal(f.location.hash,'#home');assert.equal(f.cleared,false);assert.match(f.messages.at(-1),/Готовим подключение/);
@@ -29,9 +30,21 @@ test('original checkout tab recovers on focus even when bank does not return to 
  const f=fixture({hash:'#plans?period=30',saved:id,state:'pending'});await flush();f.setState('paid');f.window.dispatchEvent(new Event('focus'));await flush();assert.equal(f.location.hash,'#home');assert.equal(f.calls.length,2);assert.equal(f.cleared,true);
 });
 test('foreign or missing order errors are not interpreted as successful payment',async()=>{
- const f=fixture({saved:id,failure:Object.assign(new Error('Заказ не найден'),{status:404})});await flush();assert.equal(f.routes.length,0);assert.equal(f.cleared,true);assert.equal(f.storage.size,0);assert.equal(f.messages.at(-1),'Заказ не найден');
+ const f=fixture({saved:id,failure:Object.assign(new Error('Заказ не найден'),{status:404})});await flush();assert.equal(f.routes.length,0);assert.equal(f.cleared,true);assert.equal(JSON.parse(f.storage.get('family-vpn-purchase-v2')).order,undefined);assert.equal(f.messages.at(-1),'Заказ не найден');
 });
 test('temporary network failure keeps recovery and terminal cancel removes it',async()=>{
- const f=fixture({saved:id,state:'canceled'});await flush();assert.equal(f.routes.length,0);assert.equal(f.cleared,true);assert.equal(f.storage.size,0);assert.match(f.messages.at(-1),/отменён/);
- const error=fixture({saved:id,failure:new Error('Сеть недоступна')});await flush();assert.equal(error.cleared,false);assert.equal(error.storage.size,1);assert.equal(error.routes.length,0);
+ const f=fixture({saved:id,state:'canceled'});await flush();assert.equal(f.routes.length,0);assert.equal(f.cleared,true);assert.equal(JSON.parse(f.storage.get('family-vpn-purchase-v2')).order,undefined);assert.match(f.messages.at(-1),/отменён/);
+ const error=fixture({saved:id,failure:new Error('Сеть недоступна')});await flush();assert.equal(error.cleared,false);assert.equal(JSON.parse(error.storage.get('family-vpn-purchase-v2')).order,id);assert.equal(error.routes.length,0);
+});
+
+test('purchase recovery is scoped to the verified account and logout clears it',async()=>{
+ const f=fixture({hash:'#plans',saved:id,state:'pending'});await flush();assert.equal(f.window.vpnPurchaseIntent.order,id);
+ assert.equal(f.window.vpnPurchaseIntent.bind('different-account'),null);assert.equal(f.window.vpnPurchaseIntent.order,null);
+ f.window.vpnPurchaseIntent.select(90);f.window.vpnRememberCheckout(id,90);assert.equal(f.window.vpnPurchaseIntent.bind('different-account'),90);
+ f.window.vpnPurchaseIntent.clear();assert.equal(f.storage.size,0);assert.equal(f.window.vpnPurchaseIntent.order,null);
+});
+test('payment return preserves period and language and stops stealing later navigation',async()=>{
+ const f=fixture({sub:{active:false,payment_confirmed:true,sync_state:'pending'}});f.location.search='?lang=en&period=180';await flush();assert.equal(f.routes[0],'/vpn/cabinet/?lang=en&period=180#home');
+ f.location.hash='#devices?platform=ios';await f.tick();assert.equal(f.location.hash,'#devices?platform=ios');
+ f.setSub({active:true,payment_confirmed:true,sync_state:'synced'});await f.tick();assert.equal(f.location.hash,'#devices?platform=ios');assert.equal(f.cleared,true);
 });

@@ -19,8 +19,15 @@
     linux: ['Linux', 'Для Ubuntu и Debian выбери DEB, для Fedora — RPM. Другие сборки доступны на официальной странице.', [['Linux DEB · x64','https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.deb'],['Linux RPM · x64','https://github.com/Happ-proxy/happ-desktop/releases/latest/download/Happ.linux.x64.rpm'],['Все сборки','https://www.happ.su/main/ru']]],
     tv: ['Smart TV', 'Для Android TV установи Happ из Google Play, для Apple TV — из App Store. На других телевизорах подключение можно настроить через совместимый роутер.', [['Android TV','https://play.google.com/store/apps/details?id=com.happproxy'],['Apple TV','https://apps.apple.com/us/app/happ-proxy-utility-for-tv/id6748297274'],['Инструкция Android TV','https://www.happ.su/main/ru/faq/android-tv']]]
   };
+  function preferredPlatform() {
+    const saved=read('family-vpn-platform');if(saved in guideData)return saved;
+    const device=[navigator.userAgentData?.platform,navigator.platform,navigator.userAgent].filter(Boolean).join(' ').toLowerCase();
+    return /android/.test(device)?'android':/iphone|ipad|ipod/.test(device)||/mac/.test(device)&&navigator.maxTouchPoints>1?'ios':/win/.test(device)?'windows':/mac/.test(device)?'macos':/linux/.test(device)?'linux':'android';
+  }
+  window.vpnDevicePlatform=preferredPlatform;
   function platform(key) {
-    if (!(key in guideData)) key = 'android';
+    if (!(key in guideData)) key = preferredPlatform();
+    store('family-vpn-platform',key);
     const [name, first, downloads] = guideData[key];
     $$('[data-platform]').forEach(b => { b.setAttribute('aria-selected', String(b.dataset.platform === key)); b.tabIndex = b.dataset.platform === key ? 0 : -1; });
     const target = $('#guide'); if (!target) return;
@@ -42,8 +49,9 @@
     if (previousScreen && previousScreen !== key) { window.scrollTo(0, 0); const heading = document.querySelector(`[data-screen="${key}"] h1`); if (heading) { heading.tabIndex = -1; heading.focus({preventScroll:true}); } }
     previousScreen = key;
     const params = new URLSearchParams(query);
-    if (key === 'devices') platform(params.get('platform') || 'android');
-    if (key === 'plans' && ['30','90','180','365'].includes(params.get('period'))) window.dispatchEvent(new CustomEvent('vpn-plan-selection',{detail:{days:Number(params.get('period'))}}));
+    if (key === 'devices') platform(params.get('platform') || preferredPlatform());
+    const requestedPeriod=params.get('period')||new URLSearchParams(location.search).get('period');
+    if (key === 'plans' && ['30','90','180','365'].includes(requestedPeriod)) window.dispatchEvent(new CustomEvent('vpn-plan-selection',{detail:{days:Number(requestedPeriod)}}));
     document.title = `${$('[data-route][aria-current="page"]')?.textContent.trim() || 'Кабинет'} — Family VPN`;
   }
   window.addEventListener('hashchange', route);
