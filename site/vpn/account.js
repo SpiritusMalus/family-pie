@@ -1,10 +1,50 @@
 (() => {
+ 'use strict';
+ const validLang=value=>value==='ru'||value==='en';
+ const validPeriod=value=>['30','90','180','365'].includes(String(value))?Number(value):null;
+ // Accept only our cabinet path. A return destination must never choose a host or another page.
+ function safeNext(value){
+  if(typeof value!=='string'||value.length>1024||!/^\/vpn\/cabinet\/(?:\?[^#]*)?(?:#[^\s]*)?$/.test(value)||/[\\\s\u0000-\u001f\u007f]/.test(value))return null;
+  const url=new URL(value,'https://family-spy.ru');
+  if(url.pathname!=='/vpn/cabinet/'||url.origin!=='https://family-spy.ru')return null;
+  for(const [key,item]of url.searchParams){if((key!=='lang'&&key!=='period')||(key==='lang'&&!validLang(item))||(key==='period'&&!validPeriod(item))||url.searchParams.getAll(key).length!==1)return null;}
+  const period=validPeriod(url.searchParams.get('period'));
+  if(period&&(!url.hash||url.hash==='#plans')){url.searchParams.delete('period');url.hash='plans?period='+period;}
+  return url.pathname+url.search+url.hash;
+ }
+ function readAuth(source=location){
+  const query=new URLSearchParams(source.search),next=safeNext(query.get('next')),nextURL=next?new URL(next,'https://family-spy.ru'):null;
+  const hash=nextURL?.hash||(source.pathname==='/vpn/cabinet/'?source.hash:'')||'',route=hash.slice(1).split('?')[0];
+  const period=validPeriod(query.get('period'))||(route==='plans'?validPeriod(new URLSearchParams(hash.split('?')[1]||'').get('period')):null);
+  const lang=[query.get('lang'),nextURL?.searchParams.get('lang'),window.FPi18n?.lang].find(validLang)||null;
+  const mode=query.get('mode')==='login'||query.has('change')||query.has('reauth')||query.has('google_error')?'login':query.get('mode')==='register'||period?'register':'login';
+  return {mode,period,lang,next};
+ }
+ function cabinetURL(source=location){
+  const state=readAuth(source),path=state.next||(source.pathname==='/vpn/cabinet/'?safeNext(source.pathname+(source.search||'')+(source.hash||'')):null)||'/vpn/cabinet/',url=new URL(path,'https://family-spy.ru');
+  if(state.lang)url.searchParams.set('lang',state.lang);
+  if(state.period){url.searchParams.delete('period');url.hash='plans?period='+state.period;}
+  return url.pathname+url.search+url.hash;
+ }
+ function authURL(source=location){
+  const state=readAuth(source),query=new URLSearchParams();
+  if(state.lang)query.set('lang',state.lang);
+  if(state.period){query.set('mode','register');query.set('period',state.period);}
+  if(source.pathname==='/vpn/cabinet/'||state.next||state.period)query.set('next',cabinetURL(source));
+  return '/vpn/cabinet/auth/'+(query.size?'?'+query:'');
+ }
+ function destination(user,source=location){
+  const state=readAuth(source);
+  if(state.next||state.period)return cabinetURL(source);
+  const path=user.role==='admin'?'/vpn/admin/':'/vpn/cabinet/';
+  return path+(state.lang?'?lang='+state.lang:'');
+ }
+ window.vpnAuthFlow={read:readAuth,safeNext,cabinetURL,authURL,destination};
  const t=text=>window.FPi18n.t(text);
  const $=s=>document.querySelector(s);let csrf='',me,authVersion=0;
  const message=(x,tone='info')=>{const el=$('#account-message');if(el){el.dataset.tone=tone;el.textContent=x;}};
  async function api(path,method='GET',body){const version=authVersion;const r=await fetch('/vpn/api/'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok){const e=new Error(d.error||'Сервис временно недоступен');e.status=r.status;throw e;}if(d.csrf&&version===authVersion)csrf=d.csrf;return d;}
  function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
- const destination=user=>{const next=new URLSearchParams(location.search).get('next');return next&&/^\/vpn\/cabinet\/(?:#[^\s]*)?$/.test(next)?next:user.role==='admin'?'/vpn/admin/':'/vpn/cabinet/';};
  window.vpnLoginDestination=destination;
  window.vpnFinishLogin=async()=>{
   authVersion++;
@@ -28,6 +68,7 @@
   if(me?.user?.login)$('#login').value=me.user.login;
   me=null;$('#password-form').hidden=true;$('#login-form').hidden=false;$('#auth-title').textContent='Вход в аккаунт';authCopy(false);
   for(const id of ['password','current','next','repeat'])$('#'+id).value='';
+  window.dispatchEvent?.(new CustomEvent('vpn-auth-login-view'));
   message(text,tone);$('#password').focus();
  }
  $('#login-form')?.addEventListener('submit',async e=>{e.preventDefault();authVersion++;const b=e.submitter;let authenticated=false;b.disabled=true;message('Входим…');try{const d=await api('login','POST',{login:$('#login').value,password:$('#password').value});authenticated=true;me=d;
@@ -51,7 +92,7 @@
   form.addEventListener('submit',async e=>{e.preventDefault();save.disabled=true;try{await api('admin/users/'+u.account_id,'PATCH',{expiresAt:input.value?Date.parse(input.value+'T23:59:59.000Z'):0,unlimited:unlimited.checked,enabled:true,deleted:false});await adminList();}catch(err){message(err.message,'error');}finally{save.disabled=false;}});
   const remove=el('button','Удалить подписку','btn small secondary');remove.type='button';remove.addEventListener('click',async()=>{if(!confirm(t('Отключить подписку этого пользователя? Запись сохранится для восстановления.')))return;try{await api('admin/users/'+u.account_id,'DELETE',{});await adminList();}catch(err){message(err.message,'error');}});form.append(remove);row.append(form);target.append(row);}}
  $('#create-user')?.addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const d=await api('admin/users','POST',{login:$('#new-login').value,expiresAt:$('#new-expiry').value?Date.parse($('#new-expiry').value+'T23:59:59.000Z'):0,unlimited:false});$('#new-credentials').textContent=`Логин: ${d.login}. Временный пароль: ${d.temporaryPassword}. Передай лично: при входе пользователь обязан сменить пароль. Доступ к VPN появится только после подтверждённой оплаты ЮKassa.`;$('#new-login').value='';await adminList();}catch(err){message(err.message,'error');}finally{b.disabled=false;}});
- async function boot(){const version=authVersion;try{const fresh=await api('me');if(version!==authVersion)return;me=fresh;if($('#login-form')){if(new URLSearchParams(location.search).has('reauth')){$('#login').value=me.user.login;message('Подтверди пароль, чтобы изменить способы входа.');return;}if(me.user.must_change||new URLSearchParams(location.search).has('change'))changeView();else location.href=destination(me.user);return;}if(me.user.must_change){location.href='/vpn/cabinet/auth/';return;}
+ async function boot(){const version=authVersion;try{const fresh=await api('me');if(version!==authVersion)return;me=fresh;if($('#login-form')){if(new URLSearchParams(location.search).has('reauth')){$('#login').value=me.user.login;message('Подтверди пароль, чтобы изменить способы входа.');return;}if(me.user.must_change||new URLSearchParams(location.search).has('change'))changeView();else location.href=destination(me.user);return;}if(me.user.must_change){location.href=authURL();return;}
  const actions=$('.nav-actions');const logout=el('button','Выйти','btn small secondary');logout.addEventListener('click',async()=>{await api('logout','POST',{});location.href='/vpn/cabinet/auth/';});actions?.append(logout);
  if($('#admin-users')){if(me.user.role!=='admin'){message('Раздел доступен только администратору');$('#main').replaceChildren(el('h1','Нет доступа'));return;}await adminList();window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));return;}
  $('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;
@@ -60,6 +101,6 @@
  if(sub.active&&sub.profile_url&&sub.sync_state==='synced'){const copy=el('button','Скопировать подключение','btn');copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sub.profile_url);copy.textContent='Скопировано';}catch{copy.textContent='Не удалось скопировать';}});panel.append(copy);}
  const settings=$('[data-screen="settings"]');const a=el('a','Сменить пароль','btn secondary');a.href='/vpn/cabinet/auth/?change=1';const security=settings?.querySelector('a[href="/vpn/cabinet/auth/"]')?.closest('section');if(security){const actions=el('div',undefined,'cab-actions');actions.append(security.querySelector('a[href="/vpn/cabinet/auth/"]'),a);security.append(actions);}else settings?.append(a);
  await window.vpnTelegramLink({api,settings,home:$('[data-screen="home"]'),accountId:me.user.account_id});window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));
- }catch(err){if(version!==authVersion)return;if(err.status===401){if(!$('#login-form'))location.href='/vpn/cabinet/auth/?next='+encodeURIComponent(location.pathname+location.hash);}else message(err.message,'error');}}
+ }catch(err){if(version!==authVersion)return;if(err.status===401){if(!$('#login-form'))location.href=authURL();}else message(err.message,'error');}}
  boot();
 })();

@@ -11,6 +11,9 @@ async function file(path) {try{return (await stat(path)).isFile()?path:null;}cat
 createServer(async(req,res)=>{
   try {
     const url=new URL(req.url,'http://localhost');
+    if(['/vpn','/vpn/','/vpn/index.html'].includes(url.pathname)){
+      res.writeHead(301,{Location:'/'+url.search+'#vpn'});return res.end();
+    }
     if(vpnQa&&url.pathname.startsWith('/vpn/api/')){
       const headers={...req.headers,host:new URL(vpnQa).host};
       const body=['GET','HEAD'].includes(req.method)?undefined:Buffer.concat(await Array.fromAsync(req));

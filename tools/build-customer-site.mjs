@@ -25,7 +25,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
   for (const folder of ['vpn','sufler','i18n']) await cp(resolve(project,'site',folder),resolve(output,folder),{
     recursive:true,filter:source => {
       const path = relative(resolve(project,'site'),source).replaceAll('\\','/');
-      return !/^vpn\/api(\/|$)/.test(path);
+      return path!=='vpn/index.html'&&!/^vpn\/api(\/|$)/.test(path);
     }
   });
   for (const file of ['index.html','customer.css','customer.js']) await cp(resolve(project,'customer-site',file),resolve(output,file));
@@ -42,10 +42,6 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
       else if(item.name.endsWith('.html') && path !== resolve(output,'index.html')) {
         let html=await readFile(path,'utf8');
         html=html.replace(/<div class="fp-social">[\s\S]*?<\/div>/g,'');
-        if(path===resolve(output,'vpn/index.html')) {
-          html=html.replace('<script src="/vpn/portal.js" defer></script>','');
-          html=html.replace(/<div class="hero-art"><canvas[\s\S]*?<\/canvas><\/div>/,'<figure class="hero-art customer-evidence"><img src="/media/vpn-android.jpg" width="1120" height="780" alt="Кабинет Family VPN: инструкция Android" data-ru="Кабинет Family VPN: инструкция Android" data-en="Family VPN account: Android guide" data-copy-attr="alt"></figure>');
-        }
         if(path===resolve(output,'sufler/index.html')) {
           html=html.replace(/<div class="preview" id="about"[\s\S]*?<\/div>\s*<\/section>/,'<figure class="preview customer-evidence" id="about"><img src="/media/sufler-answer.jpg" width="760" height="560" alt="Sufler: короткая подсказка к ответу" data-ru="Sufler: короткая подсказка к ответу" data-en="Sufler: answer prompt" data-copy-attr="alt"></figure></section>');
         }
@@ -72,7 +68,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
   await writeFile(accountScript,(await readFile(accountScript,'utf8')).replace("$('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;", "$('.preview-bar').replaceChildren(el('span','Аккаунт:'),document.createTextNode(' '+me.user.login+'. '),el('span','Личный кабинет Family VPN.'));") );
   // The existing service worker caches public shell assets only; account APIs stay network-only.
   await writeFile(resolve(output,'robots.txt'),'User-agent: *\nAllow: /\nDisallow: /public-plans/\nSitemap: https://family-spy.ru/sitemap.xml\n');
-  const routes=['/','/vpn/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
+  const routes=['/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
   await writeFile(resolve(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+routes.map(route=>`<url><loc>https://family-spy.ru${route}</loc></url>`).join('')+'</urlset>\n');
   await writeFile(resolve(output,'404.html'),'<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Страница не найдена · Family Spy</title><link rel="stylesheet" href="/vpn/fonts.css"><link rel="stylesheet" href="/customer.css"><main class="wrap intro"><h1>Страница не найдена</h1><p><a class="button" href="/">На главную Family Spy</a></p></main></html>');
   return {output,pages:count+1};

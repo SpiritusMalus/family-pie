@@ -793,3 +793,39 @@ Object.assign(window.FP_EN, {
   "Подтверждение ключа отменено или ключ не найден. Войди по паролю; новый ключ можно добавить в настройках.": "Passkey confirmation was canceled or no key was found. Sign in with your password; you can add a new key in Settings.",
   "Вход по логину и паролю работает. Ключ входа можно добавить в настройках. Google и email появятся после подключения этих способов входа.": "Username and password sign-in works. Add a passkey in Settings. Google and email will appear once configured."
 });
+
+Object.assign(window.FP_EN, {
+  "3–40 латинских букв, цифр, точек, дефисов или _.": "3–40 Latin letters, digits, dots, hyphens or _.",
+  "Регистрация — Family VPN": "Create account — Family VPN",
+  "Подключение появится после подтверждения оплаты.": "Your connection will appear once payment is confirmed.",
+  "Такой логин уже занят": "This username is already taken",
+  "Логин:3–40 латинских букв, цифр, точек или дефисов": "Username: 3–40 Latin letters, digits, dots or hyphens",
+  "Подтверди условия и обработку данных": "Accept the access and data processing terms",
+  "От 12 до 128 символов.": "12 to 128 characters.",
+  "Принимаю": "I accept",
+  "условия доступа и обработку данных": "the access and data processing terms",
+  "Создаём аккаунт…": "Creating your account…",
+  "Уже есть аккаунт? Войти": "Already have an account? Sign in",
+  "Нет аккаунта? Создать аккаунт": "New here? Create an account",
+  "Другие способы входа": "Other sign-in methods",
+  "Создай аккаунт, затем переходи к оплате выбранной подписки.": "Create an account, then pay for your selected subscription.",
+  "Создай аккаунт, чтобы выбрать подписку и подключить устройства.": "Create an account to choose a subscription and connect your devices.",
+  "Ключ входа и подтверждённая почта доступны в других способах входа.": "Use Other sign-in methods for a passkey or a verified email address.",
+  "Выбранная подписка": "Selected subscription",
+  "Изменить тариф": "Change plan",
+  "Повторить загрузку цены": "Reload price",
+  "Не удалось загрузить цену. Попробуй ещё раз.": "Could not load the price. Try again.",
+  "Этот тариф сейчас недоступен. Выбери другой период.": "This plan is unavailable. Choose another period.",
+  "Загружаем цену…": "Loading price…"
+});
+
+Object.assign(window.FP_EN, {
+  "Выбери период. Новый срок добавится к действующему после подтверждения оплаты.": "Choose a period. Once payment is confirmed, it will be added to your current subscription.",
+  "Карту или СБП выбираешь на защищённой странице ЮKassa. Автоматических списаний нет.": "Choose a card or SBP on YooKassa’s secure payment page. No automatic charges.",
+  "Email для чека": "Receipt email",
+  "Промокод": "Promo code",
+  "Перейти к оплате": "Continue to payment",
+  "Проверить промокод": "Check promo code",
+  "Оплат пока нет.": "No payments yet."
+});
+window.FP_PATTERNS.push(["{days} дней · {price}", "{days} days · {price}", []]);

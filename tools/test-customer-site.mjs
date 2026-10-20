@@ -8,9 +8,13 @@ test('standalone customer artifact includes account/payment pages without portfo
   const directory=await mkdtemp(resolve('customer-site/dist-test-'));
   t.after(()=>rm(directory,{recursive:true,force:true}));
   const {output}=await buildCustomerSite(directory);
-  for(const path of ['index.html','vpn/index.html','vpn/terms/index.html','sufler/index.html','sufler/setup/index.html','sufler/privacy/index.html','i18n/language.js','vpn/fonts.css','vpn/cabinet/index.html','vpn/cabinet/auth/index.html','vpn/admin/index.html','sufler/buy/index.html','sufler/buy/done/index.html'])await access(resolve(output,path));
+  for(const path of ['index.html','vpn/terms/index.html','sufler/index.html','sufler/setup/index.html','sufler/privacy/index.html','i18n/language.js','vpn/fonts.css','vpn/cabinet/index.html','vpn/cabinet/auth/index.html','vpn/admin/index.html','sufler/buy/index.html','sufler/buy/done/index.html'])await access(resolve(output,path));
+  await assert.rejects(access(resolve(output,'vpn/index.html')));
   for(const path of ['work','preview','rest_lumen','driftora'])await assert.rejects(access(resolve(output,path)));
   const home=await readFile(resolve(output,'index.html'),'utf8');
+  const sitemap=await readFile(resolve(output,'sitemap.xml'),'utf8');
+  assert.doesNotMatch(sitemap,/<loc>https:\/\/family-spy\.ru\/vpn\/<\/loc>/);
+  assert.match(sitemap,/<loc>https:\/\/family-spy\.ru\/vpn\/terms\/<\/loc>/);
   assert.doesNotMatch(home,/Eugene|Евгений|LinkedIn|SpiritusMalus|portrait/);
   const sufler=await readFile(resolve(output,'sufler/index.html'),'utf8');
   assert.doesNotMatch(sufler,/fp-social|linkedin\.com/);
@@ -21,7 +25,7 @@ test('standalone customer artifact includes account/payment pages without portfo
     assert.match(html,/<a class="brand"[^>]*>family-spy <span>\/ Sufler<\/span>/,route);
     assert.doesNotMatch(html,/<a class="brand"[^>]*>family-pie/,route);
   }
-  for(const route of ['vpn/index.html','vpn/cabinet/index.html','vpn/cabinet/auth/index.html','vpn/terms/index.html','vpn/privacy/index.html']) {
+  for(const route of ['vpn/cabinet/index.html','vpn/cabinet/auth/index.html','vpn/terms/index.html','vpn/privacy/index.html']) {
     const html=await readFile(resolve(output,route),'utf8');
     assert.match(html,/<nav class="customer-home"[\s\S]*?<a href="\/">/,route);
     assert.match(html,/data-en="All Family Spy products"/,route);
@@ -71,7 +75,7 @@ test('product evidence ships real image bytes without portal or private fixture 
   const directory=await mkdtemp(resolve('customer-site/dist-test-'));
   t.after(()=>rm(directory,{recursive:true,force:true}));
   const {output}=await buildCustomerSite(directory);
-  for(const route of ['index.html','vpn/index.html','sufler/index.html']) {
+  for(const route of ['index.html','sufler/index.html']) {
     const html=await readFile(resolve(output,route),'utf8');
     assert.doesNotMatch(html,/data-screen-link|href="\/screenshots\//);
     for(const anchor of html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/g)) assert.doesNotMatch(anchor[0],/<img\b/,route);
