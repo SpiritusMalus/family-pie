@@ -1,6 +1,7 @@
 import {cp, mkdir, readFile, writeFile, rm, readdir} from 'node:fs/promises';
 import {resolve, relative, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {buildVpnLanding} from './build-vpn-landing.mjs';
 
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const customerRedirects = [];
@@ -28,7 +29,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
       return path!=='vpn/index.html'&&!/^vpn\/api(\/|$)/.test(path);
     }
   });
-  for (const file of ['index.html','customer.css','customer.js']) await cp(resolve(project,'customer-site',file),resolve(output,file));
+  for (const file of ['index.html','customer.css','customer.js','vpn-search.css']) await cp(resolve(project,'customer-site',file),resolve(output,file));
   await cp(resolve(project,'customer-site/media'),resolve(output,'media'),{recursive:true});
   const dictionary=resolve(output,'i18n/en.js');
   await writeFile(dictionary,(await readFile(dictionary,'utf8')).replaceAll('· family-pie"','· Family Spy"')+'\nwindow.FP_EN["Ключ, созданный на старом сайте?"] = "Have a passkey from the previous site?";\nwindow.FP_EN["Войти со старым ключом"] = "Use an existing passkey";\nwindow.FP_EN["Выбери подписку"] = "Choose a plan";\nwindow.FP_EN["Аккаунт:"] = "Account:";\nwindow.FP_EN["Личный кабинет Family VPN."] = "Family VPN account.";\nwindow.FP_EN["Ожидаем оплату"] = "Awaiting payment";\nwindow.FP_EN["Выбрать тариф"] = "Choose a plan";\nwindow.FP_EN["Маршруты в твоём профиле"] = "Connection routes in your profile";\nwindow.FP_EN["Личная подписка содержит доступные пути подключения. После импорта выбери маршрут в VPN-приложении. Проверить свою сеть можно в разделе «Диагностика»."] = "Your subscription includes the available connection routes. After importing it, choose a route in your VPN app. You can check your connection under Diagnostics.";\nwindow.FP_EN[". Здесь можно войти прежним логином и паролем и добавить новый ключ в настройках."] = ". You can also use your existing username and password here, then add a new passkey in Settings.";\n');
@@ -64,11 +65,14 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
     }
   }
   await pages(output);
+  const vpnLanding=buildVpnLanding(await readFile(resolve(output,'index.html'),'utf8'),await readFile(resolve(project,'customer-site/vpn-details.html'),'utf8'));
+  await writeFile(resolve(output,'vpn/index.html'),vpnLanding);
+  count++;
   const accountScript=resolve(output,'vpn/account.js');
   await writeFile(accountScript,(await readFile(accountScript,'utf8')).replace("$('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;", "$('.preview-bar').replaceChildren(el('span','Аккаунт:'),document.createTextNode(' '+me.user.login+'. '),el('span','Личный кабинет Family VPN.'));") );
   // The existing service worker caches public shell assets only; account APIs stay network-only.
   await writeFile(resolve(output,'robots.txt'),'User-agent: *\nAllow: /\nDisallow: /public-plans/\nSitemap: https://family-spy.ru/sitemap.xml\n');
-  const routes=['/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
+  const routes=['/','/vpn/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
   await writeFile(resolve(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+routes.map(route=>`<url><loc>https://family-spy.ru${route}</loc></url>`).join('')+'</urlset>\n');
   await writeFile(resolve(output,'404.html'),'<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Страница не найдена · Family Spy</title><link rel="stylesheet" href="/vpn/fonts.css"><link rel="stylesheet" href="/customer.css"><main class="wrap intro"><h1>Страница не найдена</h1><p><a class="button" href="/">На главную Family Spy</a></p></main></html>');
   return {output,pages:count+1};

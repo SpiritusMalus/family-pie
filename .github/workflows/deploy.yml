@@ -20,6 +20,7 @@ on:
       - 'data/**'
       - 'tools/build-legal.mjs'
       - 'tools/build-customer-site.mjs'
+      - 'tools/build-vpn-landing.mjs'
       - 'tools/build-portfolio-site.mjs'
       - 'Caddyfile'
       - 'tools/vps/fp-deploy-caddy.sh'
@@ -44,7 +45,7 @@ jobs:
           node-version: '22'
       - run: node --check tools/build-legal.mjs && node tools/build-legal.mjs
       - run: test -s site/index.html
-      - run: node tools/build-customer-site.mjs && node --test tools/test-customer-site.mjs
+      - run: node tools/build-customer-site.mjs && node --test tools/test-customer-site.mjs tools/test-vpn-search.mjs
       - run: node tools/build-portfolio-site.mjs && node --test tools/test-customer-retirement.mjs
       - name: Test site language and appearance
         run: node --test tools/test-i18n.mjs tools/test-home-theme.mjs tools/test-portfolio.mjs tools/test-vpn-shell.mjs tools/test-vpn-payment-return.mjs tools/test-vpn-purchase-flow.mjs tools/test-vpn-telegram-link.mjs

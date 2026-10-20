@@ -1,0 +1,17 @@
+.vpn-answers{display:grid;grid-template-columns:1fr 1.6fr;gap:40px 72px;padding-block:80px}
+.vpn-answers h2{font-size:36px;line-height:1.15;letter-spacing:-.025em;text-wrap:balance;margin:0 0 20px}
+.vpn-answers>div>p{max-width:32ch;color:var(--quiet);line-height:1.65}
+.vpn-answers-list{min-width:0}
+.vpn-answers details{border-top:1px solid var(--rule);padding-block:24px}
+.vpn-answers details:last-child{border-bottom:1px solid var(--rule)}
+.vpn-answers summary{display:flex;align-items:center;justify-content:space-between;gap:24px;list-style:none;cursor:pointer;font-size:18px;line-height:1.4;min-height:44px}
+.vpn-answers summary::-webkit-details-marker{display:none}
+.vpn-answers summary svg{flex:0 0 20px;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;color:var(--accent)}
+.vpn-answers details[open] summary svg{transform:rotate(45deg)}
+.vpn-answers details p{max-width:68ch;line-height:1.7;color:var(--quiet);margin:20px 0 0}
+.vpn-answers details>a{display:inline-flex;align-items:center;min-height:44px;margin-top:12px;color:var(--accent)}
+.vpn-legal{grid-column:2;display:flex;flex-wrap:wrap;gap:12px 28px;font-size:14px;color:var(--quiet)}
+.vpn-legal a{min-height:44px;display:inline-flex;align-items:center}
+.vpn-landing .support-products{grid-template-columns:1fr}
+@media(max-width:800px){.vpn-answers{grid-template-columns:1fr;gap:32px;padding-block:56px}.vpn-answers>div>p{max-width:60ch}.vpn-legal{grid-column:1}}
+@media(max-width:420px){.vpn-answers h2{font-size:30px}.vpn-answers summary{font-size:18px;gap:16px}.vpn-answers details{padding-block:20px}}

@@ -252,12 +252,12 @@ www.family-spy.ru {
 family-spy.ru {
 	encode zstd gzip
 	root * /var/www/family-products/site
-	# One public VPN landing; account, API and legal paths keep their own handlers.
-	@legacy_vpn path /vpn /vpn/ /vpn/index.html
+	# Canonical public VPN landing; account, API and legal paths keep their handlers.
+	@legacy_vpn path /vpn /vpn/index.html
 	handle @legacy_vpn {
 		@with_query expression `{http.request.uri.query} != ""`
-		redir @with_query /?{query}#vpn permanent
-		redir * /#vpn permanent
+		redir @with_query /vpn/?{query} permanent
+		redir * /vpn/ permanent
 	}
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
