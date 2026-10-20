@@ -27,7 +27,7 @@ export async function configureBotMenu(client){
  await client.call('setChatMenuButton',{menu_button:{type:'commands'}});
 }
 export class TelegramStore {
- constructor(store,{clock=Date.now}={}){this.store=store;this.db=store.db;this.clock=clock;this.db.exec(`
+ constructor(store,{clock=Date.now,support=null}={}){this.store=store;this.db=store.db;this.clock=clock;this.support=support;this.db.exec(`
  CREATE TABLE IF NOT EXISTS telegram_links(account_id TEXT PRIMARY KEY REFERENCES identities(account_id),chat_id TEXT UNIQUE NOT NULL,username TEXT,enabled INTEGER NOT NULL DEFAULT 1,generation TEXT NOT NULL,bound_at INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS telegram_challenges(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES identities(account_id),session_hash TEXT NOT NULL REFERENCES sessions(token_hash) ON DELETE CASCADE,expires INTEGER NOT NULL,chat_id TEXT,username TEXT);
  CREATE TABLE IF NOT EXISTS telegram_outbox(id TEXT PRIMARY KEY,dedupe TEXT UNIQUE NOT NULL,account_id TEXT,chat_id TEXT NOT NULL,generation TEXT,expiry INTEGER,stage TEXT,text TEXT,state TEXT NOT NULL DEFAULT 'pending',ready_at INTEGER NOT NULL,created_at INTEGER NOT NULL);
@@ -59,6 +59,10 @@ export class TelegramStore {
   return row.expires_at?'Твоя подписка действует до '+expiryDate(row.expires_at)+'.\nБез ограничений по устройствам.\nПодключение: '+CABINET+'#home':'Нет активной подписки.\n'+CABINET+'#plans';
  }
  update(update){if(!Number.isSafeInteger(update?.update_id)||update.update_id<this.offset())return;this.store.transaction(()=>{
+ if(this.support?.handle(update)){
+  this.db.prepare("INSERT INTO telegram_meta VALUES('offset',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(update.update_id+1);
+  return;
+ }
  const msg=update.message,chat=msg?.chat,from=msg?.from;
  if(chat?.type==='private'&&Number.isSafeInteger(chat.id)&&chat.id>0&&from?.id===chat.id&&!from.is_bot&&typeof msg.text==='string'){
   const id=String(chat.id),command=menuActions.get(msg.text.trim())||msg.text.trim().split(/\s+/)[0].split('@')[0];let text;
@@ -111,6 +115,6 @@ export class TelegramStore {
 export class TelegramApiError extends Error {constructor(code,retryAfter=0){super('Telegram request rejected');this.code=code;this.retryAfter=retryAfter;}}
 export class TelegramClient {
  constructor(token,{request=fetch}={}){if(!/^\d{5,}:[A-Za-z0-9_-]{20,}$/.test(token))throw new Error('Invalid private Telegram credential');this.token=token;this.request=request;}
- async call(method,data={}){if(!['getMe','getWebhookInfo','getUpdates','sendMessage','setMyCommands','getMyCommands','setChatMenuButton','getChatMenuButton'].includes(method))throw new Error('Unsupported method');let r;try{r=await this.request(`https://api.telegram.org/bot${this.token}/${method}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),redirect:'error',signal:AbortSignal.timeout(30000)});}catch{throw new Error('Telegram delivery outcome unknown');}let x;try{x=await r.json();}catch{throw new Error('Telegram delivery outcome unknown');}if(!r.ok||x.ok!==true)throw new TelegramApiError(Number(x.error_code)||r.status,Number(x.parameters?.retry_after)||0);return x.result;}
+ async call(method,data={}){if(!['getMe','getWebhookInfo','getUpdates','sendMessage','copyMessage','setMyCommands','getMyCommands','setChatMenuButton','getChatMenuButton'].includes(method))throw new Error('Unsupported method');let r;try{r=await this.request(`https://api.telegram.org/bot${this.token}/${method}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),redirect:'error',signal:AbortSignal.timeout(30000)});}catch{throw new Error('Telegram delivery outcome unknown');}let x;try{x=await r.json();}catch{throw new Error('Telegram delivery outcome unknown');}if(!r.ok||x.ok!==true)throw new TelegramApiError(Number(x.error_code)||r.status,Number(x.parameters?.retry_after)||0);return x.result;}
 }
 export async function deliverOne(telegram,client){const job=telegram.next();if(!job)return false;const changed=telegram.db.prepare("UPDATE telegram_outbox SET state='sending' WHERE id=? AND state='pending'").run(job.id);if(!changed.changes)return false;try{await client.call('sendMessage',{chat_id:job.chat_id,text:job.text,reply_markup:botKeyboard,link_preview_options:{is_disabled:true}});telegram.db.prepare("UPDATE telegram_outbox SET state='sent' WHERE id=?").run(job.id);}catch(e){if(e instanceof TelegramApiError&&e.code===429)telegram.db.prepare("UPDATE telegram_outbox SET state='pending',ready_at=? WHERE id=?").run(telegram.clock()+Math.max(1000,Math.min(e.retryAfter*1000,3600000)),job.id);else{telegram.db.prepare('UPDATE telegram_outbox SET state=? WHERE id=?').run(e instanceof TelegramApiError&&e.code===403?'blocked':'uncertain',job.id);if(e instanceof TelegramApiError&&e.code===403&&job.account_id)telegram.db.prepare('UPDATE telegram_links SET enabled=0 WHERE account_id=?').run(job.account_id);}}return true;}

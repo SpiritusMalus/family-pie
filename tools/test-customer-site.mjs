@@ -31,9 +31,9 @@ test('standalone customer artifact includes account/payment pages without portfo
   assert.doesNotMatch(checkout,/hub\.146-103|LinkedIn/);
   const auth=await readFile(resolve(output,'vpn/cabinet/auth/index.html'),'utf8');
   assert.doesNotMatch(auth,/href="https:\/\/family-pie\.ru/);
-  assert.match(auth,/Ключ входа со старого сайта привязан к прежнему домену/);
+  assert.doesNotMatch(auth,/Ключ входа со старого сайта привязан к прежнему домену/);
   const dictionary=await readFile(resolve(output,'i18n/en.js'),'utf8');
-  assert.match(dictionary,/Sign in here with your username and password or verified email/);
+  assert.doesNotMatch(dictionary,/Passkeys from the previous site are tied to that domain/);
   assert.doesNotMatch(home,/Демо-аккаунт/);
   assert.doesNotMatch(home,/Пример собеседования|demo-question|Для Windows и macOS\. Нужен свой ключ/);
   assert.doesNotMatch(home,/vpn-pricing-basis|vpn-currency-note|demo-provenance|support-note/);
