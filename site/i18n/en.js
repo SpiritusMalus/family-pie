@@ -829,3 +829,57 @@ Object.assign(window.FP_EN, {
   "Оплат пока нет.": "No payments yet."
 });
 window.FP_PATTERNS.push(["{days} дней · {price}", "{days} days · {price}", []]);
+
+Object.assign(window.FP_EN, {
+  "Оплачен": "Paid",
+  "Отменён": "Canceled",
+  "Возврат": "Refunded",
+  "До": "Until",
+  "Добавить в Happ": "Add to Happ",
+  "Показать личный QR-код": "Show my private QR code",
+  "Личный QR-код подключения": "Private connection QR code",
+  "Не публикуй этот код: он даёт доступ к твоей подписке.": "Do not publish this code: it gives access to your subscription.",
+  "Проверить подключение": "Check connection",
+  "Написать в поддержку": "Contact support",
+  "Выбрать тариф": "Choose a plan",
+  "Выбери подписку": "Choose a subscription",
+  "Доступ приостановлен": "Access suspended",
+  "Ожидаем оплату": "Awaiting payment",
+  "Не удалось применить настройки. Напиши в поддержку": "Could not apply the settings. Contact support",
+  "Маршруты в твоём профиле": "Routes in your profile",
+  "Личная подписка содержит доступные пути подключения. После импорта выбери маршрут в VPN-приложении. Проверить свою сеть можно в разделе «Диагностика».": "Your personal subscription contains the available connection routes. After importing it, choose a route in the VPN app. Test your network in Diagnostics.",
+  "Выбери период": "Choose a period",
+  "Укажи корректный email для чека": "Enter a valid receipt email",
+  "Возврат подтверждён. Подписка пересчитана.": "Refund confirmed. Your subscription has been adjusted.",
+  "Сервис не ответил. Проверь соединение и повтори вход.": "The service did not respond. Check your connection and sign in again.",
+  "Не удалось выполнить запрос": "Could not complete the request",
+  "Настроить VPN": "Set up VPN",
+  "Продолжить оплату": "Continue payment",
+  "Незавершённая оплата": "Pending payment",
+  "Ссылка оплаты больше недоступна. Проверь статус заказа или напиши в поддержку перед новой покупкой.": "The payment link is no longer available. Check the order status or contact support before making a new purchase.",
+  "Платёж больше нельзя продолжить. Выбери тот же тариф и создай новый заказ или напиши в поддержку": "This payment can no longer be continued. Choose the same plan and create a new order, or contact support",
+  "Заказ уже завершён": "This order is already complete",
+  "Для покупки используй отдельный пользовательский аккаунт": "Use a separate customer account to make a purchase",
+  "Подписка отключена. Сначала напиши в поддержку": "Your subscription is disabled. Contact support first",
+  "У тебя бессрочный доступ. Оплачивать продление не нужно": "Your access has no expiry date. No renewal payment is needed",
+  "Оплата временно недоступна": "Payment is temporarily unavailable",
+  "Укажи email для чека": "Enter a receipt email",
+  "Данные заказа уже сохранены": "Your order details have already been saved",
+  "Заказ устарел. Создай новый": "This order has expired. Create a new one",
+  "Не удалось создать платёж. Повтори позже": "Could not create the payment. Try again later",
+  "Проверка платежа временно недоступна. Повтори позже.": "Payment verification is temporarily unavailable. Try again later.",
+  "Проверка платежа временно недоступна. Попробуй ещё раз.": "Payment verification is temporarily unavailable. Try again.",
+  "Создать другой заказ": "Create another order",
+  "Создать другой заказ?": "Create another order?",
+  "Предыдущий платёж не отменится. Оплати только один заказ, чтобы избежать двойной покупки.": "Your previous payment will remain open. Pay for only one order to avoid buying twice.",
+  "Выбран другой тариф. Для него нужен отдельный заказ.": "You selected another plan. It needs a separate order.",
+  "Укажи email для чека. Затем снова нажми «Создать другой заказ».": "Enter a receipt email, then select Create another order again.",
+  "Оплата уже подтверждена. Открой «Обзор», чтобы подключить VPN.": "Payment is already confirmed. Open Overview to connect your VPN.",
+  "У тебя есть незавершённый платёж. Продолжи его или проверь статус перед новой покупкой.": "You have a pending payment. Continue it or check its status before making a new purchase.",
+  "Сначала заверши или отмени текущий платёж у ЮKassa. Затем можно выбрать другой тариф.": "Complete or cancel your current payment with YooKassa first. You can then choose another plan.",
+  "Платёж отменён. Можно оплатить выбранный тариф ещё раз.": "Payment canceled. You can pay for your selected plan again.",
+  "Тариф этого заказа сейчас недоступен для новой покупки.": "This order’s plan is currently unavailable for a new purchase."
+});
+// Download links append their external-link marker after the translated label.
+window.FP_PATTERNS.push(["{label} ↗", "{label} ↗", ["label"]]);
+window.FP_PATTERNS.push(["Скидка {percent}%. Сумма будет сохранена в заказе.", "Discount: {percent}%. The amount will be saved in your order.", []]);

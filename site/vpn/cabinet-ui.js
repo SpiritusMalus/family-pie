@@ -1,9 +1,10 @@
 (() => {
  'use strict';
  const $=s=>document.querySelector(s),node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
- const money=n=>new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB'}).format(n/100);
- const when=n=>new Date(n).toLocaleString('ru-RU');
- function button(text,action,secondary=false){const b=node('button',text,'btn'+(secondary?' secondary':''));b.type='button';b.addEventListener('click',async()=>{b.disabled=true;try{await action();}catch(e){status(e.name==='TimeoutError'?'Сервис не ответил. Проверь соединение и повтори вход.':e.message,'error');}finally{b.disabled=false;}});return b;}
+ const locale=()=>window.FPi18n?.lang==='en'?'en-US':'ru-RU';
+ const money=n=>new Intl.NumberFormat(locale(),{style:'currency',currency:'RUB'}).format(n/100);
+ const when=n=>new Date(n).toLocaleString(locale());
+ function button(text,action,secondary=false){const b=node('button',text,'btn'+(secondary?' secondary':''));b.type='button';b.addEventListener('click',async()=>{b.disabled=true;try{await action();}catch(e){status(e.name==='TimeoutError'?'Сервис не ответил. Проверь соединение и повтори вход.':e.message,'error');}finally{b.disabled=b.dataset.locked==='true';}});return b;}
  function status(text,tone='info'){let n=$('#account-message');if(!n){n=node('p',undefined,'cab-status');n.id='account-message';n.setAttribute('role','status');$('#main')?.prepend(n);}n.classList.add('cab-status');n.dataset.tone=['info','success','error'].includes(tone)?tone:'info';n.textContent=text;}
  function speedSaber(){
   const root=node('div',undefined,'speed-saber'),visual=node('div',undefined,'speed-saber-visual'),hilt=node('span',undefined,'speed-saber-hilt'),blade=node('span',undefined,'speed-saber-blade'),label=node('p','Готов к проверке','speed-saber-label');
@@ -71,21 +72,113 @@
   try{
    if($('#admin-users')){await admin(api);return;}
    profile=(await api('profile')).profile;plans=await api('plans');
-   function deviceConnection(s){const notice=$('[data-screen="devices"] .notice');if(!notice)return;const ready=s.active&&s.profile_url&&s.sync_state==='synced';notice.replaceChildren(node('span',ready?'Добавь подписку в Happ или открой ссылку и QR-код в «Обзоре».':s.payment_confirmed?'Готовим подключение. После подтверждения оплаты повторно платить не нужно.':'Выбери подписку, чтобы получить личное подключение.'));const a=node('a',ready?'Добавить в Happ':s.payment_confirmed?'Проверить подключение':'Выбрать подписку','btn secondary small');a.href=ready?'happ://add/'+s.profile_url:s.payment_confirmed?'#home':'#plans';notice.append(a);if(ready){const overview=node('a','Ссылка и QR-код','btn secondary small');overview.href='#home';notice.append(overview);}}
-   async function subscription(){const fresh=await api('me');me.subscription=fresh.subscription;const s=fresh.subscription,panel=$('.subscription'),expired=!s.active&&!s.unlimited&&s.expires_at&&s.expires_at<=Date.now();deviceConnection(s);panel.replaceChildren(node('h2',expired?'Подписка закончилась':s.active?'Твоя подписка':s.payment_required?'Выбери подписку':s.payment_confirmed&&s.sync_state!=='synced'?'Оплата подтверждена':'Доступ приостановлен'),node('p',s.unlimited?'Подписка без ограничения срока':s.expires_at?'До '+when(s.expires_at):'Подключение появится после подтверждения оплаты'),node('p',expired?'Продли подписку, чтобы снова подключиться.':s.sync_state==='synced'?(s.active&&s.profile_url?'Подключение готово':'Доступ отключён. Напиши в поддержку'):s.sync_state==='awaiting_payment'?'Ожидаем оплату':s.sync_state==='error'?'Не удалось применить настройки. Напиши в поддержку':'Готовим подключение','muted'));
-    if(s.active&&s.profile_url&&s.sync_state==='synced'){panel.append(node('p','Твоё подключение готово. Добавь его в Happ, скопируй ссылку или открой QR-код.'));const actions=node('div',undefined,'cab-actions');actions.append(button('Скопировать подключение',async()=>{await navigator.clipboard.writeText(s.profile_url);status('Подключение скопировано. Добавь его в VPN-приложение.','success');}));const open=node('a','Добавить в Happ','btn secondary');open.href='happ://add/'+s.profile_url;actions.append(open);panel.append(actions);const qr=node('details');qr.append(node('summary','Показать личный QR-код'));const image=node('img');image.src='/vpn/api/subscription/qr';image.width=image.height=240;image.alt='Личный QR-код подключения';qr.append(image,node('p','Не публикуй этот код: он даёт доступ к твоей подписке.','muted'));panel.append(qr);}else {if(s.payment_confirmed&&s.sync_state!=='synced'){panel.append(button('Проверить подключение',async()=>{await subscription();status(me.subscription.active&&me.subscription.sync_state==='synced'?'Подключение готово':'Оплата подтверждена. Готовим подключение; повторная оплата не нужна.');},true));const help=node('a','Написать в поддержку','btn secondary');help.href='#support';panel.append(help);}else{const link=node('a','Выбрать тариф','btn');link.href='#plans';panel.append(link);}}
+   function deviceConnection(s){const notice=$('[data-screen="devices"] .notice');if(!notice)return;const ready=s.active&&s.profile_url&&s.sync_state==='synced';notice.replaceChildren(node('span',ready?'Добавь подписку в Happ или открой ссылку и QR-код в «Обзоре».':s.payment_confirmed?'Оплата подтверждена. Готовим подключение; повторно платить не нужно.':'Выбери подписку, чтобы получить личное подключение.'));const a=node('a',ready?'Добавить в Happ':s.payment_confirmed?'Проверить подключение':'Выбрать подписку','btn secondary small');a.href=ready?'happ://add/'+s.profile_url:s.payment_confirmed?'#home':'#plans';notice.append(a);if(ready){const overview=node('a','Ссылка и QR-код','btn secondary small');overview.href='#home';notice.append(overview);}}
+   async function subscription(){const fresh=await api('me');me.subscription=fresh.subscription;const s=fresh.subscription,panel=$('.subscription'),expired=!s.active&&!s.unlimited&&s.expires_at&&s.expires_at<=Date.now();deviceConnection(s);const expiry=node('p');if(s.expires_at&&!s.unlimited)expiry.append(node('span','До'),document.createTextNode(' '+when(s.expires_at)));else expiry.textContent=s.unlimited?'Подписка без ограничения срока':s.payment_confirmed?'Оплата подтверждена. Готовим подключение; повторно платить не нужно.':'Подключение появится после подтверждения оплаты';panel.replaceChildren(node('h2',expired?'Подписка закончилась':s.active?'Твоя подписка':s.payment_required?'Выбери подписку':s.payment_confirmed&&s.sync_state!=='synced'?'Оплата подтверждена':'Доступ приостановлен'),expiry,node('p',expired?'Продли подписку, чтобы снова подключиться.':s.sync_state==='synced'?(s.active&&s.profile_url?'Подключение готово':'Доступ отключён. Напиши в поддержку'):s.sync_state==='awaiting_payment'?'Ожидаем оплату':s.sync_state==='error'?'Не удалось применить настройки. Напиши в поддержку':'Готовим подключение','muted'));
+    if(s.active&&s.profile_url&&s.sync_state==='synced'){panel.append(node('p','Твоё подключение готово. Добавь его в Happ, скопируй ссылку или открой QR-код.'));const actions=node('div',undefined,'cab-actions');const setup=node('a','Настроить VPN','btn');setup.href='#devices?platform='+(window.vpnDevicePlatform?.()||'android');actions.append(setup);actions.append(button('Скопировать подключение',async()=>{await navigator.clipboard.writeText(s.profile_url);status('Подключение скопировано. Добавь его в VPN-приложение.','success');},true));const open=node('a','Добавить в Happ','btn secondary');open.href='happ://add/'+s.profile_url;actions.append(open);panel.append(actions);const qr=node('details');qr.append(node('summary','Показать личный QR-код'));const image=node('img');image.src='/vpn/api/subscription/qr';image.width=image.height=240;image.alt='Личный QR-код подключения';qr.append(image,node('p','Не публикуй этот код: он даёт доступ к твоей подписке.','muted'));panel.append(qr);}else {if(s.payment_confirmed&&s.sync_state!=='synced'){panel.append(button('Проверить подключение',async()=>{await subscription();status(me.subscription.active&&me.subscription.sync_state==='synced'?'Подключение готово':'Оплата подтверждена. Готовим подключение; повторная оплата не нужна.');},true));const help=node('a','Написать в поддержку','btn secondary');help.href='#support';panel.append(help);}else{const link=node('a','Выбрать тариф','btn');link.href='#plans';panel.append(link);}}
    }
    await subscription();
    const home=$('[data-screen="home"]'),routes=home.querySelector('.cab-section');if(routes){routes.replaceChildren(node('h2','Маршруты в твоём профиле'),node('p','Личная подписка содержит доступные пути подключения. После импорта выбери маршрут в VPN-приложении. Проверить свою сеть можно в разделе «Диагностика».'));}
 
-   const planScreen=screen('plans','Подписка','Выбери период. Новый срок добавится к действующему после подтверждения оплаты.');const grid=node('div',undefined,'plans'),checkout=section('Оплата','Карту или СБП выбираешь на защищённой странице ЮKassa. Автоматических списаний нет.'),email=field(checkout,'Email для чека','email',profile.receipt_email),promo=field(checkout,'Промокод'),selection=node('p'),message=node('p');message.setAttribute('role','status');let selected=null,key=null;const pay=button('Перейти к оплате',async()=>{if(!selected)throw new Error('Выбери период');if(!email.value||!email.checkValidity()){email.reportValidity();throw new Error('Укажи корректный email для чека');}key=key||crypto.randomUUID();const r=await api('checkout','POST',{days:selected.days,email:email.value,promo:promo.value.trim()||undefined,requestKey:key});window.vpnRememberCheckout(r.orderId);location.href=r.url;});pay.disabled=true;email.required=true;email.addEventListener('input',()=>key=null);promo.addEventListener('input',()=>key=null);checkout.append(selection,pay,message);
-   function selectPlan(p){selected=p;key=null;selection.replaceChildren(node('span',p.days+' дней · '+money(p.priceMinor)),document.createTextNode(' · '),node('span','Любое количество устройств'));pay.disabled=!plans.available||Boolean(me.subscription.unlimited);grid.querySelectorAll('[data-selected]').forEach(c=>c.removeAttribute('data-selected'));grid.querySelector('[data-days="'+p.days+'"]')?.setAttribute('data-selected','true');}
+   const intent=window.vpnPurchaseIntent,savedPeriod=intent.bind(me.user.account_id),incomingParams=new URLSearchParams(location.hash.split('?')[1]||''),returnedOrder=incomingParams.get('order');
+   const requestedPeriod=Number(incomingParams.get('period')||new URLSearchParams(location.search).get('period')),explicitPeriod=[30,90,180,365].includes(requestedPeriod)?requestedPeriod:null;
+   const planScreen=screen('plans','Подписка','Выбери период. Новый срок добавится к действующему после подтверждения оплаты.');
+   const grid=node('div',undefined,'plans'),checkout=section('Оплата','Карту или СБП выбираешь на защищённой странице ЮKassa. Автоматических списаний нет.');
+   const email=field(checkout,'Email для чека','email',profile.receipt_email),promo=field(checkout,'Промокод'),selection=node('p'),message=node('p'),pendingNotice=node('div',undefined,'pending-checkout');
+   message.setAttribute('role','status');pendingNotice.setAttribute('role','status');
+   let selected=null,key=null,pendingOrders=[],ordersKnown=false,userSelected=false,checkoutBusy=false,newOrderFields=false,lastOrders=[];const resumeUnavailable=new Set();
+   const pay=button('Перейти к оплате',()=>beginCheckout());
+   async function beginCheckout(approvedPending=null){
+    if(checkoutBusy)return;checkoutBusy=true;refreshCheckout();
+    try{const freshOrders=await orders();
+    if(approvedPending&&freshOrders.some(o=>approvedPending.has(o.id)&&o.state==='paid')){await subscription();location.hash='home';throw new Error('Оплата уже подтверждена. Открой «Обзор», чтобы подключить VPN.');}
+    if(pendingOrders.some(o=>!approvedPending?.has(o.id)))throw new Error('У тебя есть незавершённый платёж. Продолжи его или проверь статус перед новой покупкой.');
+    if(!selected)throw new Error('Выбери период');
+    if(!plans.available||me.subscription.unlimited)throw new Error('Оплата сейчас недоступна. Попробуй позже или напиши в поддержку.');
+    if(!email.value||!email.checkValidity()){email.reportValidity();throw new Error('Укажи корректный email для чека');}
+    const checkoutDays=selected.days;key=key||crypto.randomUUID();const r=await api('checkout','POST',{days:checkoutDays,email:email.value,promo:promo.value.trim()||undefined,requestKey:key,lang:window.FPi18n?.lang||'ru'});
+    window.vpnRememberCheckout(r.orderId,checkoutDays);location.href=r.url;
+    }catch(error){checkoutBusy=false;refreshCheckout();throw error;}
+   }
+   pay.disabled=true;email.required=true;email.addEventListener('input',()=>key=null);promo.addEventListener('input',()=>key=null);checkout.append(selection,pendingNotice,pay,message);
+   function rememberSelection(days){
+    intent.select(days);const query=new URLSearchParams(location.search);query.set('period',days);
+    history.replaceState(null,'',location.pathname+'?'+query+location.hash);
+   }
+   function refreshCheckout(){
+    pay.disabled=checkoutBusy||!selected||!plans.available||Boolean(me.subscription.unlimited)||!ordersKnown||pendingOrders.length>0;pay.dataset.locked=String(pay.disabled);
+    pay.hidden=pendingOrders.length>0;email.parentElement.hidden=promo.parentElement.hidden=pendingOrders.length>0&&!newOrderFields;email.disabled=promo.disabled=checkoutBusy;grid.querySelectorAll('button').forEach(b=>b.disabled=checkoutBusy);
+    pendingNotice.replaceChildren();pendingNotice.hidden=!pendingOrders.length;
+    if(pendingOrders.length){
+     const order=pendingOrders.find(o=>o.days===selected?.days)||pendingOrders[0];
+     pendingNotice.append(node('h3','Незавершённая оплата'),node('p',order.days+' дней · '+money(order.price_minor)),node('p','У тебя есть незавершённый платёж. Продолжи его или проверь статус перед новой покупкой.','muted'),button('Продолжить оплату',()=>resumeOrder(order.id)));
+     if(selected&&selected.days!==order.days)pendingNotice.append(node('p','Выбран другой тариф. Для него нужен отдельный заказ.','muted'));
+     if(selected&&(resumeUnavailable.has(order.id)||selected.days!==order.days)){
+      pendingNotice.append(button('Создать другой заказ',async()=>{
+       newOrderFields=true;refreshCheckout();promoCheck.hidden=false;
+       if(!email.value||!email.checkValidity()){email.focus();email.reportValidity();throw new Error('Укажи email для чека. Затем снова нажми «Создать другой заказ».');}
+       const t=text=>window.FPi18n?.t(text)||text;
+       if(!confirm(t('Создать другой заказ?')+'\n\n'+t(selected.days+' дней · '+money(selected.priceMinor))+'\n\n'+t('Предыдущий платёж не отменится. Оплати только один заказ, чтобы избежать двойной покупки.')))return;
+       const approved=new Set(pendingOrders.map(o=>o.id));key=crypto.randomUUID();await beginCheckout(approved);
+      },true));
+     }
+     pendingNotice.querySelectorAll('button').forEach(b=>b.disabled=checkoutBusy);
+    }
+   }
+   function selectPlan(p,explicit='route'){
+    if(explicit===true||explicit==='route'&&selected?.days!==p.days)userSelected=true;
+    if(selected?.days!==p.days)key=null;selected=p;rememberSelection(p.days);
+    selection.replaceChildren(node('span',p.days+' дней · '+money(p.priceMinor)),document.createTextNode(' · '),node('span','Любое количество устройств'));
+    grid.querySelectorAll('[data-selected]').forEach(c=>c.removeAttribute('data-selected'));grid.querySelector('[data-days="'+p.days+'"]')?.setAttribute('data-selected','true');refreshCheckout();
+   }
+   function recoverOrder(order){
+    if(order?.id===returnedOrder&&!explicitPeriod&&!userSelected){const plan=plans.plans.find(p=>p.days===order.days);if(plan)selectPlan(plan,false);}
+   }
    window.addEventListener('vpn-plan-selection',e=>{const p=plans.plans.find(p=>p.days===e.detail.days);if(p)selectPlan(p);});
-   for(const p of plans.plans){const card=node('article',undefined,'plan');card.dataset.days=p.days;const pricing=node('div',undefined,'plan-pricing'),before=node('div',undefined,'price-before'),base=plans.plans.find(p=>p.days===30),fullPrice=base?Math.round(base.priceMinor*(p.days===365?12:p.days/30)/10000)*10000:p.priceMinor,discount=Math.round((1-p.priceMinor/fullPrice)*1000)/10,price=n=>new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',maximumFractionDigits:0}).format(n/100);if(p.days>30&&discount>0){const original=node('s',price(fullPrice));original.setAttribute('aria-label','Цена без скидки');before.append(original,node('span','≈ −'+new Intl.NumberFormat('ru',{maximumFractionDigits:1}).format(discount)+'%','discount'));}else before.setAttribute('aria-hidden','true');pricing.append(before,node('div',price(p.priceMinor),'price'));card.append(node('h3',p.days+' дней'),pricing,node('p','Любое количество устройств'));card.append(button('Выбрать',()=>{selectPlan(p);location.hash='plans?period='+p.days;checkout.scrollIntoView({block:'center',behavior:'smooth'});},true));grid.append(card);}
-   const requested=new URLSearchParams(location.hash.split('?')[1]||'').get('period');const initial=plans.plans.find(p=>p.days===Number(requested));if(initial)selectPlan(initial);
-   if(!plans.plans.length)grid.append(node('p','Тарифы сейчас недоступны. Попробуй позже или напиши в поддержку.','muted'));if(!plans.available)message.textContent='Оплата сейчас недоступна. Попробуй позже или напиши в поддержку.';if(me.subscription.unlimited)message.textContent='У тебя подписка без ограничения срока. Продление не требуется.';if(me.subscription.unlimited){const current=section('Подписка без ограничения срока','Продление не требуется.');const connection=node('a','Открыть моё подключение','btn');connection.href='#home';current.append(connection);planScreen.append(current);}else planScreen.append(grid,checkout);checkout.append(button('Проверить промокод',async()=>{if(!promo.value.trim())throw new Error('Введи промокод');const p=await api('promo','POST',{code:promo.value});message.textContent='Скидка '+p.percent+'%. Сумма будет сохранена в заказе.';key=null;},true));
-   const history=section('История платежей');planScreen.append(history);async function orders(){history.replaceChildren(node('h2','История платежей'));const data=await api('orders');if(!data.orders.length)history.append(node('p','Оплат пока нет.'));for(const o of data.orders){const row=node('div',undefined,'row');row.append(node('span',o.days+' дней · '+money(o.price_minor)+' · '+when(o.created_at)),node('span',{paid:'Оплачен',pending:'Оплата не подтверждена',canceled:'Отменён',refunded:'Возврат'}[o.state]||o.state));if(o.state==='pending'){row.append(button('Проверить',async()=>{const checked=await api('orders/'+o.id+'/check','POST',{});await orders();await subscription();status(checked.order.state==='paid'?'Оплата подтверждена. Статус подключения — в «Обзоре».':checked.order.state==='canceled'?'Платёж отменён. Деньги за этот заказ не приняты.':'Оплата пока не подтверждена. Если страница оплаты не открылась или деньги списались, напиши в поддержку перед повторной покупкой.');},true));const help=node('a','Помощь с оплатой','btn secondary small');help.href='#support';row.append(help);}history.append(row);}}
-   await orders();window.vpnPaymentReturn({api,refreshOrders:orders,refreshSubscription:subscription,getSubscription:()=>me.subscription,status});
+   for(const p of plans.plans){
+    const card=node('article',undefined,'plan');card.dataset.days=p.days;const pricing=node('div',undefined,'plan-pricing'),before=node('div',undefined,'price-before'),base=plans.plans.find(p=>p.days===30),fullPrice=base?Math.round(base.priceMinor*(p.days===365?12:p.days/30)/10000)*10000:p.priceMinor,discount=Math.round((1-p.priceMinor/fullPrice)*1000)/10,price=n=>new Intl.NumberFormat(locale(),{style:'currency',currency:'RUB',maximumFractionDigits:0}).format(n/100);
+    if(p.days>30&&discount>0){const original=node('s',price(fullPrice));original.setAttribute('aria-label','Цена без скидки');before.append(original,node('span','≈ −'+new Intl.NumberFormat(locale(),{maximumFractionDigits:1}).format(discount)+'%','discount'));}else before.setAttribute('aria-hidden','true');
+    pricing.append(before,node('div',price(p.priceMinor),'price'));card.append(node('h3',p.days+' дней'),pricing,node('p','Любое количество устройств'));
+    card.append(button('Выбрать',()=>{selectPlan(p,true);location.hash='plans?period='+p.days;checkout.scrollIntoView({block:'center',behavior:'smooth'});},true));grid.append(card);
+   }
+   const initial=plans.plans.find(p=>p.days===(explicitPeriod||savedPeriod));if(initial)selectPlan(initial,false);
+   if(!plans.plans.length)grid.append(node('p','Тарифы сейчас недоступны. Попробуй позже или напиши в поддержку.','muted'));
+   if(!plans.available)message.textContent='Оплата сейчас недоступна. Попробуй позже или напиши в поддержку.';
+   if(me.subscription.unlimited){message.textContent='У тебя подписка без ограничения срока. Продление не требуется.';const current=section('Подписка без ограничения срока','Продление не требуется.'),connection=node('a','Открыть моё подключение','btn');connection.href='#home';current.append(connection);planScreen.append(current);}else planScreen.append(grid,checkout);
+   const promoCheck=button('Проверить промокод',async()=>{if(!promo.value.trim())throw new Error('Введи промокод');const p=await api('promo','POST',{code:promo.value});message.textContent='Скидка '+p.percent+'%. Сумма будет сохранена в заказе.';key=null;},true);checkout.append(promoCheck);
+   const historyPanel=section('История платежей');planScreen.append(historyPanel);
+   async function checkedOrder(order){
+    recoverOrder(order);await orders();await subscription();
+    if(order.state==='paid'){
+     intent.forgetOrder(order.id);location.hash='home';status(me.subscription.active&&me.subscription.sync_state==='synced'?'Подключение готово':'Оплата подтверждена. Готовим подключение; повторно платить не нужно.','success');
+    }else if(order.state==='canceled'){intent.forgetOrder(order.id);status('Платёж отменён. Можно оплатить выбранный тариф ещё раз.');}
+    else if(order.state==='refunded'){intent.forgetOrder(order.id);status('Возврат подтверждён. Подписка пересчитана.');}
+    else status('Ждём подтверждение платежа от ЮKassa. После оплаты подключение появится автоматически.');
+   }
+   async function resumeOrder(id){
+    if(checkoutBusy)return;const result=await api('orders/'+id+'/resume','POST',{});await checkedOrder(result.order);
+    if(result.order.state==='pending'){
+     if(result.url){window.vpnRememberCheckout(result.order.id,result.order.days);location.href=result.url;}
+     else{resumeUnavailable.add(id);refreshCheckout();throw new Error('Ссылка оплаты больше недоступна. Проверь статус заказа или напиши в поддержку перед новой покупкой.');}
+    }
+   }
+   async function orders(){
+    const data=await api('orders');lastOrders=data.orders;pendingOrders=data.orders.filter(o=>o.state==='pending');ordersKnown=true;promoCheck.hidden=pendingOrders.length>0&&!newOrderFields;
+    for(const order of data.orders)recoverOrder(order);
+    refreshCheckout();renderOrderHistory(data.orders);return data.orders;
+   }
+   function renderOrderHistory(items){
+    historyPanel.replaceChildren(node('h2','История платежей'));if(!items.length)historyPanel.append(node('p','Оплат пока нет.'));
+    for(const o of items){
+     const row=node('div',undefined,'row payment-order');row.append(node('span',o.days+' дней · '+money(o.price_minor)+' · '+when(o.created_at)),node('span',{paid:'Оплачен',pending:'Оплата не подтверждена',canceled:'Отменён',refunded:'Возврат'}[o.state]||o.state));
+     if(o.state==='pending'){
+      row.append(button('Продолжить оплату',()=>resumeOrder(o.id)),button('Проверить',async()=>{const checked=await api('orders/'+o.id+'/check','POST',{});await checkedOrder(checked.order);},true));
+      const help=node('a','Помощь с оплатой','btn secondary small');help.href='#support';row.append(help);
+     }
+     historyPanel.append(row);
+    }
+   }
+   window.addEventListener('fp-languagechange',()=>{renderOrderHistory(lastOrders);if(selected)selection.replaceChildren(node('span',selected.days+' дней · '+money(selected.priceMinor)),document.createTextNode(' · '),node('span','Любое количество устройств'));refreshCheckout();});
+   await orders();window.vpnPaymentReturn({api,refreshOrders:orders,refreshSubscription:subscription,getSubscription:()=>me.subscription,status,onOrder:recoverOrder});
    const friends=screen('friends','Приглашения','Личная ссылка учитывает приглашения, зарегистрированные аккаунты и подтверждённые покупки.');async function renderFriends(){const f=await api('friends'),s=section('Твоя ссылка'),i=field(s,'Ссылка приглашения','text',f.url);i.readOnly=true;s.append(button('Скопировать ссылку',async()=>{await navigator.clipboard.writeText(f.url);status('Ссылка приглашения скопирована','success');}),node('p','Зарегистрировались: '+f.registered+' · Оплатили: '+f.paid));const image=node('img');image.src='/vpn/api/friends/qr';image.width=image.height=180;image.alt='QR-код приглашения';s.append(image);friends.querySelectorAll('section').forEach(n=>n.remove());friends.append(s);if(f.rewardsEnabled){const balance=section('Бонусы','Бонус начисляется с оплаченной подписки. Возврат отменяет начисление.');balance.append(node('p','Доступно: '+money(f.balance)+' · Минимум вывода: '+money(f.policy.withdrawMinimum)),button('Запросить вывод',async()=>{await api('friends/withdraw','POST',{amount:f.balance});await renderFriends();},true));for(const w of f.withdrawals)balance.append(node('p',money(w.amount)+' · '+({pending:'На рассмотрении',paid:'Перевод выполнен',declined:'Отклонена'}[w.state]||w.state)));friends.append(balance);}}await renderFriends();
    const support=screen('support','Поддержка','Напиши боту. Вход в кабинет не нужен, ответ придёт в тот же чат.'),telegram=node('a','Написать в Telegram','btn');telegram.href='https://t.me/family_pie_vpn_bot?start=support_vpn';telegram.target='_blank';telegram.rel='noopener noreferrer';support.append(telegram);
    const previous=node('details',undefined,'cab-section');previous.append(node('summary','Обращения в кабинете'),node('p','Здесь можно прочитать прежние обращения и продолжить переписку. Новые вопросы отправляй боту.','muted'));support.append(previous);try{await supportUI(api,previous,false,false);}catch{previous.append(node('p','Не удалось загрузить прежние обращения. Обнови страницу или напиши боту.','muted'));}

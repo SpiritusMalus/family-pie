@@ -43,7 +43,7 @@
  const t=text=>window.FPi18n.t(text);
  const $=s=>document.querySelector(s);let csrf='',me,authVersion=0;
  const message=(x,tone='info')=>{const el=$('#account-message');if(el){el.dataset.tone=tone;el.textContent=x;}};
- async function api(path,method='GET',body){const version=authVersion;const r=await fetch('/vpn/api/'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok){const e=new Error(d.error||'Сервис временно недоступен');e.status=r.status;throw e;}if(d.csrf&&version===authVersion)csrf=d.csrf;return d;}
+ async function api(path,method='GET',body){const version=authVersion;const r=await fetch('/vpn/api/'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok){const e=new Error(d.error||'Сервис временно недоступен');e.status=r.status;throw e;}if(d.csrf&&version===authVersion)csrf=d.csrf;if(path==='logout'){window.vpnPurchaseIntent?.clear();try{sessionStorage.removeItem('family-vpn-purchase-v2');sessionStorage.removeItem('family-vpn-pending-order');}catch{}}return d;}
  function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
  window.vpnLoginDestination=destination;
  window.vpnFinishLogin=async()=>{

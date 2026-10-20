@@ -156,3 +156,17 @@ test('registration keeps terms consent and confirmation before the normal verifi
  await f.submit(form);assert.equal(f.calls.some(c=>c.path.endsWith('/register')),false);assert.match(f.message.textContent,/Пароли не совпадают/);
  repeat.value=password.value;await f.submit(form);const call=f.calls.find(c=>c.path.endsWith('/register'));assert.equal(JSON.parse(call.options.body).acceptedTerms,true);assert.equal(JSON.parse(call.options.body).login,'fixture.user');assert.equal(f.window.finished,1);
 });
+
+const appCode=readFileSync(new URL('../site/vpn/app.js',import.meta.url),'utf8');
+function preferredPlatform(navigator,saved=null){
+ const storage=new Map(saved?[['family-vpn-platform',saved]]:[]),window={addEventListener(){}};
+ runInNewContext(appCode,{window,navigator,location:{hash:'',search:''},document:{querySelector:()=>null,querySelectorAll:()=>[],body:{classList:{toggle(){}}}},localStorage:{getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)}});
+ return window.vpnDevicePlatform();
+}
+test('device setup detects mobile browsers before desktop platform fallbacks and respects an explicit device preference',()=>{
+ assert.equal(preferredPlatform({platform:'Linux aarch64',userAgent:'Mozilla/5.0 (Android 15; Mobile; rv:130.0) Gecko/130.0 Firefox/130.0'}),'android');
+ assert.equal(preferredPlatform({platform:'MacIntel',userAgent:'Mozilla/5.0 (Macintosh; Intel Mac OS X) Mobile',maxTouchPoints:5}),'ios');
+ assert.equal(preferredPlatform({platform:'MacIntel',userAgent:'Mozilla/5.0 (Macintosh; Intel Mac OS X)',maxTouchPoints:0}),'macos');
+ assert.equal(preferredPlatform({userAgentData:{platform:'Windows'},platform:'Win32',userAgent:'Mozilla/5.0 (Windows NT 10.0)'}),'windows');
+ assert.equal(preferredPlatform({platform:'Linux aarch64',userAgent:'Android'},'tv'),'tv');
+});

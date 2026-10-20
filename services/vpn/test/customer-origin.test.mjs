@@ -53,7 +53,7 @@ test('new provider checkout returns to customer cabinet without changing price, 
   payload=JSON.parse(options.body);return {ok:true,json:async()=>({id:'fixture-payment',confirmation:{confirmation_url:'https://yoomoney.ru/fixture'}})};
  }});
  const result=await billing.checkout(account.accountId,30,'request-fixture','receipt@example.invalid');
- assert.equal(payload.confirmation.return_url,current+'/vpn/cabinet/#plans?order='+result.orderId);
+ assert.equal(payload.confirmation.return_url,current+'/vpn/cabinet/#plans?order='+result.orderId+'&period=30');
  assert.equal(payload.amount.value,'300.00');assert.equal(payload.metadata.product,'family-vpn');
  assert.equal(store.subscription(account.accountId).active,false);
 });

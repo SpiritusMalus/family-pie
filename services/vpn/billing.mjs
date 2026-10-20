@@ -1,6 +1,6 @@
 import {readFileSync} from 'node:fs';
 import {YooKassaReader} from './yookassa.mjs';
-export function paymentUrl(value){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||!['yoomoney.ru','yookassa.ru'].some(h=>u.hostname===h||u.hostname.endsWith('.'+h)))throw new Error('Unexpected payment page');return u.href;}
+export function paymentUrl(value){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.port||!['yoomoney.ru','yookassa.ru'].some(h=>u.hostname===h||u.hostname.endsWith('.'+h)))throw new Error('Unexpected payment page');return u.href;}
 export class Billing {
  constructor(store,{origin='https://family-pie.ru',shopId,secret,testMode=false,receipt=true,vatCode=1,taxSystemCode=null,paymentMode='full_prepayment',request=fetch}={}){
   this.origin=origin;this.store=store;this.request=request;this.config={shopId,secret,testMode,receipt,vatCode,taxSystemCode,paymentMode};
@@ -8,24 +8,46 @@ export class Billing {
   for(const [name,type] of [['confirmation_url','TEXT'],['receipt_email','TEXT'],['checked_at','INTEGER NOT NULL DEFAULT 0'],['refund_request','TEXT'],['refund_id','TEXT'],['refund_requested_at','INTEGER']])if(!store.db.prepare('PRAGMA table_info(orders)').all().some(x=>x.name===name))store.db.exec(`ALTER TABLE orders ADD COLUMN ${name} ${type}`);
  }
  ready(){const c=this.config;return Boolean(this.reader&&(!c.receipt||Number.isInteger(c.vatCode)&&c.vatCode>=1&&c.vatCode<=12)&&['full_payment','full_prepayment'].includes(c.paymentMode));}
- async checkout(accountId,days,key,email){
+ async checkout(accountId,days,key,email,{lang}={}){
   if(!this.ready())throw new Error('Оплата временно недоступна');
   if(typeof email!=='string'||email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw new Error('Укажи email для чека');
   const order=this.store.createOrder(accountId,days,key);
   if(order.state!=='pending')throw new Error('Заказ уже завершён');
   if(order.receipt_email&&order.receipt_email!==email)throw new Error('Данные заказа уже сохранены');
-  if(order.confirmation_url)return {orderId:order.id,url:paymentUrl(order.confirmation_url)};
+  if(order.confirmation_url){const resumed=await this.resume(accountId,order.id);if(resumed.url)return {orderId:order.id,url:resumed.url};throw new Error(resumed.order.state==='pending'?'Платёж больше нельзя продолжить. Выбери тот же тариф и создай новый заказ или напиши в поддержку':'Заказ уже завершён');}
   // The provider retains idempotence keys for24h; never retry an ambiguous old creation.
   if(this.store.clock()-order.created_at>23*3600_000)throw new Error('Заказ устарел. Создай новый');
   this.store.db.prepare('UPDATE orders SET receipt_email=? WHERE id=?').run(email,order.id);
   const c=this.config,amount={value:(order.price_minor/100).toFixed(2),currency:'RUB'},description=`Family VPN — ${order.days} дней`;
-  const payload={amount,capture:true,description,metadata:{product:'family-vpn',order_id:order.id},confirmation:{type:'redirect',return_url:this.origin+'/vpn/cabinet/#plans?order='+order.id}};
+  const locale=['ru','en'].includes(lang)?'?lang='+lang:'';
+  const payload={amount,capture:true,description,metadata:{product:'family-vpn',order_id:order.id},confirmation:{type:'redirect',return_url:this.origin+'/vpn/cabinet/'+locale+'#plans?order='+order.id+'&period='+order.days}};
   if(c.receipt){payload.receipt={customer:{email},items:[{description,quantity:'1.00',amount,vat_code:c.vatCode,payment_subject:'service',payment_mode:c.paymentMode}]};if(c.taxSystemCode)payload.receipt.tax_system_code=c.taxSystemCode;}
   const response=await this.request('https://api.yookassa.ru/v3/payments',{method:'POST',headers:{Authorization:`Basic ${Buffer.from(c.shopId+':'+c.secret).toString('base64')}`,'Content-Type':'application/json','Idempotence-Key':order.id},body:JSON.stringify(payload),signal:AbortSignal.timeout(12000),redirect:'error'});
   if(!response.ok)throw new Error('Не удалось создать платёж. Повтори позже');
   const payment=await response.json();if(typeof payment.id!=='string'||!/^[A-Za-z0-9-]{1,128}$/.test(payment.id))throw new Error('Invalid provider object');
   const url=paymentUrl(payment.confirmation?.confirmation_url);this.store.bindPayment(accountId,order.id,payment.id);this.store.db.prepare('UPDATE orders SET confirmation_url=? WHERE id=?').run(url,order.id);
   return {orderId:order.id,url};
+ }
+ orderSummary(order){return {id:order.id,state:order.state,days:order.days,price_minor:order.price_minor};}
+ async resume(accountId,id){
+  // Ownership is resolved before any provider request; resuming never creates a payment.
+  let order=this.store.order(accountId,id);
+  const result=reason=>({order:this.orderSummary(order),...(reason?{resumeReason:reason}:{})});
+  if(order.state!=='pending')return result();
+  if(!this.ready())return result('unavailable');
+  if(!order.payment_id)return result('missing');
+  const payment=await this.reader.object('payments',order.payment_id);
+  if(payment.metadata?.product!=='family-vpn'||payment.metadata?.order_id!==order.id||payment.amount?.currency!=='RUB'||payment.amount?.value!==(order.price_minor/100).toFixed(2))throw new Error('Wrong payment');
+  if(payment.status==='succeeded')this.store.confirmPayment(payment,{testMode:this.config.testMode});
+  else if(payment.status==='canceled')this.store.db.prepare("UPDATE orders SET state='canceled' WHERE id=? AND state='pending'").run(order.id);
+  order=this.store.order(accountId,id);
+  if(order.state!=='pending')return result();
+  if(payment.status!=='pending'||payment.paid!==false)return result('unavailable');
+  if(payment.expires_at){const expires=Date.parse(payment.expires_at);if(!Number.isFinite(expires))return result('unavailable');if(expires<=this.store.clock())return result('expired');}
+  const raw=payment.confirmation?.confirmation_url||order.confirmation_url;
+  if(!raw)return result('missing');
+  let url;try{url=paymentUrl(raw);}catch{return result('unsafe');}
+  return {...result(),url};
  }
  async check(accountId,id){const o=this.store.order(accountId,id);if(o.payment_id&&o.state==='pending')await this.confirm(o.payment_id);return this.store.order(accountId,id);}
  async confirm(id){const o=this.store.db.prepare('SELECT id FROM orders WHERE payment_id=?').get(id);if(!o)return false;const p=await this.reader.object('payments',id);if(p.metadata?.product!=='family-vpn'||p.metadata?.order_id!==o.id)throw new Error('Wrong product');if(p.status==='succeeded')this.store.confirmPayment(p,{testMode:this.config.testMode});else if(p.status==='canceled')this.store.db.prepare("UPDATE orders SET state='canceled' WHERE payment_id=? AND state='pending'").run(id);return true;}

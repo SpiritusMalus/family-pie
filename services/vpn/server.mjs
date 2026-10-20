@@ -4,6 +4,7 @@ import { Accounts } from './auth.mjs';
 import { TelegramStore } from './telegram.mjs';
 import { Cabinet } from './cabinet.mjs';
 import { Billing,billingConfig } from './billing.mjs';
+import { ProviderUnavailableError } from './yookassa.mjs';
 import { randomBytes } from 'node:crypto';
 import { Passkeys } from './passkeys.mjs';
 import QRCode from 'qrcode';
@@ -115,9 +116,18 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
     if(!billing.ready())return send(res,503,{error:'Оплата временно недоступна'});
     if(typeof body.email!=='string'||body.email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))return send(res,400,{error:'Укажи email для чека'});
     if(!users.db.prepare('SELECT 1 FROM orders WHERE account_id=? AND request_key=?').get(id,body.requestKey)&&users.db.prepare("SELECT count(*) n FROM orders WHERE account_id=? AND state='pending' AND created_at>?").get(id,Date.now()-24*3600000).n>=5)return send(res,429,{error:'Сначала заверши или дождись отмены предыдущих платежей'});
-    cabinet.createOrder(id,body.days,body.requestKey,body.promo);return send(res,200,await billing.checkout(id,body.days,body.requestKey,body.email));
+    cabinet.createOrder(id,body.days,body.requestKey,body.promo);return send(res,200,await billing.checkout(id,body.days,body.requestKey,body.email,{lang:body.lang}));
    }
-   const orderMatch=path.match(/^\/vpn\/api\/orders\/([a-f0-9-]+)\/check$/);if(orderMatch&&req.method==='POST'){const o=await billing.check(id,orderMatch[1]);return send(res,200,{order:{id:o.id,state:o.state},subscription:users.subscription(id)});}
+   const orderMatch=path.match(/^\/vpn\/api\/orders\/([a-f0-9-]+)\/(check|resume)$/);if(orderMatch&&req.method==='POST'){
+    if(orderMatch[2]==='resume'){
+     if(admin)return send(res,409,{error:'Для покупки используй отдельный пользовательский аккаунт'});
+     const sub=users.subscription(id);
+     if(sub.deleted)return send(res,409,{error:'Подписка отключена. Сначала напиши в поддержку'});
+     if(sub.allow_unlimited)return send(res,409,{error:'У тебя бессрочный доступ. Оплачивать продление не нужно'});
+     return send(res,200,{...await billing.resume(id,orderMatch[1]),subscription:users.subscription(id)});
+    }
+    const o=await billing.check(id,orderMatch[1]);return send(res,200,{order:billing.orderSummary(o),subscription:users.subscription(id)});
+   }
    if(path==='/vpn/api/support'&&req.method==='GET')return send(res,200,{threads:cabinet.threads(id)});
    if(path==='/vpn/api/support'&&req.method==='POST')return send(res,201,{thread:cabinet.createThread(id,body.subject,body.message,body.requestKey)});
    const threadMatch=path.match(/^\/vpn\/api\/(admin\/)?support\/([a-f0-9-]+)$/);if(threadMatch){if(threadMatch[1]&&!admin)return send(res,403,{error:'Только для администратора'});const privileged=Boolean(threadMatch[1]);if(req.method==='GET')return send(res,200,{thread:cabinet.thread(threadMatch[2],id,privileged),messages:cabinet.messages(threadMatch[2],id,privileged)});if(req.method==='POST')return send(res,201,cabinet.reply(threadMatch[2],id,body.message,privileged,body.requestKey));if(req.method==='PATCH'){cabinet.closeThread(threadMatch[2],id,body.closed,privileged);return send(res,200,{ok:true});}}
@@ -162,7 +172,7 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
     if(match&&['PATCH','DELETE'].includes(req.method))return send(res,200,{subscription:users.edit(id,match[1],req.method==='DELETE'?{deleted:true,enabled:false}:body)});
    }
    return send(res,404,{error:'Раздел не найден'});
-  }catch(e){send(res,400,{error:e.message==='Unlimited access is reserved for existing users'?'Новым пользователям нужна подписка с датой окончания':['Wrong current password','Choose a new password'].includes(e.message)?'Проверь текущий пароль и выбери новый':e.message.startsWith('Password must')?'Пароль должен содержать от12 до128 символов':/[А-Яа-я]/.test(e.message)?e.message.slice(0,240):'Запрос не выполнен. Проверь данные.'});}
+  }catch(e){send(res,e instanceof ProviderUnavailableError?503:400,{error:e.message==='Unlimited access is reserved for existing users'?'Новым пользователям нужна подписка с датой окончания':['Wrong current password','Choose a new password'].includes(e.message)?'Проверь текущий пароль и выбери новый':e.message.startsWith('Password must')?'Пароль должен содержать от12 до128 символов':/[А-Яа-я]/.test(e.message)?e.message.slice(0,240):'Запрос не выполнен. Проверь данные.'});}
  });server.headersTimeout=10000;server.requestTimeout=15000;
  return {server,users,cabinet,billing,passkeys,google,emailLogin,push};
 }
