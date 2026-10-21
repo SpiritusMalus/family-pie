@@ -34,8 +34,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     .replace('<span>VPN</span></h2>', '<span>VPN</span></h1>')
     .replace('href="#sufler"', 'href="/sufler/"')
     .replace(/<section id="sufler"[\s\S]*?<\/section>/, '')
-    .replace(/<article><h3>Sufler<\/h3>[\s\S]*?<\/article>/, '')
-    .replace('<section id="support"', details+'\n<section id="support"')
+    .replace(/<section id="support"[\s\S]*?<\/section>/, details)
+    .replace('href="#support"', 'href="https://t.me/family_pie_vpn_bot?start=support_vpn" target="_blank" rel="noopener noreferrer"')
+    .replace(/<footer class="site-footer wrap">[\s\S]*?<\/footer>/, '<footer class="site-footer wrap"><a href="https://t.me/family_pie_vpn_bot?start=support_vpn" target="_blank" rel="noopener noreferrer" data-ru="Поддержка" data-en="Support">Поддержка</a></footer>')
     .replace(/<p class="vpn-more">[\s\S]*?<\/p>/, '<p class="vpn-more"><a href="#vpn-questions" data-ru="Вопросы о VPN" data-en="VPN questions">Вопросы о VPN</a></p>')
     .replaceAll('Тарифы на странице VPN','Тарифы в личном кабинете')
     .replaceAll('See plans on the VPN page','See account pricing');
