@@ -86,9 +86,9 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
   await writeFile(resolve(output,'vpn/index.html'),vpnLanding);
   count++;
   const guides=buildVpnGuides(await readFile(resolve(output,'index.html'),'utf8'),
-    await readFile(resolve(project,'customer-site/vpn-happ.html'),'utf8'),
+    await readFile(resolve(project,'customer-site/vpn-setup.html'),'utf8'),
     await readFile(resolve(project,'customer-site/vpn-help.html'),'utf8'));
-  for (const [route,html] of [['vpn/happ',guides.happ],['vpn/help/connection',guides.help]]) {
+  for (const [route,html] of [['vpn/setup',guides.setup],['vpn/help/connection',guides.help]]) {
     await mkdir(resolve(output,route),{recursive:true});
     await writeFile(resolve(output,route,'index.html'),html);count++;
   }
@@ -96,7 +96,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
   await writeFile(accountScript,(await readFile(accountScript,'utf8')).replace("$('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;", "$('.preview-bar').replaceChildren(el('span','Аккаунт:'),document.createTextNode(' '+me.user.login+'. '),el('span','Личный кабинет Family VPN.'));") );
   // The existing service worker caches public shell assets only; account APIs stay network-only.
   await writeFile(resolve(output,'robots.txt'),'User-agent: *\nAllow: /\nDisallow: /public-plans/\nSitemap: https://family-spy.ru/sitemap.xml\n');
-  const routes=['/','/vpn/','/vpn/happ/','/vpn/help/connection/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
+  const routes=['/','/vpn/','/vpn/setup/','/vpn/help/connection/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
   await writeFile(resolve(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+routes.map(route=>`<url><loc>https://family-spy.ru${route}</loc></url>`).join('')+'</urlset>\n');
   await writeFile(resolve(output,'404.html'),'<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Страница не найдена · Family Spy</title><link rel="stylesheet" href="/vpn/fonts.css"><link rel="stylesheet" href="/customer.css"><main class="wrap intro"><h1>Страница не найдена</h1><p><a class="button" href="/">На главную Family Spy</a></p></main></html>');
   return {output,pages:count+1};

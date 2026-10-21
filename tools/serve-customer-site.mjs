@@ -12,7 +12,8 @@ const server=createServer(async(req,res)=>{
   try {
     const url=new URL(req.url,'http://localhost');
     const aliases={'/vpn':'/vpn/','/vpn/index.html':'/vpn/',
-      '/vpn/happ':'/vpn/happ/','/vpn/happ/index.html':'/vpn/happ/',
+      '/vpn/setup':'/vpn/setup/','/vpn/setup/index.html':'/vpn/setup/',
+      '/vpn/happ':'/vpn/','/vpn/happ/':'/vpn/','/vpn/happ/index.html':'/vpn/',
       '/vpn/help/connection':'/vpn/help/connection/','/vpn/help/connection/index.html':'/vpn/help/connection/'};
     if(aliases[url.pathname]){
       res.writeHead(301,{Location:aliases[url.pathname]+url.search});return res.end();

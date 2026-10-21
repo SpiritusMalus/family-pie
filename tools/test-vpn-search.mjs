@@ -46,14 +46,18 @@ test('VPN generation refuses to silently lose its shared storefront sections',()
   for(const home of ['','<section id="vpn"','<section id="vpn"><section id="sufler"'])assert.throws(()=>buildVpnLanding(home,''),/Missing storefront section/);
 });
 
-test('Happ offer and help remain crawlable, connected and separate from private account state',async t=>{
+test('Family VPN setup and help remain crawlable, connected and separate from private account state',async t=>{
   const directory=await mkdtemp(resolve('customer-site/dist-test-guides-'));
   t.after(()=>rm(directory,{recursive:true,force:true}));
   await buildCustomerSite(directory);
   const sitemap=await readFile(resolve(directory,'sitemap.xml'),'utf8');
-  for (const [route,type] of [['/vpn/happ/','Service'],['/vpn/help/connection/','TechArticle']]) {
+  assert.doesNotMatch(sitemap,/happ/i);
+  for (const [route,type] of [['/vpn/setup/','TechArticle'],['/vpn/help/connection/','TechArticle']]) {
     const html=await readFile(resolve(directory,'.'+route,'index.html'),'utf8');
     assert.equal((html.match(/<h1\b/g)||[]).length,1);
+    assert.doesNotMatch(html.match(/<title[^>]*>[\s\S]*?<\/title>/)[0],/Happ/i);
+    assert.doesNotMatch(html.match(/<h1[^>]*>[\s\S]*?<\/h1>/)[0],/Happ/i);
+    assert.doesNotMatch(html.match(/<meta name="description"[^>]*>/)[0],/Happ/i);
     assert.equal((html.match(/href="\/vpn-guides.css"/g)||[]).length,1);
     assert.ok(html.includes(`<link rel="canonical" href="https://family-spy.ru${route}">`));
     assert.ok(sitemap.includes(`<loc>https://family-spy.ru${route}</loc>`));
@@ -70,16 +74,17 @@ test('Happ offer and help remain crawlable, connected and separate from private 
       await readFile(file);
     }
   }
-  const happ=await readFile(resolve(directory,'vpn/happ/index.html'),'utf8');
-  assert.match(happ,/Family Spy не является разработчиком Happ/);
-  assert.match(happ,/Проверь возможность установки до покупки подписки/);
-  assert.doesNotMatch(happ,/data-device-scene|name="hero-device"/);
-  for(const days of [30,90,180,365]) assert.ok(happ.includes(`/vpn/cabinet/#plans?period=${days}`));
-  for(const id of ['android','windows','ios'])assert.ok(happ.includes(`id="happ-${id}"`));
-  assert.match(await readFile(resolve(directory,'vpn/index.html'),'utf8'),/href="\/vpn\/happ\/"/);
+  const setup=await readFile(resolve(directory,'vpn/setup/index.html'),'utf8');
+  assert.doesNotMatch(setup.match(/<title[^>]*>[\s\S]*?<\/title>/)[0],/Happ/i);
+  assert.match(setup,/Проверь возможность установки до покупки подписки/);
+  assert.doesNotMatch(setup,/data-device-scene|name="hero-device"/);
+  assert.doesNotMatch(setup,/data-vpn-plan=/);
+  assert.match(setup,/href="\/vpn\/#vpn-pricing"/);
+  for(const id of ['android','windows','ios'])assert.ok(setup.includes(`id="setup-${id}"`));
+  assert.match(await readFile(resolve(directory,'vpn/index.html'),'utf8'),/href="\/vpn\/setup\/"/);
   // Ownership proofs remain inherited without introducing a second configuration surface.
   await buildCustomerSite(directory,{googleSiteVerification:'fixture-google',yandexSiteVerification:'fixture-yandex'});
-  for(const route of ['vpn/happ','vpn/help/connection'])assert.match(await readFile(resolve(directory,route,'index.html'),'utf8'),/name="google-site-verification" content="fixture-google"/);
+  for(const route of ['vpn/setup','vpn/help/connection'])assert.match(await readFile(resolve(directory,route,'index.html'),'utf8'),/name="google-site-verification" content="fixture-google"/);
 });
 
 test('public VPN routes serve the landing, canonical aliases preserve queries, private routes stay separate',async t=>{
@@ -93,17 +98,18 @@ test('public VPN routes serve the landing, canonical aliases preserve queries, p
   });
   const response=await fetch(base+'/vpn/');assert.equal(response.status,200);
   const html=await response.text();assert.match(html,/id="vpn-questions"/);assert.match(html,/href="\/vpn\/cabinet\/"/);
-  for(const path of ['/vpn/happ/','/vpn/help/connection/']) {
+  for(const path of ['/vpn/setup/','/vpn/help/connection/']) {
     const r=await fetch(base+path);assert.equal(r.status,200);assert.match(await r.text(),/href="\/vpn-guides.css"/);
   }
   for(const path of ['/vpn','/vpn/index.html']){
     const r=await fetch(base+path+'?lang=en&period=90',{redirect:'manual'});
     assert.equal(r.status,301);assert.equal(r.headers.get('location'),'/vpn/?lang=en&period=90');
   }
-  for(const route of ['/vpn/happ/','/vpn/help/connection/'])for(const path of [route.slice(0,-1),route+'index.html']){
+  for(const route of ['/vpn/setup/','/vpn/help/connection/'])for(const path of [route.slice(0,-1),route+'index.html']){
     const r=await fetch(base+path+'?lang=en&period=90',{redirect:'manual'});
     assert.equal(r.status,301);assert.equal(r.headers.get('location'),route+'?lang=en&period=90');
   }
+  const retired=await fetch(base+'/vpn/happ/?lang=en',{redirect:'manual'});assert.equal(retired.status,301);assert.equal(retired.headers.get('location'),'/vpn/?lang=en');
   const account=await fetch(base+'/vpn/cabinet/auth/?mode=register&period=180');assert.equal(account.status,200);assert.match(await account.text(),/noindex,nofollow/);
   const missing=await fetch(base+'/vpn/not-a-real-page');assert.equal(missing.status,404);assert.doesNotMatch(await missing.text(),/id="vpn-title"/);
   const head=await fetch(base+'/vpn/',{method:'HEAD'});assert.equal(head.status,200);assert.equal(await head.text(),'');

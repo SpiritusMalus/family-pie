@@ -1,8 +1,4 @@
 /* Established Spy surfaces: shared offers, then readable setup and diagnostics. */
-.happ-landing .vpn-heading h1{display:block;font-size:clamp(44px,5.2vw,64px);line-height:1.08;letter-spacing:-.035em}
-.happ-landing ::selection,.connection-help ::selection{background:var(--accent);color:var(--paper)}
-.happ-landing .vpn-purpose{font-size:22px;max-width:29ch}
-.happ-landing .device-setup{display:inline-flex;align-items:center;min-height:44px;margin-top:24px;color:var(--accent)}
 .guide-section{padding-block:80px;border-bottom:1px solid var(--rule);scroll-margin-top:24px}
 .guide-section h2{font-size:36px;margin-bottom:24px}
 .guide-section p,.guide-section li{max-width:70ch;color:var(--quiet)}
@@ -38,5 +34,6 @@
 .guide-article .guide-links a{display:inline-flex}
 .guide-links a:focus-visible,.guide-index a:focus-visible{outline-offset:3px}
 .guide-page :is(section,h2,h3){scroll-margin-top:24px}
-@media(max-width:900px){.guide-shell{grid-template-columns:1fr;gap:24px}.guide-index{position:static;flex-direction:row;flex-wrap:wrap;gap:8px 24px}.guide-hero{padding-top:48px}.happ-landing .vpn-purpose{font-size:22px}}
-@media(max-width:600px){.guide-section{padding-block:48px}.guide-section h2{font-size:30px}.guide-hero>p{font-size:18px}.guide-hero h1{font-size:40px}.guide-shell{padding-bottom:48px}.guide-article h2{font-size:26px}.guide-platform{padding-block:24px}.happ-landing .vpn-heading h1{font-size:44px}.happ-landing .vpn-purpose{font-size:20px}.guide-nav{gap:4px 24px}}
+@media(max-width:900px){.guide-shell{grid-template-columns:1fr;gap:24px}.guide-index{position:static;flex-direction:row;flex-wrap:wrap;gap:8px 24px}.guide-hero{padding-top:48px}}
+@media(max-width:600px){.guide-section{padding-block:48px}.guide-section h2{font-size:30px}.guide-hero>p{font-size:18px}.guide-hero h1{font-size:40px}.guide-shell{padding-bottom:48px}.guide-article h2{font-size:26px}.guide-platform{padding-block:24px}.guide-nav{gap:4px 24px}}
+.vpn-setup ::selection,.connection-help ::selection{background:var(--accent);color:var(--paper)}

@@ -259,11 +259,11 @@ family-spy.ru {
 		redir @with_query /vpn/?{query} permanent
 		redir * /vpn/ permanent
 	}
-	@happ_alias path /vpn/happ /vpn/happ/index.html
-	handle @happ_alias {
+	@setup_alias path /vpn/setup /vpn/setup/index.html
+	handle @setup_alias {
 		@with_query expression `{http.request.uri.query} != ""`
-		redir @with_query /vpn/happ/?{query} permanent
-		redir * /vpn/happ/ permanent
+		redir @with_query /vpn/setup/?{query} permanent
+		redir * /vpn/setup/ permanent
 	}
 	@connection_help_alias path /vpn/help/connection /vpn/help/connection/index.html
 	handle @connection_help_alias {
