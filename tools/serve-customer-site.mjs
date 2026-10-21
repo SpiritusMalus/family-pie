@@ -11,8 +11,11 @@ async function file(path) {try{return (await stat(path)).isFile()?path:null;}cat
 const server=createServer(async(req,res)=>{
   try {
     const url=new URL(req.url,'http://localhost');
-    if(['/vpn','/vpn/index.html'].includes(url.pathname)){
-      res.writeHead(301,{Location:'/vpn/'+url.search});return res.end();
+    const aliases={'/vpn':'/vpn/','/vpn/index.html':'/vpn/',
+      '/vpn/happ':'/vpn/happ/','/vpn/happ/index.html':'/vpn/happ/',
+      '/vpn/help/connection':'/vpn/help/connection/','/vpn/help/connection/index.html':'/vpn/help/connection/'};
+    if(aliases[url.pathname]){
+      res.writeHead(301,{Location:aliases[url.pathname]+url.search});return res.end();
     }
     if(vpnQa&&url.pathname.startsWith('/vpn/api/')){
       const headers={...req.headers,host:new URL(vpnQa).host};

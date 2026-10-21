@@ -2,6 +2,7 @@ import {cp, mkdir, readFile, writeFile, rm, readdir} from 'node:fs/promises';
 import {resolve, relative, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {buildVpnLanding} from './build-vpn-landing.mjs';
+import {buildVpnGuides} from './build-vpn-guides.mjs';
 
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const customerRedirects = [];
@@ -40,7 +41,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
       return path!=='vpn/index.html'&&!/^vpn\/api(\/|$)/.test(path);
     }
   });
-  for (const file of ['index.html','customer.css','customer.js','vpn-search.css']) await cp(resolve(project,'customer-site',file),resolve(output,file));
+  for (const file of ['index.html','customer.css','customer.js','vpn-search.css','vpn-guides.css']) await cp(resolve(project,'customer-site',file),resolve(output,file));
   const meta = siteProofs.filter(([,value]) => value).map(([name,value]) => `<meta name="${name}" content="${value}">`).join('');
   if (meta) {
     const home = resolve(output,'index.html');
@@ -84,11 +85,18 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
   const vpnLanding=buildVpnLanding(await readFile(resolve(output,'index.html'),'utf8'),await readFile(resolve(project,'customer-site/vpn-details.html'),'utf8'));
   await writeFile(resolve(output,'vpn/index.html'),vpnLanding);
   count++;
+  const guides=buildVpnGuides(await readFile(resolve(output,'index.html'),'utf8'),
+    await readFile(resolve(project,'customer-site/vpn-happ.html'),'utf8'),
+    await readFile(resolve(project,'customer-site/vpn-help.html'),'utf8'));
+  for (const [route,html] of [['vpn/happ',guides.happ],['vpn/help/connection',guides.help]]) {
+    await mkdir(resolve(output,route),{recursive:true});
+    await writeFile(resolve(output,route,'index.html'),html);count++;
+  }
   const accountScript=resolve(output,'vpn/account.js');
   await writeFile(accountScript,(await readFile(accountScript,'utf8')).replace("$('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;", "$('.preview-bar').replaceChildren(el('span','Аккаунт:'),document.createTextNode(' '+me.user.login+'. '),el('span','Личный кабинет Family VPN.'));") );
   // The existing service worker caches public shell assets only; account APIs stay network-only.
   await writeFile(resolve(output,'robots.txt'),'User-agent: *\nAllow: /\nDisallow: /public-plans/\nSitemap: https://family-spy.ru/sitemap.xml\n');
-  const routes=['/','/vpn/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
+  const routes=['/','/vpn/','/vpn/happ/','/vpn/help/connection/','/vpn/terms/','/vpn/privacy/','/sufler/','/sufler/setup/','/sufler/terms/','/sufler/privacy/'];
   await writeFile(resolve(output,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+routes.map(route=>`<url><loc>https://family-spy.ru${route}</loc></url>`).join('')+'</urlset>\n');
   await writeFile(resolve(output,'404.html'),'<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Страница не найдена · Family Spy</title><link rel="stylesheet" href="/vpn/fonts.css"><link rel="stylesheet" href="/customer.css"><main class="wrap intro"><h1>Страница не найдена</h1><p><a class="button" href="/">На главную Family Spy</a></p></main></html>');
   return {output,pages:count+1};

@@ -1,0 +1,42 @@
+/* Established Spy surfaces: shared offers, then readable setup and diagnostics. */
+.happ-landing .vpn-heading h1{display:block;font-size:clamp(44px,5.2vw,64px);line-height:1.08;letter-spacing:-.035em}
+.happ-landing ::selection,.connection-help ::selection{background:var(--accent);color:var(--paper)}
+.happ-landing .vpn-purpose{font-size:22px;max-width:29ch}
+.happ-landing .device-setup{display:inline-flex;align-items:center;min-height:44px;margin-top:24px;color:var(--accent)}
+.guide-section{padding-block:80px;border-bottom:1px solid var(--rule);scroll-margin-top:24px}
+.guide-section h2{font-size:36px;margin-bottom:24px}
+.guide-section p,.guide-section li{max-width:70ch;color:var(--quiet)}
+.guide-section p+p{margin-top:16px}
+.guide-section a:not(.button),.guide-article a{color:var(--accent);text-decoration:underline;text-underline-offset:4px}
+.guide-section .button{margin-top:24px}
+.guide-steps{margin:32px 0 0;padding-left:24px;display:grid;gap:24px}
+.guide-steps li{padding-left:8px}
+.guide-steps strong{display:block;color:var(--ink);font-size:20px;margin-bottom:8px}
+.guide-links{display:flex;gap:8px 24px;flex-wrap:wrap;margin-top:12px}
+.guide-links a{display:inline-flex;align-items:center;min-height:44px}
+.guide-platform{padding-block:32px;scroll-margin-top:24px;border-top:1px solid var(--rule)}
+.guide-platform h3{font-size:24px;margin-bottom:16px}
+.guide-platform ol{padding-left:24px;display:grid;gap:12px;margin-block:16px}
+.guide-note{font-size:15px}
+.guide-nav{display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:24px}
+.guide-nav a{min-height:44px;display:inline-flex;align-items:center}
+.guide-hero{padding-block:72px 48px}
+.guide-hero h1{font-size:clamp(40px,5vw,64px);max-width:21ch;line-height:1.1;margin-bottom:24px}
+.guide-hero>p{max-width:65ch;color:var(--quiet);font-size:20px}
+.guide-shell{display:grid;grid-template-columns:240px minmax(0,1fr);gap:72px;padding-bottom:80px}
+.guide-index{align-self:start;position:sticky;top:24px;display:flex;flex-direction:column;gap:8px}
+.guide-index a{display:flex;align-items:center;min-height:44px;color:var(--quiet);font-size:15px}
+.guide-article{min-width:0}
+.guide-article section{padding-block:32px;border-top:1px solid var(--rule);scroll-margin-top:24px}
+.guide-article h2{font-size:28px;margin-bottom:20px}
+.guide-article p,.guide-article li{color:var(--quiet);max-width:70ch}
+.guide-article p+p{margin-top:16px}
+.guide-article ol{padding-left:24px;margin:20px 0;display:grid;gap:14px}
+.guide-article strong{color:var(--ink)}
+.guide-article a{display:inline-block;min-height:44px;align-content:center}
+.guide-article .button{color:var(--paper);text-decoration:none;margin-top:20px}
+.guide-article .guide-links a{display:inline-flex}
+.guide-links a:focus-visible,.guide-index a:focus-visible{outline-offset:3px}
+.guide-page :is(section,h2,h3){scroll-margin-top:24px}
+@media(max-width:900px){.guide-shell{grid-template-columns:1fr;gap:24px}.guide-index{position:static;flex-direction:row;flex-wrap:wrap;gap:8px 24px}.guide-hero{padding-top:48px}.happ-landing .vpn-purpose{font-size:22px}}
+@media(max-width:600px){.guide-section{padding-block:48px}.guide-section h2{font-size:30px}.guide-hero>p{font-size:18px}.guide-hero h1{font-size:40px}.guide-shell{padding-bottom:48px}.guide-article h2{font-size:26px}.guide-platform{padding-block:24px}.happ-landing .vpn-heading h1{font-size:44px}.happ-landing .vpn-purpose{font-size:20px}.guide-nav{gap:4px 24px}}

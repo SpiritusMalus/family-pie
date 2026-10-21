@@ -21,6 +21,7 @@ on:
       - 'tools/build-legal.mjs'
       - 'tools/build-customer-site.mjs'
       - 'tools/build-vpn-landing.mjs'
+      - 'tools/build-vpn-guides.mjs'
       - 'tools/build-portfolio-site.mjs'
       - 'Caddyfile'
       - 'tools/vps/fp-deploy-caddy.sh'

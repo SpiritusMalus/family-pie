@@ -259,6 +259,18 @@ family-spy.ru {
 		redir @with_query /vpn/?{query} permanent
 		redir * /vpn/ permanent
 	}
+	@happ_alias path /vpn/happ /vpn/happ/index.html
+	handle @happ_alias {
+		@with_query expression `{http.request.uri.query} != ""`
+		redir @with_query /vpn/happ/?{query} permanent
+		redir * /vpn/happ/ permanent
+	}
+	@connection_help_alias path /vpn/help/connection /vpn/help/connection/index.html
+	handle @connection_help_alias {
+		@with_query expression `{http.request.uri.query} != ""`
+		redir @with_query /vpn/help/connection/?{query} permanent
+		redir * /vpn/help/connection/ permanent
+	}
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
