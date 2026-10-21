@@ -17,7 +17,7 @@ test('VPN search page has crawlable product content, one heading and honest stru
   assert.match(html,/<h1 id="vpn-title"><span>Family<\/span> <span>VPN<\/span><\/h1>/);
   assert.match(html,/<h2[^>]*data-ru="В одной подписке"/);
   assert.match(html,/<h3[^>]*data-ru="Без лимита устройств"/);
-  assert.match(html,/<title[^>]*>Купить VPN-подписку/);
+  assert.match(html,/<title[^>]*>Купить ВПН для телефона и компьютера/);
   assert.match(html,/<link rel="canonical" href="https:\/\/family-spy\.ru\/vpn\/">/);
   assert.doesNotMatch(html,/<meta name="robots"[^>]*noindex/);
   for(const content of ['Family VPN — VPN-сервис от Family Spy','Как купить VPN-подписку?','Как подключить ВПН после оплаты?','Android TV и Apple TV','нет лимита устройств']) assert.ok(html.includes(content),content);
