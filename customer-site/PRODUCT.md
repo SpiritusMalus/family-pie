@@ -55,3 +55,11 @@ Google Search Console and Yandex Webmaster ownership use their actual owner-sess
 ## Homepage and VPN support footer — approved 2026-10-21
 
 The homepage's entire verbose VPN/Sufler support section and the standalone support block on `/vpn/` are removed. Both pages end with only “Поддержка” / “Support”. The homepage footer and header Help link open `https://t.me/family_pie_vpn_bot?start=support` directly; the VPN entry inherits the footer with `start=support_vpn` and uses that same VPN destination for Help. Its FAQ, including the practical support answer, remains. No product chooser or new support copy is introduced. Product/account flows, Sufler downloads, prices, screenshots, backend and the established visual system remain unchanged. Recorded browser checks for both pages at 390, 690, 1280 and 1440 px found no horizontal overflow, dead support anchor or standalone support section. The existing test logs record 16 static and 76 web checks passing. The owner explicitly approved publication of the shown `8ce434d` result on 2026-10-21. Actual integration and release verification are recorded separately in the project journal.
+
+## VPN tariff emphasis — preview behavior
+
+On hover-capable fine pointers outside forced-colors mode, the homepage and `/vpn/` dim their surroundings while all four tariff rows remain undimmed; the hovered row uses the existing graphite field. With no tariff hovered, keyboard focus receives the same emphasis. The scrim is pointer-transparent. Its fade and the row-background transition take 180ms only when reduced motion is not requested. Native mobile disclosures, prices, copy and purchase destinations remain unchanged. Publication of this shown preview still requires the owner's explicit approval.
+
+## VPN pricing — preview candidate, 2026-10-21
+
+The candidate catalog totals are 300/780/1380/2400 RUB for 30/90/180/365 days. Existing 1/3/6/12 comparison months yield exact displayed monthly equivalents of 300/260/230/200 RUB without display-only truncation. The catalog is shared with new-order pricing after activation; existing orders retain their stored amounts and idempotent retries. Updating source does not replace the live Cabinet's persisted plans. Shown-result approval and explicit plan activation remain pending; the tariff emphasis, layout and purchase destinations are unchanged.
