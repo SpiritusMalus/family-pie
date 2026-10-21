@@ -59,3 +59,7 @@ The homepage's entire verbose VPN/Sufler support section and the standalone supp
 ## VPN tariff emphasis — preview behavior
 
 On hover-capable fine pointers outside forced-colors mode, the homepage and `/vpn/` dim their surroundings while all four tariff rows remain undimmed; the hovered row uses the existing graphite field. With no tariff hovered, keyboard focus receives the same emphasis. The scrim is pointer-transparent. Its fade and the row-background transition take 180ms only when reduced motion is not requested. Native mobile disclosures, prices, copy and purchase destinations remain unchanged. Publication of this shown preview still requires the owner's explicit approval.
+
+## VPN pricing — preview candidate, 2026-10-21
+
+The candidate catalog totals are 300/780/1380/2400 RUB for 30/90/180/365 days. Existing 1/3/6/12 comparison months yield exact displayed monthly equivalents of 300/260/230/200 RUB without display-only truncation. The catalog is shared with new-order pricing after activation; existing orders retain their stored amounts and idempotent retries. Updating source does not replace the live Cabinet's persisted plans. Shown-result approval and explicit plan activation remain pending; the tariff emphasis, layout and purchase destinations are unchanged.

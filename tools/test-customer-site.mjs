@@ -145,6 +145,11 @@ test('pricing uses validated public RUB plans and the USD reference rate',async(
   return {price,cards,context,events};
  };
  const valid={available:true,testMode:false,plans:[{days:30,priceMinor:30000},{days:90,priceMinor:80000},{days:180,priceMinor:140000},{days:365,priceMinor:250000}]};
+ const approved=JSON.parse(await readFile('services/vpn/approved-plans.json','utf8'));
+ const catalog=await run({...valid,plans:approved});
+ assert.deepEqual(catalog.cards.map(c=>c.monthly.textContent),['300 ₽','260 ₽','230 ₽','200 ₽']);
+ assert.deepEqual(catalog.cards.map(c=>c.amount.textContent),['Всего 300 ₽','Всего 780 ₽','Всего 1\u00a0380 ₽','Всего 2\u00a0400 ₽']);
+ assert.deepEqual(catalog.cards.slice(1).map(c=>c.saving.textContent),['Экономия 120 ₽','Экономия 420 ₽','Экономия 1\u00a0200 ₽']);
  const h=await run(valid);
  assert.equal(h.price.textContent,'300 ₽ за 30 дней');
  assert.equal(h.cards[0].usd.textContent,'≈ US$3.59');assert.equal(h.cards[3].usd.textContent,'≈ US$29.90');
