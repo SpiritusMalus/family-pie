@@ -58,7 +58,7 @@ The homepage's entire verbose VPN/Sufler support section and the standalone supp
 
 ## VPN tariff emphasis — preview behavior
 
-On hover-capable fine pointers outside forced-colors mode, the homepage and `/vpn/` dim their surroundings while all four tariff rows remain undimmed; the hovered row uses the existing graphite field. With no tariff hovered, keyboard focus receives the same emphasis. The scrim is pointer-transparent. Its fade and the row-background transition take 180ms only when reduced motion is not requested. Native mobile disclosures, prices, copy and purchase destinations remain unchanged. Publication of this shown preview still requires the owner's explicit approval.
+On hover-capable fine pointers outside forced-colors mode, the homepage and `/vpn/` dim their surroundings while all four tariff rows remain undimmed; the hovered row uses the existing graphite field. With no tariff hovered, keyboard focus keeps the local row emphasis and visible outline without activating the page scrim. This prevents an offscreen focused tariff from leaving the whole page dim after scrolling. The scrim is pointer-transparent. Its fade and the row-background transition take 180ms only when reduced motion is not requested. Native mobile disclosures, prices, copy and purchase destinations remain unchanged. Publication of this shown preview still requires the owner's explicit approval.
 
 ## VPN pricing — preview candidate, 2026-10-21
 

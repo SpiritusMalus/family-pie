@@ -115,7 +115,7 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.035em;line-height:1.15;text-wrap:ba
 /* Keep every tariff readable while the surroundings recede. */
 @media(hover:hover) and (pointer:fine) and (forced-colors:none){
  body::after{content:"";position:fixed;inset:0;z-index:10;background:#000b;opacity:0;pointer-events:none}
- body:has(.vpn-plan:hover,.vpn-plan :focus-visible)::after{opacity:1}
+ body:has(.vpn-plan:hover)::after{opacity:1}
  .vpn-plans{position:relative;z-index:11}
  .vpn-plan:hover,body:not(:has(.vpn-plan:hover)) .vpn-plan:has(:focus-visible){background:#101215}
 }
