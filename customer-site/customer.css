@@ -112,15 +112,14 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.035em;line-height:1.15;text-wrap:ba
 .vpn-plan[data-best=true] .vpn-plan-action{background:var(--accent);color:var(--paper);border-color:var(--accent)}
 .vpn-plan[data-best=true] .vpn-plan-action span:last-child{color:var(--paper)}
 
-/* Spotlight only the hovered subscription benefit; tariffs never dim the page. */
+/* Emphasize only the hovered benefit; the page and tariffs keep their brightness. */
 @media(hover:hover) and (pointer:fine) and (forced-colors:none){
- body::after{content:"";position:fixed;inset:0;z-index:10;background:#000b;opacity:0;pointer-events:none}
- body:has(.vpn-features li:hover)::after{opacity:1}
- .vpn-features li:hover{position:relative;z-index:11}
+ .vpn-features li:hover :is(h3,h4){color:var(--accent)}
+ .vpn-features li:hover .vpn-icon{color:#ffb39f}
  .vpn-plan:hover,body:not(:has(.vpn-plan:hover)) .vpn-plan:has(:focus-visible){background:#101215}
 }
 @media(hover:hover) and (pointer:fine) and (forced-colors:none) and (prefers-reduced-motion:no-preference){
- body::after{transition:opacity .18s cubic-bezier(.16,1,.3,1)}
+ .vpn-features :is(h3,h4){transition:color .18s cubic-bezier(.16,1,.3,1)}
  .vpn-plan{transition:background-color .18s cubic-bezier(.16,1,.3,1)}
 }
 
@@ -171,7 +170,6 @@ figure{margin:0}
  .device-option:hover>span,.device-setup:hover{color:var(--ink)}
  .device-setup:hover>span:last-child{transform:translate(2px,-2px)}
  .vpn-devices a:hover{transform:translateY(-3px);color:var(--accent)}
- .vpn-features li:hover .vpn-icon{filter:none;color:var(--ink)}
 }
 @media(max-width:1050px){
  .vpn-intro{gap:32px}.vpn-offer .product-actions{gap:8px 20px}

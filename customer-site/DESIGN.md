@@ -328,7 +328,7 @@ Support retains two columns with a 64px gap, reduced to 32px at 900px and stacke
 
 ## Elevation & Depth
 
-Depth belongs to the physical hero drawing and the actual Sufler capture. Hardware frames and the laptop base cast contained shadows; Sufler retains its inner image shadow. Capabilities and price rows stay flat. Ambient coral remains static. Capability icons change to primary ink on hover; their active treatment has no glow.
+Depth belongs to the physical hero drawing and the actual Sufler capture. Hardware frames and the laptop base cast contained shadows; Sufler retains its inner image shadow. Capabilities and price rows stay flat. Ambient coral remains static. In the current preview, the hovered capability heading uses storefront coral and its icon uses hover coral, with no glow or page dimming.
 
 Motion is bounded and local: platform selection repositions devices over 500ms, with a quicker opacity change; the stage has one clipped 700ms arrival. Native radio underline, setup arrow, primary/price actions and device destinations have short control feedback. Hover-capable actions lift and press by a small amount; device links rise slightly. Interpolation and arrival are declared only when reduced motion is not requested. Reduced motion removes those transitions/arrival and smooth scrolling while retaining immediate selected and hover states. No device cycles itself, no ambient animation runs and no animation library or connection API is added.
 
@@ -348,7 +348,7 @@ The hardware radius family belongs only to the CSS drawing: laptop body, TV, pho
 
 **Navigation and language.** The header retains the Family Spy mark, direct VPN/Sufler/Help anchors and RU/EN controls. Navigation/languages have 44px minimum targets; languages also have 44px minimum widths. Selected language uses primary ink and an underline offset by 6px. JavaScript reveals languages while default Russian copy and destinations remain usable without it.
 
-**Capabilities.** Four concise factual headings use consistent coral Tabler line icons with 1.6 stroke. Their open band has no individual fill or box. Hover changes icon ink without implying a click destination; factual content retains a default cursor. On hover-capable fine pointers outside forced-colors mode, the page scrim dims the surroundings and only the hovered capability stays above it. Leaving the capability restores the page. Tariff hover and keyboard focus do not activate the scrim. Reduced motion removes its fade.
+**Capabilities.** Four concise factual headings use consistent coral Tabler line icons with 1.6 stroke. Their open band has no individual fill or box. The current preview changes only the hovered heading to storefront coral and its icon to hover coral on hover-capable fine pointers outside forced-colors mode. Factual content retains a default cursor. There is no page scrim, elevation, fill or layout movement; other items and prices retain their normal brightness. Leaving restores the original colors. Reduced motion removes the 180ms color fade. Publication awaits owner approval of the rendered candidate.
 
 **Pricing.** Native details hold four 30/90/180/365-day rows. JavaScript keeps desktop offers open and removes summaries from tab order; at 600px and below 30 days is initially open in the exclusive `vpn-offers` group. At most one mobile offer is open, and it may also be closed. Returning to desktop opens all rows; the last chosen duration is retained when returning to mobile. Without JavaScript all rows start open with useful account-pricing links.
 
