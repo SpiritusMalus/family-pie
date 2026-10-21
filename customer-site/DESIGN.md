@@ -348,7 +348,7 @@ The hardware radius family belongs only to the CSS drawing: laptop body, TV, pho
 
 **Navigation and language.** The header retains the Family Spy mark, direct VPN/Sufler/Help anchors and RU/EN controls. Navigation/languages have 44px minimum targets; languages also have 44px minimum widths. Selected language uses primary ink and an underline offset by 6px. JavaScript reveals languages while default Russian copy and destinations remain usable without it.
 
-**Capabilities.** Four concise factual headings use consistent coral Tabler line icons with 1.6 stroke. Their open band has no individual fill or box. Hover changes icon ink without implying a click destination; factual content retains a default cursor.
+**Capabilities.** Four concise factual headings use consistent coral Tabler line icons with 1.6 stroke. Their open band has no individual fill or box. Hover changes icon ink without implying a click destination; factual content retains a default cursor. On hover-capable fine pointers outside forced-colors mode, the page scrim dims the surroundings and only the hovered capability stays above it. Leaving the capability restores the page. Tariff hover and keyboard focus do not activate the scrim. Reduced motion removes its fade.
 
 **Pricing.** Native details hold four 30/90/180/365-day rows. JavaScript keeps desktop offers open and removes summaries from tab order; at 600px and below 30 days is initially open in the exclusive `vpn-offers` group. At most one mobile offer is open, and it may also be closed. Returning to desktop opens all rows; the last chosen duration is retained when returning to mobile. Without JavaScript all rows start open with useful account-pricing links.
 
