@@ -52,7 +52,7 @@ jobs:
       - name: Test VPN service core
         run: npm ci --prefix services/vpn && node --test services/vpn/test/*.test.mjs
       - name: Test isolated Telegram Stars sandbox
-        run: node --test tools/test-vpn-stars-sandbox.mjs
+        run: node --test tools/test-vpn-stars-sandbox.mjs tools/test-vpn-stars-ledger-report.mjs
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: verify

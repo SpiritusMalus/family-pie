@@ -2,11 +2,15 @@ import {randomBytes,randomUUID,createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {PasswordRecovery} from './recovery.mjs';
 import {validateStarsPlans} from './telegram-pricing.mjs';
+import {SUPPORT_EMAIL} from './support-contact.mjs';
 const digest=value=>createHash('sha256').update(value).digest('hex');
 const devices=new Set(['android','ios','windows','macos','linux','tv']);
 const invalid=message=>{const e=new Error(message);e.code='INVALID_PAYMENT';throw e;};
 const chat=value=>{const id=String(value);if(!/^[1-9][0-9]{0,15}$/.test(id)||!Number.isSafeInteger(Number(id)))invalid('Недопустимый личный чат');return id;};
 const required=(ok,message='Не удалось проверить платёж')=>{if(!ok)invalid(message);};
+// Bump the version whenever this purchase notice or the linked purchase terms change.
+export const TELEGRAM_STARS_TERMS=Object.freeze({version:'2026-10-27.1',notice:'Платёж в Telegram Stars разовый. Автоматических списаний нет. Доступ появится после подтверждения оплаты. Помощь с оплатой и возвратом: /paysupport или '+SUPPORT_EMAIL+'.',termsPath:'/vpn/terms/',privacyPath:'/vpn/privacy/'});
+const termsSnapshot=JSON.stringify(TELEGRAM_STARS_TERMS),termsHash=digest(termsSnapshot);
 
 // Prices are explicit Stars amounts, never a conversion from the website RUB price.
 export function loadTelegramStarsConfig(env=process.env){
@@ -27,7 +31,10 @@ export class TelegramCommerce {
   this.db.exec(`CREATE TABLE IF NOT EXISTS telegram_native_accounts(account_id TEXT PRIMARY KEY REFERENCES identities(account_id),registered_chat TEXT NOT NULL,terms_at INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS telegram_handoffs(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES identities(account_id),chat_id TEXT NOT NULL,generation TEXT NOT NULL,purpose TEXT NOT NULL,device TEXT NOT NULL,expires INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS telegram_orders(order_id TEXT PRIMARY KEY REFERENCES orders(id),payload TEXT UNIQUE NOT NULL,chat_id TEXT NOT NULL,precheckout_id TEXT UNIQUE,expires INTEGER NOT NULL);
-   CREATE TABLE IF NOT EXISTS telegram_refunds(order_id TEXT PRIMARY KEY REFERENCES orders(id),state TEXT NOT NULL,requested_at INTEGER NOT NULL);`);
+   CREATE TABLE IF NOT EXISTS telegram_refunds(order_id TEXT PRIMARY KEY REFERENCES orders(id),state TEXT NOT NULL,requested_at INTEGER NOT NULL);
+   CREATE TABLE IF NOT EXISTS telegram_purchase_consents(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES identities(account_id),chat_id TEXT NOT NULL,generation TEXT NOT NULL,request_key TEXT NOT NULL,days INTEGER NOT NULL,stars INTEGER NOT NULL,terms_version TEXT NOT NULL,terms_hash TEXT NOT NULL,terms_json TEXT NOT NULL,expires INTEGER NOT NULL,accepted_at INTEGER,order_id TEXT REFERENCES orders(id));
+   CREATE INDEX IF NOT EXISTS telegram_purchase_order ON telegram_purchase_consents(order_id);
+   CREATE INDEX IF NOT EXISTS telegram_purchase_pending ON telegram_purchase_consents(account_id,expires);`);
   this.recovery=recovery||new PasswordRecovery(store,users,{origin,clock});
  }
  recoveryHandoff(chatId){return this.recovery.issueTelegram(chatId);}
@@ -88,18 +95,62 @@ export class TelegramCommerce {
    return {...this.users.newSession(row.account_id,{method:'telegram'}),device:row.device};
   });
  }
- invoice(chatId,days,requestKey){
+ purchaseAccount(chatId,days,requestKey){
   const id=chat(chatId),identity=this.accountForChat(id),plan=this.starPlans.get(Number(days));
   required(this.enabled&&plan,'Покупка в Telegram пока недоступна');required(identity?.role==='user','Сначала создай или подключи пользовательский аккаунт');
   const sub=this.users.subscription(identity.account_id);required(!sub.deleted&&!sub.allow_unlimited,'Для этого аккаунта покупка недоступна');
   required(typeof requestKey==='string'&&requestKey.length>=8&&requestKey.length<=128,'Не удалось создать заказ');
+  const link=this.db.prepare('SELECT generation FROM telegram_links WHERE account_id=? AND chat_id=?').get(identity.account_id,id);
+  return {id,identity,plan,generation:link?.generation};
+ }
+ prunePurchaseOffers(){this.db.prepare('DELETE FROM telegram_purchase_consents WHERE order_id IS NULL AND expires<=?').run(this.clock());}
+ preparePurchase(chatId,days,requestKey){
+  return this.transaction(()=>{
+   const {id,identity,plan,generation}=this.purchaseAccount(chatId,days,requestKey),old=this.db.prepare('SELECT * FROM orders WHERE account_id=? AND request_key=?').get(identity.account_id,requestKey);
+   if(old)required(old.provider==='telegram-stars'&&old.currency==='XTR'&&old.days===Number(days)&&old.payment_actor===id&&old.state==='pending','Данные заказа уже сохранены');
+   const binding=old&&this.db.prepare('SELECT expires FROM telegram_orders WHERE order_id=?').get(old.id);
+   required(!old||binding?.expires>this.clock(),'Срок заказа истёк. Выбери тариф ещё раз');
+   // Retain order-linked acceptance evidence; unused quotes expire without retaining chat data forever.
+   this.prunePurchaseOffers();this.db.prepare('DELETE FROM telegram_purchase_consents WHERE order_id IS NULL AND account_id=? AND request_key=?').run(identity.account_id,requestKey);
+   required(this.db.prepare('SELECT count(*) n FROM telegram_purchase_consents WHERE account_id=? AND order_id IS NULL').get(identity.account_id).n<5,'Сначала заверши выбранную покупку или попробуй через 10 минут');
+   const token=randomBytes(24).toString('base64url');
+   this.db.prepare('INSERT INTO telegram_purchase_consents(token_hash,account_id,chat_id,generation,request_key,days,stars,terms_version,terms_hash,terms_json,expires) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(digest(token),identity.account_id,id,generation,requestKey,plan.days,old?old.payment_amount:plan.stars,TELEGRAM_STARS_TERMS.version,termsHash,termsSnapshot,Math.min(this.clock()+600000,binding?.expires??Infinity));
+   return this.purchaseTerms(id,token);
+  });
+ }
+ purchaseRecord(chatId,token){
+  required(typeof token==='string'&&/^[A-Za-z0-9_-]{32}$/.test(token),'Перед оплатой открой тариф и прими условия');
+  const row=this.db.prepare('SELECT * FROM telegram_purchase_consents WHERE token_hash=?').get(digest(token));
+  required(row,'Перед оплатой открой тариф и прими условия');
+  const authority=this.purchaseAccount(chatId,row.days,row.request_key);
+  required(row.account_id===authority.identity.account_id&&row.chat_id===authority.id&&row.generation===authority.generation,'Подтверди условия заново в своём аккаунте');
+  required(row.terms_version===TELEGRAM_STARS_TERMS.version&&row.terms_hash===termsHash&&row.terms_json===termsSnapshot,'Условия изменились. Выбери тариф и подтверди их заново');
+  const old=this.db.prepare('SELECT * FROM orders WHERE account_id=? AND request_key=?').get(row.account_id,row.request_key);
+  if(old)required(old.provider==='telegram-stars'&&old.currency==='XTR'&&old.state==='pending'&&old.payment_actor===row.chat_id&&old.days===row.days&&old.payment_amount===row.stars&&(!row.order_id||row.order_id===old.id),'Данные заказа уже сохранены');
+  else required(!row.order_id&&row.stars===authority.plan.stars,'Цена изменилась. Выбери тариф ещё раз');
+  const binding=old&&this.db.prepare('SELECT expires FROM telegram_orders WHERE order_id=?').get(old.id);
+  required(row.order_id?binding?.expires>this.clock():row.expires>this.clock(),'Подтверждение истекло. Выбери тариф ещё раз');
+  return row;
+ }
+ purchaseTerms(chatId,token){
+  const row=this.purchaseRecord(chatId,token);
+  return {token,days:row.days,stars:row.stars,version:row.terms_version,notice:TELEGRAM_STARS_TERMS.notice,termsUrl:this.origin+TELEGRAM_STARS_TERMS.termsPath,privacyUrl:this.origin+TELEGRAM_STARS_TERMS.privacyPath,expiresAt:row.expires};
+ }
+ acceptPurchase(chatId,token){
+  return this.transaction(()=>{const row=this.purchaseRecord(chatId,token);this.db.prepare('UPDATE telegram_purchase_consents SET accepted_at=COALESCE(accepted_at,?) WHERE token_hash=?').run(this.clock(),digest(token));return {days:row.days,requestKey:row.request_key,consentToken:token};});
+ }
+ invoice(chatId,days,requestKey,consentToken){
+  const id=chat(chatId);
   const order=this.transaction(()=>{
+   const {identity}=this.purchaseAccount(id,days,requestKey);
+   const consent=this.purchaseRecord(id,consentToken);required(consent.accepted_at!==null&&consent.days===Number(days)&&consent.request_key===requestKey,'Перед оплатой прими условия выбранного тарифа');
    const old=this.db.prepare('SELECT * FROM orders WHERE account_id=? AND request_key=?').get(identity.account_id,requestKey);
-   if(old){required(old.provider==='telegram-stars'&&old.currency==='XTR'&&old.days===Number(days)&&old.payment_actor===id,'Данные заказа уже сохранены');return old;}
+   if(old){required(old.provider==='telegram-stars'&&old.currency==='XTR'&&old.days===Number(days)&&old.payment_actor===id&&old.payment_amount===consent.stars,'Данные заказа уже сохранены');this.db.prepare('UPDATE telegram_purchase_consents SET order_id=? WHERE token_hash=?').run(old.id,digest(consentToken));return old;}
    required(this.db.prepare("SELECT count(*) n FROM orders WHERE account_id=? AND provider='telegram-stars' AND state='pending' AND created_at>?").get(identity.account_id,this.clock()-3600000).n<5,'Сначала заверши предыдущий заказ');
    const orderId=randomUUID(),payload=randomBytes(24).toString('base64url');
-   this.db.prepare("INSERT INTO orders(id,account_id,request_key,days,price_minor,payment_amount,devices,provider,currency,payment_actor,created_at) VALUES(?,?,?,?,0,?,0,'telegram-stars','XTR',?,?)").run(orderId,identity.account_id,requestKey,plan.days,plan.stars,id,this.clock());
+   this.db.prepare("INSERT INTO orders(id,account_id,request_key,days,price_minor,payment_amount,devices,provider,currency,payment_actor,created_at) VALUES(?,?,?,?,0,?,0,'telegram-stars','XTR',?,?)").run(orderId,identity.account_id,requestKey,consent.days,consent.stars,id,this.clock());
    this.db.prepare('INSERT INTO telegram_orders(order_id,payload,chat_id,expires) VALUES(?,?,?,?)').run(orderId,payload,id,this.clock()+1800000);
+   this.db.prepare('UPDATE telegram_purchase_consents SET order_id=? WHERE token_hash=? AND order_id IS NULL').run(orderId,digest(consentToken));
    return this.store.order(identity.account_id,orderId);
   });
   const binding=this.db.prepare('SELECT * FROM telegram_orders WHERE order_id=?').get(order.id);
@@ -118,6 +169,8 @@ export class TelegramCommerce {
    required(typeof query?.id==='string'&&query.id.length>0&&query.id.length<=256&&query.from?.is_bot!==true);
    const order=this.paymentOrder(query.from?.id,query),identity=this.accountForChat(query.from.id),sub=identity&&this.users.subscription(identity.account_id);
    required(this.enabled&&identity?.account_id===order.account_id&&identity.role==='user'&&!sub.deleted&&!sub.allow_unlimited&&order.state==='pending'&&order.expires>this.clock(),'Заказ недоступен. Открой новый в боте');
+   const link=this.db.prepare('SELECT generation FROM telegram_links WHERE account_id=? AND chat_id=?').get(order.account_id,String(query.from.id));
+   required(this.db.prepare('SELECT 1 FROM telegram_purchase_consents WHERE order_id=? AND account_id=? AND chat_id=? AND generation=? AND days=? AND stars=? AND terms_version=? AND terms_hash=? AND terms_json=? AND accepted_at IS NOT NULL').get(order.id,order.account_id,String(query.from.id),link?.generation,order.days,order.payment_amount,TELEGRAM_STARS_TERMS.version,termsHash,termsSnapshot),'Перед оплатой выбери тариф и подтверди условия заново');
    required(!order.precheckout_id||order.precheckout_id===query.id,'Этот заказ уже проверяется. Не оплачивай его повторно');
    this.db.prepare('UPDATE telegram_orders SET precheckout_id=? WHERE order_id=?').run(query.id,order.id);
    return {...answer,ok:true};

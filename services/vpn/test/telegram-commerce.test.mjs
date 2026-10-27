@@ -11,6 +11,7 @@ import {mkdtempSync,rmSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 
+function purchase(commerce,chatId,days,key){const offer=commerce.preparePurchase(chatId,days,key);commerce.acceptPurchase(chatId,offer.token);return commerce.invoice(chatId,days,key,offer.token);}
 const DAY=86400000,origin='https://family-spy.ru';
 function fixture(t,{enabled=true}={}){
  let now=Date.now();const store=new VpnStore(':memory:',{clock:()=>now,plans:[{days:30,priceMinor:30000,devices:0}]}),users=new Accounts(store,{clock:()=>now});new TelegramStore(store,{clock:()=>now});
@@ -18,7 +19,7 @@ function fixture(t,{enabled=true}={}){
  t.after(()=>store.close());return {store,users,commerce,advance:n=>now+=n,now:()=>now};
 }
 function paid(commerce,chatId,days,key,charge){
- const invoice=commerce.invoice(chatId,days,key),query={id:'query-'+key,from:{id:chatId},invoice_payload:invoice.payload,currency:'XTR',total_amount:invoice.prices[0].amount};
+ const invoice=purchase(commerce,chatId,days,key),query={id:'query-'+key,from:{id:chatId},invoice_payload:invoice.payload,currency:'XTR',total_amount:invoice.prices[0].amount};
  assert.equal(commerce.preCheckout(query).ok,true);
  const message={chat:{id:chatId,type:'private'},from:{id:chatId},successful_payment:{currency:'XTR',total_amount:query.total_amount,invoice_payload:invoice.payload,telegram_payment_charge_id:charge}};
  return {invoice,query,message,result:commerce.successfulPayment(message)};
@@ -49,17 +50,17 @@ test('Telegram-first registration is explicit, idempotent, passwordless, and has
  assert.equal(store.db.prepare('SELECT count(*) n FROM accounts').get().n,1);
 });
 test('Stars sales are disabled until explicitly approved; invoice retries preserve currency and immutable prices',t=>{
- const f=fixture(t,{enabled:false});f.commerce.ensure(123,{acceptedTerms:true});assert.equal(f.commerce.plans().available,false);assert.throws(()=>f.commerce.invoice(123,30,'request-key-1'),/недоступна/);
+ const f=fixture(t,{enabled:false});f.commerce.ensure(123,{acceptedTerms:true});assert.equal(f.commerce.plans().available,false);assert.throws(()=>purchase(f.commerce,123,30,'request-key-1'),/недоступна/);
  const c=new TelegramCommerce(f.store,{users:f.users,stars:{enabled:true,approved:false,plans:[{days:30,stars:150}]}});assert.equal(c.plans().available,false);
- f.commerce.enabled=true;const invoice=f.commerce.invoice(123,30,'request-key-1');assert.equal(invoice.currency,'XTR');assert.equal(invoice.provider_token,undefined);assert.equal(invoice.prices.length,1);assert.equal(invoice.prices[0].amount,150);
- f.commerce.starPlans.set(30,{days:30,stars:999});assert.deepEqual(f.commerce.invoice(123,30,'request-key-1'),invoice);
+ f.commerce.enabled=true;const invoice=purchase(f.commerce,123,30,'request-key-1');assert.equal(invoice.currency,'XTR');assert.equal(invoice.provider_token,undefined);assert.equal(invoice.prices.length,1);assert.equal(invoice.prices[0].amount,150);
+ f.commerce.starPlans.set(30,{days:30,stars:999});assert.deepEqual(purchase(f.commerce,123,30,'request-key-1'),invoice);
  const order=f.store.db.prepare('SELECT * FROM orders').get();assert.equal(order.provider,'telegram-stars');assert.equal(order.currency,'XTR');assert.equal(order.price_minor,0);assert.equal(order.payment_amount,150);
- assert.throws(()=>f.store.createOrder(order.account_id,30,'request-key-1'),/already used/);assert.throws(()=>f.commerce.invoice(123,90,'request-key-1'),/сохранены/);
+ assert.throws(()=>f.store.createOrder(order.account_id,30,'request-key-1'),/already used/);assert.throws(()=>purchase(f.commerce,123,90,'request-key-1'),/сохранены/);
  assert.equal(f.store.subscription(order.account_id).active,false);
 });
 test('pre-checkout binds actor, amount, XTR, expiry and one query; only successful payment grants exactly once',t=>{
  const f=fixture(t),c=f.commerce;c.ensure(123,{acceptedTerms:true});c.ensure(456,{acceptedTerms:true});
- const invoice=c.invoice(123,30,'request-one'),q={id:'pre-one',from:{id:123},invoice_payload:invoice.payload,currency:'XTR',total_amount:150};
+ const invoice=purchase(c,123,30,'request-one'),q={id:'pre-one',from:{id:123},invoice_payload:invoice.payload,currency:'XTR',total_amount:150};
  for(const patch of [{from:{id:456}},{currency:'RUB'},{total_amount:151},{invoice_payload:'forged'}])assert.equal(c.preCheckout({...q,...patch}).ok,false);
  assert.equal(c.preCheckout(q).ok,true);assert.equal(c.preCheckout(q).ok,true);assert.equal(c.preCheckout({...q,id:'other-query'}).ok,false);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
@@ -68,14 +69,14 @@ test('pre-checkout binds actor, amount, XTR, expiry and one query; only successf
  const result=c.successfulPayment(message);assert.equal(result.duplicate,false);assert.equal(result.subscription.active,true);assert.equal(c.successfulPayment(message).duplicate,true);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,1);assert.equal(f.store.db.prepare('SELECT count(*) n FROM jobs').get().n,1);
  assert.throws(()=>c.successfulPayment({...message,successful_payment:{...message.successful_payment,telegram_payment_charge_id:'charge-other'}}),e=>e.code==='INVALID_PAYMENT');
- const next=c.invoice(123,90,'request-next'),q2={...q,id:'pre-next',invoice_payload:next.payload,total_amount:400};assert.equal(c.preCheckout(q2).ok,true);
+ const next=purchase(c,123,90,'request-next'),q2={...q,id:'pre-next',invoice_payload:next.payload,total_amount:400};assert.equal(c.preCheckout(q2).ok,true);
  assert.throws(()=>c.successfulPayment({...message,successful_payment:{...message.successful_payment,invoice_payload:next.payload,total_amount:400}}),e=>e.code==='INVALID_PAYMENT');
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,1);
 });
 test('payment processing participates in update transaction and late paid events survive sales shutdown',t=>{
  const f=fixture(t),c=f.commerce;c.ensure(123,{acceptedTerms:true});const p=paid(c,123,30,'request-atomic','charge-atomic');
  const before=f.store.subscription(p.result.accountId);assert.equal(before.revision,1);
- const next=c.invoice(123,90,'request-rollback'),q={id:'query-rollback',from:{id:123},invoice_payload:next.payload,currency:'XTR',total_amount:400};assert.equal(c.preCheckout(q).ok,true);
+ const next=purchase(c,123,90,'request-rollback'),q={id:'query-rollback',from:{id:123},invoice_payload:next.payload,currency:'XTR',total_amount:400};assert.equal(c.preCheckout(q).ok,true);
  const message={...p.message,successful_payment:{...p.message.successful_payment,invoice_payload:next.payload,total_amount:400,telegram_payment_charge_id:'charge-rollback'}};
  assert.throws(()=>f.store.transaction(()=>{c.successfulPayment(message);throw new Error('offset write failed');}),/offset/);
  assert.equal(f.store.subscription(p.result.accountId).revision,1);c.enabled=false;f.advance(2*DAY);

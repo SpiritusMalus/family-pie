@@ -11,6 +11,7 @@ import {TelegramStore} from '../telegram.mjs';
 import {TelegramUI} from '../telegram-ui.mjs';
 
 // These are proposed synthetic catalogue values, not approved production prices.
+function purchase(commerce,chatId,days,key){const offer=commerce.preparePurchase(chatId,days,key);commerce.acceptPurchase(chatId,offer.token);return commerce.invoice(chatId,days,key,offer.token);}
 const candidate=[{days:30,stars:350},{days:90,stars:900},{days:180,stars:1600},{days:365,stars:2800}];
 function fixture(t,{plans=candidate,enabled=true}={}){
  const store=new VpnStore(':memory:');t.after(()=>store.close());const users=new Accounts(store),telegram=new TelegramStore(store);
@@ -58,9 +59,9 @@ test('explicit config files are validated independently of enablement and never 
 });
 
 test('catalogue replacement affects new invoices while replayed and persisted orders retain their original price',t=>{
- const f=fixture(t),first=f.commerce.invoice(1001,30,'pricing-existing-order');
+ const f=fixture(t),first=purchase(f.commerce,1001,30,'pricing-existing-order');
  const changed=new TelegramCommerce(f.store,{users:f.users,stars:{enabled:true,approved:true,plans:[{days:90,stars:950},{days:30,stars:400}]}});
- assert.deepEqual(changed.invoice(1001,30,'pricing-existing-order'),first);assert.equal(changed.invoice(1001,30,'pricing-new-order').prices[0].amount,400);
+ assert.deepEqual(purchase(changed,1001,30,'pricing-existing-order'),first);assert.equal(purchase(changed,1001,30,'pricing-new-order').prices[0].amount,400);
  const rows=f.store.db.prepare('SELECT payment_amount FROM orders ORDER BY payment_amount').all();assert.deepEqual(rows.map(p=>p.payment_amount),[350,400]);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
  assert.throws(()=>new TelegramCommerce(f.store,{users:f.users,stars:{plans:[{days:30,stars:400},{days:90,stars:1200}]}}),/less per day/);assert.deepEqual(f.store.db.prepare('SELECT payment_amount FROM orders ORDER BY payment_amount').all().map(p=>p.payment_amount),[350,400]);
 });
