@@ -1,0 +1,535 @@
+{
+  "schema": "family-vpn-bot-preview/v1",
+  "syntheticOnly": true,
+  "generatedAt": "2026-10-27T13:21:18.576Z",
+  "fixtureDate": "2026-10-27T12:00:00.000Z",
+  "evidence": "Messages captured from TelegramStore.update → TelegramUI → injected local sender. No Telegram API, provider, real profile or device import.",
+  "redaction": "Opaque callback, account and handoff tokens excluded. Visible text and button labels are exact handler output. All displayed subscription values are synthetic.",
+  "sales": {
+    "enabled": false,
+    "approved": false,
+    "starPrices": []
+  },
+  "sources": {
+    "services/vpn/telegram-ui.mjs": "c498f0b451afb3acc6f79eb6d6426d45bd295665a3825ab16697dc4496065fc2",
+    "services/vpn/telegram.mjs": "01ca777aa060553e1bd79b438116202ba4f92dbb1a6110914a3fb7ab72773710",
+    "services/vpn/telegram-commerce.mjs": "8b8e7c0d62bfdd36e958667fde51b5f230d6419b30b780009fbb2bdb4547650f"
+  },
+  "screens": [
+    {
+      "id": "guest",
+      "title": "Первый запуск",
+      "trigger": "/start",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>Family VPN</b>\n\nПодключи существующую подписку или создай аккаунт.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Подключиться",
+              "kind": "callback",
+              "action": "devices",
+              "arguments": {}
+            },
+            {
+              "text": "Моя подписка",
+              "kind": "callback",
+              "action": "subscription",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "Купить / продлить",
+              "kind": "callback",
+              "action": "plans",
+              "arguments": {}
+            },
+            {
+              "text": "Помощь",
+              "kind": "callback",
+              "action": "help",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "Напоминания",
+              "kind": "callback",
+              "action": "settings",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "unlinked",
+      "title": "Подключение аккаунта",
+      "trigger": "Купить / продлить",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>Family VPN</b>\n\nПодключи существующую подписку или создай аккаунт.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Уже есть подписка",
+              "kind": "callback",
+              "action": "binding",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "Создать аккаунт",
+              "kind": "callback",
+              "action": "create",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "Помощь",
+              "kind": "callback",
+              "action": "help",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "binding",
+      "title": "Уже покупал на сайте",
+      "trigger": "Уже есть подписка",
+      "message": {
+        "method": "sendMessage",
+        "text": "Уже покупал на сайте? Войди в кабинет → Настройки → Telegram → Подключить. После Start вернись на сайт и подтверди привязку.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Открыть кабинет",
+              "kind": "url",
+              "url": "https://family-spy.ru/vpn/cabinet/#settings"
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "terms",
+      "title": "Новый аккаунт",
+      "trigger": "Создать аккаунт",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>Создать аккаунт Family VPN</b>\n\nTelegram станет способом входа в сервис. Подписка появится после подтверждённой оплаты. Нажимая «Принимаю и продолжаю», ты принимаешь условия сервиса и обработку данных.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Условия и конфиденциальность",
+              "kind": "url",
+              "url": "https://family-spy.ru/vpn/terms/"
+            }
+          ],
+          [
+            {
+              "text": "Принимаю и продолжаю",
+              "kind": "callback",
+              "action": "accept_terms",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "sales-unavailable",
+      "title": "Покупка пока закрыта",
+      "trigger": "Принимаю и продолжаю",
+      "message": {
+        "method": "sendMessage",
+        "text": "Покупка в Telegram пока недоступна. Текущая подписка и помощь остаются здесь.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Моя подписка",
+              "kind": "callback",
+              "action": "subscription",
+              "arguments": {}
+            },
+            {
+              "text": "Помощь",
+              "kind": "callback",
+              "action": "help",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "paid",
+      "title": "Подписка активна",
+      "trigger": "/start",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>Family VPN</b>\n\nПодписка активна до 26 ноября 2026 г.\nБез ограничений по устройствам.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Подключиться",
+              "kind": "callback",
+              "action": "devices",
+              "arguments": {}
+            },
+            {
+              "text": "Моя подписка",
+              "kind": "callback",
+              "action": "subscription",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "Купить / продлить",
+              "kind": "callback",
+              "action": "plans",
+              "arguments": {}
+            },
+            {
+              "text": "Помощь",
+              "kind": "callback",
+              "action": "help",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "Напоминания",
+              "kind": "callback",
+              "action": "settings",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "devices",
+      "title": "Выбор устройства",
+      "trigger": "Подключиться",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>На каком устройстве подключаем VPN?</b>\n\nУстановка → добавление подписки → включение VPN.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "iPhone / iPad",
+              "kind": "callback",
+              "action": "device",
+              "arguments": {
+                "device": "ios"
+              }
+            },
+            {
+              "text": "Android",
+              "kind": "callback",
+              "action": "device",
+              "arguments": {
+                "device": "android"
+              }
+            }
+          ],
+          [
+            {
+              "text": "Windows",
+              "kind": "callback",
+              "action": "device",
+              "arguments": {
+                "device": "windows"
+              }
+            },
+            {
+              "text": "Mac",
+              "kind": "callback",
+              "action": "device",
+              "arguments": {
+                "device": "macos"
+              }
+            }
+          ],
+          [
+            {
+              "text": "Linux",
+              "kind": "callback",
+              "action": "device",
+              "arguments": {
+                "device": "linux"
+              }
+            },
+            {
+              "text": "Smart TV",
+              "kind": "callback",
+              "action": "device",
+              "arguments": {
+                "device": "tv"
+              }
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "install",
+      "title": "Установка и импорт",
+      "trigger": "iPhone / iPad",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>iPhone / iPad</b>\n\n1. Установи Happ.\n2. Добавь личную подписку. Логин от сайта в приложении не нужен.\n3. Включи VPN в приложении.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "App Store",
+              "kind": "url",
+              "url": "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"
+            }
+          ],
+          [
+            {
+              "text": "Добавить подписку в приложение",
+              "kind": "handoff",
+              "url": "https://preview.example.invalid/vpn/connect/#SYNTHETIC_HANDOFF_REDACTED"
+            }
+          ],
+          [
+            {
+              "text": "Скопировать / вставить вручную",
+              "kind": "callback",
+              "action": "manual",
+              "arguments": {
+                "device": "ios"
+              }
+            }
+          ],
+          [
+            {
+              "text": "QR для другого устройства",
+              "kind": "callback",
+              "action": "qr",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← Выбрать устройство",
+              "kind": "callback",
+              "action": "devices",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "manual",
+      "title": "Ручное добавление",
+      "trigger": "Скопировать / вставить вручную",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>iPhone / iPad</b>\n\n1. Установи Happ.\n2. Добавь личную подписку. Логин от сайта в приложении не нужен.\n3. Включи VPN в приложении.\n\n<b>Личная ссылка</b>\n<code>https://subscription.example.invalid/sub/PREVIEW_ONLY</code>\n\nСкопируй её → открой Happ → «+» → добавь подписку из буфера. Не публикуй ссылку.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "App Store",
+              "kind": "url",
+              "url": "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215"
+            }
+          ],
+          [
+            {
+              "text": "Добавить подписку в приложение",
+              "kind": "handoff",
+              "url": "https://preview.example.invalid/vpn/connect/#SYNTHETIC_HANDOFF_REDACTED"
+            }
+          ],
+          [
+            {
+              "text": "Скопировать ссылку",
+              "kind": "copy",
+              "copyText": "https://subscription.example.invalid/sub/PREVIEW_ONLY"
+            }
+          ],
+          [
+            {
+              "text": "QR для другого устройства",
+              "kind": "callback",
+              "action": "qr",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← Выбрать устройство",
+              "kind": "callback",
+              "action": "devices",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "notifications",
+      "title": "Напоминания",
+      "trigger": "/notifications",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>Напоминания</b>\n\nВключены: за 3 дня, за сутки и после окончания подписки.\nБессрочной подписке напоминания не нужны.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Выключить напоминания",
+              "kind": "callback",
+              "action": "reminders",
+              "arguments": {
+                "enabled": false
+              }
+            }
+          ],
+          [
+            {
+              "text": "Отвязать Telegram",
+              "kind": "callback",
+              "action": "unlink",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "muted",
+      "title": "Напоминания выключены",
+      "trigger": "/stop",
+      "message": {
+        "method": "sendMessage",
+        "text": "<b>Напоминания</b>\n\nВыключены. Подписка и вход через Telegram сохранены.\nБессрочной подписке напоминания не нужны.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "Включить напоминания",
+              "kind": "callback",
+              "action": "reminders",
+              "arguments": {
+                "enabled": true
+              }
+            }
+          ],
+          [
+            {
+              "text": "Отвязать Telegram",
+              "kind": "callback",
+              "action": "unlink",
+              "arguments": {}
+            }
+          ],
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "help",
+      "title": "Помощь в чате",
+      "trigger": "Помощь",
+      "message": {
+        "method": "sendMessage",
+        "text": "Напиши, что случилось. Можно приложить фото или скриншот. Ответ придёт сюда.\nНе отправляй личную ссылку, пароли, коды входа и платёжные данные.\n/cancel — закончить обращение.",
+        "parseMode": "HTML",
+        "buttons": [
+          [
+            {
+              "text": "← В меню",
+              "kind": "callback",
+              "action": "home",
+              "arguments": {}
+            }
+          ]
+        ]
+      }
+    }
+  ]
+}

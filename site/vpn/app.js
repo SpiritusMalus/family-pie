@@ -32,7 +32,10 @@
     $$('[data-platform]').forEach(b => { b.setAttribute('aria-selected', String(b.dataset.platform === key)); b.tabIndex = b.dataset.platform === key ? 0 : -1; });
     const target = $('#guide'); if (!target) return;
     target.setAttribute('aria-labelledby', `tab-${key}`);
-    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи Happ.</strong><br>${first}<div class="guide-downloads">${downloads.map(([label,url])=>`<a class="btn secondary small" href="${url}"${url.startsWith('#')?'':' target="_blank" rel="noopener noreferrer"'}>${label}${url.startsWith('#')?'':' ↗'}</a>`).join('')}</div></li><li><strong>Добавь подписку.</strong><br>Открой «Моё подключение» ниже. После оплаты там появятся личная ссылка и QR-код. Нажми «Добавить в Happ», чтобы импортировать подписку автоматически, или добавь ссылку из буфера обмена внутри приложения.</li><li><strong>Включи VPN.</strong><br>Выбери маршрут и нажми подключение. При первом запуске разреши приложению создать VPN-соединение.</li></ol><a class="btn secondary small" href="#home">Открыть моё подключение</a><a class="btn secondary small" href="#support">Помощь с настройкой</a>`;
+    target.innerHTML = `<h2>${name}</h2><a class="setup-skip" href="#devices?platform=${key}&step=import">Приложение уже установлено</a><ol class="setup-steps"><li><h3>Установи приложение</h3><p>${first}</p><div class="guide-downloads">${downloads.map(([label,url])=>`<a class="btn secondary small" href="${url}"${url.startsWith('#')?'':' target="_blank" rel="noopener noreferrer"'}>${label}${url.startsWith('#')?'':' ↗'}</a>`).join('')}</div></li><li><h3>Добавь подписку</h3><div data-connection-slot><p>Загружаем подключение…</p></div></li><li><h3>Включи VPN</h3><p>В Happ выбери маршрут и нажми подключение. При первом запуске разреши создать VPN-соединение.</p><a class="setup-help" href="#support">Помощь с подключением</a></li></ol>`;
+    target.querySelectorAll('.guide-downloads a').forEach(a=>a.addEventListener('click',()=>window.vpnOnboardingEvent?.('install_open')));
+    target.querySelector('.setup-help')?.addEventListener('click',()=>window.vpnOnboardingEvent?.('help_click'));
+    window.dispatchEvent(new CustomEvent('vpn-platformchange',{detail:{platform:key}}));
 
   }
   $$('[data-platform]').forEach((btn, index, list) => {
@@ -49,7 +52,7 @@
     if (previousScreen && previousScreen !== key) { window.scrollTo(0, 0); const heading = document.querySelector(`[data-screen="${key}"] h1`); if (heading) { heading.tabIndex = -1; heading.focus({preventScroll:true}); } }
     previousScreen = key;
     const params = new URLSearchParams(query);
-    if (key === 'devices') platform(params.get('platform') || preferredPlatform());
+    if (key === 'devices') {platform(params.get('platform') || preferredPlatform());if(params.get('step')==='import') $('[data-connection-slot]')?.closest('li')?.scrollIntoView({block:'start'});}
     const requestedPeriod=params.get('period')||new URLSearchParams(location.search).get('period');
     if (key === 'plans' && ['30','90','180','365'].includes(requestedPeriod)) window.dispatchEvent(new CustomEvent('vpn-plan-selection',{detail:{days:Number(requestedPeriod)}}));
     document.title = `${$('[data-route][aria-current="page"]')?.textContent.trim() || 'Кабинет'} — Family VPN`;

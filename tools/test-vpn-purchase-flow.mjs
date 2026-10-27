@@ -63,7 +63,7 @@ test('old provider return restores its authoritative order period without overri
  let release;const delayed=new Promise(resolve=>release=resolve),g=fixture({url:'https://family-spy.ru/vpn/cabinet/#plans?order='+id,check:()=>delayed});await g.ready;g.dispatch('vpn-plan-selection',{days:90});release({order:old});await flush();assert.equal(g.query('[data-days="90"]').dataset.selected,'true');assert.equal(g.location.searchParams.get('period'),'90');
 });
 test('continuing an already paid order opens the connection and never follows a stale payment URL',async()=>{
- const paid={id,state:'paid',days:180,price_minor:140000,created_at:Date.now()},f=fixture({orders:[{...paid,state:'pending'}],subscription:{active:true,payment_confirmed:true,sync_state:'synced',profile_url:'https://example.invalid/fixture-sub'},resume:()=>{f.setOrders([paid]);return {order:paid};}});await f.ready;await f.click(f.buttons('Продолжить оплату')[0]);assert.equal(f.location.hash,'#home');assert.equal(f.location.hostname,'family-spy.ru');assert.equal(f.calls.some(c=>c.path==='checkout'),false);const setup=f.root.all().find(n=>n.tagName==='A'&&n.textContent==='Настроить VPN');assert.equal(setup.href,'#devices?platform=macos');
+ const paid={id,state:'paid',days:180,price_minor:140000,created_at:Date.now()},f=fixture({orders:[{...paid,state:'pending'}],subscription:{active:true,payment_confirmed:true,sync_state:'synced',profile_url:'https://example.invalid/fixture-sub'},resume:()=>{f.setOrders([paid]);return {order:paid};}});await f.ready;await f.click(f.buttons('Продолжить оплату')[0]);assert.equal(f.location.hash,'#devices?platform=macos');assert.equal(f.location.hostname,'family-spy.ru');assert.equal(f.calls.some(c=>c.path==='checkout'),false);const setup=f.root.all().find(n=>n.tagName==='A'&&n.textContent==='Настроить VPN');assert.equal(setup.href,'#devices?platform=macos');
 });
 test('checkout sends the same selected period and active language, while stored selection cannot cross accounts',async()=>{
  const f=fixture({url:'https://family-spy.ru/vpn/cabinet/?lang=en#plans?period=180'});await f.ready;await f.click(f.buttons('Перейти к оплате')[0]);const call=f.calls.find(c=>c.path==='checkout');assert.equal(call.body.days,180);assert.equal(call.body.lang,'en');
@@ -105,4 +105,11 @@ test('switching languages reformats the ready overview expiry from the cached su
  const f=fixture({subscription:{active:true,payment_confirmed:true,sync_state:'synced',expires_at:Date.parse('2027-04-18T17:00:00Z'),profile_url:'https://example.invalid/fixture-sub'}});await f.ready;const count=f.calls.length;assert.match(f.query('.subscription').textContent,/18\.04\.2027/);
  f.window.FPi18n.lang='en';f.dispatch('fp-languagechange');await flush();assert.equal(f.calls.length,count);assert.match(f.query('.subscription').textContent,/4\/18\/2027/);
  f.window.FPi18n.lang='ru';f.dispatch('fp-languagechange');await flush();assert.equal(f.calls.length,count);assert.match(f.query('.subscription').textContent,/18\.04\.2027/);assert.equal(f.root.all().find(n=>n.tagName==='A'&&n.textContent==='Настроить VPN').href,'#devices?platform=macos');
+});
+
+
+test('Stars orders show their immutable unit amount and continue in Telegram instead of a RUB provider resume',async()=>{
+ const order={id,state:'pending',days:30,price_minor:0,payment_amount:350,currency:'XTR',provider:'telegram_stars',created_at:Date.now()},f=fixture({orders:[order]});await f.ready;
+ assert.match(f.query('.pending-checkout').textContent,/350 Stars/);assert.equal(f.buttons('Продолжить оплату').length,0);assert.equal(f.calls.some(c=>c.path.endsWith('/resume')),false);
+ assert.ok(f.root.all().some(n=>n.tagName==='A'&&n.textContent==='Открыть оплату в Telegram'&&n.href==='https://t.me/family_pie_vpn_bot'));
 });

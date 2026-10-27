@@ -1,0 +1,55 @@
+{
+  "status": "prepared-not-applied",
+  "name": "Family VPN",
+  "shortDescription": "Подключение, подписка и помощь в одном месте.",
+  "description": "Family VPN от Family Spy. Подключай устройства, проверяй подписку и пиши в поддержку прямо здесь.",
+  "language": "ru",
+  "avatar": {
+    "source": "avatar.svg",
+    "render": "avatar.png",
+    "width": 1024,
+    "height": 1024,
+    "sha256": "e513790f5f8fbffe29dbd130f0f8586dc6c02a745494606b2125b60d6dcd7b34",
+    "provenance": "Adapted directly from customer-site/index.html .brand svg; same circle and three spokes. Charcoal #101216 / coral #ff9d88."
+  },
+  "commands": [
+    {
+      "command": "menu",
+      "description": "Меню Family VPN"
+    },
+    {
+      "command": "connect",
+      "description": "Подключиться на устройстве"
+    },
+    {
+      "command": "status",
+      "description": "Моя подписка"
+    },
+    {
+      "command": "renew",
+      "description": "Купить или продлить"
+    },
+    {
+      "command": "help",
+      "description": "Написать в поддержку"
+    },
+    {
+      "command": "notifications",
+      "description": "Напоминания и привязка"
+    },
+    {
+      "command": "stop",
+      "description": "Выключить напоминания"
+    },
+    {
+      "command": "paysupport",
+      "description": "Помощь с оплатой"
+    },
+    {
+      "command": "terms",
+      "description": "Условия сервиса"
+    }
+  ],
+  "changesAppliedToTelegram": false,
+  "publication": "Owner approval and authorized bot administration required; no BotFather or API calls performed."
+}

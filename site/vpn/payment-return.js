@@ -29,8 +29,8 @@
       window.removeEventListener('focus',check);
     }
     function overview(text,tone='info') {
-      if (!overviewShown&&!location.hash.startsWith('#home')) {
-        history.replaceState(null,'',location.pathname + location.search + '#home');
+      if (!overviewShown&&!location.hash.startsWith('#devices')) {
+        history.replaceState(null,'',location.pathname + location.search + '#devices?platform='+(window.vpnDevicePlatform?.()||'android'));
         window.dispatchEvent(new Event('hashchange'));
       }
       overviewShown=true;status(text,tone);
@@ -52,7 +52,7 @@
           status(state === 'canceled' ? 'Платёж отменён. Можно оплатить выбранный тариф ещё раз.' : 'Возврат подтверждён. Подписка пересчитана.');
         } else if (sub.active && sub.sync_state === 'synced' && (!valid(order) || state === 'paid')) {
           window.vpnPurchaseIntent.forgetOrder(order);stop();
-          overview('Оплата подтверждена. Твоё подключение готово — добавь его в Happ или открой QR-код ниже.','success');
+          overview('Оплата подтверждена. Установи приложение и добавь подписку по инструкции ниже.','success');
         } else if (state === 'paid' || !valid(order) && sub.payment_confirmed) {
           overview('Оплата подтверждена. Готовим подключение; повторно платить не нужно.');
         } else {

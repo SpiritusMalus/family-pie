@@ -1,5 +1,5 @@
 (() => {
- window.vpnTelegramLink = async ({api, settings, home, accountId}) => {
+ window.vpnTelegramLink = async ({api, settings, home, setup, accountId}) => {
   let state, url = '', busy = false, checking = false, timer, deadline = 0, error = '';
   const notifyError = e => { error = e.message; render(); };
   const views = [];
@@ -11,7 +11,7 @@
   function render() {
    for (const v of views) {
     v.card.hidden = v.overview && Boolean(deferred || state?.linked && state?.enabled && !state?.pending);
-    v.status.textContent = error || (!state?.available ? 'Telegram временно недоступен. Попробуй позже.' : state.pending ? `Подтверди, что ${state.candidate} — твой Telegram-аккаунт.` : state.linked && state.enabled ? 'Telegram подключён. В боте доступны подписка, срок действия и напоминания.' : url ? 'Нажми «Старт» в Telegram и вернись сюда. Кабинет сам проверит привязку.' : 'Подписка и срок действия — в боте. Напоминания помогут вовремя продлить доступ.');
+    v.status.textContent = error || (!state?.available ? 'Telegram временно недоступен. Попробуй позже.' : state.pending ? `Подтверди, что ${state.candidate} — твой Telegram-аккаунт.` : state.linked && state.enabled ? 'Telegram подключён. В боте доступны подписка, срок действия и напоминания.' : url ? 'Нажми «Старт» в Telegram и вернись сюда. Кабинет сам проверит привязку.' : 'Подписка и помощь — в Telegram. В боте можно подключиться, продлить доступ и написать в поддержку.');
     v.start.hidden = Boolean(state?.pending || state?.linked && state?.enabled);
     v.start.disabled = busy || !state?.available;
     v.start.textContent = busy ? 'Открываем Telegram…' : url ? 'Открыть Telegram снова' : 'Подключить Telegram';
@@ -64,7 +64,7 @@
    catch (e) { notifyError(e); }
    finally { busy = false; render(); }
   }
-  for (const [container, overview] of [[home, true], [settings, false]]) {
+  for (const [container, overview] of [[home, true], [settings, false], [setup, false]]) {
    if (!container) continue;
    const card = node('section', '', 'panel cab-section telegram-link'); card.dataset.telegramLink = '';
    card.append(node('h2', 'Подписка в Telegram'));

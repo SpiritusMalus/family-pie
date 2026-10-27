@@ -13,7 +13,7 @@ export class EmailLogin{
   try{await this.send(email,code);}catch{this.db.prepare('DELETE FROM email_challenges WHERE id=?').run(id);throw new Error('Не удалось отправить письмо. Повтори позже');}return {challengeId:id};
  }
  confirm(id,code,session){const row=this.db.prepare('SELECT * FROM email_challenges WHERE id=? AND expires>? AND attempts<5').get(id,this.clock());if(!row||row.session_hash&&row.session_hash!==session?.token_hash)throw new Error('Код не подходит или устарел');this.db.prepare('UPDATE email_challenges SET attempts=attempts+1 WHERE id=?').run(id);if(typeof code!=='string'||!/^[0-9]{8}$/.test(code)||hash(id+':'+code)!==row.code_hash)throw new Error('Код не подходит или устарел');return this.store.transaction(()=>{this.db.prepare('DELETE FROM email_challenges WHERE id=?').run(id);if(row.session_hash){this.db.prepare('DELETE FROM verified_emails WHERE account_id=?').run(row.account_id);this.db.prepare('INSERT INTO verified_emails VALUES(?,?)').run(row.account_id,row.email);return {linked:true};}if(!this.users.identity(row.account_id)?.enabled)throw new Error('Аккаунт отключён');return this.users.newSession(row.account_id,{method:'email'});});}
- disconnect(id){if(!this.db.prepare('SELECT password_set FROM identities WHERE account_id=?').get(id)?.password_set&&!this.db.prepare('SELECT 1 FROM passkeys WHERE account_id=?').get(id)&&!this.db.prepare('SELECT 1 FROM google_identities WHERE account_id=?').get(id))throw new Error('Сначала добавь другой способ входа');this.db.prepare('DELETE FROM verified_emails WHERE account_id=?').run(id);}
+ disconnect(id){return this.users.authMutation(()=>{if(!this.users.hasAlternativeAuth(id,'email'))throw new Error('Сначала добавь другой способ входа');this.db.prepare('DELETE FROM verified_emails WHERE account_id=?').run(id);});}
 }
 export function smtpTransport(env=process.env,createTransport=options=>nodemailer.createTransport(options)){
  if(!env.VPN_SMTP_HOST||!env.VPN_SMTP_FROM)return null;
@@ -36,8 +36,8 @@ export function smtpPurchaseSender(env=process.env,createTransport){
 Текущий срок доступа: до ${date} (московское время).
 Количество устройств не ограничено.
 
-Открой кабинет, чтобы добавить подключение в Happ или получить ссылку и QR-код:
-${env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru'}/vpn/cabinet/#home
+Открой настройку: установи приложение, добавь личную подписку и включи VPN. Логин от сайта в приложении не нужен:
+${env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru'}/vpn/cabinet/#devices
 
 Актуальный статус подписки всегда доступен в кабинете. Повторно платить не нужно.
 Кассовый чек — отдельный документ от платёжного сервиса.

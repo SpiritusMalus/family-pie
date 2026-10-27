@@ -883,3 +883,65 @@ Object.assign(window.FP_EN, {
 // Download links append their external-link marker after the translated label.
 window.FP_PATTERNS.push(["{label} ↗", "{label} ↗", ["label"]]);
 window.FP_PATTERNS.push(["Скидка {percent}%. Сумма будет сохранена в заказе.", "Discount: {percent}%. The amount will be saved in your order.", []]);
+
+// First connection and secure Telegram handoff.
+Object.assign(window.FP_EN, {
+  "Подключить VPN": "Connect VPN",
+  "Выбери устройство. Установка и личная ссылка — здесь.": "Choose your device. Installation and your personal link are here.",
+  "Установи приложение": "Install the app",
+  "Добавь подписку": "Add your subscription",
+  "Включи VPN": "Turn on VPN",
+  "В Happ выбери маршрут и нажми подключение. При первом запуске разреши создать VPN-соединение.": "Choose a route in Happ and connect. On first use, allow the app to create a VPN connection.",
+  "Загружаем подключение…": "Loading your connection…",
+  "Помощь с подключением": "Help connecting",
+  "В приложении не нужен логин от сайта. Добавь подписку по личной ссылке.": "You do not need your website login in the app. Add your subscription using your personal link.",
+  "Добавить подписку в приложение": "Add subscription to the app",
+  "Скопировать ссылку": "Copy link",
+  "Личная ссылка подписки": "Personal subscription link",
+  "Не открылось приложение? Добавить вручную": "App did not open? Add manually",
+  "Скопируй эту ссылку. В Happ нажми «+» и добавь подписку из буфера обмена.": "Copy this link. In Happ, tap + and add the subscription from your clipboard.",
+  "Ссылка скопирована. Открой Happ и добавь её из буфера обмена.": "Link copied. Open Happ and add it from your clipboard.",
+  "Браузер не разрешил копирование. Выделенная ссылка доступна для копирования вручную.": "Your browser blocked copying. You can copy the selected link manually.",
+  "QR-код для другого устройства": "QR code for another device",
+  "Открой Happ на другом устройстве и отсканируй этот код.": "Open Happ on your other device and scan this code.",
+  "Не передавай личную ссылку и QR-код другим людям.": "Keep your personal link and QR code private.",
+  "Оплата подтверждена, но подключение пока не готово. Напиши в поддержку.": "Payment is confirmed, but your connection is not ready. Contact support.",
+  "Личная ссылка появится после оплаты подписки.": "Your personal link will appear after payment.",
+  "Подписка закончилась. Продли её, чтобы добавить подключение.": "Your subscription has expired. Renew it to add your connection.",
+  "Доступ приостановлен. Напиши в поддержку.": "Access is paused. Contact support.",
+  "Подключение готово. Открой настройку устройства, чтобы установить приложение и добавить подписку.": "Your connection is ready. Open device setup to install the app and add your subscription.",
+  "Оплата уже подтверждена. Добавь подписку в приложении.": "Payment is already confirmed. Add your subscription in the app.",
+  "Оплата подтверждена. Установи приложение и добавь подписку по инструкции ниже.": "Payment confirmed. Install the app and add your subscription using the steps below.",
+  "Подписка, продление и помощь доступны в Telegram. Подключи бота после оплаты.": "Your subscription, renewal and support are available in Telegram. Connect the bot after payment.",
+  "Подписка и помощь — в Telegram. В боте можно подключиться, продлить доступ и написать в поддержку.": "Your subscription and support are on Telegram. Connect, renew access and get help in the bot.",
+  "Открой «Устройства». Установи приложение, добавь личную подписку и включи VPN. Ссылка и QR-код находятся в этой же инструкции.": "Open Devices. Install the app, add your personal subscription and turn on VPN. The link and QR code are in the same guide.",
+  "После оплаты откроется настройка устройства с личной ссылкой и QR-кодом.": "After payment, device setup opens with your personal link and QR code.",
+  "Подключение создаётся автоматически после подтверждения оплаты. После оплаты откроется настройка устройства с личной ссылкой и QR-кодом.": "Your connection is created automatically after payment is confirmed. Device setup opens with your personal link and QR code.",
+  "Добавить подписку": "Add subscription",
+  "Готовим твою подписку…": "Preparing your subscription…",
+  "Входим через Telegram…": "Signing in through Telegram…",
+  "Ссылка устарела. Вернись в Telegram и открой новую.": "This link has expired. Go back to Telegram and open a new one.",
+  "Не удалось получить подписку. Открой новую ссылку в боте.": "Could not load your subscription. Open a new link in the bot.",
+  "Добавь подписку в приложение. Логин от сайта не нужен.": "Add your subscription to the app. You do not need your website login.",
+  "Вернуться в Telegram": "Back to Telegram",
+  "Затем выбери маршрут и включи VPN.": "Then choose a route and turn on VPN.",
+  "Если приложение не открылось, скопируй ссылку. В Happ нажми «+» и добавь подписку из буфера обмена.": "If the app did not open, copy the link. In Happ, tap + and add the subscription from your clipboard.",
+  "Для этой одноразовой ссылки нужен JavaScript. Скопируй личную ссылку прямо в боте.": "This one-time link needs JavaScript. Copy your personal link directly in the bot."
+});
+
+Object.assign(window.FP_EN, {
+  "Вход через Telegram": "Sign in through Telegram",
+  "Войти в этот аккаунт": "Sign in to this account",
+  "Использовать логин и пароль": "Use username and password",
+  "Открыть текущий кабинет": "Open current account",
+  "Проверь аккаунт и подтверди вход через Telegram.": "Check the account and confirm signing in through Telegram.",
+  "В кабинете открыт другой аккаунт. Открой его или войди по логину и паролю.": "A different account is open. Open that account or sign in with username and password.",
+  "Возврат Stars запрошен. Дождись подтверждения Telegram.": "Stars refund requested. Wait for confirmation from Telegram.",
+  "Запросить полный возврат этого заказа через Telegram Stars? Подписка будет пересчитана после подтверждения возврата.": "Request a full refund for this order through Telegram Stars? Access will be recalculated after confirmation."
+});
+
+Object.assign(window.FP_EN,{"Оплата Stars ожидает подтверждения в Telegram.": "Your Stars payment is awaiting confirmation in Telegram.", "Открыть оплату в Telegram": "Open payment in Telegram"});
+
+Object.assign(window.FP_EN,{"Возврат Stars подтверждён.": "Stars refund confirmed.", "Статус возврата Stars неоднозначен. Проверь платёж перед повторной отправкой.": "The Stars refund status is uncertain. Check the payment before sending it again."});
+
+window.FP_EN["Приложение уже установлено"]="I already have the app";

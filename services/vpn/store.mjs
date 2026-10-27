@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { chmodSync, openSync, closeSync, lstatSync } from 'node:fs';
 const DAY = 86_400_000;
 const positive = x => Number.isSafeInteger(x) && x > 0;
+const onboardingEvents=new Set(['setup_open','install_open','import_click','manual_copy','help_click']);
+const onboardingPlatforms=new Set(['android','ios','windows','macos','linux','tv']);
 export class VpnStore {
   constructor(path, { plans = [], clock = Date.now } = {}) {
     this.clock = clock;
@@ -32,9 +34,21 @@ export class VpnStore {
         state TEXT NOT NULL DEFAULT 'pending', lease_until INTEGER NOT NULL DEFAULT 0,
         attempts INTEGER NOT NULL DEFAULT 0, UNIQUE(account_id,revision));
       CREATE TABLE IF NOT EXISTS tickets(id TEXT PRIMARY KEY, account_id TEXT NOT NULL REFERENCES accounts(id),
-        message TEXT NOT NULL, created_at INTEGER NOT NULL);`);
+        message TEXT NOT NULL, created_at INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS onboarding_daily(day TEXT NOT NULL,event TEXT NOT NULL,platform TEXT NOT NULL,count INTEGER NOT NULL,PRIMARY KEY(day,event,platform));`);
+    const columns=this.db.prepare('PRAGMA table_info(orders)').all();
+    for(const [name,type] of [['provider',"TEXT NOT NULL DEFAULT 'yookassa'"],['currency',"TEXT NOT NULL DEFAULT 'RUB'"],['payment_amount','INTEGER'],['provider_charge_id','TEXT'],['payment_actor','TEXT']])if(!columns.some(x=>x.name===name))this.db.exec(`ALTER TABLE orders ADD COLUMN ${name} ${type}`);
+    this.db.exec("UPDATE orders SET payment_amount=price_minor WHERE payment_amount IS NULL;CREATE UNIQUE INDEX IF NOT EXISTS orders_provider_charge ON orders(provider,provider_charge_id) WHERE provider_charge_id IS NOT NULL");
   }
   close() { this.db.close(); }
+  recordOnboardingEvent(event,platform){
+    if(!onboardingEvents.has(event)||!onboardingPlatforms.has(platform))throw new Error('Неизвестный шаг настройки');
+    const day=new Date(this.clock()).toISOString().slice(0,10),cutoff=new Date(this.clock()-90*DAY).toISOString().slice(0,10);
+    this.transaction(()=>{
+      this.db.prepare('DELETE FROM onboarding_daily WHERE day<?').run(cutoff);
+      this.db.prepare('INSERT INTO onboarding_daily VALUES(?,?,?,1) ON CONFLICT(day,event,platform) DO UPDATE SET count=count+1').run(day,event,platform);
+    });
+  }
   transaction(fn) {
     this.db.exec('BEGIN IMMEDIATE');
     try { const result = fn(); this.db.exec('COMMIT'); return result; }
@@ -59,12 +73,12 @@ export class VpnStore {
     this.account(accountId);
     if (typeof requestKey !== 'string' || requestKey.length < 8 || requestKey.length > 128) throw new Error('Invalid request key');
     const old = this.db.prepare('SELECT * FROM orders WHERE account_id=? AND request_key=?').get(accountId,requestKey);
-    if (old) { if (String(old.days) !== String(period)) throw new Error('Request key already used'); return old; }
+    if (old) { if (old.provider!=='yookassa'||old.currency!=='RUB'||String(old.days) !== String(period)) throw new Error('Request key already used'); return old; }
     const plan = this.plans.get(String(period));
     if (!plan) throw new Error('Plan unavailable');
     const id = randomUUID();
-    this.db.prepare('INSERT INTO orders(id,account_id,request_key,days,price_minor,devices,created_at) VALUES(?,?,?,?,?,?,?)')
-      .run(id,accountId,requestKey,plan.days,plan.priceMinor,plan.devices,this.clock());
+    this.db.prepare('INSERT INTO orders(id,account_id,request_key,days,price_minor,payment_amount,devices,created_at) VALUES(?,?,?,?,?,?,?,?)')
+      .run(id,accountId,requestKey,plan.days,plan.priceMinor,plan.priceMinor,plan.devices,this.clock());
     return this.order(accountId,id);
   }
   order(accountId,id) {
@@ -76,6 +90,7 @@ export class VpnStore {
     if (typeof paymentId !== 'string' || paymentId.length > 128 || !paymentId) throw new Error('Invalid payment ID');
     return this.transaction(() => {
       const order = this.order(accountId,orderId);
+      if(order.provider!=='yookassa'||order.currency!=='RUB')throw new Error('Wrong payment provider');
       if (order.payment_id && order.payment_id !== paymentId) throw new Error('Payment already bound');
       this.db.prepare('UPDATE orders SET payment_id=? WHERE id=?').run(paymentId,orderId);
       return this.order(accountId,orderId);
@@ -106,7 +121,7 @@ export class VpnStore {
     return this.transaction(() => {
       const order = this.db.prepare('SELECT * FROM orders WHERE payment_id=?').get(payment.id);
       if (!order) throw new Error('Unknown payment');
-      if (payment.status !== 'succeeded' || payment.paid !== true || payment.test !== testMode ||
+      if (order.provider!=='yookassa'||order.currency!=='RUB'||payment.status !== 'succeeded' || payment.paid !== true || payment.test !== testMode ||
           payment.metadata?.order_id !== order.id || payment.amount?.currency !== 'RUB' ||
           payment.amount?.value !== (order.price_minor / 100).toFixed(2)) throw new Error('Payment verification failed');
       if (order.state === 'refunded') return this.subscription(order.account_id);
@@ -120,7 +135,7 @@ export class VpnStore {
     if (typeof refund.id !== 'string' || !refund.id || refund.id.length > 128) throw new Error('Invalid refund ID');
     return this.transaction(() => {
       const order = this.db.prepare('SELECT * FROM orders WHERE payment_id=?').get(refund.payment_id);
-      if (!order || !['paid','refunded'].includes(order.state) || refund.status !== 'succeeded' ||
+      if (!order || order.provider!=='yookassa'||order.currency!=='RUB'||!['paid','refunded'].includes(order.state) || refund.status !== 'succeeded' ||
         refund.amount?.currency !== 'RUB' || refund.amount?.value !== (order.price_minor / 100).toFixed(2))
         throw new Error('Refund verification failed');
       const prior = this.db.prepare('SELECT * FROM refunds WHERE id=?').get(refund.id);

@@ -14,5 +14,5 @@ export class GoogleLogin{
  }
  returnPath(state,cookie){if(!state||state!==cookie)return '/vpn/cabinet/';return googleReturnPath(this.db.prepare('SELECT return_path FROM google_states WHERE id=? AND expires>?').get(state,this.store.clock())?.return_path,this.origin);}
  state(id){return {available:this.ready(),linked:Boolean(this.db.prepare('SELECT 1 FROM google_identities WHERE account_id=?').get(id))};}
- unlink(id){if(!this.db.prepare('SELECT password_set FROM identities WHERE account_id=?').get(id)?.password_set&&!this.db.prepare('SELECT 1 FROM passkeys WHERE account_id=?').get(id)&&!this.db.prepare('SELECT 1 FROM verified_emails WHERE account_id=?').get(id))throw new Error('Сначала установи пароль или добавь ключ входа');this.db.prepare('DELETE FROM google_identities WHERE account_id=?').run(id);}
+ unlink(id){return this.users.authMutation(()=>{if(!this.users.hasAlternativeAuth(id,'google'))throw new Error('Сначала установи пароль или добавь ключ входа');this.db.prepare('DELETE FROM google_identities WHERE account_id=?').run(id);});}
 }
