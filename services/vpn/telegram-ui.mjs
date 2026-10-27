@@ -1,6 +1,7 @@
 import {createHash, randomBytes, randomUUID} from 'node:crypto';
 import QRCode from 'qrcode';
 import {SUPPORT_EMAIL,emailSupportText,supportEmailCopyButton} from './support-contact.mjs';
+import {describeStarsPlans} from './telegram-pricing.mjs';
 
 const MINUTE = 60_000, DAY = 86_400_000;
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -238,8 +239,16 @@ export class TelegramUI {
   }else if(job.view==='plans') {
    const catalogue=this.commerce.plans();
    if(sub?.allow_unlimited&&sub.unlimited){text='У тебя бессрочная подписка. Продление не требуется.';rows.push(home());}
-   else if(!catalogue.available){text='Покупка в Telegram пока недоступна. Текущая подписка и помощь остаются здесь.';rows.push([button('Моя подписка','subscription'),button('Помощь','help')],home());}
-   else {text='<b>Выбери срок подписки</b>\n\nОплата в Telegram Stars. Срок добавится к текущей подписке.';for(const plan of catalogue.plans)rows.push([button(plan.days+' дней · '+plan.stars+' ⭐','invoice',{days:plan.days})]);rows.push(home());}
+   else if(!catalogue.available||!catalogue.plans.length){text='Покупка в Telegram пока недоступна. Текущая подписка и помощь остаются здесь.';rows.push([button('Моя подписка','subscription'),button('Помощь','help')],home());}
+   else {
+    const plans=describeStarsPlans(catalogue.plans);
+    text='<b>Выбери срок подписки</b>\n\nОплата в Telegram Stars. Срок добавится к текущей подписке.';
+    if(plans.length>1||plans[0].days!==30){
+     text+='\n\nОдин платёж за весь срок. Цена за 30 дней приведена для сравнения.\n\n'+plans.map(plan=>'<b>'+plan.days+' дней · '+plan.stars+' ⭐ всего</b>\n'+plan.per30Days+' ⭐ за 30 дней'+(plan.savings?' · экономия '+html(plan.savings):'')).join('\n\n');
+     if(plans.some(plan=>plan.savings))text+='\n\nЭкономия относительно тарифа на 30 дней.';
+    }
+    for(const plan of plans)rows.push([button(plan.days+' дней · '+plan.stars+' ⭐','invoice',{days:plan.days})]);rows.push(home());
+   }
   }else if(job.view==='invoice') {
    return {method:'sendInvoice',data:this.commerce.invoice(chatId,payload.days,payload.requestKey)};
   }else if(job.view==='settings') {

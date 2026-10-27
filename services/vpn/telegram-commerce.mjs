@@ -1,8 +1,9 @@
 import {randomBytes,randomUUID,createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {PasswordRecovery} from './recovery.mjs';
+import {validateStarsPlans} from './telegram-pricing.mjs';
 const digest=value=>createHash('sha256').update(value).digest('hex');
-const periods=[30,90,180,365],devices=new Set(['android','ios','windows','macos','linux','tv']);
+const devices=new Set(['android','ios','windows','macos','linux','tv']);
 const invalid=message=>{const e=new Error(message);e.code='INVALID_PAYMENT';throw e;};
 const chat=value=>{const id=String(value);if(!/^[1-9][0-9]{0,15}$/.test(id)||!Number.isSafeInteger(Number(id)))invalid('Недопустимый личный чат');return id;};
 const required=(ok,message='Не удалось проверить платёж')=>{if(!ok)invalid(message);};
@@ -10,8 +11,8 @@ const required=(ok,message='Не удалось проверить платёж'
 // Prices are explicit Stars amounts, never a conversion from the website RUB price.
 export function loadTelegramStarsConfig(env=process.env){
  let plans=[];
- if(env.VPN_TELEGRAM_STARS_PLANS_FILE){const data=JSON.parse(readFileSync(env.VPN_TELEGRAM_STARS_PLANS_FILE,'utf8'));plans=Array.isArray(data)?data:data.plans;}
- return {enabled:env.VPN_TELEGRAM_STARS_ENABLED==='1',approved:env.VPN_TELEGRAM_STARS_APPROVED==='1',plans};
+ if(env.VPN_TELEGRAM_STARS_PLANS_FILE){const data=JSON.parse(readFileSync(env.VPN_TELEGRAM_STARS_PLANS_FILE,'utf8'));plans=Array.isArray(data)?data:data?.plans;if(!Array.isArray(plans))throw new Error('Invalid Stars plans');}
+ return {enabled:env.VPN_TELEGRAM_STARS_ENABLED==='1',approved:env.VPN_TELEGRAM_STARS_APPROVED==='1',plans:validateStarsPlans(plans)};
 }
 
 // Only the one authenticated Telegram poller calls actor/payment methods. These are
@@ -21,9 +22,7 @@ export class TelegramCommerce {
   if(!users)throw new Error('Accounts required');
   const url=new URL(origin);if(url.origin!==origin||url.protocol!=='https:'&&!(url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname)))throw new Error('HTTPS public origin required');
   this.store=store;this.db=store.db;this.users=users;this.clock=clock;this.origin=origin;
-  this.starPlans=new Map();
-  if(!Array.isArray(stars.plans??[]))throw new Error('Invalid Stars plans');
-  for(const p of stars.plans??[]){if(!periods.includes(p.days)||!Number.isSafeInteger(p.stars)||p.stars<1||p.stars>1_000_000||this.starPlans.has(p.days))throw new Error('Invalid Stars plan');this.starPlans.set(p.days,Object.freeze({days:p.days,stars:p.stars}));}
+  this.starPlans=new Map(validateStarsPlans(stars.plans===undefined?[]:stars.plans).map(plan=>[plan.days,plan]));
   this.enabled=stars.enabled===true&&stars.approved===true&&this.starPlans.size>0;
   this.db.exec(`CREATE TABLE IF NOT EXISTS telegram_native_accounts(account_id TEXT PRIMARY KEY REFERENCES identities(account_id),registered_chat TEXT NOT NULL,terms_at INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS telegram_handoffs(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES identities(account_id),chat_id TEXT NOT NULL,generation TEXT NOT NULL,purpose TEXT NOT NULL,device TEXT NOT NULL,expires INTEGER NOT NULL);

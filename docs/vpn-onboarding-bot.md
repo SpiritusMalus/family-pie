@@ -242,3 +242,98 @@ MSS/PMTU, retention safeguards, legacy-unlimited access or device limits. Existi
 subscription delivery incidents remain separate prerequisites for final real-device
 acceptance. No physical-phone, live payment or production delivery claim follows
 from the synthetic preview checks.
+
+## Isolated Telegram Stars sandbox
+
+`tools/vpn-stars-sandbox.mjs` is a manual, foreground harness for Telegram's separate
+TEST server. It reuses the real private-chat UI, commerce, payment transaction and
+refund handlers. The production worker is unchanged: `TelegramClient` still selects
+production by default. Only the sandbox explicitly selects the fixed
+`https://api.telegram.org/bot<TEST_TOKEN>/test/METHOD_NAME` route; invalid environments
+fail and a rejected test token never falls back to production.
+
+First create a separate test account and a separate test BotFather bot using the
+[official test-server setup](https://core.telegram.org/bots/webapps#using-bots-in-the-test-environment).
+Supply that bot's expected ID/username and an explicit allowlist of users from that
+same TEST environment. Production credentials, production user IDs and an injected
+sender are not a substitute for this acceptance. Test-account balance/top-up and
+seller withdrawal eligibility still need owner verification. No real Telegram test
+was performed merely by adding this tool.
+
+Use pinned Node22 on macOS/Linux. Keep the credential file and JSON configuration
+owned by the invoking user, without group/world permissions (normally0600). Do not
+put a token in the JSON, source, command line, chat or logs. The following values are
+fictional placeholders; one Star is a sandbox amount, not an approved live price:
+
+```json
+{
+  "environment": "test",
+  "credentialFile": "/absolute/private/test-bot.token",
+  "expectedBot": {"id": 123456789, "username": "replace_test_bot"},
+  "allowedUserIds": [987654321],
+  "stateDir": "/absolute/private/new-stars-sandbox",
+  "plans": [{"days": 30, "stars": 1}],
+  "maxRunSeconds": 900
+}
+```
+
+```sh
+node tools/vpn-stars-sandbox.mjs --config /absolute/private/stars-test.json
+```
+
+The config is explicit; the harness neither loads service.env nor accepts an inherited
+`VPN_*`/`CREDENTIALS_DIRECTORY` environment. Known production credential/database
+roots, credential symlinks, shared credential files and an existing state directory
+are rejected. The state parent must not be writable by others unless it is a sticky
+temporary directory. Read-only `getMe` and `getWebhookInfo` must confirm the exact test
+bot and an empty webhook before any state/lock creation or polling. It does not remove
+webhooks or stop other consumers. A private, bot-specific lock prevents two harnesses
+on the same host; a stale lock needs manual inspection, never automatic removal.
+
+After preflight, only the fresh state directory's SQLite database is opened. Directories
+are0700 and private files0600. The allowlist filters updates before actual handlers
+see them; ignored updates advance the durable offset without sending a reply or
+creating an account. Outgoing messages, invoices and refunds are restricted to the
+same approved test users. Nothing is automatically sent at startup: a tester starts
+with `/menu`, chooses purchase, explicitly accepts terms, then chooses the test term.
+
+Acceptance sequence, only after the dedicated test credentials are available:
+
+1. Confirm a refused identity/webhook/config leaves no state and makes no polling or
+   send call. Confirm another process cannot acquire the same test bot lock.
+2. In the TEST account, open the test bot, send `/menu`, choose purchase and accept
+   terms. Check the invoice uses XTR, one integer price and the expected test amount.
+3. Complete the test payment in Telegram. Check a pre-checkout acknowledgement alone
+   grants nothing; a validated successful payment creates one grant and a pending
+   provisioning job. Replayed updates must not extend the entitlement twice.
+4. Purchase another term in that same isolated account to check renewal. The retained
+   SQLite evidence contains the test order IDs. To queue a deliberate test refund,
+   enter a JSON control line on the harness's private stdin:
+   `{"action":"refund","orderId":"SANDBOX_ORDER_UUID"}`.
+   The tool does not echo the ID. Only a matching Stars order owned by an allowlisted
+   test user is accepted; the real adapter handles confirmation/uncertainty.
+5. Review the private state/events and test expiry after refund. Stop with Ctrl-C or
+   let the bounded session expire. Retain uncertain sessions for review rather than
+   replaying a refund or replacing their database.
+
+The harness never starts a panel worker, touches a live panel, applies grants to a
+production account or publishes a usable VPN profile. Paid access correctly remains
+preparing because provisioning is absent. Website/handoff destinations use reserved
+`sandbox.invalid` and are not a live website. Do not use them for app import, recovery
+or physical traffic checks; no Happ configuration is changed. This harness does not
+claim website, real-device or seller payout acceptance.
+
+Each run requires a fresh state directory; old state is retained as private evidence.
+There is no automatic resume or raw-update log. Events contain only controlled event
+names/counts, without credentials, message bodies or Telegram IDs; public output is
+generic. Existing offline tests cover durable handler/offset restart behavior. A
+provider-ledger reconciliation path for outages beyond Telegram's update retention,
+returning-customer versioned purchase-terms agreement, seller eligibility, explicit
+production XTR prices and real test-server payment/refund acceptance remain gates
+before enabling production Stars. The sandbox does not approve or enable live prices.
+
+Focused checks use synthetic credential files and injected responses only:
+
+```sh
+node --test services/vpn/test/telegram-client-environment.test.mjs tools/test-vpn-stars-sandbox.mjs
+```
