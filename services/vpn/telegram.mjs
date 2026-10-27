@@ -1,4 +1,5 @@
 import {randomBytes,createHash,randomUUID} from 'node:crypto';
+import {emailSupportText,supportEmailCopyButton} from './support-contact.mjs';
 const DAY=86400_000,hash=x=>createHash('sha256').update(x).digest('hex');
 const CABINET='https://family-spy.ru/vpn/cabinet/';
 const BIND_HELP='Чтобы увидеть свою подписку, привяжи Telegram в кабинете: Настройки → Telegram → Подключить. После запуска бота вернись в кабинет и подтверди привязку.\n'+CABINET+'#settings';
@@ -10,6 +11,7 @@ export const botCommands=[
  {command:'renew',description:'Продлить подписку'},
  {command:'cabinet',description:'Личный кабинет'},
  {command:'recover',description:'Забыл пароль. Восстановить доступ'},
+ {command:'email',description:'Email поддержки'},
  {command:'help',description:'Помощь с подключением'},
  {command:'notifications',description:'Настройки уведомлений'},
  {command:'stop',description:'Отключить уведомления и отвязать Telegram'}
@@ -25,7 +27,7 @@ const menuActions=new Map([
 ]);
 const expiryDate=ms=>new Intl.DateTimeFormat('ru-RU',{timeZone:'UTC',dateStyle:'long',timeStyle:'short'}).format(ms)+' UTC';
 export async function configureBotMenu(client,{commands=botCommands}={}){
- const menu=commands.some(row=>row.command==='recover')?commands:[...commands,botCommands.find(row=>row.command==='recover')];
+ const menu=[...commands];for(const command of ['recover','email'])if(!menu.some(row=>row.command===command))menu.push(botCommands.find(row=>row.command===command));
  await client.call('setMyCommands',{commands:menu,scope:{type:'all_private_chats'}});
  await client.call('setChatMenuButton',{menu_button:{type:'commands'}});
 }
@@ -48,6 +50,9 @@ export class TelegramStore {
  reply(chatId,updateId,text){this.db.prepare("INSERT OR IGNORE INTO telegram_outbox(id,dedupe,chat_id,text,ready_at,created_at) VALUES(?,?,?,?,?,?)").run(randomUUID(),'reply:'+updateId,chatId,text,this.clock(),this.clock());}
  replyRecovery(chatId,updateId){this.db.prepare("INSERT OR IGNORE INTO telegram_outbox(id,dedupe,chat_id,stage,text,ready_at,created_at) VALUES(?,?,?,'recovery',?,?,?)")
  .run(randomUUID(),'recovery:'+updateId,chatId,'Восстановление доступа Family VPN',this.clock(),this.clock());}
+ replyEmail(chatId,updateId){this.db.prepare("INSERT OR IGNORE INTO telegram_outbox(id,dedupe,chat_id,stage,text,ready_at,created_at) VALUES(?,?,?,'support_email',?,?,?)")
+ .run(randomUUID(),'support-email:'+updateId,chatId,'Email поддержки Family VPN',this.clock(),this.clock());}
+ emailReply(){return {text:emailSupportText(),reply_markup:{inline_keyboard:[[supportEmailCopyButton()]]}};}
  recoveryReply(chatId){
   const support={text:'Помощь без входа',url:'https://t.me/family_pie_vpn_bot?start=support_vpn'};
   const commerce=this.commerce||this.ui?.commerce;
@@ -56,8 +61,8 @@ export class TelegramStore {
    const handoff=commerce.recoveryHandoff(chatId),url=new URL(handoff.url);
    if(url.protocol!=='https:'||url.username||url.password||url.pathname!=='/vpn/cabinet/auth/'||!/^#recovery=[A-Za-z0-9_-]{43}$/.test(url.hash)||commerce.origin&&url.origin!==commerce.origin)throw new Error('Unexpected recovery handoff');
    const account=typeof handoff.login==='string'&&handoff.login.length<=80?' для аккаунта '+handoff.login:'';
-   return {text:'Восстановление пароля'+account+'.\nОдноразовая ссылка действует 5 минут. Она откроет смену пароля, без входа по старому паролю. Не пересылай её другим людям.',reply_markup:{inline_keyboard:[[{text:'Восстановить пароль',url:url.href}],[support]]}};
-  }catch(error){return {text:['INVALID_RECOVERY','INVALID_PAYMENT'].includes(error.code)?RECOVERY_HELP:'Не удалось подготовить ссылку восстановления. Попробуй /recover ещё раз или напиши в поддержку. Подписка и пароль не изменились.',reply_markup:{inline_keyboard:[[support]]}};}
+   return {text:'Восстановление пароля'+account+'.\nОдноразовая ссылка действует 5 минут. Она откроет смену пароля, без входа по старому паролю. Не пересылай её другим людям.\n\n'+emailSupportText(),reply_markup:{inline_keyboard:[[{text:'Восстановить пароль',url:url.href}],[support],[supportEmailCopyButton()]]}};
+  }catch(error){return {text:(['INVALID_RECOVERY','INVALID_PAYMENT'].includes(error.code)?RECOVERY_HELP:'Не удалось подготовить ссылку восстановления. Попробуй /recover ещё раз или напиши в поддержку. Подписка и пароль не изменились.')+'\n\n'+emailSupportText(),reply_markup:{inline_keyboard:[[support],[supportEmailCopyButton()]]}};}
  }
  linkedSubscription(chatId){return this.db.prepare('SELECT s.*,i.enabled AS account_enabled,i.must_change,l.enabled AS notifications FROM telegram_links l JOIN managed_subscriptions s USING(account_id) JOIN identities i USING(account_id) WHERE l.chat_id=?').get(chatId);}
  subscriptionStatus(row){
@@ -78,6 +83,11 @@ export class TelegramStore {
  const recoveryMessage=update.message;
  if(recoveryMessage?.chat?.type==='private'&&Number.isSafeInteger(recoveryMessage.chat.id)&&recoveryMessage.chat.id>0&&recoveryMessage.from?.id===recoveryMessage.chat.id&&!recoveryMessage.from.is_bot&&typeof recoveryMessage.text==='string'){
   const parts=recoveryMessage.text.trim().split(/\s+/),command=parts[0].split('@')[0];
+  if(command==='/email'){
+   const chatId=String(recoveryMessage.chat.id),recent=this.db.prepare('SELECT count(*) n FROM telegram_outbox WHERE chat_id=? AND created_at>?').get(chatId,this.clock()-60000).n;
+   if(recent<10)this.replyEmail(chatId,update.update_id);
+   this.db.prepare("INSERT INTO telegram_meta VALUES('offset',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(update.update_id+1);return;
+  }
   if(['/recover','/recovery'].includes(command)||command==='/start'&&['recover','recovery'].includes(parts[1])){
    const chatId=String(recoveryMessage.chat.id),recent=this.db.prepare('SELECT count(*) n FROM telegram_outbox WHERE chat_id=? AND created_at>?').get(chatId,this.clock()-60000).n;
    if(recent<10)this.replyRecovery(chatId,update.update_id);
@@ -115,7 +125,7 @@ export class TelegramStore {
   }else if(command==='/cabinet'){
    text='Твой личный кабинет: '+CABINET+'\nВойди своим логином и паролем.';
   }else if(command==='/help'){
-   text='Настройка VPN для твоего устройства: '+CABINET+'#devices\nЕсли подключение не работает, напиши в поддержку: '+CABINET+'#support';
+   text='Настройка VPN для твоего устройства: '+CABINET+'#devices\nПоддержка в кабинете: '+CABINET+'#support\n\n'+emailSupportText();
   }else if(command==='/notifications'){
    const row=this.linkedSubscription(id);
    text=!row||!row.account_enabled||row.must_change?BIND_HELP:row.notifications?'Напоминания включены: за 3 дня, за сутки и после окончания подписки. Для бессрочной подписки напоминаний нет.\n/stop — отключить уведомления и отвязать Telegram.\nНастройки: '+CABINET+'#settings':'Напоминания выключены. Подключить их снова можно в настройках: '+CABINET+'#settings';
@@ -151,4 +161,4 @@ export class TelegramClient {
   r=await this.request(`https://api.telegram.org/bot${this.token}/${method}`,{method:'POST',...options,redirect:'error',signal:AbortSignal.timeout(['answerPreCheckoutQuery','answerCallbackQuery'].includes(method)?3000:30000)});
  }catch{throw new Error('Telegram delivery outcome unknown');}let x;try{x=await r.json();}catch{throw new Error('Telegram delivery outcome unknown');}if(!r.ok||x.ok!==true)throw new TelegramApiError(Number(x.error_code)||r.status,Number(x.parameters?.retry_after)||0);return x.result;}
 }
-export async function deliverOne(telegram,client){const job=telegram.next();if(!job)return false;const changed=telegram.db.prepare("UPDATE telegram_outbox SET state='sending' WHERE id=? AND state='pending'").run(job.id);if(!changed.changes)return false;try{const content=job.stage==='recovery'?telegram.recoveryReply(job.chat_id):{text:job.text,reply_markup:botKeyboard};await client.call('sendMessage',{chat_id:job.chat_id,...content,link_preview_options:{is_disabled:true}});telegram.db.prepare("UPDATE telegram_outbox SET state='sent' WHERE id=?").run(job.id);}catch(e){if(e instanceof TelegramApiError&&e.code===429)telegram.db.prepare("UPDATE telegram_outbox SET state='pending',ready_at=? WHERE id=?").run(telegram.clock()+Math.max(1000,Math.min(e.retryAfter*1000,3600000)),job.id);else{telegram.db.prepare('UPDATE telegram_outbox SET state=? WHERE id=?').run(e instanceof TelegramApiError&&e.code===403?'blocked':'uncertain',job.id);if(e instanceof TelegramApiError&&e.code===403&&job.account_id)telegram.db.prepare('UPDATE telegram_links SET enabled=0 WHERE account_id=?').run(job.account_id);}}return true;}
+export async function deliverOne(telegram,client){const job=telegram.next();if(!job)return false;const changed=telegram.db.prepare("UPDATE telegram_outbox SET state='sending' WHERE id=? AND state='pending'").run(job.id);if(!changed.changes)return false;try{const content=job.stage==='recovery'?telegram.recoveryReply(job.chat_id):job.stage==='support_email'?telegram.emailReply():{text:job.text,reply_markup:botKeyboard};await client.call('sendMessage',{chat_id:job.chat_id,...content,link_preview_options:{is_disabled:true}});telegram.db.prepare("UPDATE telegram_outbox SET state='sent' WHERE id=?").run(job.id);}catch(e){if(e instanceof TelegramApiError&&e.code===429)telegram.db.prepare("UPDATE telegram_outbox SET state='pending',ready_at=? WHERE id=?").run(telegram.clock()+Math.max(1000,Math.min(e.retryAfter*1000,3600000)),job.id);else{telegram.db.prepare('UPDATE telegram_outbox SET state=? WHERE id=?').run(e instanceof TelegramApiError&&e.code===403?'blocked':'uncertain',job.id);if(e instanceof TelegramApiError&&e.code===403&&job.account_id)telegram.db.prepare('UPDATE telegram_links SET enabled=0 WHERE account_id=?').run(job.account_id);}}return true;}

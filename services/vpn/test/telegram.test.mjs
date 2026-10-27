@@ -137,7 +137,7 @@ test('recovery aliases require a private same-author chat and unlinked users get
  const f=await fixture(t);let issued=0;f.telegram.commerce={recoveryHandoff:()=>{issued++;const error=new Error('No confirmed binding');error.code='INVALID_RECOVERY';throw error;}};
  const group=message(1,'/recover');group.message.chat.type='group';f.telegram.update(group);
  const spoof=message(2,'/recovery');spoof.message.from.id=1002;f.telegram.update(spoof);assert.equal(f.count(),0);
- f.telegram.update(message(3,'/start recover'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.equal(issued,1);assert.match(calls[0].body.text,/подтверждённой привязки/);assert.match(calls[0].body.text,/Запуск бота сам по себе не подтверждает/);assert.equal(calls[0].body.reply_markup.inline_keyboard.length,1);
+ f.telegram.update(message(3,'/start recover'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.equal(issued,1);assert.match(calls[0].body.text,/подтверждённой привязки/);assert.match(calls[0].body.text,/Запуск бота сам по себе не подтверждает/);assert.ok(!calls[0].body.reply_markup.inline_keyboard.flat().some(button=>button.url?.includes('#recovery=')));assert.ok(calls[0].body.reply_markup.inline_keyboard.flat().some(button=>button.copy_text?.text==='support@family-pie.ru'));
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,1);assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).linked,false);
  f.telegram.update(message(4,'/recovery'));await deliverOne(f.telegram,{call:async()=>{}});assert.equal(issued,2);
 });
@@ -166,4 +166,19 @@ test('real recovery issuer lets a confirmed gated account reset its password whi
  await commerce.recovery.reset(token,'Fictional-Recovered-Password-2026');assert.equal(f.store.db.prepare('SELECT count(*) n FROM sessions').get().n,0);
  const recovered=await f.users.login(f.user.login,'Fictional-Recovered-Password-2026');assert.equal(recovered.identity.account_id,f.user.accountId);assert.equal(f.store.subscription(f.user.accountId).expiresAt,before.expiresAt);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,1);
  assert.throws(()=>commerce.recovery.preview(token));
+});
+
+test('email support is available to an unlinked private user before native navigation or support routing, with no credentials or account mutation',async t=>{
+ const f=await fixture(t);f.telegram.ui={enabled:false,handle:()=>{throw Error('Email must not depend on native navigation');}};f.telegram.support={handle:()=>{throw Error('Email must not become a relay ticket');}};
+ const before=f.store.db.prepare('SELECT count(*) n FROM identities').get().n;
+ f.telegram.update(message(1,'/email'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});
+ assert.equal(calls.length,1);assert.equal(calls[0].method,'sendMessage');assert.match(calls[0].body.text,/support@family-pie\.ru/);assert.match(calls[0].body.text,/Укажи устройство/);assert.match(calls[0].body.text,/Не отправляй пароли/);
+ assert.deepEqual(calls[0].body.reply_markup.inline_keyboard,[[{text:'Скопировать email',copy_text:{text:'support@family-pie.ru'}}]]);
+ assert.doesNotMatch(JSON.stringify(calls[0]),/#recovery=|#telegram=|\/sub\/|vpn_session|mailto:/);assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,before);assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).linked,false);
+ f.telegram.update(message(1,'/email'));assert.equal(f.count(),1);
+});
+
+test('email command keeps private-chat guards and is exposed in both command menus',async t=>{
+ const f=await fixture(t),group=message(1,'/email');group.message.chat.type='group';f.telegram.update(group);const spoof=message(2,'/email');spoof.message.from.id=1002;f.telegram.update(spoof);assert.equal(f.count(),0);
+ const configured=[];await configureBotMenu({call:async(method,body)=>configured.push({method,body})},{commands:[{command:'menu',description:'Меню'}]});assert.ok(configured[0].body.commands.some(row=>row.command==='email'));assert.ok(botCommands.some(row=>row.command==='email'));
 });

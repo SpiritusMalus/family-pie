@@ -38,7 +38,7 @@
     return true;
   }
   const failureMessage = error => ['TimeoutError', 'TypeError', 'SyntaxError'].includes(error.name)
-    ? purpose === 'import' ? 'Не удалось получить подписку. Открой новую ссылку в боте.' : 'Сервис временно недоступен. Повтори позже или напиши в поддержку.'
+    ? purpose === 'import' ? 'Не удалось получить подписку. Открой новую ссылку в боте или напиши на почту ниже.' : 'Сервис временно недоступен. Повтори позже или напиши в поддержку.'
     : error.message;
   if (purpose !== 'import') {
     const cancel = document.querySelector('#telegram-login-confirm')?.querySelector('[data-telegram-cancel]');
@@ -67,13 +67,13 @@
     const result = await response.json();
     if (!response.ok) throw new Error(response.status === 409
       ? 'В кабинете открыт другой аккаунт. Открой его или войди по логину и паролю.'
-      : 'Ссылка устарела. Вернись в Telegram и открой новую.');
+      : 'Ссылка устарела. Открой новую в боте или напиши в поддержку по почте ниже.');
     return result;
   }
   window.vpnTelegramEntry = (async () => {
     if (!/^[A-Za-z0-9_-]{43}$/.test(token || '')) {
       const restored = restoreNormalLogin();
-      if (restored !== false) setMessage('Ссылка устарела. Вернись в Telegram и открой новую.', true);
+      if (restored !== false) setMessage('Ссылка устарела. Открой новую в боте или напиши в поддержку по почте ниже.', true);
       showImportRecovery();
       return false;
     }
@@ -106,7 +106,7 @@
       }
       const result = await request('import');
       const url = new URL(result.profileUrl);
-      if (url.protocol !== 'https:' || url.username || url.password) throw new Error('Не удалось получить подписку. Открой новую ссылку в боте.');
+      if (url.protocol !== 'https:' || url.username || url.password) throw new Error('Не удалось получить подписку. Открой новую ссылку в боте или напиши на почту ниже.');
       const box = document.querySelector('#telegram-import');
       const add = box.querySelector('[data-import-add]');
       const input = box.querySelector('textarea');

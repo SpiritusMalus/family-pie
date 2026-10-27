@@ -4,6 +4,7 @@
   "shortDescription": "Подключение, подписка и помощь в одном месте.",
   "description": "Family VPN от Family Spy. Подключай устройства, проверяй подписку и пиши в поддержку прямо здесь.",
   "language": "ru",
+  "supportEmail": "support@family-pie.ru",
   "avatar": {
     "source": "avatar.svg",
     "render": "avatar.png",
@@ -52,6 +53,10 @@
     {
       "command": "recover",
       "description": "Забыл пароль. Восстановить доступ"
+    },
+    {
+      "command": "email",
+      "description": "Email поддержки"
     }
   ],
   "changesAppliedToTelegram": false,

@@ -84,7 +84,7 @@
     challengeId = data.challengeId;
     retryAt = Date.now() + Math.min(300, Math.max(1, Number(data.retryAfter) || 60)) * 1000;
     resetForm(false);
-    message('Проверь входящие и папку «Спам». Если почта не подключена, обратись в поддержку по ссылке ниже.');
+    message('Проверь входящие и папку «Спам». Если почта не подключена, напиши в поддержку по почте ниже.');
   }
   function action(element, event, operation) {
     element.addEventListener(event, async value => {

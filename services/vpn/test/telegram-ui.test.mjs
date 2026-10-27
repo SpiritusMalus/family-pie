@@ -220,3 +220,10 @@ test('explicit 429 is retried, callback acknowledgements precede chat backlog an
  let request;const client=new TelegramClient('123456:FICTIONAL_ONLY_TELEGRAM_CREDENTIAL',{request:async(url,options)=>{request={url,options};return {ok:true,json:async()=>({ok:true,result:{message_id:1}})};}});
  await client.call('sendPhoto',{chat_id:CHAT,photo:new Uint8Array([137,80,78,71]),caption:'private QR',protect_content:true});assert.ok(request.options.body instanceof FormData);assert.equal(request.options.headers,undefined);assert.equal(request.options.body.get('photo').name,'subscription.png');
 });
+
+test('native help offers a copyable published email even without a bound account or Telegram operator',async t=>{
+ const f=await fixture(t,{stars:false});const before=f.store.db.prepare('SELECT count(*) n FROM identities').get().n;
+ f.message('/help');await f.drain();const message=f.last();assert.match(message.text,/support@family-pie\.ru/);assert.match(message.text,/Укажи устройство/);assert.match(message.text,/Не отправляй пароли/);
+ const copy=message.reply_markup.inline_keyboard.flat().find(button=>button.copy_text);assert.equal(copy.copy_text.text,'support@family-pie.ru');assert.ok(!message.reply_markup.inline_keyboard.flat().some(button=>button.url?.startsWith('mailto:')));
+ assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,before);assert.equal(f.commerce.accountForChat(CHAT),null);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
+});

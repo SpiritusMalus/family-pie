@@ -60,7 +60,7 @@ test('server-scoped device chooses official installer; malformed device names fa
 
 test('consumed import credentials show the explicit bot recovery path while keeping private data and import controls unavailable',async()=>{
  const f=fixture({ok:false});assert.equal(await f.window.vpnTelegramEntry,false);assert.equal(f.recovery.hidden,false);assert.equal(f.box.hidden,true);assert.equal(f.input.value,undefined);assert.equal(f.add.href,undefined);assert.equal(f.location.hash,'');
- const html=readFileSync(new URL('../site/vpn/connect/index.html',import.meta.url),'utf8');assert.match(html,/Получить новую ссылку в Telegram/);assert.match(html,/В боте нажми «Подключиться»/);assert.ok(!html.includes('Войти в кабинет'));
+ const html=readFileSync(new URL('../site/vpn/connect/index.html',import.meta.url),'utf8');assert.match(html,/Получить новую ссылку в Telegram/);assert.match(html,/Для новой ссылки открой бота или напиши в поддержку по почте ниже/);assert.ok(!html.includes('Войти в кабинет'));
 });
 
 test('expired, conflicting and unavailable login previews restore password recovery controls without changing the pending purchase destination',async()=>{

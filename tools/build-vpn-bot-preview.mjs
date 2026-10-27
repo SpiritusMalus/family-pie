@@ -11,6 +11,7 @@ import {TelegramStore,deliverOne,configureBotMenu} from '../services/vpn/telegra
 import {TelegramCommerce} from '../services/vpn/telegram-commerce.mjs';
 import {TelegramUI,deliverUiOne,botBranding,nativeBotCommands} from '../services/vpn/telegram-ui.mjs';
 import {TelegramSupport} from '../services/vpn/telegram-support.mjs';
+import {SUPPORT_EMAIL} from '../services/vpn/support-contact.mjs';
 
 if(process.env.NODE_ENV==='production')throw new Error('Synthetic local preview only');
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),out=root+'/docs/preview/bot';
@@ -100,7 +101,8 @@ store.db.prepare("INSERT INTO telegram_links(account_id,chat_id,generation,bound
 telegram.support=new TelegramSupport(store,{operatorAccountId:operator.accountId,botId:14004,clock});
 message(paidChat,'/menu');await drain();await press(paidChat,'Помощь');snapshot('help','Помощь в чате','Помощь');
 message(paidChat,'/recover');await drain();snapshot('recovery','Восстановление пароля','/recover');
-const sourceFiles=['services/vpn/telegram-ui.mjs','services/vpn/telegram.mjs','services/vpn/telegram-commerce.mjs','services/vpn/recovery.mjs'];
+message(paidChat,'/email');await drain();snapshot('email','Email поддержки','/email');
+const sourceFiles=['services/vpn/telegram-ui.mjs','services/vpn/telegram.mjs','services/vpn/telegram-commerce.mjs','services/vpn/recovery.mjs','services/vpn/telegram-support.mjs','services/vpn/support-contact.mjs'];
 const transcript={schema:'family-vpn-bot-preview/v1',syntheticOnly:true,generatedAt:new Date().toISOString(),fixtureDate:new Date(now).toISOString(),
  evidence:'Messages captured from TelegramStore.update → TelegramUI → injected local sender. No Telegram API, provider, real profile or device import.',
  redaction:'Opaque callback, internal account IDs and handoff/reset tokens excluded. Visible text and button labels are exact handler output. Displayed logins and subscription values are synthetic.',
@@ -111,7 +113,7 @@ assert.ok(!JSON.stringify(transcript).includes('u_')&&!JSON.stringify(transcript
 const configured=[];await configureBotMenu({call:async(method,data)=>configured.push({method,data})},{commands:nativeBotCommands});
 const commands=configured.find(row=>row.method==='setMyCommands').data.commands;
 assert.ok(commands.some(row=>row.command==='recover'));
-const metadata={status:'prepared-not-applied',name:botBranding.name,shortDescription:botBranding.shortDescription,description:botBranding.description,language:'ru',
+const metadata={status:'prepared-not-applied',name:botBranding.name,shortDescription:botBranding.shortDescription,description:botBranding.description,language:'ru',supportEmail:SUPPORT_EMAIL,
  avatar:{source:'avatar.svg',render:'avatar.png',width:1024,height:1024,sha256:hash(readFileSync(out+'/avatar.png')),provenance:'Adapted directly from customer-site/index.html .brand svg; same circle and three spokes. Charcoal #101216 / coral #ff9d88.'},
  commands,changesAppliedToTelegram:false,publication:'Owner approval and authorized bot administration required; no BotFather or API calls performed.'};
 assert.ok(metadata.name.length<=64&&metadata.shortDescription.length<=120&&metadata.description.length<=512);

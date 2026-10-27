@@ -1,7 +1,7 @@
 {
   "schema": "family-vpn-bot-preview/v1",
   "syntheticOnly": true,
-  "generatedAt": "2026-10-27T14:29:46.781Z",
+  "generatedAt": "2026-10-27T16:23:56.000Z",
   "fixtureDate": "2026-10-27T12:00:00.000Z",
   "evidence": "Messages captured from TelegramStore.update → TelegramUI → injected local sender. No Telegram API, provider, real profile or device import.",
   "redaction": "Opaque callback, internal account IDs and handoff/reset tokens excluded. Visible text and button labels are exact handler output. Displayed logins and subscription values are synthetic.",
@@ -11,10 +11,12 @@
     "starPrices": []
   },
   "sources": {
-    "services/vpn/telegram-ui.mjs": "c498f0b451afb3acc6f79eb6d6426d45bd295665a3825ab16697dc4496065fc2",
-    "services/vpn/telegram.mjs": "3a291b99f551c57e824654a7ad66e5aa977d6d939a828e2b8ec850223bb5db80",
+    "services/vpn/telegram-ui.mjs": "1bf3561ea1593fdf93290a96dbf132f5ded60bf18195629480a43895f990a61e",
+    "services/vpn/telegram.mjs": "4cf2777c53bd089230277a4f720841a5c9630c2d9ea5de541ff845fb3bb220d0",
     "services/vpn/telegram-commerce.mjs": "a0b4eda10fbe85bc98749bde3551b845913faf7859baba73b992eca721c7ef13",
-    "services/vpn/recovery.mjs": "1803700f25456b3cc3199115a669bb32e0a7c48d7d0eb2b4a2a1018a71dbdee6"
+    "services/vpn/recovery.mjs": "1803700f25456b3cc3199115a669bb32e0a7c48d7d0eb2b4a2a1018a71dbdee6",
+    "services/vpn/telegram-support.mjs": "955af1a3e824ad4565d1ad334002d1d4bff0548781b8fcf0f2d3725bdbe8c40a",
+    "services/vpn/support-contact.mjs": "24a553bade249b879f51f76ff832fd46423aca8c373e49a4f7d9a9e455a3790d"
   },
   "screens": [
     {
@@ -518,9 +520,16 @@
       "trigger": "Помощь",
       "message": {
         "method": "sendMessage",
-        "text": "Напиши, что случилось. Можно приложить фото или скриншот. Ответ придёт сюда.\nНе отправляй личную ссылку, пароли, коды входа и платёжные данные.\n/cancel — закончить обращение.",
+        "text": "Напиши здесь или по email. Ответ на сообщение в Telegram придёт в этот чат. Можно приложить фото или скриншот.\n/cancel — закончить обращение.\n\nEmail поддержки: <code>support@family-pie.ru</code>\nУкажи устройство, что происходит и когда началась проблема. Если вопрос об оплате, добавь номер заказа, если он есть.\nНе отправляй пароли, коды входа, личную VPN-ссылку или данные карты.",
         "parseMode": "HTML",
         "buttons": [
+          [
+            {
+              "text": "Скопировать email",
+              "kind": "copy",
+              "copyText": "support@family-pie.ru"
+            }
+          ],
           [
             {
               "text": "← В меню",
@@ -538,7 +547,7 @@
       "trigger": "/recover",
       "message": {
         "method": "sendMessage",
-        "text": "Восстановление пароля для аккаунта synthetic-bot-preview-paid.\nОдноразовая ссылка действует 5 минут. Она откроет смену пароля, без входа по старому паролю. Не пересылай её другим людям.",
+        "text": "Восстановление пароля для аккаунта synthetic-bot-preview-paid.\nОдноразовая ссылка действует 5 минут. Она откроет смену пароля, без входа по старому паролю. Не пересылай её другим людям.\n\nEmail поддержки: support@family-pie.ru\nУкажи устройство, что происходит и когда началась проблема. Если вопрос об оплате, добавь номер заказа, если он есть.\nНе отправляй пароли, коды входа, личную VPN-ссылку или данные карты.",
         "parseMode": null,
         "buttons": [
           [
@@ -553,6 +562,32 @@
               "text": "Помощь без входа",
               "kind": "url",
               "url": "https://t.me/family_pie_vpn_bot?start=support_vpn"
+            }
+          ],
+          [
+            {
+              "text": "Скопировать email",
+              "kind": "copy",
+              "copyText": "support@family-pie.ru"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "email",
+      "title": "Email поддержки",
+      "trigger": "/email",
+      "message": {
+        "method": "sendMessage",
+        "text": "Email поддержки: support@family-pie.ru\nУкажи устройство, что происходит и когда началась проблема. Если вопрос об оплате, добавь номер заказа, если он есть.\nНе отправляй пароли, коды входа, личную VPN-ссылку или данные карты.",
+        "parseMode": null,
+        "buttons": [
+          [
+            {
+              "text": "Скопировать email",
+              "kind": "copy",
+              "copyText": "support@family-pie.ru"
             }
           ]
         ]

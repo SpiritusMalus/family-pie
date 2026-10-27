@@ -9,10 +9,11 @@
   <link rel="stylesheet" href="/vpn/style.css"><link rel="stylesheet" href="/vpn/portal-style.css">
   <link rel="stylesheet" href="/i18n/language.css"><script src="/i18n/en.js"></script><script src="/i18n/language.js"></script>
   <script src="/vpn/telegram-entry.js" defer></script>
+<link rel="stylesheet" href="/vpn/support-email.css"><script src="/vpn/support-email.js" defer></script>
 </head>
 <body class="is-cabinet is-import">
   <a class="skip" href="#main">К содержимому</a>
-  <header class="nav"><div class="wrap nav-in"><a class="brand" href="/vpn/">family<span>/vpn</span></a><a href="https://t.me/family_pie_vpn_bot" rel="noopener noreferrer">Вернуться в Telegram</a></div></header>
+  <header class="nav"><div class="wrap nav-in"><a class="brand" href="/vpn/">family<span>/vpn</span></a><a class="support-nav-link" href="/vpn/help/">Помощь</a></div></header>
   <main class="wrap import-page" id="main">
     <h1>Подключим VPN на этом устройстве</h1>
     <p class="cab-status" id="telegram-entry-message" role="status">Готовим твою подписку…</p>
@@ -37,7 +38,7 @@
         <h2>Включи VPN в приложении</h2>
         <p>Открой Happ, выбери маршрут и нажми подключение. При первом запуске разреши создать VPN-соединение.</p>
         <p>Дождись подтверждения подключения в приложении и открой нужный сайт.</p>
-        <div class="cab-actions"><a class="btn" href="https://t.me/family_pie_vpn_bot?start=support_vpn" rel="noopener noreferrer">Нужна помощь</a><button class="btn secondary" data-import-back-add type="button">Назад к добавлению подписки</button></div>
+        <div class="cab-actions"><a class="btn" href="/vpn/help/">Нужна помощь</a><button class="btn secondary" data-import-back-add type="button">Назад к добавлению подписки</button></div>
       </section>
       <section class="setup-manual import-manual" aria-labelledby="import-manual-title">
         <h2 id="import-manual-title">Личная ссылка подписки</h2>
@@ -47,8 +48,8 @@
         <p class="muted">Не передавай личную ссылку и QR-код другим людям.</p>
       </section>
     </section>
-    <section id="telegram-entry-recovery" hidden><p>В боте нажми «Подключиться» и выбери устройство.</p><a class="btn" href="https://t.me/family_pie_vpn_bot" rel="noopener noreferrer">Получить новую ссылку в Telegram</a></section>
-    <p><a href="https://t.me/family_pie_vpn_bot?start=support_vpn" rel="noopener noreferrer">Помощь без входа в кабинет</a></p>
+    <section id="telegram-entry-recovery" hidden><p>Для новой ссылки открой бота или напиши в поддержку по почте ниже.</p><a class="btn" href="https://t.me/family_pie_vpn_bot" rel="noopener noreferrer">Получить новую ссылку в Telegram</a></section>
+    <section class="support-contact"><h2>Нужна помощь?</h2><div class="support-email" data-email-support><a class="support-email-address" href="mailto:support@family-pie.ru" data-fp-no-i18n>support@family-pie.ru</a><button class="support-email-copy" type="button" data-copy-support-email hidden data-ru="Скопировать адрес" data-en="Copy email address">Скопировать адрес</button><span class="support-email-result" data-email-copy-status role="status" aria-live="polite"></span></div><p><a href="https://t.me/family_pie_vpn_bot?start=support_vpn" rel="noopener noreferrer">Или напиши в Telegram</a></p></section>
     <noscript><p>Для этой одноразовой ссылки нужен JavaScript. Скопируй личную ссылку прямо в боте.</p></noscript>
   </main>
 </body>

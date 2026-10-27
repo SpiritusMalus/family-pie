@@ -1,6 +1,7 @@
 import {randomBytes,randomInt,createHash} from 'node:crypto';
 import nodemailer from 'nodemailer';
 import {readFileSync} from 'node:fs';
+import {isIP} from 'node:net';
 const hash=x=>createHash('sha256').update(x).digest('hex');
 export class EmailLogin{
  constructor(store,users,{send=null,clock=store.clock}={}){this.store=store;this.users=users;this.db=store.db;this.clock=clock;this.send=send;this.db.exec(`CREATE TABLE IF NOT EXISTS verified_emails(account_id TEXT UNIQUE NOT NULL REFERENCES identities(account_id),email TEXT PRIMARY KEY);CREATE TABLE IF NOT EXISTS email_challenges(id TEXT PRIMARY KEY,email TEXT NOT NULL,account_id TEXT,session_hash TEXT REFERENCES sessions(token_hash) ON DELETE CASCADE,code_hash TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,created_at INTEGER NOT NULL,expires INTEGER NOT NULL);`);}
@@ -19,9 +20,11 @@ export function smtpTransport(env=process.env,createTransport=options=>nodemaile
  if(!env.VPN_SMTP_HOST||!env.VPN_SMTP_FROM)return null;
  const port=Number(env.VPN_SMTP_PORT||465);
  if(![465,587].includes(port))throw new Error('SMTP requires TLS on port465 or587');
+ const localAddress=env.VPN_SMTP_LOCAL_ADDRESS;
+ if(localAddress!==undefined&&localAddress!==''&&(typeof localAddress!=='string'||!isIP(localAddress)))throw new Error('VPN_SMTP_LOCAL_ADDRESS must be an IP address');
  const password=env.VPN_SMTP_PASSWORD_FILE?readFileSync(env.VPN_SMTP_PASSWORD_FILE,'utf8').replace(/[\r\n]+$/,''):env.VPN_SMTP_PASSWORD;
  if(env.VPN_SMTP_USER&&(!password||/[\r\n]/.test(password)))throw new Error('Private SMTP password missing or invalid');
- return createTransport({host:env.VPN_SMTP_HOST,port,secure:port===465,requireTLS:true,
+ return createTransport({host:env.VPN_SMTP_HOST,port,secure:port===465,requireTLS:true,...(localAddress?{localAddress}:{}),
   auth:env.VPN_SMTP_USER?{user:env.VPN_SMTP_USER,pass:password}:undefined,
   tls:{minVersion:'TLSv1.2',rejectUnauthorized:true},disableFileAccess:true,disableUrlAccess:true,
   connectionTimeout:8000,greetingTimeout:8000,socketTimeout:10000});

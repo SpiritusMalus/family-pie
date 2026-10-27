@@ -93,9 +93,10 @@ test('product evidence ships real image bytes without portal or private fixture 
   const vpn=home.match(/<section id="vpn"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(vpn,/href="\/vpn\/(terms|privacy)\//);
   const footer=home.match(/<footer[\s\S]*?<\/footer>/)[0];
-  assert.match(footer,/href="https:\/\/t\.me\/family_pie_vpn_bot\?start=support"/);
+  assert.match(footer,/href="\/vpn\/help\/"/);
+  assert.match(footer,/href="mailto:support@family-pie\.ru"/);
   assert.doesNotMatch(home,/<section id="support"|href="#support"/);
-  assert.equal((footer.match(/<a /g)||[]).length,1);
+  assert.equal((footer.match(/<a /g)||[]).length,2);
   assert.doesNotMatch(footer,/Условия|Данные|Deepgram|©|class="brand"/);
   const suflerSection=home.match(/<section id="sufler"[\s\S]*?<\/section>/)[0];
   assert.doesNotMatch(suflerSection,/Скачай приложение|href="\/sufler\/(terms|privacy)\//);

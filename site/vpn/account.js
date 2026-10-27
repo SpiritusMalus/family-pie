@@ -120,7 +120,7 @@
  if(sub.active&&sub.profile_url&&sub.sync_state==='synced'){const copy=el('button','Скопировать подключение','btn');copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sub.profile_url);copy.textContent='Скопировано';}catch{copy.textContent='Не удалось скопировать';}});panel.append(copy);}
  const settings=$('[data-screen="settings"]');const a=el('a','Сменить пароль','btn secondary');a.href='/vpn/cabinet/auth/?change=1';const security=settings?.querySelector('a[href="/vpn/cabinet/auth/"]')?.closest('section');if(security){const actions=el('div',undefined,'cab-actions');actions.append(security.querySelector('a[href="/vpn/cabinet/auth/"]'),a);security.append(actions);}else settings?.append(a);
  await window.vpnTelegramLink({api,settings,home:$('[data-screen="home"]'),setup:$('#setup-telegram'),accountId:me.user.account_id});publishReady();
- }catch(err){if(version!==authVersion)return;if(err.status===401){if(!$('#login-form'))location.href=authURL();}else if($('#cabinet-load-state')){$('#cabinet-load-message').textContent=err.message;$('#cabinet-load-recovery').hidden=false;}else message(err.message,'error');}}
+ }catch(err){if(version!==authVersion)return;if(err.status===401){if(!$('#login-form'))location.href=authURL();}else if($('#cabinet-load-state')){$('#cabinet-load-message').textContent='Не удалось загрузить аккаунт. Обнови страницу или напиши в поддержку.';$('#cabinet-load-recovery').hidden=false;}else message('Не удалось загрузить аккаунт. Обнови страницу или напиши в поддержку.','error');}}
  $('#cabinet-load-retry')?.addEventListener('click',()=>location.reload());
  if(!window.vpnTelegramEntry&&!window.vpnRecoveryEntry)boot();
 })();

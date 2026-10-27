@@ -21,6 +21,8 @@ window.FP_EN = {
   "Доступ отключён. Напиши в поддержку": "Access is disabled. Contact support",
   "Оплата не подтверждена": "Payment not confirmed",
   "Помощь с оплатой": "Payment help",
+  "Не удалось загрузить способы входа. Обнови страницу или напиши в поддержку.": "Could not load sign-in options. Reload the page or contact support.",
+  "Не удалось загрузить аккаунт. Обнови страницу или напиши в поддержку.": "Could not load your account. Reload the page or contact support.",
   "Оплата подтверждена. Статус подключения — в «Обзоре».": "Payment confirmed. Check your connection status in Overview.",
   "Оплата пока не подтверждена. Если страница оплаты не открылась или деньги списались, напиши в поддержку перед повторной покупкой.": "Payment has not been confirmed yet. If the payment page did not open or you have been charged, contact support before making another purchase.",
   "≈ −11,1%": "≈ −11.1%",
@@ -1037,3 +1039,42 @@ Object.assign(window.FP_EN, {
 Object.assign(window.FP_EN, {"Повтори новый пароль": "Confirm new password", "Восстанови доступ, чтобы вернуться к своей подписке.": "Recover access to return to your subscription."});
 
 Object.assign(window.FP_EN,{"Загружаем твою подписку…":"Loading your subscription…","Повторить загрузку":"Try loading again"});
+
+// Public support remains reachable before sign-in and VPN setup.
+Object.assign(window.FP_EN, {
+  "Помощь — Family VPN": "Help — Family VPN",
+  "Поможем с VPN": "VPN help",
+  "Личный кабинет": "My account",
+  "Нужна помощь?": "Need help?",
+  "С входом, оплатой и подключением. Вход в кабинет и Telegram не нужны.": "For sign-in, payment, and connection issues. No account sign-in or Telegram is required.",
+  "Напиши на почту": "Email us",
+  "Написать на почту": "Email support",
+  "Скопировать адрес": "Copy email address",
+  "Почта скопирована": "Email address copied",
+  "Выдели адрес и скопируй его вручную.": "Select the address and copy it manually.",
+  "Укажи логин, устройство и что не получается. Для вопроса об оплате добавь номер заказа, если он есть.": "Include your username, device, and what went wrong. For payment issues, add your order number if you have one.",
+  "Не присылай пароль, коды входа, личную VPN-ссылку или данные карты.": "Do not send passwords, sign-in codes, your private VPN link, or card details.",
+  "Не открылось почтовое приложение? Скопируй адрес и отправь письмо из своей почты.": "No email app opened? Copy the address and send a message from your email service.",
+  "Или напиши в Telegram": "Or message us in Telegram",
+  "Напиши на почту. Вход в кабинет и Telegram не нужны.": "Email support. No account sign-in or Telegram is required.",
+  "Как обратиться в поддержку": "How to contact support",
+  "Письма для восстановления сейчас недоступны. Напиши в поддержку ниже.": "Recovery emails are currently unavailable. Contact support below.",
+  "Не приходит код? Написать на почту": "No code? Email support",
+  "Помощь по почте или в Telegram. Вход в кабинет не нужен.": "Get help by email or Telegram. No account sign-in is required.",
+  "Для новой ссылки открой бота или напиши в поддержку по почте ниже.": "For a new link, open the bot or email support using the address below.",
+  "Если Telegram недоступен, напиши на почту.": "If Telegram is unavailable, email us.",
+  "Нет соединения — Family VPN": "Offline — Family VPN",
+  "Нет соединения.": "You are offline.",
+  "Для кабинета нужен интернет. Проверь сеть и открой страницу снова.": "Your account needs an internet connection. Check your network and open this page again.",
+  "Повторить": "Try again",
+  "Помощь с оплатой": "Payment help",
+  "Укажи логин, устройство и что не получается.": "Include your username, device, and what went wrong.",
+  "Здесь можно прочитать прежние обращения и продолжить переписку. Новые вопросы отправляй по почте или в Telegram.": "Read or continue previous requests here. Send new questions by email or Telegram.",
+  "Не удалось загрузить прежние обращения. Обнови страницу или напиши на почту.": "Could not load previous requests. Reload the page or email support.",
+  "Для следующего подключения просто открой Happ и включи VPN. Подписка и помощь останутся в кабинете.": "Next time, just open Happ and turn on VPN. Your subscription and help remain available in your account.",
+  "Telegram — по желанию: подписка и напоминания под рукой. Помощь доступна и по почте.": "Telegram is optional: keep your subscription and reminders handy. Support is also available by email.",
+  "Проверь входящие и папку «Спам». Если почта не подключена, напиши в поддержку по почте ниже.": "Check your inbox and spam folder. If no email was linked, contact support at the address below.",
+  "Ссылка устарела. Открой новую в боте или напиши в поддержку по почте ниже.": "This link has expired. Open a new one in the bot or email support using the address below.",
+  "Не удалось получить подписку. Открой новую ссылку в боте или напиши на почту ниже.": "Could not load your subscription. Open a new link in the bot or email us using the address below.",
+  "Проверка займёт больше времени. Проверь заказ в истории платежей или напиши в поддержку по почте. Повторно оплачивать не нужно.": "Verification is taking longer. Check your payment history or email support. You do not need to pay again."
+});

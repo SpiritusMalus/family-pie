@@ -36,7 +36,13 @@ test('expired password form returns to login without attempting a password mutat
  assert.equal(f.elements.get('.demo-label').hidden,false);
 });
 test('a failed restored-session request gives a visible retry and support path instead of a blank cabinet',async()=>{
- const f=authFixture([{status:503,body:{error:'Сервис временно недоступен'}}],'',{cabinet:true,loading:true});await flushAuth();assert.equal(f.elements.get('#cabinet-load-message').textContent,'Сервис временно недоступен');assert.equal(f.elements.get('#cabinet-load-recovery').hidden,false);assert.ok(f.elements.get('#cabinet-load-retry').listeners.has('click'));assert.equal(f.location.href,undefined);
+ const f=authFixture([{status:503,body:{error:'SYNTHETIC_UPSTREAM_DETAIL'}}],'',{cabinet:true,loading:true});await flushAuth();assert.ok(f.elements.get('#cabinet-load-message').textContent);assert.doesNotMatch(f.elements.get('#cabinet-load-message').textContent,/SYNTHETIC_UPSTREAM_DETAIL/);assert.equal(f.elements.get('#cabinet-load-recovery').hidden,false);assert.ok(f.elements.get('#cabinet-load-retry').listeners.has('click'));assert.equal(f.location.href,undefined);
+});
+test('late account startup failure cannot expose technical detail after a provider-loading failure',async()=>{
+ let finish;const pending=new Promise(resolve=>finish=resolve),f=authFixture([()=>pending]);
+ f.elements.get('#account-message').textContent='Не удалось загрузить способы входа. Обнови страницу или напиши в поддержку.';
+ finish({status:503,body:{error:'SYNTHETIC_UPSTREAM_DETAIL'}});await flushAuth();
+ assert.ok(f.elements.get('#account-message').textContent);assert.doesNotMatch(f.elements.get('#account-message').textContent,/SYNTHETIC_UPSTREAM_DETAIL/);assert.equal(f.elements.get('#account-message').dataset.tone,'error');assert.equal(f.elements.get('#login-form').hidden,false);assert.equal(f.location.href,undefined);assert.deepEqual(f.calls.map(c=>c.path),['/vpn/api/me']);
 });
 test('valid temporary password change refreshes CSRF and opens cabinet',async()=>{
  const f=authFixture([{}, {body:{user:{login:'test-only',role:'user',must_change:1},csrf:'csrf-new'}}, {body:{ok:true,csrf:'csrf-rotated'}}]);await flushAuth();await f.submit('#password-form');
@@ -122,7 +128,7 @@ test('safe auth destinations reject other origins, path escapes, query abuse and
 });
 
 const cabinetUiCode=readFileSync(new URL('../site/vpn/cabinet-ui.js',import.meta.url),'utf8');
-function signupFixture({mode='register',period=90,lang='ru',planResponses=[{plans:[{days:90,priceMinor:80045}],available:true}]}={}){
+function signupFixture({mode='register',period=90,lang='ru',authOptionsStatus=200,planResponses=[{plans:[{days:90,priceMinor:80045}],available:true}]}={}){
  const observers=new Map();
  class Element{
   constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.dataset={};this.attrs={};this.events=new Map();this._text='';this._hidden=false;this.classList={add:(...names)=>{this.className=[this.className||'',...names].join(' ');}};}
@@ -141,8 +147,8 @@ function signupFixture({mode='register',period=90,lang='ru',planResponses=[{plan
  const listeners=new Map(),calls=[],location=new URL('https://family-spy.ru/vpn/cabinet/auth/?mode='+mode+(period?'&period='+period+'&next='+encodeURIComponent('/vpn/cabinet/?lang=ru#plans?period='+period):'')),window={FPi18n:{lang,t:x=>x},vpnAuthFlow:{read:()=>({mode,period,lang})},PublicKeyCredential:class{},vpnLoginDestination:()=>'/vpn/cabinet/?lang='+window.FPi18n.lang+'#plans?period='+period,addEventListener:(name,fn)=>listeners.set(name,fn),vpnFinishLogin:async()=>{window.finished=(window.finished||0)+1;}};
  const history={replaceState(_a,_b,value){const next=new URL(value,location);location.href=next.href;}};
  runInNewContext(cabinetUiCode,{document,window,location,history,URLSearchParams,Intl,AbortSignal,Uint8Array,MutationObserver:class{constructor(fn){this.fn=fn;}observe(el){observers.set(el,this.fn);}},fetch:async(path,options)=>{
-  calls.push({path,options});let data=path.endsWith('/auth-options')?{google:true,email:true}:path.endsWith('/plans')?planResponses.shift():{ok:true};
-  if(data instanceof Error)throw data;assert.ok(data,'Unexpected request '+path);return {ok:true,json:async()=>data};
+  calls.push({path,options});const unavailable=path.endsWith('/auth-options')&&authOptionsStatus>=400;let data=path.endsWith('/auth-options')?unavailable?{error:'temporarily unavailable'}:{google:true,email:true}:path.endsWith('/plans')?planResponses.shift():{ok:true};
+  if(data instanceof Error)throw data;assert.ok(data,'Unexpected request '+path);return {ok:!unavailable,status:unavailable?authOptionsStatus:200,json:async()=>data};
  }});
  return {root,panel,intro,selected,title,loginForm,passwordForm,message,window,location,calls,dispatch:name=>listeners.get(name)?.(),find:selector=>root.querySelector(selector),click:async el=>el.events.get('click')(),submit:async el=>el.events.get('submit')({preventDefault(){},submitter:el.all().find(n=>n.tagName==='BUTTON')})};
 }
@@ -157,6 +163,15 @@ test('normal sign-in, forced password change, and session recovery keep one acti
  const f=signupFixture({mode:'login',period:null});await flushAuth();assert.equal(f.loginForm.hidden,false);assert.equal(f.find('#register-form').hidden,true);assert.ok(!f.selected.textContent);assert.equal(f.find('.auth-switch').textContent,'Нет аккаунта? Создать аккаунт');
  f.loginForm.hidden=true;f.passwordForm.hidden=false;await flushAuth();assert.equal(f.find('.auth-methods').hidden,true);
  f.passwordForm.hidden=true;f.dispatch('vpn-auth-login-view');await flushAuth();assert.equal(f.find('.auth-methods').hidden,false);assert.equal(f.loginForm.hidden,false);assert.equal(f.find('#register-form').hidden,true);
+});
+
+test('failed provider loading leaves manual sign-in available and preserves form validation',async()=>{
+ const f=signupFixture({mode:'login',period:null,authOptionsStatus:503});await flushAuth();
+ assert.equal(f.loginForm.hidden,false);assert.equal(f.find('.auth-methods').hidden,false);assert.equal(f.find('.auth-alternatives').querySelector('a').hidden,true);
+ assert.ok(f.find('.auth-alternatives').all().filter(n=>n.tagName==='FORM').every(n=>n.hidden));assert.equal(f.window.finished,undefined);
+ assert.ok(f.message.textContent);assert.doesNotMatch(f.message.textContent,/temporarily unavailable/);assert.equal(f.message.dataset.tone,'error');
+ await f.click(f.find('.auth-switch'));const form=f.find('#register-form'),[,password,repeat]=form.all().filter(n=>n.tagName==='INPUT');password.value='Synthetic-test-password';repeat.value='different';await f.submit(form);
+ assert.match(f.message.textContent,/Пароли не совпадают/);assert.equal(f.calls.some(c=>c.path.endsWith('/register')),false);
 });
 
 test('signup summary retries failed prices and retains the selection when the language changes',async()=>{
