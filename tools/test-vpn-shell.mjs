@@ -19,9 +19,10 @@ function authFixture(responses,search='',options={}){
  for(const key of ['#login-form','#password-form','#auth-title','#account-message','.demo-label','.auth-layout > div > p','#password-form p','#login','#password','#current','#next','#repeat','#switch-account'])elements.set(key,{hidden:key==='#password-form',value:'test-only-password',dataset:{},listeners:new Map(),addEventListener(name,fn){this.listeners.set(name,fn);},focus(){this.focused=true;}});
  const calls=[],location={search,pathname:options.pathname||'/vpn/cabinet/auth/',hash:options.hash||''};
  if(options.cabinet)elements.delete('#login-form');
+ if(options.loading)for(const key of ['#cabinet-load-state','#cabinet-load-message','#cabinet-load-recovery','#cabinet-load-retry'])elements.set(key,{hidden:true,listeners:new Map(),addEventListener(name,fn){this.listeners.set(name,fn);}});
  const document={querySelector:key=>elements.get(key)||null};
  const user={login:'test-only',role:'user',must_change:1},session={user,csrf:'csrf-fresh'};
- const window={FPi18n:{t:x=>x,...(options.lang?{lang:options.lang}:{})}};runInNewContext(accountCode,{window,document,location,URL,URLSearchParams,fetch:async(path,options)=>{
+ const window={FPi18n:{t:x=>x,...(options.lang?{lang:options.lang}:{})}};runInNewContext(accountCode,{AbortSignal,window,document,location,URL,URLSearchParams,fetch:async(path,options)=>{
   calls.push({path,options});const response=responses.shift();assert.ok(response,'Unexpected request '+path);const data=typeof response==='function'?await response():response;
   return {ok:!data.status||data.status===200,status:data.status||200,json:async()=>data.body||session};
  }});
@@ -34,10 +35,28 @@ test('expired password form returns to login without attempting a password mutat
  for(const key of ['#password','#current','#next','#repeat'])assert.equal(f.elements.get(key).value,'');
  assert.equal(f.elements.get('.demo-label').hidden,false);
 });
+test('a failed restored-session request gives a visible retry and support path instead of a blank cabinet',async()=>{
+ const f=authFixture([{status:503,body:{error:'SYNTHETIC_UPSTREAM_DETAIL'}}],'',{cabinet:true,loading:true});await flushAuth();assert.ok(f.elements.get('#cabinet-load-message').textContent);assert.doesNotMatch(f.elements.get('#cabinet-load-message').textContent,/SYNTHETIC_UPSTREAM_DETAIL/);assert.equal(f.elements.get('#cabinet-load-recovery').hidden,false);assert.ok(f.elements.get('#cabinet-load-retry').listeners.has('click'));assert.equal(f.location.href,undefined);
+});
+test('late account startup failure cannot expose technical detail after a provider-loading failure',async()=>{
+ let finish;const pending=new Promise(resolve=>finish=resolve),f=authFixture([()=>pending]);
+ f.elements.get('#account-message').textContent='Не удалось загрузить способы входа. Обнови страницу или напиши в поддержку.';
+ finish({status:503,body:{error:'SYNTHETIC_UPSTREAM_DETAIL'}});await flushAuth();
+ assert.ok(f.elements.get('#account-message').textContent);assert.doesNotMatch(f.elements.get('#account-message').textContent,/SYNTHETIC_UPSTREAM_DETAIL/);assert.equal(f.elements.get('#account-message').dataset.tone,'error');assert.equal(f.elements.get('#login-form').hidden,false);assert.equal(f.location.href,undefined);assert.deepEqual(f.calls.map(c=>c.path),['/vpn/api/me']);
+});
 test('valid temporary password change refreshes CSRF and opens cabinet',async()=>{
  const f=authFixture([{}, {body:{user:{login:'test-only',role:'user',must_change:1},csrf:'csrf-new'}}, {body:{ok:true,csrf:'csrf-rotated'}}]);await flushAuth();await f.submit('#password-form');
  assert.equal(f.location.href,'/vpn/cabinet/');assert.equal(f.calls[2].options.headers['X-CSRF-Token'],'csrf-new');
  assert.match(f.elements.get('#password-form p').textContent,/После сохранения откроется личный кабинет/);
+});
+test('a verified nonpassword sign-in sets a password without the forgotten password and opens the intended cabinet',async()=>{
+ const body={user:{login:'fixture-recovered',role:'user',must_change:1},csrf:'fresh',authMethod:'email',passwordSetupAllowed:true},f=authFixture([{body},{body},{body:{ok:true}}]);await flushAuth();assert.equal(f.elements.get('#current').required,false);assert.match(f.elements.get('#password-form p').textContent,/Подписка останется/);await f.submit('#password-form');assert.equal(f.calls[2].path,'/vpn/api/password/set');assert.deepEqual(JSON.parse(f.calls[2].options.body),{next:'test-only-password'});assert.equal(f.location.href,'/vpn/cabinet/');
+});
+test('expired recovery verification never silently falls back to asking the forgotten password',async()=>{
+ const body={user:{login:'fixture-recovered',role:'user',must_change:1},csrf:'fresh',authMethod:'email',passwordSetupAllowed:true},f=authFixture([{body},{body:{...body,passwordSetupAllowed:false}}]);await flushAuth();await f.submit('#password-form');assert.equal(f.calls.length,2);assert.equal(f.elements.get('#password-form').hidden,true);assert.match(f.elements.get('#account-message').textContent,/Подтверждение устарело/);
+});
+test('a normal recent password sign-in still asks for the current password when changing it',async()=>{
+ const body={user:{login:'fixture-password',role:'user',must_change:0},csrf:'fresh',authMethod:'password',passwordSetupAllowed:true},f=authFixture([{body},{body},{body:{ok:true}}],'?change=1');await flushAuth();assert.equal(f.elements.get('#current').required,true);await f.submit('#password-form');assert.equal(f.calls[2].path,'/vpn/api/password');assert.ok(JSON.parse(f.calls[2].options.body).current);
 });
 test('session loss during password submit recovers login; rejected current password keeps form',async()=>{
  const f=authFixture([{}, {}, {status:401,body:{error:'Войди в аккаунт'}}]);await flushAuth();await f.submit('#password-form');assert.equal(f.elements.get('#password-form').hidden,true);
@@ -109,7 +128,7 @@ test('safe auth destinations reject other origins, path escapes, query abuse and
 });
 
 const cabinetUiCode=readFileSync(new URL('../site/vpn/cabinet-ui.js',import.meta.url),'utf8');
-function signupFixture({mode='register',period=90,lang='ru',planResponses=[{plans:[{days:90,priceMinor:80045}],available:true}]}={}){
+function signupFixture({mode='register',period=90,lang='ru',authOptionsStatus=200,planResponses=[{plans:[{days:90,priceMinor:80045}],available:true}]}={}){
  const observers=new Map();
  class Element{
   constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.dataset={};this.attrs={};this.events=new Map();this._text='';this._hidden=false;this.classList={add:(...names)=>{this.className=[this.className||'',...names].join(' ');}};}
@@ -128,8 +147,8 @@ function signupFixture({mode='register',period=90,lang='ru',planResponses=[{plan
  const listeners=new Map(),calls=[],location=new URL('https://family-spy.ru/vpn/cabinet/auth/?mode='+mode+(period?'&period='+period+'&next='+encodeURIComponent('/vpn/cabinet/?lang=ru#plans?period='+period):'')),window={FPi18n:{lang,t:x=>x},vpnAuthFlow:{read:()=>({mode,period,lang})},PublicKeyCredential:class{},vpnLoginDestination:()=>'/vpn/cabinet/?lang='+window.FPi18n.lang+'#plans?period='+period,addEventListener:(name,fn)=>listeners.set(name,fn),vpnFinishLogin:async()=>{window.finished=(window.finished||0)+1;}};
  const history={replaceState(_a,_b,value){const next=new URL(value,location);location.href=next.href;}};
  runInNewContext(cabinetUiCode,{document,window,location,history,URLSearchParams,Intl,AbortSignal,Uint8Array,MutationObserver:class{constructor(fn){this.fn=fn;}observe(el){observers.set(el,this.fn);}},fetch:async(path,options)=>{
-  calls.push({path,options});let data=path.endsWith('/auth-options')?{google:true,email:true}:path.endsWith('/plans')?planResponses.shift():{ok:true};
-  if(data instanceof Error)throw data;assert.ok(data,'Unexpected request '+path);return {ok:true,json:async()=>data};
+  calls.push({path,options});const unavailable=path.endsWith('/auth-options')&&authOptionsStatus>=400;let data=path.endsWith('/auth-options')?unavailable?{error:'temporarily unavailable'}:{google:true,email:true}:path.endsWith('/plans')?planResponses.shift():{ok:true};
+  if(data instanceof Error)throw data;assert.ok(data,'Unexpected request '+path);return {ok:!unavailable,status:unavailable?authOptionsStatus:200,json:async()=>data};
  }});
  return {root,panel,intro,selected,title,loginForm,passwordForm,message,window,location,calls,dispatch:name=>listeners.get(name)?.(),find:selector=>root.querySelector(selector),click:async el=>el.events.get('click')(),submit:async el=>el.events.get('submit')({preventDefault(){},submitter:el.all().find(n=>n.tagName==='BUTTON')})};
 }
@@ -144,6 +163,15 @@ test('normal sign-in, forced password change, and session recovery keep one acti
  const f=signupFixture({mode:'login',period:null});await flushAuth();assert.equal(f.loginForm.hidden,false);assert.equal(f.find('#register-form').hidden,true);assert.ok(!f.selected.textContent);assert.equal(f.find('.auth-switch').textContent,'Нет аккаунта? Создать аккаунт');
  f.loginForm.hidden=true;f.passwordForm.hidden=false;await flushAuth();assert.equal(f.find('.auth-methods').hidden,true);
  f.passwordForm.hidden=true;f.dispatch('vpn-auth-login-view');await flushAuth();assert.equal(f.find('.auth-methods').hidden,false);assert.equal(f.loginForm.hidden,false);assert.equal(f.find('#register-form').hidden,true);
+});
+
+test('failed provider loading leaves manual sign-in available and preserves form validation',async()=>{
+ const f=signupFixture({mode:'login',period:null,authOptionsStatus:503});await flushAuth();
+ assert.equal(f.loginForm.hidden,false);assert.equal(f.find('.auth-methods').hidden,false);assert.equal(f.find('.auth-alternatives').querySelector('a').hidden,true);
+ assert.ok(f.find('.auth-alternatives').all().filter(n=>n.tagName==='FORM').every(n=>n.hidden));assert.equal(f.window.finished,undefined);
+ assert.ok(f.message.textContent);assert.doesNotMatch(f.message.textContent,/temporarily unavailable/);assert.equal(f.message.dataset.tone,'error');
+ await f.click(f.find('.auth-switch'));const form=f.find('#register-form'),[,password,repeat]=form.all().filter(n=>n.tagName==='INPUT');password.value='Synthetic-test-password';repeat.value='different';await f.submit(form);
+ assert.match(f.message.textContent,/Пароли не совпадают/);assert.equal(f.calls.some(c=>c.path.endsWith('/register')),false);
 });
 
 test('signup summary retries failed prices and retains the selection when the language changes',async()=>{

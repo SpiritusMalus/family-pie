@@ -1,0 +1,21 @@
+.support-email{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;min-width:0}
+.support-email-address{color:var(--accent,#ff746c);font-weight:600;overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}
+.support-email-copy{min-height:40px;padding:7px 12px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit;font:inherit;font-size:.875rem;cursor:pointer}
+.support-email-copy:hover{background:rgba(255,155,133,.08)}
+.support-email-copy:focus-visible,.support-email-address:focus-visible{outline:2px solid var(--accent,#ff746c);outline-offset:4px}
+.support-email-copy[hidden]{display:none}
+.support-email-result{flex-basis:100%;font-size:.875rem;color:var(--muted,#a5b0ba)}
+.support-email-result:empty{height:0}
+.support-contact p{max-width:66ch}
+.support-contact .support-email{margin:14px 0}
+.support-contact .support-alternative{margin-top:18px}
+.support-contact .support-privacy{font-size:.875rem;color:var(--muted,#a5b0ba)}
+.support-help-page{max-width:760px;padding-top:48px;padding-bottom:64px}
+.support-help-page h1{margin-top:0}
+.is-support-help:before,.is-support-help:after{content:none;box-shadow:none}
+.support-help-page .panel{margin-top:24px;padding:28px}
+.support-footer-mail{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+.support-footer-mail .support-email{flex:1}
+.support-nav-link{display:inline-flex;align-items:center;min-height:40px;font-size:.875rem;white-space:nowrap}
+.is-cabinet .nav-actions{min-width:0;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:420px){.support-help-page{padding-top:28px}.support-help-page .panel{padding:20px}.support-footer-mail{align-items:flex-start}.support-footer-mail .support-email{flex-basis:100%}.support-email{column-gap:10px}}

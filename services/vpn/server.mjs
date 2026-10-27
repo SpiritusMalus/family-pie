@@ -1,7 +1,9 @@
 import { createServer } from 'node:http';
 import { VpnStore } from './store.mjs';
 import { Accounts } from './auth.mjs';
+import {PasswordRecovery} from './recovery.mjs';
 import { TelegramStore } from './telegram.mjs';
+import {TelegramCommerce,loadTelegramStarsConfig} from './telegram-commerce.mjs';
 import { Cabinet } from './cabinet.mjs';
 import { Billing,billingConfig } from './billing.mjs';
 import { ProviderUnavailableError } from './yookassa.mjs';
@@ -12,7 +14,7 @@ import { GoogleLogin,googleConfig as readGoogleConfig,googleReturnPath } from '.
 import {EmailLogin,smtpSender,smtpPurchaseSender} from './email.mjs';
 import {PurchaseMail} from './purchase-mail.mjs';
 import {PushNotifications} from './push.mjs';
-export function createApp({store,origin='https://family-spy.ru',additionalOrigins=[],publicSubscriptionOrigin=null,secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={}}){
+export function createApp({store,origin='https://family-spy.ru',additionalOrigins=[],publicSubscriptionOrigin=null,secure=true,revision='development',botUsername='',paymentConfig={},googleConfig={},sendEmail=null,pushConfig={},starsConfig={}}){
  const users=new Accounts(store,{publicSubscriptionOrigin}),attempts=new Map();let passwordOperations=0;
  const cabinet=new Cabinet(store,{origin}),billing=new Billing(store,{...paymentConfig,origin});
  const passkeys=new Passkeys(store,users,origin);
@@ -25,7 +27,9 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
  const push=new PushNotifications(store,pushConfig);
  const savedPlans=cabinet.plans();if(savedPlans.length)store.plans=new Map(savedPlans.map(p=>[String(p.days),Object.freeze({...p})]));
  const telegram=new TelegramStore(store),botReady=/^[A-Za-z0-9_]{5,32}$/.test(botUsername)&&/bot$/i.test(botUsername);
- const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));};
+ const recovery=new PasswordRecovery(store,users,{origin,send:sendEmail});
+ const commerce=new TelegramCommerce(store,{users,origin,stars:starsConfig,recovery});
+ const send=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(JSON.stringify(data));};
  const cookie=(res,token)=>res.setHeader('Set-Cookie',`vpn_session=${token}; Path=/vpn/; HttpOnly; SameSite=Strict; ${secure?'Secure; ':''}Max-Age=${token?43200:0}`);
  const token=req=>(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_session='))?.slice(12);
  const recent=s=>{if(!users.db.prepare('SELECT 1 FROM session_auth WHERE token_hash=? AND verified_at>?').get(s.token_hash,Date.now()-300000))throw new Error('Повтори вход перед изменением способов входа');};
@@ -38,7 +42,7 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
    const path=new URL(req.url,origin).pathname;
    if(path==='/vpn/api/health'&&req.method==='GET')return send(res,200,{service:'family-vpn-cabinet',revision});
    if(path==='/vpn/api/plans'&&req.method==='GET')return send(res,200,{plans:[...store.plans.values()],available:billing.ready()&&store.plans.size>0,testMode:billing.config.testMode});
-   if(path==='/vpn/api/auth-options'&&req.method==='GET')return send(res,200,{google:google.ready(),email:Boolean(sendEmail),passkey:true,password:true,registration:true});
+   if(path==='/vpn/api/auth-options'&&req.method==='GET')return send(res,200,{google:google.ready(),email:Boolean(sendEmail),passkey:true,password:true,registration:true,recoveryEmail:Boolean(sendEmail),recoveryTelegram:botReady&&typeof commerce.recoveryHandoff==='function'});
    if(path==='/vpn/api/google/start'&&req.method==='GET'){const q=new URL(req.url,origin).searchParams,next=googleReturnPath(q.get('next'),origin),existing=users.session(token(req));if(!google.ready()){res.writeHead(302,{'Location':'/vpn/cabinet/auth/?google_error=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}if(existing?.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль'});if(existing){try{recent(existing);}catch{res.writeHead(302,{'Location':'/vpn/cabinet/auth/?reauth=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}}const s=google.start(existing,next);res.writeHead(302,{'Location':s.url,'Cache-Control':'no-store','Set-Cookie':`vpn_google=${s.state}; Path=/vpn/api/google/; HttpOnly; SameSite=Lax; ${secure?'Secure; ':''}Max-Age=300`});return res.end();}
    if(path==='/vpn/api/google/callback'&&req.method==='GET'){const q=new URL(req.url,origin).searchParams,c=(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('vpn_google='))?.slice(11),next=google.returnPath(q.get('state'),c);try{const s=await google.finish(q.get('state'),c,q.get('code'));cookie(res,s.token);res.writeHead(302,{'Location':s.identity.role==='admin'&&s.next==='/vpn/cabinet/'?'/vpn/admin/':s.next,'Cache-Control':'no-store'});return res.end();}catch{res.writeHead(302,{'Location':'/vpn/cabinet/auth/?google_error=1&next='+encodeURIComponent(next),'Cache-Control':'no-store'});return res.end();}}
    if(path==='/vpn/api/passkeys/login/options'&&req.method==='POST'){
@@ -52,6 +56,19 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
    if(mutation){if(!String(req.headers['content-type']).startsWith('application/json'))return send(res,415,{error:'Ожидается JSON'});
     let raw='';for await(const chunk of req){raw+=chunk;if(Buffer.byteLength(raw)>(path==='/vpn/api/support/attachment'?1500000:32768))return send(res,413,{error:'Слишком большой запрос'});}try{body=JSON.parse(raw);}catch{return send(res,400,{error:'Некорректный запрос'});}}
    if(webhook){const key='webhook',now=Date.now(),limit=attempts.get(key)||{count:0,until:now+60000};if(limit.until<now){limit.count=0;limit.until=now+60000;}if(limit.count++>=30)return send(res,429,{error:'Повтори позже'});attempts.set(key,limit);try{await billing.webhook(body.event,body.object?.id);return send(res,200,{ok:true});}catch{return send(res,503,{error:'Проверка платежа недоступна'});}}
+   if(path==='/vpn/api/recovery/request'&&req.method==='POST'){
+    const now=Date.now(),key='recovery-request',limit=attempts.get(key)||{count:0,until:now+60000};if(limit.until<=now){limit.count=0;limit.until=now+60000;}
+    if(limit.count++>=60)return send(res,429,{error:'Слишком много запросов. Повтори позже'});attempts.set(key,limit);
+    return send(res,200,recovery.request(body.identifier,{challengeId:body.challengeId}));
+   }
+   if(path==='/vpn/api/recovery/preview'&&req.method==='POST')return send(res,200,recovery.preview(body.token,{accountId:users.session(token(req))?.account_id||null}));
+   if(['/vpn/api/recovery/confirm','/vpn/api/recovery/reset'].includes(path)&&req.method==='POST'){
+    if(passwordOperations>=1)return send(res,429,{error:'Повтори через несколько секунд'});passwordOperations++;
+    try{const options={accountId:users.session(token(req))?.account_id||null};return send(res,200,path.endsWith('/confirm')?await recovery.confirm(body.challengeId,body.code,body.password,options):await recovery.reset(body.token,body.password,options));}finally{passwordOperations--;}
+   }
+   if(path==='/vpn/api/telegram/login/preview'&&req.method==='POST')return send(res,200,commerce.previewLogin(body.token,{accountId:users.session(token(req))?.account_id||null}));
+   if(path==='/vpn/api/telegram/login'&&req.method==='POST'){const s=commerce.consume(body.token,'login',{accountId:users.session(token(req))?.account_id||null});cookie(res,s.token);return send(res,200,{user:s.identity,csrf:s.csrf,device:s.device});}
+   if(path==='/vpn/api/telegram/import'&&req.method==='POST')return send(res,200,commerce.consume(body.token,'import'));
    if(path==='/vpn/api/passkeys/login'&&req.method==='POST'){const s=await passkeys.login(body.challengeId,body.response);cookie(res,s.token);return send(res,200,{user:s.identity,csrf:s.csrf});}
    if(path==='/vpn/api/email/login/request'&&req.method==='POST')return send(res,200,await emailLogin.issue(body.email));
    if(path==='/vpn/api/email/login/confirm'&&req.method==='POST'){const s=emailLogin.confirm(body.challengeId,body.code);cookie(res,s.token);return send(res,200,{user:s.identity,csrf:s.csrf});}
@@ -74,7 +91,7 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
    const session=users.session(token(req));if(!session)return send(res,401,{error:'Войди в аккаунт'});
    const id=session.account_id;
    if(mutation&&req.headers['x-csrf-token']!==session.csrf)return send(res,403,{error:'Обнови страницу и повтори'});
-   if(path==='/vpn/api/me'&&req.method==='GET')return send(res,200,{user:session.identity,csrf:session.csrf,subscription:session.identity.must_change?null:users.subscription(id)});
+   if(path==='/vpn/api/me'&&req.method==='GET')return send(res,200,{user:session.identity,csrf:session.csrf,...users.passwordSetupState(id,session.token_hash),subscription:session.identity.must_change?null:users.subscription(id)});
    if(path==='/vpn/api/logout'&&req.method==='POST'){users.logout(token(req));cookie(res,'');return send(res,200,{ok:true});}
    if(path==='/vpn/api/password'&&req.method==='POST'){
     const key='pw:'+id,now=Date.now(),limit=attempts.get(key)||{count:0,until:now+600_000};
@@ -82,6 +99,7 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
     if(limit.count>=10||passwordOperations>=1)return send(res,429,{error:'Повтори позже'});limit.count++;attempts.set(key,limit);passwordOperations++;
     try{const updated=await users.changePassword(id,body.current,body.next);cookie(res,updated.token);return send(res,200,{ok:true,csrf:updated.csrf});}finally{passwordOperations--;}
    }
+   if(path==='/vpn/api/password/set'&&req.method==='POST'){if(passwordOperations>=1)return send(res,429,{error:'Повтори через несколько секунд'});passwordOperations++;try{const s=await users.setPassword(id,session.token_hash,body.next);cookie(res,s.token);return send(res,200,{ok:true,csrf:s.csrf});}finally{passwordOperations--;}}
    if(session.identity.must_change)return send(res,403,{error:'Сначала смени временный пароль',mustChange:true});
    const admin=session.identity.role==='admin';
    if(mutation&&['/vpn/api/email','/vpn/api/email/confirm','/vpn/api/google','/vpn/api/passkeys','/vpn/api/passkeys/options'].includes(path))recent(session);
@@ -92,7 +110,6 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
    if(path==='/vpn/api/email'&&req.method==='POST')return send(res,200,await emailLogin.issue(body.email,session));
    if(path==='/vpn/api/email/confirm'&&req.method==='POST')return send(res,200,emailLogin.confirm(body.challengeId,body.code,session));
    if(path==='/vpn/api/email'&&req.method==='DELETE'){emailLogin.disconnect(id);return send(res,200,{ok:true});}
-   if(path==='/vpn/api/password/set'&&req.method==='POST'){const s=await users.setPassword(id,session.token_hash,body.next);cookie(res,s.token);return send(res,200,{ok:true,csrf:s.csrf});}
    if(path==='/vpn/api/google'&&req.method==='GET')return send(res,200,google.state(id));
    if(path==='/vpn/api/google'&&req.method==='DELETE'){google.unlink(id);return send(res,200,{ok:true});}
    if(path==='/vpn/api/passkeys'&&req.method==='GET')return send(res,200,{passkeys:passkeys.list(id)});
@@ -101,6 +118,13 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
    if(path==='/vpn/api/passkeys'&&req.method==='DELETE'){passkeys.remove(id,body.id);return send(res,200,{ok:true});}
    if(path==='/vpn/api/subscription/qr'&&req.method==='GET'){const sub=users.subscription(id);if(!sub.active||sub.sync_state!=='synced'||!sub.profile_url)return send(res,403,{error:'Нет активного подключения'});const svg=await QRCode.toString(sub.profile_url,{type:'svg',errorCorrectionLevel:'M',margin:2,width:240});res.writeHead(200,{'Content-Type':'image/svg+xml','Cache-Control':'no-store','Content-Security-Policy':"default-src 'none'; sandbox"});return res.end(svg);}
    if(path==='/vpn/api/friends/qr'&&req.method==='GET'){const svg=await QRCode.toString(cabinet.friends(id).url,{type:'svg',margin:2,width:240});res.writeHead(200,{'Content-Type':'image/svg+xml','Cache-Control':'no-store'});return res.end(svg);}
+   if(path==='/vpn/api/onboarding/events'&&req.method==='POST'){
+    if(Object.keys(body).some(key=>!['event','platform'].includes(key)))return send(res,400,{error:'Ожидается только шаг настройки и устройство'});
+    const now=Date.now();for(const[k,v]of attempts)if(v.until<now)attempts.delete(k);
+    const key='onboarding:'+id,limit=attempts.get(key)||{count:0,until:now+60000};
+    if(limit.count>=30||attempts.size>=10000)return send(res,429,{error:'Повтори позже'});
+    store.recordOnboardingEvent(body.event,body.platform);limit.count++;attempts.set(key,limit);return send(res,200,{ok:true});
+   }
    if(path==='/vpn/api/profile'&&req.method==='GET')return send(res,200,{profile:cabinet.profile(id)});
    if(path==='/vpn/api/profile'&&req.method==='PATCH')return send(res,200,{profile:cabinet.updateProfile(id,body)});
    if(path==='/vpn/api/sessions'&&req.method==='GET')return send(res,200,{sessions:users.db.prepare('SELECT token_hash id,expires FROM sessions WHERE account_id=? AND expires>? ORDER BY expires DESC').all(id,Date.now()).map(s=>({...s,current:s.id===session.token_hash}))});
@@ -132,14 +156,14 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
    if(path==='/vpn/api/support'&&req.method==='POST')return send(res,201,{thread:cabinet.createThread(id,body.subject,body.message,body.requestKey)});
    const threadMatch=path.match(/^\/vpn\/api\/(admin\/)?support\/([a-f0-9-]+)$/);if(threadMatch){if(threadMatch[1]&&!admin)return send(res,403,{error:'Только для администратора'});const privileged=Boolean(threadMatch[1]);if(req.method==='GET')return send(res,200,{thread:cabinet.thread(threadMatch[2],id,privileged),messages:cabinet.messages(threadMatch[2],id,privileged)});if(req.method==='POST')return send(res,201,cabinet.reply(threadMatch[2],id,body.message,privileged,body.requestKey));if(req.method==='PATCH'){cabinet.closeThread(threadMatch[2],id,body.closed,privileged);return send(res,200,{ok:true});}}
    if(path==='/vpn/api/support/attachment'&&req.method==='POST')return send(res,201,cabinet.attachment(body.messageId,id,body.name,body.mime,body.data,admin));
-   const fileMatch=path.match(/^\/vpn\/api\/support\/files\/([a-f0-9-]+)$/);if(fileMatch&&req.method==='GET'){const f=cabinet.file(fileMatch[1],id,admin);res.writeHead(200,{'Content-Type':f.mime,'Content-Disposition':`attachment; filename*=UTF-8''${encodeURIComponent(f.name)}`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; sandbox"});return res.end(Buffer.from(f.data));}
+   const fileMatch=path.match(/^\/vpn\/api\/support\/files\/([a-f0-9-]+)$/);if(fileMatch&&req.method==='GET'){const f=cabinet.file(fileMatch[1],id,admin);res.writeHead(200,{'Content-Type':f.mime,'Content-Disposition':`attachment; filename*=UTF-8''${encodeURIComponent(f.name)}`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'; sandbox"});return res.end(Buffer.from(f.data));}
    if(path==='/vpn/api/news'&&req.method==='GET')return send(res,200,{posts:cabinet.posts(id)});
    if(path==='/vpn/api/news/read'&&req.method==='POST'){cabinet.readPost(id,body.id);return send(res,200,{ok:true});}
    if(path==='/vpn/api/diagnostics'&&req.method==='GET'){const peer=String(req.headers['x-forwarded-for']||'').split(',')[0].trim();return send(res,200,{time:Date.now(),exitRequest:!process.env.VPN_EXIT_IPS||!peer||['127.0.0.1','::1'].includes(peer)?null:process.env.VPN_EXIT_IPS.split(',').includes(peer)});}
    if(path==='/vpn/api/diagnostics/download'&&req.method==='GET'){const data=randomBytes(262144);res.writeHead(200,{'Content-Type':'application/octet-stream','Content-Length':data.length,'Cache-Control':'no-store'});return res.end(data);}
    if(path==='/vpn/api/diagnostics/upload'&&req.method==='POST')return send(res,200,{received:typeof body.data==='string'?Buffer.byteLength(body.data):0});
    if(path==='/vpn/api/telegram'&&req.method==='GET')return send(res,200,{available:botReady,...telegram.state(id,session.token_hash)});
-   if(path==='/vpn/api/telegram'&&req.method==='DELETE'){telegram.disconnect(id);return send(res,200,{ok:true});}
+   if(path==='/vpn/api/telegram'&&req.method==='DELETE'){store.transaction(()=>{const link=users.db.prepare('SELECT chat_id FROM telegram_links WHERE account_id=?').get(id);if(link&&!commerce.canUnlink(link.chat_id))throw new Error('Сначала добавь пароль, ключ входа или подтверждённую почту');telegram.disconnectInternal(id);});return send(res,200,{ok:true});}
    if(path==='/vpn/api/telegram/link'&&req.method==='POST'){
     if(!botReady)return send(res,503,{error:'Telegram-бот ещё подключается'});
     return send(res,200,{url:`https://t.me/${botUsername}?start=bind_${telegram.issue(id,session.token_hash)}`});
@@ -147,9 +171,10 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
    if(path==='/vpn/api/telegram/confirm'&&req.method==='POST'){if(!botReady)return send(res,503,{error:'Telegram-бот ещё подключается'});telegram.confirm(id,session.token_hash);return send(res,200,{ok:true});}
    if(path.startsWith('/vpn/api/admin/')){
     if(session.identity.role!=='admin')return send(res,403,{error:'Только для администратора'});
+    if(path==='/vpn/api/admin/recovery-links'&&req.method==='POST'){recent(session);const result=recovery.issueAdmin(session,body.accountId,{ownershipVerified:body.ownershipVerified,requestKey:body.requestKey});return send(res,result.alreadyIssued?200:201,result);}
     if(path==='/vpn/api/admin/plans'&&req.method==='PUT')return send(res,200,{plans:cabinet.setPlans(body.plans)});
-    if(path==='/vpn/api/admin/orders'&&req.method==='GET')return send(res,200,{orders:users.db.prepare('SELECT o.id,o.account_id,o.days,o.price_minor,o.state,o.created_at,i.login FROM orders o JOIN identities i USING(account_id) ORDER BY o.created_at DESC LIMIT 100').all()});
-    if(path==='/vpn/api/admin/refund'&&req.method==='POST'){const o=users.db.prepare('SELECT account_id FROM orders WHERE id=?').get(body.orderId);if(!o)throw new Error('Заказ не найден');return send(res,200,await billing.refund(o.account_id,body.orderId,body.requestKey));}
+    if(path==='/vpn/api/admin/orders'&&req.method==='GET')return send(res,200,{orders:users.db.prepare('SELECT o.id,o.account_id,o.days,o.price_minor,o.payment_amount,o.currency,o.provider,o.state,o.created_at,i.login FROM orders o JOIN identities i USING(account_id) ORDER BY o.created_at DESC LIMIT 100').all()});
+    if(path==='/vpn/api/admin/refund'&&req.method==='POST'){const o=users.db.prepare('SELECT account_id,provider FROM orders WHERE id=?').get(body.orderId);if(!o)throw new Error('Заказ не найден');return send(res,200,o.provider==='telegram-stars'?commerce.queueRefund(o.account_id,body.orderId):await billing.refund(o.account_id,body.orderId,body.requestKey));}
     if(path==='/vpn/api/admin/referrals'&&req.method==='GET')return send(res,200,cabinet.referralPolicy());
     if(path==='/vpn/api/admin/referrals'&&req.method==='PUT')return send(res,200,cabinet.setReferralPolicy(body));
     if(path==='/vpn/api/admin/withdrawals'&&req.method==='GET')return send(res,200,{withdrawals:users.db.prepare('SELECT w.*,i.login FROM withdrawals w JOIN identities i USING(account_id) ORDER BY created_at DESC LIMIT 100').all()});
@@ -172,18 +197,18 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
     if(match&&['PATCH','DELETE'].includes(req.method))return send(res,200,{subscription:users.edit(id,match[1],req.method==='DELETE'?{deleted:true,enabled:false}:body)});
    }
    return send(res,404,{error:'Раздел не найден'});
-  }catch(e){send(res,e instanceof ProviderUnavailableError?503:400,{error:e.message==='Unlimited access is reserved for existing users'?'Новым пользователям нужна подписка с датой окончания':['Wrong current password','Choose a new password'].includes(e.message)?'Проверь текущий пароль и выбери новый':e.message.startsWith('Password must')?'Пароль должен содержать от12 до128 символов':/[А-Яа-я]/.test(e.message)?e.message.slice(0,240):'Запрос не выполнен. Проверь данные.'});}
+  }catch(e){send(res,e.code==='LOGIN_ACCOUNT_CONFLICT'?409:e.code==='RECOVERY_RATE_LIMIT'?429:e.code==='RECOVERY_UNAVAILABLE'||e instanceof ProviderUnavailableError?503:400,{error:e.message==='Unlimited access is reserved for existing users'?'Новым пользователям нужна подписка с датой окончания':['Wrong current password','Choose a new password'].includes(e.message)?'Проверь текущий пароль и выбери новый':e.message.startsWith('Password must')?'Пароль должен содержать от12 до128 символов':/[А-Яа-я]/.test(e.message)?e.message.slice(0,240):'Запрос не выполнен. Проверь данные.'});}
  });server.headersTimeout=10000;server.requestTimeout=15000;
- return {server,users,cabinet,billing,passkeys,google,emailLogin,push};
+ return {server,users,cabinet,billing,passkeys,google,emailLogin,push,commerce,recovery};
 }
 if(process.argv[1]?.endsWith('/server.mjs')){
  if(!process.env.VPN_DATABASE_PATH)throw new Error('Private database path required');
  const store=new VpnStore(process.env.VPN_DATABASE_PATH);
  const pushConfig=process.env.VPN_PUSH_CONFIG_FILE?JSON.parse((await import('node:fs')).readFileSync(process.env.VPN_PUSH_CONFIG_FILE,'utf8')):{};
- const {server,billing,push}=createApp({store,origin:process.env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru',additionalOrigins:(process.env.VPN_ADDITIONAL_ORIGINS||'').split(',').map(value=>value.trim()).filter(Boolean),publicSubscriptionOrigin:process.env.VPN_SUBSCRIPTION_ORIGIN||null,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig});
+ const {server,billing,push,recovery}=createApp({store,origin:process.env.VPN_PUBLIC_ORIGIN||'https://family-spy.ru',additionalOrigins:(process.env.VPN_ADDITIONAL_ORIGINS||'').split(',').map(value=>value.trim()).filter(Boolean),publicSubscriptionOrigin:process.env.VPN_SUBSCRIPTION_ORIGIN||null,revision:process.env.VPN_REVISION||'unknown',botUsername:process.env.VPN_TELEGRAM_BOT_USERNAME||'',paymentConfig:billingConfig(),googleConfig:readGoogleConfig(),sendEmail:smtpSender(),pushConfig,starsConfig:loadTelegramStarsConfig()});
  const purchaseMail=new PurchaseMail(store,{send:smtpPurchaseSender()});purchaseMail.recover();
  const reconcile=setInterval(()=>{billing.reconcile().catch(()=>{});push.tick().catch(()=>{});purchaseMail.tick().catch(()=>{});},30000);reconcile.unref();
  purchaseMail.tick().catch(()=>{});
  server.listen(Number(process.env.VPN_PORT)||8796,'127.0.0.1');
- process.on('SIGTERM',()=>{clearInterval(reconcile);server.close(async()=>{await purchaseMail.shutdown().catch(()=>{});store.close();process.exit(0);});});
+ process.on('SIGTERM',()=>{clearInterval(reconcile);server.close(async()=>{await purchaseMail.shutdown().catch(()=>{});await recovery.shutdown().catch(()=>{});store.close();process.exit(0);});});
 }

@@ -11,17 +11,25 @@ async function file(path) {try{return (await stat(path)).isFile()?path:null;}cat
 const server=createServer(async(req,res)=>{
   try {
     const url=new URL(req.url,'http://localhost');
+    if(vpnQa&&['/__preview__/bot/','/__preview__/bot/index.html'].includes(url.pathname)){
+      if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);return res.end();}
+      const body=await readFile(new URL('../docs/preview/bot/index.html',import.meta.url));
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow'});
+      return res.end(req.method==='HEAD'?undefined:body);
+    }
+    // A synthetic preview must not mix its account API with live public prices.
+    const qaPath=vpnQa&&url.pathname==='/public-plans/vpn'?'/vpn/api/plans':vpnQa&&url.pathname==='/public-plans/sufler'?'/sufler/api/billing/plan':url.pathname;
     if(['/vpn','/vpn/index.html'].includes(url.pathname)){
       res.writeHead(301,{Location:'/vpn/'+url.search});return res.end();
     }
-    if(vpnQa&&url.pathname.startsWith('/vpn/api/')){
+    if(vpnQa&&qaPath.startsWith('/vpn/api/')){
       const headers={...req.headers,host:new URL(vpnQa).host};
       const body=['GET','HEAD'].includes(req.method)?undefined:Buffer.concat(await Array.fromAsync(req));
-      const upstream=await fetch(vpnQa+url.pathname+url.search,{method:req.method,headers,body,redirect:'manual'});
+      const upstream=await fetch(vpnQa+qaPath+url.search,{method:req.method,headers,body,redirect:'manual'});
       res.writeHead(upstream.status,Object.fromEntries(upstream.headers));return res.end(Buffer.from(await upstream.arrayBuffer()));
     }
-    if(vpnQa&&url.pathname==='/sufler/api/billing/plan'){res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end(JSON.stringify({enabled:true,amount:'990.00',currency:'RUB',days:30,receiptRequired:true}));}
-    if(vpnQa&&url.pathname==='/sufler/api/billing/result'){res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end('{"status":"pending"}');}
+    if(vpnQa&&qaPath==='/sufler/api/billing/plan'){res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end(JSON.stringify({enabled:true,amount:'990.00',currency:'RUB',days:30,receiptRequired:true}));}
+    if(vpnQa&&qaPath==='/sufler/api/billing/result'){res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});return res.end('{"status":"pending"}');}
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);return res.end();}
     if(canonicalCustomerFlow(url.pathname)){res.writeHead(302,{Location:'https://family-pie.ru'+url.pathname+url.search,'Cache-Control':'no-store'});return res.end();}
     if(publicPlans[url.pathname]) {

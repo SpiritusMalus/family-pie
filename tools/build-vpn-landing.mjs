@@ -7,7 +7,7 @@ export function buildVpnLanding(home, details) {
   const service = {
     '@context':'https://schema.org', '@type':'Service', '@id':'https://family-spy.ru/vpn/#service',
     name:'Family VPN', serviceType:'VPN-подписка', url:'https://family-spy.ru/vpn/',
-    description:'VPN-подписка для телефона, компьютера и телевизора. Без лимита устройств, с настройкой в личном кабинете и поддержкой в Telegram.',
+    description:'VPN-подписка для телефона, компьютера и телевизора. Без лимита устройств, с настройкой в личном кабинете и поддержкой по почте и в Telegram.',
     brand:{'@type':'Brand',name:'Family Spy',url:'https://family-spy.ru/'}
   };
   // The shared home nests the offer under H2; this dedicated page starts at H1.

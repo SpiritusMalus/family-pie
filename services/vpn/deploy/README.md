@@ -50,7 +50,22 @@ Deploy integrated immutable runtime on the primary only; preserve DB/links/offse
 
 Use documented mail.hosting.reg.ru465 implicit TLS or587 mandatory STARTTLS, full sender mailbox as username/from. Install root600 `/etc/family-vpn/smtp.password` and `smtp-credentials.conf` only after authenticated transport verification. The API reads the credential via systemd LoadCredential/VPN_SMTP_PASSWORD_FILE; never store mailbox secrets in source, process arguments, provider tickets or logs. Keep TLS certificate validation enabled. File credentials take precedence over the legacy protected environment password; empty/multiline credentials fail closed.
 
-VDSina documents SMTP egress465/587 blocked by default and support-requested unblocking: https://vdsina.ru/qa/q/kakie-porty-zakryty-na-vds . Verify actual reachability and the hosting account's settings, do not assume a timeout is a bad password. Do not enable email availability while transport/authentication is unverified, or move the service/secret to a different VPN host as a workaround. Sender setup does not add transactional purchase notifications; smtpSender currently sends account-verification/login codes only. Test only an owner-approved recipient; SMTP acceptance does not prove inbox delivery.
+SMTP connection configuration is read at API startup by the login/recovery and purchase-mail senders:
+
+| Variable | Purpose |
+| --- | --- |
+| `VPN_SMTP_HOST`, `VPN_SMTP_PORT` | Provider SMTP host and465 implicit TLS or587 required STARTTLS. |
+| `VPN_SMTP_FROM`, `VPN_SMTP_USER` | Approved sender address and full mailbox username. |
+| `VPN_SMTP_PASSWORD_FILE` | Protected systemd credential file; takes precedence over `VPN_SMTP_PASSWORD`. |
+| `VPN_SMTP_LOCAL_ADDRESS` | Optional literal IPv4/IPv6 address already assigned to this host. Unset/empty uses normal OS source selection. |
+
+For a host with multiple assigned addresses, an approved protected environment can set, for example, `VPN_SMTP_LOCAL_ADDRESS=192.0.2.10` (reserved documentation address; replace with an owned, assigned address). The adapter validates IP syntax with Node's `net.isIP` and passes [Nodemailer's `localAddress`](https://nodemailer.com/smtp#connection-options) only to each SMTP connection. It does not assign an address, alter the default route, change providers or fall back silently if binding fails.
+
+Hostnames, ports and CIDR values are rejected; the error omits the configured value. TLS validation, credentials and existing8s connection/greeting and10s socket timeouts remain unchanged. Public auth options expose email availability only, never this address or transport credentials.
+
+Source configuration alone does not prove delivery: verify the selected address is assigned and authorized, then separately perform owner-approved TLS/authentication and recipient delivery checks. Keep deployment and root-owned environment changes under the established approval/backup route.
+
+VDSina documents SMTP egress465/587 blocked by default and support-requested unblocking: https://vdsina.ru/qa/q/kakie-porty-zakryty-na-vds . Verify actual reachability and the hosting account's settings, do not assume a timeout is a bad password. Do not enable email availability while transport/authentication is unverified, or move the service/secret to a different VPN host as a workaround. `smtpSender` sends verification/login/recovery codes; transactional purchase notifications use `smtpPurchaseSender` and the separate `PurchaseMail` queue described below. Test only an owner-approved recipient; SMTP acceptance does not prove inbox delivery.
 
 ## Device policy — 2026-10-08
 

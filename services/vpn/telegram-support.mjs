@@ -1,12 +1,13 @@
 import {randomUUID} from 'node:crypto';
+import {SUPPORT_EMAIL,emailSupportText,supportEmailCopyButton} from './support-contact.mjs';
 
 const DAY=86_400_000, MINUTE=60_000;
 const positive=x=>Number.isSafeInteger(x)&&x>0;
 const terminal=new Set(['sent','canceled','blocked','uncertain','failed']);
-const knownCommands=new Set(['/start','/menu','/status','/subscription','/connect','/renew','/cabinet','/notifications']);
+const knownCommands=new Set(['/start','/menu','/status','/subscription','/connect','/renew','/cabinet','/notifications','/email','/recover','/recovery']);
 const menuText=new Set(['Моя подписка','Подключиться','Продлить','Личный кабинет','Уведомления','Меню']);
-const intro='Напиши, что случилось. Можно приложить фото или скриншот. Ответ поддержки придёт сюда, вход в кабинет не нужен. Не отправляй пароли, коды входа и платёжные данные.\n/cancel — закончить обращение.';
-const unavailable='Поддержка в Telegram сейчас недоступна. Напиши на support@family-pie.ru.';
+const intro='Напиши, что случилось. Можно приложить фото или скриншот. Ответ поддержки придёт сюда, вход в кабинет не нужен. Можно также обратиться по email.\n\n'+emailSupportText()+'\n/cancel — закончить обращение.';
+const unavailable='Поддержка в Telegram сейчас недоступна.\n\n'+emailSupportText();
 const operatorHelp='Чтобы ответить пользователю, нажми «Ответить» на сообщении его обращения или на заголовке с номером. /close в таком ответе закрывает обращение.';
 
 /** Metadata-only relay. handle() runs inside TelegramStore.update's transaction. */
@@ -123,7 +124,7 @@ export class TelegramSupport {
   this.db.prepare('UPDATE telegram_support_outbox SET state=?,error_code=?,updated_at=? WHERE id=?').run(state,code,this.clock(),job.id);
   if(job.direction==='operator'){
    const ticket=this.db.prepare('SELECT chat_id FROM telegram_support_tickets WHERE id=?').get(job.ticket_id);
-   if(ticket)this.notice(ticket.chat_id,'failure:'+job.id,`Не удалось ${state==='uncertain'?'подтвердить доставку':'доставить сообщение'} по обращению #${job.ticket_id}. Сообщение автоматически не отправится повторно. Напиши ещё раз или на support@family-pie.ru.`,{ticketId:job.ticket_id});
+   if(ticket)this.notice(ticket.chat_id,'failure:'+job.id,`Не удалось ${state==='uncertain'?'подтвердить доставку':'доставить сообщение'} по обращению #${job.ticket_id}. Сообщение автоматически не отправится повторно. Напиши ещё раз или на ${SUPPORT_EMAIL}.`,{ticketId:job.ticket_id});
   }else if(job.direction==='customer'){
    const op=this.operator();if(op&&op.chat_id===job.operator_chat_id&&op.generation===job.operator_generation)this.notice(op.chat_id,'failure:'+job.id,`Ответ по обращению #${job.ticket_id} ${state==='uncertain'?'мог быть доставлен, но подтверждения нет. Автоматического повтора не будет':'не доставлен'}.`,{operator:op,ticketId:job.ticket_id});
   }
@@ -175,7 +176,9 @@ export class TelegramSupport {
 export async function deliverSupportOne(support,client) {
  const job=support.next();if(!job||!support.claim(job))return false;
  try {
-  const result=await client.call(job.kind==='copy'?'copyMessage':'sendMessage',job.kind==='copy'?{chat_id:job.chat_id,from_chat_id:job.source_chat_id,message_id:job.source_message_id}:{chat_id:job.chat_id,text:job.text,link_preview_options:{is_disabled:true}});
+  const data=job.kind==='copy'?{chat_id:job.chat_id,from_chat_id:job.source_chat_id,message_id:job.source_message_id}:{chat_id:job.chat_id,text:job.text,link_preview_options:{is_disabled:true}};
+  if(job.kind!=='copy'&&job.direction==='notice_customer'&&job.text?.includes(SUPPORT_EMAIL))data.reply_markup={inline_keyboard:[[supportEmailCopyButton()]]};
+  const result=await client.call(job.kind==='copy'?'copyMessage':'sendMessage',data);
   support.sent(job,result?.message_id);
  }catch(error){support.failed(job,error);}
  return true;

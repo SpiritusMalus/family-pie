@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru" data-fp-translate data-telegram-entry="import">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Добавить подписку — Family VPN</title>
+  <link rel="icon" href="/vpn/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/vpn/style.css"><link rel="stylesheet" href="/vpn/portal-style.css">
+  <link rel="stylesheet" href="/i18n/language.css"><script src="/i18n/en.js"></script><script src="/i18n/language.js"></script>
+  <script src="/vpn/telegram-entry.js" defer></script>
+<link rel="stylesheet" href="/vpn/support-email.css"><script src="/vpn/support-email.js" defer></script>
+</head>
+<body class="is-cabinet is-import">
+  <a class="skip" href="#main">К содержимому</a>
+  <header class="nav"><div class="wrap nav-in"><a class="brand" href="/vpn/">family<span>/vpn</span></a><a class="support-nav-link" href="/vpn/help/">Помощь</a></div></header>
+  <main class="wrap import-page" id="main">
+    <h1>Подключим VPN на этом устройстве</h1>
+    <p class="cab-status" id="telegram-entry-message" role="status">Готовим твою подписку…</p>
+    <section id="telegram-import" hidden>
+      <p class="muted" data-import-device></p>
+      <ol class="setup-progress" aria-label="Шаги подключения">
+        <li data-import-progress="install">Установка</li><li data-import-progress="import">Подписка</li><li data-import-progress="enable">Включение</li>
+      </ol>
+      <p class="import-progress" data-import-step-label role="status"></p>
+      <section class="panel import-step" data-import-step="install">
+        <h2>Установи приложение</h2><p>Установи Happ, затем вернись на эту страницу.</p>
+        <div class="guide-downloads cab-actions" data-import-downloads></div>
+        <button class="btn secondary" data-import-installed type="button">Happ уже установлен — дальше</button>
+      </section>
+      <section class="panel import-step" data-import-step="import" hidden>
+        <h2>Добавь подписку</h2><p>В приложении не нужен логин от сайта. Добавь подписку по личной ссылке.</p>
+        <div class="cab-actions"><a class="btn" data-import-add referrerpolicy="no-referrer">Добавить подписку в приложение</a></div>
+        <p>После добавления вернись сюда и переходи к включению VPN.</p>
+        <div class="cab-actions"><button class="btn" data-import-added type="button">Я добавил подписку — дальше</button><button class="btn secondary" data-import-back-install type="button">Назад к установке</button></div>
+      </section>
+      <section class="panel import-step" data-import-step="enable" hidden>
+        <h2>Включи VPN в приложении</h2>
+        <p>Открой Happ, выбери маршрут и нажми подключение. При первом запуске разреши создать VPN-соединение.</p>
+        <p>Дождись подтверждения подключения в приложении и открой нужный сайт.</p>
+        <div class="cab-actions"><a class="btn" href="/vpn/help/">Нужна помощь</a><button class="btn secondary" data-import-back-add type="button">Назад к добавлению подписки</button></div>
+      </section>
+      <section class="setup-manual import-manual" aria-labelledby="import-manual-title">
+        <h2 id="import-manual-title">Личная ссылка подписки</h2>
+        <label class="form-row">Ссылка для добавления вручную<textarea rows="2" readonly spellcheck="false" data-fp-no-i18n aria-label="Личная ссылка подписки"></textarea></label>
+        <button class="btn secondary" data-import-copy type="button">Скопировать ссылку</button>
+        <p>Если приложение не открылось, скопируй ссылку. В Happ нажми «+» и добавь подписку из буфера обмена.</p>
+        <p class="muted">Не передавай личную ссылку и QR-код другим людям.</p>
+      </section>
+    </section>
+    <section id="telegram-entry-recovery" hidden><p>Для новой ссылки открой бота или напиши в поддержку по почте ниже.</p><a class="btn" href="https://t.me/family_pie_vpn_bot" rel="noopener noreferrer">Получить новую ссылку в Telegram</a></section>
+    <section class="support-contact"><h2>Нужна помощь?</h2><div class="support-email" data-email-support><a class="support-email-address" href="mailto:support@family-pie.ru" data-fp-no-i18n>support@family-pie.ru</a><button class="support-email-copy" type="button" data-copy-support-email hidden data-ru="Скопировать адрес" data-en="Copy email address">Скопировать адрес</button><span class="support-email-result" data-email-copy-status role="status" aria-live="polite"></span></div><p><a href="https://t.me/family_pie_vpn_bot?start=support_vpn" rel="noopener noreferrer">Или напиши в Telegram</a></p></section>
+    <noscript><p>Для этой одноразовой ссылки нужен JavaScript. Скопируй личную ссылку прямо в боте.</p></noscript>
+  </main>
+</body>
+</html>

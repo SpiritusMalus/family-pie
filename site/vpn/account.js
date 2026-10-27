@@ -41,10 +41,20 @@
  }
  window.vpnAuthFlow={read:readAuth,safeNext,cabinetURL,authURL,destination};
  const t=text=>window.FPi18n.t(text);
- const $=s=>document.querySelector(s);let csrf='',me,authVersion=0;
+ const $=s=>document.querySelector(s);let csrf='',me,authVersion=0,passwordSetupOnly=false;
  const message=(x,tone='info')=>{const el=$('#account-message');if(el){el.dataset.tone=tone;el.textContent=x;}};
- async function api(path,method='GET',body){const version=authVersion;const r=await fetch('/vpn/api/'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})},...(body?{body:JSON.stringify(body)}:{})});const d=await r.json();if(!r.ok){const e=new Error(d.error||'Сервис временно недоступен');e.status=r.status;throw e;}if(d.csrf&&version===authVersion)csrf=d.csrf;if(path==='logout'){window.vpnPurchaseIntent?.clear();try{sessionStorage.removeItem('family-vpn-purchase-v2');sessionStorage.removeItem('family-vpn-pending-order');}catch{}}return d;}
+ async function api(path,method='GET',body){
+  const version=authVersion;let r,d;
+  try{r=await fetch('/vpn/api/'+path,{signal:AbortSignal.timeout(15000),method,credentials:'same-origin',headers:{'Content-Type':'application/json',...(csrf?{'X-CSRF-Token':csrf}:{})},...(body?{body:JSON.stringify(body)}:{})});}
+  catch(error){throw new Error(error.name==='TimeoutError'||error.name==='AbortError'?'Сервис не ответил. Проверь соединение и повтори вход.':'Не удалось связаться с сервисом. Проверь соединение и повтори вход.');}
+  try{d=await r.json();}catch{throw new Error('Сервис временно недоступен. Повтори позже или напиши в поддержку.');}
+  if(!r.ok){const e=new Error(d.error||'Сервис временно недоступен');e.status=r.status;throw e;}
+  if(d.csrf&&version===authVersion)csrf=d.csrf;
+  if(path==='logout'){window.vpnPurchaseIntent?.clear();try{sessionStorage.removeItem('family-vpn-purchase-v2');sessionStorage.removeItem('family-vpn-pending-order');}catch{}}
+  return d;
+ }
  function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
+ function publishReady(){const detail={api,me};window.vpnAccountReady=detail;window.dispatchEvent(new CustomEvent('vpn-ready',{detail}));}
  window.vpnLoginDestination=destination;
  window.vpnFinishLogin=async()=>{
   authVersion++;
@@ -60,11 +70,12 @@
  }
  function changeView(){
   $('#login-form').hidden=true;$('#password-form').hidden=false;authCopy(true);
-  $('#auth-title').textContent=me.user.must_change?'Смени временный пароль':'Сменить пароль';
-  $('#password-form p').textContent=me.user.must_change?'Задай свой пароль от 12 символов. После сохранения откроется личный кабинет.':'Выбери новый пароль от 12 символов.';
+  passwordSetupOnly=Boolean(me.passwordSetupAllowed&&me.authMethod&&me.authMethod!=='password');$('#current').required=!passwordSetupOnly;if($('#current').parentElement)$('#current').parentElement.hidden=passwordSetupOnly;
+  $('#auth-title').textContent=passwordSetupOnly?'Задай новый пароль':me.user.must_change?'Смени временный пароль':'Сменить пароль';
+  $('#password-form p').textContent=passwordSetupOnly?'Задай новый пароль от 12 символов. Подписка останется в твоём аккаунте.':me.user.must_change?'Задай свой пароль от 12 символов. После сохранения откроется личный кабинет.':'Выбери новый пароль от 12 символов.';
  }
  function loginView(text,tone='error'){
-  authVersion++;csrf='';
+  authVersion++;csrf='';passwordSetupOnly=false;
   if(me?.user?.login)$('#login').value=me.user.login;
   me=null;$('#password-form').hidden=true;$('#login-form').hidden=false;$('#auth-title').textContent='Вход в аккаунт';authCopy(false);
   for(const id of ['password','current','next','repeat'])$('#'+id).value='';
@@ -78,7 +89,7 @@
  }catch(err){if(err.status===401&&authenticated)loginView('Не удалось сохранить вход. Разреши cookies для этого сайта и войди снова.');else message(err.message,'error');}finally{b.disabled=false;}});
  $('#password-form')?.addEventListener('submit',async e=>{e.preventDefault();if($('#next').value!==$('#repeat').value)return message('Новые пароли не совпадают','error');const b=e.submitter;b.disabled=true;message('Сохраняем пароль…');try{
   // Refresh CSRF and verify the session before submitting any password mutation.
-  me=await api('me');await api('password','POST',{current:$('#current').value,next:$('#next').value});location.href=destination(me.user);
+  me=await api('me');if(passwordSetupOnly&&(!me.passwordSetupAllowed||!me.authMethod||me.authMethod==='password')){loginView('Подтверждение устарело. Повтори вход через почту или другой подключённый способ.');return;}if(passwordSetupOnly){await api('password/set','POST',{next:$('#next').value});location.href=destination(me.user);return;}await api('password','POST',{current:$('#current').value,next:$('#next').value});location.href=destination(me.user);
  }catch(err){if(err.status===401)loginView('Сессия завершилась. Войди снова, затем повтори смену пароля.');else message(err.message,'error');}finally{b.disabled=false;}});
  $('#switch-account')?.addEventListener('click',async e=>{
   const button=e.currentTarget;button.disabled=true;
@@ -90,17 +101,26 @@
  async function adminList(){const d=await api('admin/users');const target=$('#admin-users');target.replaceChildren();for(const u of d.users){if(u.role==='admin')continue;const row=el('article',undefined,'admin-user');row.dataset.login=u.login.toLowerCase();const heading=el('h3',u.login);heading.dataset.fpNoI18n='';row.append(heading);const state=el('p',`${u.deleted?'Удалена':u.enabled&&(u.unlimited||u.expires_at>Date.now())?'Активна':'Неактивна'} · ${date(u)} · ${u.sync_state==='awaiting_payment'?'Ожидает оплаты ЮKassa':u.sync_state==='synced'?'Применено на VPN':u.sync_state==='error'?'Ошибка применения, проверь сервер':'Ожидает применения'}`,'muted');row.append(state);
   const form=el('form');const label=el('label','Доступ до');const input=el('input');input.type='date';if(u.expires_at)input.value=new Date(u.expires_at).toISOString().slice(0,10);label.append(input);form.append(label);const unlimited=el('input');unlimited.type='checkbox';unlimited.checked=Boolean(u.unlimited);unlimited.style.width='auto';const ul=el('label');ul.append(unlimited,document.createTextNode(' Без ограничения срока'));if(u.allow_unlimited)form.append(ul);else input.required=true;const save=el('button','Сохранить','btn small');save.type='submit';form.append(save);
   form.addEventListener('submit',async e=>{e.preventDefault();save.disabled=true;try{await api('admin/users/'+u.account_id,'PATCH',{expiresAt:input.value?Date.parse(input.value+'T23:59:59.000Z'):0,unlimited:unlimited.checked,enabled:true,deleted:false});await adminList();}catch(err){message(err.message,'error');}finally{save.disabled=false;}});
-  const remove=el('button','Удалить подписку','btn small secondary');remove.type='button';remove.addEventListener('click',async()=>{if(!confirm(t('Отключить подписку этого пользователя? Запись сохранится для восстановления.')))return;try{await api('admin/users/'+u.account_id,'DELETE',{});await adminList();}catch(err){message(err.message,'error');}});form.append(remove);row.append(form);target.append(row);}}
+  const remove=el('button','Удалить подписку','btn small secondary');remove.type='button';remove.addEventListener('click',async()=>{if(!confirm(t('Отключить подписку этого пользователя? Запись сохранится для восстановления.')))return;try{await api('admin/users/'+u.account_id,'DELETE',{});await adminList();}catch(err){message(err.message,'error');}});form.append(remove);row.append(form);
+  const recovery=el('details',undefined,'admin-recovery');recovery.append(el('summary','Восстановить доступ'));
+  recovery.append(el('p','Проверь владельца по известному тебе каналу. Ссылка позволит задать новый пароль, не изменяя подписку. Передай её лично этому человеку.','muted'));
+  const ownership=el('label',undefined,'row'),verified=el('input');verified.type='checkbox';ownership.append(verified,document.createTextNode(' Я проверил владельца аккаунта'));recovery.append(ownership);
+  const create=el('button','Создать одноразовую ссылку','btn small secondary');create.type='button';
+  const output=el('p');output.setAttribute('role','status');const recoveryLabel=el('label','Одноразовая ссылка','form-row'),link=el('textarea');link.readOnly=true;link.rows=3;link.dataset.fpNoI18n='';recoveryLabel.append(link);recoveryLabel.hidden=true;
+  const reauth=el('a','Повторить вход для подтверждения');reauth.href='/vpn/cabinet/auth/?reauth=1';let requestKey=crypto.randomUUID();
+  create.addEventListener('click',async()=>{if(!verified.checked){output.textContent=t('Сначала проверь владельца и отметь подтверждение.');return;}create.disabled=true;try{const result=await api('admin/recovery-links','POST',{accountId:u.account_id,requestKey,ownershipVerified:true});requestKey=crypto.randomUUID();if(result.url){link.value=result.url;recoveryLabel.hidden=false;output.textContent=t('Ссылка действует 15 минут и откроется один раз. Старый пароль перестанет работать только после сохранения нового.');}else{recoveryLabel.hidden=true;link.value='';output.textContent=t('Ссылка уже была создана. Создай новую, чтобы передать её владельцу.');}create.textContent=t('Создать новую ссылку');}catch(error){output.textContent=t(error.message);}finally{create.disabled=false;}});
+  recovery.append(create,output,recoveryLabel,reauth);row.append(recovery);target.append(row);}}
  $('#create-user')?.addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const d=await api('admin/users','POST',{login:$('#new-login').value,expiresAt:$('#new-expiry').value?Date.parse($('#new-expiry').value+'T23:59:59.000Z'):0,unlimited:false});$('#new-credentials').textContent=`Логин: ${d.login}. Временный пароль: ${d.temporaryPassword}. Передай лично: при входе пользователь обязан сменить пароль. Доступ к VPN появится только после подтверждённой оплаты ЮKassa.`;$('#new-login').value='';await adminList();}catch(err){message(err.message,'error');}finally{b.disabled=false;}});
  async function boot(){const version=authVersion;try{const fresh=await api('me');if(version!==authVersion)return;me=fresh;if($('#login-form')){if(new URLSearchParams(location.search).has('reauth')){$('#login').value=me.user.login;message('Подтверди пароль, чтобы изменить способы входа.');return;}if(me.user.must_change||new URLSearchParams(location.search).has('change'))changeView();else location.href=destination(me.user);return;}if(me.user.must_change){location.href=authURL();return;}
  const actions=$('.nav-actions');const logout=el('button','Выйти','btn small secondary');logout.addEventListener('click',async()=>{await api('logout','POST',{});location.href='/vpn/cabinet/auth/';});actions?.append(logout);
- if($('#admin-users')){if(me.user.role!=='admin'){message('Раздел доступен только администратору');$('#main').replaceChildren(el('h1','Нет доступа'));return;}await adminList();window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));return;}
+ if($('#admin-users')){if(me.user.role!=='admin'){message('Раздел доступен только администратору');$('#main').replaceChildren(el('h1','Нет доступа'));return;}await adminList();publishReady();return;}
  $('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;
  if(me.user.role==='admin'){const a=el('a','Администрирование','btn small');a.href='/vpn/admin/';actions?.append(a);}
  const panel=$('.subscription');const sub=me.subscription;panel.replaceChildren(el('h2',sub.payment_required?'Ожидаем подтверждение оплаты':sub.active?'Твоя подписка':'Подписка не активна'),el('p',sub.payment_required?'Аккаунт создан. Ключ VPN выдаётся только после подтверждённой оплаты ЮKassa. Выбери тариф в разделе «Подписка».':`${date(sub)}${sub.sync_state!=='synced'?' · Изменения ещё применяются на VPN':''}`));
  if(sub.active&&sub.profile_url&&sub.sync_state==='synced'){const copy=el('button','Скопировать подключение','btn');copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sub.profile_url);copy.textContent='Скопировано';}catch{copy.textContent='Не удалось скопировать';}});panel.append(copy);}
  const settings=$('[data-screen="settings"]');const a=el('a','Сменить пароль','btn secondary');a.href='/vpn/cabinet/auth/?change=1';const security=settings?.querySelector('a[href="/vpn/cabinet/auth/"]')?.closest('section');if(security){const actions=el('div',undefined,'cab-actions');actions.append(security.querySelector('a[href="/vpn/cabinet/auth/"]'),a);security.append(actions);}else settings?.append(a);
- await window.vpnTelegramLink({api,settings,home:$('[data-screen="home"]'),accountId:me.user.account_id});window.dispatchEvent(new CustomEvent('vpn-ready',{detail:{api,me}}));
- }catch(err){if(version!==authVersion)return;if(err.status===401){if(!$('#login-form'))location.href=authURL();}else message(err.message,'error');}}
- boot();
+ await window.vpnTelegramLink({api,settings,home:$('[data-screen="home"]'),setup:$('#setup-telegram'),accountId:me.user.account_id});publishReady();
+ }catch(err){if(version!==authVersion)return;if(err.status===401){if(!$('#login-form'))location.href=authURL();}else if($('#cabinet-load-state')){$('#cabinet-load-message').textContent='Не удалось загрузить аккаунт. Обнови страницу или напиши в поддержку.';$('#cabinet-load-recovery').hidden=false;}else message('Не удалось загрузить аккаунт. Обнови страницу или напиши в поддержку.','error');}}
+ $('#cabinet-load-retry')?.addEventListener('click',()=>location.reload());
+ if(!window.vpnTelegramEntry&&!window.vpnRecoveryEntry)boot();
 })();

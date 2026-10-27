@@ -32,7 +32,10 @@
     $$('[data-platform]').forEach(b => { b.setAttribute('aria-selected', String(b.dataset.platform === key)); b.tabIndex = b.dataset.platform === key ? 0 : -1; });
     const target = $('#guide'); if (!target) return;
     target.setAttribute('aria-labelledby', `tab-${key}`);
-    target.innerHTML = `<h2>Подключение: ${name}</h2><ol><li><strong>Установи Happ.</strong><br>${first}<div class="guide-downloads">${downloads.map(([label,url])=>`<a class="btn secondary small" href="${url}"${url.startsWith('#')?'':' target="_blank" rel="noopener noreferrer"'}>${label}${url.startsWith('#')?'':' ↗'}</a>`).join('')}</div></li><li><strong>Добавь подписку.</strong><br>Открой «Моё подключение» ниже. После оплаты там появятся личная ссылка и QR-код. Нажми «Добавить в Happ», чтобы импортировать подписку автоматически, или добавь ссылку из буфера обмена внутри приложения.</li><li><strong>Включи VPN.</strong><br>Выбери маршрут и нажми подключение. При первом запуске разреши приложению создать VPN-соединение.</li></ol><a class="btn secondary small" href="#home">Открыть моё подключение</a><a class="btn secondary small" href="#support">Помощь с настройкой</a>`;
+    target.innerHTML = `<h2>${name}</h2><div data-setup-progress aria-live="polite"></div><ol class="setup-steps"><li data-setup-step="1"><h3>Установи приложение</h3><p>${first}</p><div class="guide-downloads">${downloads.map(([label,url])=>`<a class="btn secondary small" href="${url}"${url.startsWith('#')?'':' target="_blank" rel="noopener noreferrer"'}>${label}${url.startsWith('#')?'':' ↗'}</a>`).join('')}</div><p class="muted">После установки вернись на эту страницу. Входить в Happ не нужно.</p><button class="btn" type="button" data-setup-next="2">Приложение установлено. Дальше</button><button class="setup-skip" type="button" data-setup-next="2">Приложение уже установлено</button></li><li data-setup-step="2"><h3>Добавь подписку</h3><div data-connection-slot><p>Загружаем подключение…</p></div></li><li data-setup-step="3"><h3>Включи VPN</h3><p>В Happ выбери маршрут и нажми подключение. При первом запуске разреши создать VPN-соединение.</p><p>Открой любой сайт. Если он загружается с включённым VPN, всё готово.</p><button class="btn" type="button" data-setup-next="4">VPN включён, всё работает</button><a class="setup-help" href="/vpn/help/">Не получается подключиться</a></li></ol><section data-setup-complete hidden><h3>Ты подтвердил, что VPN работает</h3><p>Для следующего подключения просто открой Happ и включи VPN. Подписка и помощь останутся в кабинете.</p><a class="btn secondary" href="/vpn/help/">Нужна помощь</a></section>`;
+    target.querySelectorAll('.guide-downloads a').forEach(a=>a.addEventListener('click',()=>window.vpnOnboardingEvent?.('install_open')));
+    target.querySelector('.setup-help')?.addEventListener('click',()=>window.vpnOnboardingEvent?.('help_click'));
+    window.dispatchEvent(new CustomEvent('vpn-platformchange',{detail:{platform:key}}));
 
   }
   $$('[data-platform]').forEach((btn, index, list) => {
@@ -49,7 +52,7 @@
     if (previousScreen && previousScreen !== key) { window.scrollTo(0, 0); const heading = document.querySelector(`[data-screen="${key}"] h1`); if (heading) { heading.tabIndex = -1; heading.focus({preventScroll:true}); } }
     previousScreen = key;
     const params = new URLSearchParams(query);
-    if (key === 'devices') platform(params.get('platform') || preferredPlatform());
+    if (key === 'devices') {platform(params.get('platform') || preferredPlatform());if(params.get('step')==='import') $('[data-connection-slot]')?.closest('li')?.scrollIntoView({block:'start'});}
     const requestedPeriod=params.get('period')||new URLSearchParams(location.search).get('period');
     if (key === 'plans' && ['30','90','180','365'].includes(requestedPeriod)) window.dispatchEvent(new CustomEvent('vpn-plan-selection',{detail:{days:Number(requestedPeriod)}}));
     document.title = `${$('[data-route][aria-current="page"]')?.textContent.trim() || 'Кабинет'} — Family VPN`;

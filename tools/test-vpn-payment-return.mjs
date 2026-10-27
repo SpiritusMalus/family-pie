@@ -17,17 +17,17 @@ function fixture({hash='#plans?order='+id,saved=null,state='paid',sub={active:tr
  return {window,location,messages,calls,routes,storage,get cleared(){return cleared;},tick:()=>tick(),setState:value=>state=value,setSub:value=>sub=value};
 }
 test('verified paid order opens ready connection and clears pending recovery',async()=>{
- const f=fixture({saved:id});await flush();assert.equal(f.location.hash,'#home');assert.equal(f.cleared,true);assert.equal(JSON.parse(f.storage.get('family-vpn-purchase-v2')).order,undefined);assert.match(f.messages.at(-1),/подключение готово/);
+ const f=fixture({saved:id});await flush();assert.equal(f.location.hash,'#devices?platform=android');assert.equal(f.cleared,true);assert.equal(JSON.parse(f.storage.get('family-vpn-purchase-v2')).order,undefined);assert.match(f.messages.at(-1),/Установи приложение и добавь подписку/);
 });
 test('confirmed payment remains pending until physical provisioning completes',async()=>{
- const f=fixture({sub:{active:false,payment_confirmed:true,sync_state:'pending'}});await flush();assert.equal(f.location.hash,'#home');assert.equal(f.cleared,false);assert.match(f.messages.at(-1),/Готовим подключение/);
- f.setSub({active:true,payment_confirmed:true,sync_state:'synced'});await f.tick();assert.equal(f.cleared,true);assert.match(f.messages.at(-1),/подключение готово/);
+ const f=fixture({sub:{active:false,payment_confirmed:true,sync_state:'pending'}});await flush();assert.equal(f.location.hash,'#devices?platform=android');assert.equal(f.cleared,false);assert.match(f.messages.at(-1),/Готовим подключение/);
+ f.setSub({active:true,payment_confirmed:true,sync_state:'synced'});await f.tick();assert.equal(f.cleared,true);assert.match(f.messages.at(-1),/Установи приложение и добавь подписку/);
 });
 test('an existing active subscription does not turn an unconfirmed order into success',async()=>{
  const f=fixture({state:'pending'});await flush();assert.equal(f.routes.length,0);assert.equal(f.cleared,false);assert.match(f.messages.at(-1),/Ждём подтверждение/);
 });
 test('original checkout tab recovers on focus even when bank does not return to the URL',async()=>{
- const f=fixture({hash:'#plans?period=30',saved:id,state:'pending'});await flush();f.setState('paid');f.window.dispatchEvent(new Event('focus'));await flush();assert.equal(f.location.hash,'#home');assert.equal(f.calls.length,2);assert.equal(f.cleared,true);
+ const f=fixture({hash:'#plans?period=30',saved:id,state:'pending'});await flush();f.setState('paid');f.window.dispatchEvent(new Event('focus'));await flush();assert.equal(f.location.hash,'#devices?platform=android');assert.equal(f.calls.length,2);assert.equal(f.cleared,true);
 });
 test('foreign or missing order errors are not interpreted as successful payment',async()=>{
  const f=fixture({saved:id,failure:Object.assign(new Error('Заказ не найден'),{status:404})});await flush();assert.equal(f.routes.length,0);assert.equal(f.cleared,true);assert.equal(JSON.parse(f.storage.get('family-vpn-purchase-v2')).order,undefined);assert.equal(f.messages.at(-1),'Заказ не найден');
@@ -44,7 +44,7 @@ test('purchase recovery is scoped to the verified account and logout clears it',
  f.window.vpnPurchaseIntent.clear();assert.equal(f.storage.size,0);assert.equal(f.window.vpnPurchaseIntent.order,null);
 });
 test('payment return preserves period and language and stops stealing later navigation',async()=>{
- const f=fixture({sub:{active:false,payment_confirmed:true,sync_state:'pending'}});f.location.search='?lang=en&period=180';await flush();assert.equal(f.routes[0],'/vpn/cabinet/?lang=en&period=180#home');
+ const f=fixture({sub:{active:false,payment_confirmed:true,sync_state:'pending'}});f.location.search='?lang=en&period=180';await flush();assert.equal(f.routes[0],'/vpn/cabinet/?lang=en&period=180#devices?platform=android');
  f.location.hash='#devices?platform=ios';await f.tick();assert.equal(f.location.hash,'#devices?platform=ios');
  f.setSub({active:true,payment_confirmed:true,sync_state:'synced'});await f.tick();assert.equal(f.location.hash,'#devices?platform=ios');assert.equal(f.cleared,true);
 });

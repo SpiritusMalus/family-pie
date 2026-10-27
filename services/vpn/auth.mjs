@@ -54,9 +54,17 @@ export class Accounts {
  }
  async login(login,password) {
   const identity=this.db.prepare('SELECT * FROM identities WHERE login=?').get(this.normalize(login));
-  const valid=await checkPassword(password,identity?.password_hash||await this.dummyHash);
-  if(!identity?.enabled||!valid)return null;
+  const valid=await checkPassword(password,identity?.password_set&&identity.password_hash||await this.dummyHash);
+  if(!identity?.enabled||!identity.password_set||!valid)return null;
   return this.newSession(identity.account_id);
+ }
+ // Internal authenticated-provider registration. There is deliberately no password:
+ // Telegram is a first-class login method, not an uncommunicated temporary secret.
+ addTelegramInternal(){
+  const account=this.store.createAccount(`${randomBytes(16).toString('hex')}@accounts.invalid`),login='telegram_'+randomBytes(12).toString('hex');
+  this.db.prepare('INSERT INTO identities(account_id,login,password_hash,role,must_change,password_set) VALUES(?,?,\'\',\'user\',0,0)').run(account.id,login);
+  this.db.prepare("INSERT INTO managed_subscriptions(account_id,enabled,sync_state) VALUES(?,0,'awaiting_payment')").run(account.id);
+  return this.identity(account.id);
  }
  newSession(accountId,{method='password'}={}){
   this.db.prepare('DELETE FROM sessions WHERE expires<=?').run(this.clock());
@@ -66,6 +74,16 @@ export class Accounts {
   return {token,csrf,identity:this.identity(accountId)};
  }
  identity(accountId){return this.db.prepare('SELECT account_id,login,role,must_change,enabled FROM identities WHERE account_id=?').get(accountId);}
+ authMutation(fn){return this.db.isTransaction?fn():this.store.transaction(fn);}
+ hasAlternativeAuth(accountId,exclude=''){
+  const identity=this.db.prepare('SELECT enabled,must_change,password_set FROM identities WHERE account_id=?').get(accountId);
+  if(!identity?.enabled||identity.must_change)return false;
+  if(exclude!=='password'&&identity.password_set)return true;
+  for(const [method,table] of [['passkey','passkeys'],['email','verified_emails'],['google','google_identities'],['telegram','telegram_links']]){
+   if(method!==exclude&&this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(table)&&this.db.prepare(`SELECT 1 FROM ${table} WHERE account_id=?`).get(accountId))return true;
+  }
+  return false;
+ }
  session(token){
   if(!token)return null;
   const session=this.db.prepare('SELECT * FROM sessions WHERE token_hash=? AND expires>?').get(sha(token),this.clock());
@@ -73,7 +91,24 @@ export class Accounts {
   return identity?.enabled?{...session,identity}:null;
  }
  logout(token){this.db.prepare('DELETE FROM sessions WHERE token_hash=?').run(sha(token));}
- async setPassword(accountId,sessionHash,next){const proof=this.db.prepare('SELECT * FROM session_auth WHERE token_hash=? AND verified_at>?').get(sessionHash,this.clock()-300000);if(!proof)throw new Error('Повтори вход перед установкой пароля');const hash=await passwordHash(next);this.store.transaction(()=>{this.db.prepare('UPDATE identities SET password_hash=?,password_set=1,must_change=0 WHERE account_id=?').run(hash,accountId);this.db.prepare('DELETE FROM sessions WHERE account_id=?').run(accountId);});return this.newSession(accountId);}
+ passwordSetupState(accountId,sessionHash){
+  const identity=this.identity(accountId),proof=this.db.prepare('SELECT a.method,a.verified_at FROM session_auth a JOIN sessions s USING(token_hash) WHERE s.token_hash=? AND s.account_id=? AND s.expires>?').get(sessionHash,accountId,this.clock());
+  let allowed=Boolean(identity?.enabled&&proof&&proof.verified_at>this.clock()-300000);
+  if(allowed&&identity.must_change){
+   const table={email:'verified_emails',google:'google_identities',passkey:'passkeys',telegram:'telegram_links'}[proof.method];
+   allowed=Boolean(table&&this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(table)&&this.db.prepare(`SELECT 1 FROM ${table} WHERE account_id=?`).get(accountId));
+  }
+  return {authMethod:proof?.method||null,passwordSetupAllowed:allowed};
+ }
+ async setPassword(accountId,sessionHash,next){
+  if(!this.passwordSetupState(accountId,sessionHash).passwordSetupAllowed)throw new Error('Повтори вход подтверждённым способом перед установкой пароля');
+  const hash=await passwordHash(next);
+  this.authMutation(()=>{
+   if(!this.passwordSetupState(accountId,sessionHash).passwordSetupAllowed)throw new Error('Повтори вход подтверждённым способом перед установкой пароля');
+   this.db.prepare('UPDATE identities SET password_hash=?,password_set=1,must_change=0 WHERE account_id=?').run(hash,accountId);
+   this.db.prepare('DELETE FROM sessions WHERE account_id=?').run(accountId);
+  });return this.newSession(accountId);
+ }
  async changePassword(accountId,current,next){
   const old=this.db.prepare('SELECT password_hash FROM identities WHERE account_id=?').get(accountId);
   if(!old||!await checkPassword(current,old.password_hash))throw new Error('Wrong current password');
@@ -86,7 +121,11 @@ export class Accounts {
   });return this.newSession(accountId);
  }
  list(){return this.db.prepare('SELECT identities.account_id,login,role,must_change,identities.enabled AS account_enabled,managed_subscriptions.* FROM identities JOIN managed_subscriptions USING(account_id) ORDER BY login').all().map(({profile_url,...x})=>x);}
- subscription(accountId){const s=this.db.prepare('SELECT * FROM managed_subscriptions WHERE account_id=?').get(accountId);if(!s)return {active:false};const paid=this.store.subscription(accountId),required=!s.allow_unlimited&&!paid.expiresAt&&this.identity(accountId)?.role==='user';return {...s,sync_state:!s.allow_unlimited&&paid.active&&s.sync_state==='awaiting_payment'?'pending':s.sync_state,profile_url:required?null:subscriptionURL(s.profile_url,this.publicSubscriptionOrigin),payment_required:Boolean(required),payment_confirmed:paid.active,paid_expires_at:paid.expiresAt,active:Boolean(!s.deleted&&s.enabled&&(s.unlimited||s.expires_at>this.clock())&&(s.allow_unlimited||paid.active))};}
+ subscription(accountId){
+  const s=this.db.prepare('SELECT * FROM managed_subscriptions WHERE account_id=?').get(accountId);if(!s)return {active:false};
+  const paid=this.store.subscription(accountId),required=!s.allow_unlimited&&!paid.expiresAt&&this.identity(accountId)?.role==='user',preparing=!s.allow_unlimited&&paid.active&&(s.entitlement_revision!==paid.revision||s.sync_state==='awaiting_payment');
+  return {...s,sync_state:preparing&&s.sync_state!=='error'?'pending':s.sync_state,profile_url:required||preparing?null:subscriptionURL(s.profile_url,this.publicSubscriptionOrigin),payment_required:Boolean(required),payment_confirmed:paid.active,paid_expires_at:paid.expiresAt,active:Boolean(!preparing&&!s.deleted&&s.enabled&&(s.unlimited||s.expires_at>this.clock())&&(s.allow_unlimited||paid.active))};
+ }
  edit(actor,id,patch){
   if(this.identity(actor)?.role!=='admin')throw new Error('Forbidden');
   return this.store.transaction(()=>this.editInternal(actor,id,patch));
