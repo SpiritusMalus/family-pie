@@ -117,3 +117,53 @@ test('expired and legacy unlimited subscriptions have distinct renewal behavior'
  const f=await fixture(t,{unlimited:true,allowUnlimited:true,expiresAt:0});f.link();f.telegram.update(message(1,'Моя подписка'));assert.match(replyText(f,1),/без ограничения срока/);f.telegram.update(message(2,'Продлить'));assert.match(replyText(f,2),/Продление не требуется/);
  const paid=await fixture(t);paid.link();paid.advance(31*DAY);paid.telegram.update(message(1,'Моя подписка'));assert.match(replyText(paid,1),/закончилась/);paid.telegram.update(message(2,'Подключиться'));assert.doesNotMatch(replyText(paid,2),/QR-код/);paid.telegram.update(message(3,'Продлить'));assert.match(replyText(paid,3),/#plans/);
 });
+
+test('password recovery command bypasses native menu and support context, including the first-password gate, without persisting reset credentials',async t=>{
+ const f=await fixture(t);f.link();f.store.db.prepare('UPDATE identities SET must_change=1 WHERE account_id=?').run(f.user.accountId);
+ let issued=0;const token='R'.repeat(43),commerce={origin:'https://family-spy.ru',recoveryHandoff:chatId=>{
+  assert.equal(chatId,'1001');assert.equal(f.store.db.prepare('SELECT account_id FROM telegram_links WHERE chat_id=?').get(chatId).account_id,f.user.accountId);issued++;
+  return {url:'https://family-spy.ru/vpn/cabinet/auth/#recovery='+token,login:f.user.login,expiresIn:300};
+ }};
+ f.telegram.ui={enabled:false,commerce,handle:()=>{throw Error('Recovery must not enter native navigation');}};
+ f.telegram.support={handle:()=>{throw Error('Recovery must not become a support message');}};
+ f.telegram.update(message(1,'/recover'));assert.equal(issued,0);assert.equal(f.telegram.offset(),2);
+ const persisted=JSON.stringify(f.store.db.prepare('SELECT * FROM telegram_outbox').all());assert.doesNotMatch(persisted,/#recovery=|RRRRRR|#telegram=/);
+ const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.equal(issued,1);assert.match(calls[0].body.text,/5 минут/);assert.equal(calls[0].body.reply_markup.inline_keyboard[0][0].url,'https://family-spy.ru/vpn/cabinet/auth/#recovery='+token);
+ assert.equal(f.users.identity(f.user.accountId).must_change,1);assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,1);
+ f.telegram.update(message(1,'/recover'));assert.equal(f.count(),1);
+});
+
+test('recovery aliases require a private same-author chat and unlinked users get an honest ownership/support path',async t=>{
+ const f=await fixture(t);let issued=0;f.telegram.commerce={recoveryHandoff:()=>{issued++;const error=new Error('No confirmed binding');error.code='INVALID_RECOVERY';throw error;}};
+ const group=message(1,'/recover');group.message.chat.type='group';f.telegram.update(group);
+ const spoof=message(2,'/recovery');spoof.message.from.id=1002;f.telegram.update(spoof);assert.equal(f.count(),0);
+ f.telegram.update(message(3,'/start recover'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.equal(issued,1);assert.match(calls[0].body.text,/подтверждённой привязки/);assert.match(calls[0].body.text,/Запуск бота сам по себе не подтверждает/);assert.equal(calls[0].body.reply_markup.inline_keyboard.length,1);
+ assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,1);assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).linked,false);
+ f.telegram.update(message(4,'/recovery'));await deliverOne(f.telegram,{call:async()=>{}});assert.equal(issued,2);
+});
+
+test('recovery is resolved at delivery after revocation; stale intents expire and every command menu exposes recovery',async t=>{
+ const f=await fixture(t);f.link();f.telegram.commerce={origin:'https://family-spy.ru',recoveryHandoff:chatId=>{
+  if(!f.store.db.prepare('SELECT 1 FROM telegram_links WHERE chat_id=?').get(chatId)){const error=new Error('revoked');error.code='INVALID_RECOVERY';throw error;}
+  return {url:'https://family-spy.ru/vpn/cabinet/auth/#recovery='+'Q'.repeat(43),login:f.user.login};
+ }};
+ f.telegram.update(message(1,'/recover'));f.telegram.disconnect(f.user.accountId);const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.match(calls[0].body.text,/подтверждённой привязки/);
+ f.telegram.update(message(2,'/recover'));f.advance(300001);assert.equal(f.telegram.next(),null);
+ const configured=[];await configureBotMenu({call:async(method,body)=>configured.push({method,body})},{commands:[{command:'menu',description:'Меню'}]});assert.ok(configured[0].body.commands.some(x=>x.command==='recover'));
+});
+
+test('real recovery issuer lets a confirmed gated account reset its password while navigation and sales remain disabled, preserving paid access',async t=>{
+ const {TelegramCommerce}=await import('../telegram-commerce.mjs');
+ const f=await fixture(t,{profileUrl:'https://sub.family-pie.ru/sub/FICTIONAL_RECOVERY_ONLY'});f.link();
+ f.store.db.prepare('UPDATE identities SET must_change=1 WHERE account_id=?').run(f.user.accountId);
+ const commerce=new TelegramCommerce(f.store,{users:f.users,clock:f.store.clock});f.telegram.ui={enabled:false,commerce,handle:()=>{throw Error('Recovery must precede navigation');}};
+ assert.equal(commerce.accountForChat('1001'),null);assert.equal(commerce.plans().available,false);
+ const before=f.store.subscription(f.user.accountId),sessions=f.store.db.prepare('SELECT count(*) n FROM sessions').get().n;
+ f.telegram.update(message(1,'/recover'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push(body)});
+ const token=new URLSearchParams(new URL(calls[0].reply_markup.inline_keyboard[0][0].url).hash.slice(1)).get('recovery');
+ assert.equal(commerce.recovery.preview(token).login,f.user.login);assert.equal(f.users.identity(f.user.accountId).must_change,1);assert.equal(f.store.db.prepare('SELECT count(*) n FROM sessions').get().n,sessions);
+ assert.doesNotMatch(JSON.stringify(f.store.db.prepare('SELECT * FROM telegram_outbox').all()),new RegExp(token));
+ await commerce.recovery.reset(token,'Fictional-Recovered-Password-2026');assert.equal(f.store.db.prepare('SELECT count(*) n FROM sessions').get().n,0);
+ const recovered=await f.users.login(f.user.login,'Fictional-Recovered-Password-2026');assert.equal(recovered.identity.account_id,f.user.accountId);assert.equal(f.store.subscription(f.user.accountId).expiresAt,before.expiresAt);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,1);
+ assert.throws(()=>commerce.recovery.preview(token));
+});

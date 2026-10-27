@@ -23,3 +23,9 @@ test('submission port587 always requires STARTTLS, never plaintext SMTP',()=>{
 test('configured sender sends only the requested login code to the validated recipient',async()=>{
  let sent;const send=smtpSender({...config,VPN_SMTP_PASSWORD:'FICTIONAL'},()=>({sendMail:async value=>{sent=value;return {accepted:[value.to]};}}));await send('owned@example.invalid','12345678');assert.equal(sent.to,'owned@example.invalid');assert.equal(sent.from,config.VPN_SMTP_FROM);assert.match(sent.text,/12345678/);assert.equal(sent.subject,'Код входа в Family VPN');assert.equal(sent.attachments,undefined);
 });
+test('recovery mail states reset purpose and ten-minute validity while ordinary sign-in stays five minutes',async()=>{
+ const messages=[],send=smtpSender({...config,VPN_SMTP_PASSWORD:'FICTIONAL'},()=>({sendMail:async value=>{messages.push(value);return {accepted:[value.to]};}}));
+ await send('owned@example.invalid','12345678',{purpose:'recovery'});await send('owned@example.invalid','87654321');
+ assert.equal(messages[0].subject,'Восстановление доступа к Family VPN');assert.match(messages[0].text,/10 минут/);assert.match(messages[0].text,/новый пароль/);assert.match(messages[0].text,/Текущий пароль и подписка не изменены/);assert.doesNotMatch(messages[0].text,/Действует5 минут/);
+ assert.equal(messages[1].subject,'Код входа в Family VPN');assert.match(messages[1].text,/Действует5 минут/);
+});

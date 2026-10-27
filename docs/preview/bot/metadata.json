@@ -48,6 +48,10 @@
     {
       "command": "terms",
       "description": "Условия сервиса"
+    },
+    {
+      "command": "recover",
+      "description": "Забыл пароль. Восстановить доступ"
     }
   ],
   "changesAppliedToTelegram": false,

@@ -38,14 +38,15 @@
     track('setup_open');
     const url = personalURL(sub.profile_url);
     const ready = Boolean(sub.active && sub.sync_state === 'synced' && url);
+    window.vpnSetupProgress?.update({accountId: current.accountId, ready});
     const signature = JSON.stringify([ready, url, sub.payment_confirmed, sub.sync_state, sub.active, sub.expires_at, window.FPi18n?.lang]);
     if (rendered.get(target) === signature) return;
     // The private URL lives only in this authenticated DOM, never in storage or events.
     rendered.set(target, signature);
     target.replaceChildren();
     if (!ready) {
-      const expired = !sub.active && sub.expires_at && sub.expires_at <= Date.now();
-      const preparing = sub.payment_confirmed && !expired && sub.sync_state !== 'synced';
+      const preparing = sub.payment_confirmed && sub.sync_state !== 'synced';
+      const expired = !preparing && !sub.active && sub.expires_at && sub.expires_at <= Date.now();
       const message = sub.sync_state === 'error'
         ? 'Оплата подтверждена, но подключение пока не готово. Напиши в поддержку.'
         : preparing ? 'Оплата подтверждена. Готовим подключение; повторно платить не нужно.'
@@ -99,6 +100,9 @@
       }
     });
     actions.append(add, copy);
+    const next = node('button', text('Подписка добавлена. Дальше'), 'btn secondary setup-continue');
+    next.type = 'button';
+    next.addEventListener('click', () => window.vpnSetupProgress?.go(3));
     const qr = node('details', undefined, 'setup-qr');
     qr.append(node('summary', text('QR-код для другого устройства')));
     const image = node('img');
@@ -107,7 +111,7 @@
     image.width = image.height = 224;
     image.loading = 'lazy';
     qr.append(image, node('p', text('Открой Happ на другом устройстве и отсканируй этот код.'), 'muted'));
-    target.append(actions, feedback, manual, qr, node('p', text('Не передавай личную ссылку и QR-код другим людям.'), 'setup-privacy muted'));
+    target.append(actions, feedback, manual, node('p', text('После добавления подписки вернись сюда и продолжи настройку.'), 'muted'), next, qr, node('p', text('Не передавай личную ссылку и QR-код другим людям.'), 'setup-privacy muted'));
   }
   window.vpnConnectionSetup = {update(value) { current = value; render(); }};
   window.addEventListener('vpn-platformchange', render);

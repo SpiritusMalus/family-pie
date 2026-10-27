@@ -1,5 +1,6 @@
 import {randomBytes,randomUUID,createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
+import {PasswordRecovery} from './recovery.mjs';
 const digest=value=>createHash('sha256').update(value).digest('hex');
 const periods=[30,90,180,365],devices=new Set(['android','ios','windows','macos','linux','tv']);
 const invalid=message=>{const e=new Error(message);e.code='INVALID_PAYMENT';throw e;};
@@ -16,7 +17,7 @@ export function loadTelegramStarsConfig(env=process.env){
 // Only the one authenticated Telegram poller calls actor/payment methods. These are
 // deliberately not HTTP endpoints accepting a client's claimed Telegram identity.
 export class TelegramCommerce {
- constructor(store,{users,origin='https://family-spy.ru',stars={},clock=store.clock}={}){
+ constructor(store,{users,origin='https://family-spy.ru',stars={},clock=store.clock,recovery=null}={}){
   if(!users)throw new Error('Accounts required');
   const url=new URL(origin);if(url.origin!==origin||url.protocol!=='https:'&&!(url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname)))throw new Error('HTTPS public origin required');
   this.store=store;this.db=store.db;this.users=users;this.clock=clock;this.origin=origin;
@@ -28,7 +29,9 @@ export class TelegramCommerce {
    CREATE TABLE IF NOT EXISTS telegram_handoffs(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES identities(account_id),chat_id TEXT NOT NULL,generation TEXT NOT NULL,purpose TEXT NOT NULL,device TEXT NOT NULL,expires INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS telegram_orders(order_id TEXT PRIMARY KEY REFERENCES orders(id),payload TEXT UNIQUE NOT NULL,chat_id TEXT NOT NULL,precheckout_id TEXT UNIQUE,expires INTEGER NOT NULL);
    CREATE TABLE IF NOT EXISTS telegram_refunds(order_id TEXT PRIMARY KEY REFERENCES orders(id),state TEXT NOT NULL,requested_at INTEGER NOT NULL);`);
+  this.recovery=recovery||new PasswordRecovery(store,users,{origin,clock});
  }
+ recoveryHandoff(chatId){return this.recovery.issueTelegram(chatId);}
  transaction(fn){return this.db.isTransaction?fn():this.store.transaction(fn);}
  plans(){return {available:Boolean(this.enabled),plans:[...this.starPlans.values()]};}
  accountForChat(chatId){

@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
 import {VpnStore} from '../services/vpn/store.mjs';
 import {Accounts} from '../services/vpn/auth.mjs';
-import {TelegramStore} from '../services/vpn/telegram.mjs';
+import {TelegramStore,deliverOne,configureBotMenu} from '../services/vpn/telegram.mjs';
 import {TelegramCommerce} from '../services/vpn/telegram-commerce.mjs';
 import {TelegramUI,deliverUiOne,botBranding,nativeBotCommands} from '../services/vpn/telegram-ui.mjs';
 import {TelegramSupport} from '../services/vpn/telegram-support.mjs';
@@ -56,7 +56,7 @@ const ui=new TelegramUI(telegram,{commerce,enabled:true,clock});telegram.ui=ui;
 const raw=[],screens=[];let sequence=0;
 const sender={call:async(method,data)=>{raw.push({method,data:structuredClone(data)});return {message_id:raw.length};}};
 const message=(chatId,text)=>telegram.update({update_id:++sequence,message:{message_id:sequence,chat:{type:'private',id:chatId},from:{id:chatId},text}});
-const drain=async()=>{let guard=100;while(await deliverUiOne(ui,sender))assert.ok(--guard>0);};
+const drain=async()=>{let guard=100;while(await deliverUiOne(ui,sender)||await deliverOne(telegram,sender))assert.ok(--guard>0);};
 const last=()=>raw.filter(row=>row.method==='sendMessage').at(-1);
 async function press(chatId,label){
  const button=last().data.reply_markup.inline_keyboard.flat().find(b=>b.text===label);assert.ok(button?.callback_data,'Missing real button '+label);
@@ -99,17 +99,21 @@ store.db.prepare('UPDATE identities SET must_change=0 WHERE account_id=?').run(o
 store.db.prepare("INSERT INTO telegram_links(account_id,chat_id,generation,bound_at) VALUES(?,13003,'synthetic-operator',?)").run(operator.accountId,now);
 telegram.support=new TelegramSupport(store,{operatorAccountId:operator.accountId,botId:14004,clock});
 message(paidChat,'/menu');await drain();await press(paidChat,'Помощь');snapshot('help','Помощь в чате','Помощь');
-const sourceFiles=['services/vpn/telegram-ui.mjs','services/vpn/telegram.mjs','services/vpn/telegram-commerce.mjs'];
+message(paidChat,'/recover');await drain();snapshot('recovery','Восстановление пароля','/recover');
+const sourceFiles=['services/vpn/telegram-ui.mjs','services/vpn/telegram.mjs','services/vpn/telegram-commerce.mjs','services/vpn/recovery.mjs'];
 const transcript={schema:'family-vpn-bot-preview/v1',syntheticOnly:true,generatedAt:new Date().toISOString(),fixtureDate:new Date(now).toISOString(),
  evidence:'Messages captured from TelegramStore.update → TelegramUI → injected local sender. No Telegram API, provider, real profile or device import.',
- redaction:'Opaque callback, account and handoff tokens excluded. Visible text and button labels are exact handler output. All displayed subscription values are synthetic.',
+ redaction:'Opaque callback, internal account IDs and handoff/reset tokens excluded. Visible text and button labels are exact handler output. Displayed logins and subscription values are synthetic.',
  sales:{enabled:false,approved:false,starPrices:[]},sources:Object.fromEntries(sourceFiles.map(path=>[path,hash(readFileSync(root+'/'+path))])),screens};
 const rawPath=privateDir+'/transcript.raw.json';writeFileSync(rawPath,JSON.stringify({syntheticOnly:true,raw},null,2)+'\n',{mode:0o600});chmodSync(rawPath,0o600);
 writeFileSync(out+'/transcript.json',JSON.stringify(transcript,null,2)+'\n');
 assert.ok(!JSON.stringify(transcript).includes('u_')&&!JSON.stringify(transcript).includes('token=')&&!JSON.stringify(transcript).includes('bind_'));
+const configured=[];await configureBotMenu({call:async(method,data)=>configured.push({method,data})},{commands:nativeBotCommands});
+const commands=configured.find(row=>row.method==='setMyCommands').data.commands;
+assert.ok(commands.some(row=>row.command==='recover'));
 const metadata={status:'prepared-not-applied',name:botBranding.name,shortDescription:botBranding.shortDescription,description:botBranding.description,language:'ru',
  avatar:{source:'avatar.svg',render:'avatar.png',width:1024,height:1024,sha256:hash(readFileSync(out+'/avatar.png')),provenance:'Adapted directly from customer-site/index.html .brand svg; same circle and three spokes. Charcoal #101216 / coral #ff9d88.'},
- commands:nativeBotCommands,changesAppliedToTelegram:false,publication:'Owner approval and authorized bot administration required; no BotFather or API calls performed.'};
+ commands,changesAppliedToTelegram:false,publication:'Owner approval and authorized bot administration required; no BotFather or API calls performed.'};
 assert.ok(metadata.name.length<=64&&metadata.shortDescription.length<=120&&metadata.description.length<=512);
 writeFileSync(out+'/metadata.json',JSON.stringify(metadata,null,2)+'\n');
 // Build a self-contained artifact: current local typefaces, avatar and sanitized real transcript are embedded.

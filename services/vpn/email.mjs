@@ -26,7 +26,7 @@ export function smtpTransport(env=process.env,createTransport=options=>nodemaile
   tls:{minVersion:'TLSv1.2',rejectUnauthorized:true},disableFileAccess:true,disableUrlAccess:true,
   connectionTimeout:8000,greetingTimeout:8000,socketTimeout:10000});
 }
-export function smtpSender(env=process.env,createTransport){const transport=smtpTransport(env,createTransport);if(!transport)return null;return (email,code)=>transport.sendMail({from:env.VPN_SMTP_FROM,to:email,subject:'Код входа в Family VPN',text:`Код Family VPN: ${code}\nДействует5 минут. Не передавай его другим. Если ты не запрашивал код, просто проигнорируй письмо.`});}
+export function smtpSender(env=process.env,createTransport){const transport=smtpTransport(env,createTransport);if(!transport)return null;return (email,code,{purpose}={})=>transport.sendMail({from:env.VPN_SMTP_FROM,to:email,subject:purpose==='recovery'?'Восстановление доступа к Family VPN':'Код входа в Family VPN',text:purpose==='recovery'?`Код восстановления Family VPN: ${code}\nДействует 10 минут. Введи код на странице восстановления и задай новый пароль. Не передавай код другим. Если ты не запрашивал восстановление, проигнорируй письмо. Текущий пароль и подписка не изменены.`:`Код Family VPN: ${code}\nДействует5 минут. Не передавай его другим. Если ты не запрашивал код, просто проигнорируй письмо.`});}
 
 export function smtpPurchaseSender(env=process.env,createTransport){
  const transport=smtpTransport(env,createTransport);if(!transport)return null;

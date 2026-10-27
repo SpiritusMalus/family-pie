@@ -14,16 +14,41 @@
   <a class="skip" href="#main">К содержимому</a>
   <header class="nav"><div class="wrap nav-in"><a class="brand" href="/vpn/">family<span>/vpn</span></a><a href="https://t.me/family_pie_vpn_bot" rel="noopener noreferrer">Вернуться в Telegram</a></div></header>
   <main class="wrap import-page" id="main">
-    <h1>Добавить подписку</h1>
+    <h1>Подключим VPN на этом устройстве</h1>
     <p class="cab-status" id="telegram-entry-message" role="status">Готовим твою подписку…</p>
     <section id="telegram-import" hidden>
-      <div class="cab-actions"><a class="btn" data-import-add>Добавить подписку в приложение</a><button class="btn secondary" data-import-copy type="button">Скопировать ссылку</button></div>
-      <label class="form-row">Личная ссылка подписки<textarea rows="2" readonly spellcheck="false" data-fp-no-i18n aria-label="Личная ссылка подписки"></textarea></label>
-      <p>Если приложение не открылось, скопируй ссылку. В Happ нажми «+» и добавь подписку из буфера обмена.</p>
-      <p>Затем выбери маршрут и включи VPN.</p>
-      <p class="muted">Не передавай личную ссылку и QR-код другим людям.</p>
+      <p class="muted" data-import-device></p>
+      <ol class="setup-progress" aria-label="Шаги подключения">
+        <li data-import-progress="install">Установка</li><li data-import-progress="import">Подписка</li><li data-import-progress="enable">Включение</li>
+      </ol>
+      <p class="import-progress" data-import-step-label role="status"></p>
+      <section class="panel import-step" data-import-step="install">
+        <h2>Установи приложение</h2><p>Установи Happ, затем вернись на эту страницу.</p>
+        <div class="guide-downloads cab-actions" data-import-downloads></div>
+        <button class="btn secondary" data-import-installed type="button">Happ уже установлен — дальше</button>
+      </section>
+      <section class="panel import-step" data-import-step="import" hidden>
+        <h2>Добавь подписку</h2><p>В приложении не нужен логин от сайта. Добавь подписку по личной ссылке.</p>
+        <div class="cab-actions"><a class="btn" data-import-add referrerpolicy="no-referrer">Добавить подписку в приложение</a></div>
+        <p>После добавления вернись сюда и переходи к включению VPN.</p>
+        <div class="cab-actions"><button class="btn" data-import-added type="button">Я добавил подписку — дальше</button><button class="btn secondary" data-import-back-install type="button">Назад к установке</button></div>
+      </section>
+      <section class="panel import-step" data-import-step="enable" hidden>
+        <h2>Включи VPN в приложении</h2>
+        <p>Открой Happ, выбери маршрут и нажми подключение. При первом запуске разреши создать VPN-соединение.</p>
+        <p>Дождись подтверждения подключения в приложении и открой нужный сайт.</p>
+        <div class="cab-actions"><a class="btn" href="https://t.me/family_pie_vpn_bot?start=support_vpn" rel="noopener noreferrer">Нужна помощь</a><button class="btn secondary" data-import-back-add type="button">Назад к добавлению подписки</button></div>
+      </section>
+      <section class="setup-manual import-manual" aria-labelledby="import-manual-title">
+        <h2 id="import-manual-title">Личная ссылка подписки</h2>
+        <label class="form-row">Ссылка для добавления вручную<textarea rows="2" readonly spellcheck="false" data-fp-no-i18n aria-label="Личная ссылка подписки"></textarea></label>
+        <button class="btn secondary" data-import-copy type="button">Скопировать ссылку</button>
+        <p>Если приложение не открылось, скопируй ссылку. В Happ нажми «+» и добавь подписку из буфера обмена.</p>
+        <p class="muted">Не передавай личную ссылку и QR-код другим людям.</p>
+      </section>
     </section>
-    <p><a href="https://t.me/family_pie_vpn_bot" rel="noopener noreferrer">Открыть бота</a></p>
+    <section id="telegram-entry-recovery" hidden><p>В боте нажми «Подключиться» и выбери устройство.</p><a class="btn" href="https://t.me/family_pie_vpn_bot" rel="noopener noreferrer">Получить новую ссылку в Telegram</a></section>
+    <p><a href="https://t.me/family_pie_vpn_bot?start=support_vpn" rel="noopener noreferrer">Помощь без входа в кабинет</a></p>
     <noscript><p>Для этой одноразовой ссылки нужен JavaScript. Скопируй личную ссылку прямо в боте.</p></noscript>
   </main>
 </body>

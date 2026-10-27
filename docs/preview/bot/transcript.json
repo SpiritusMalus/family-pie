@@ -1,10 +1,10 @@
 {
   "schema": "family-vpn-bot-preview/v1",
   "syntheticOnly": true,
-  "generatedAt": "2026-10-27T13:21:18.576Z",
+  "generatedAt": "2026-10-27T14:29:46.781Z",
   "fixtureDate": "2026-10-27T12:00:00.000Z",
   "evidence": "Messages captured from TelegramStore.update → TelegramUI → injected local sender. No Telegram API, provider, real profile or device import.",
-  "redaction": "Opaque callback, account and handoff tokens excluded. Visible text and button labels are exact handler output. All displayed subscription values are synthetic.",
+  "redaction": "Opaque callback, internal account IDs and handoff/reset tokens excluded. Visible text and button labels are exact handler output. Displayed logins and subscription values are synthetic.",
   "sales": {
     "enabled": false,
     "approved": false,
@@ -12,8 +12,9 @@
   },
   "sources": {
     "services/vpn/telegram-ui.mjs": "c498f0b451afb3acc6f79eb6d6426d45bd295665a3825ab16697dc4496065fc2",
-    "services/vpn/telegram.mjs": "01ca777aa060553e1bd79b438116202ba4f92dbb1a6110914a3fb7ab72773710",
-    "services/vpn/telegram-commerce.mjs": "8b8e7c0d62bfdd36e958667fde51b5f230d6419b30b780009fbb2bdb4547650f"
+    "services/vpn/telegram.mjs": "3a291b99f551c57e824654a7ad66e5aa977d6d939a828e2b8ec850223bb5db80",
+    "services/vpn/telegram-commerce.mjs": "a0b4eda10fbe85bc98749bde3551b845913faf7859baba73b992eca721c7ef13",
+    "services/vpn/recovery.mjs": "1803700f25456b3cc3199115a669bb32e0a7c48d7d0eb2b4a2a1018a71dbdee6"
   },
   "screens": [
     {
@@ -526,6 +527,32 @@
               "kind": "callback",
               "action": "home",
               "arguments": {}
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": "recovery",
+      "title": "Восстановление пароля",
+      "trigger": "/recover",
+      "message": {
+        "method": "sendMessage",
+        "text": "Восстановление пароля для аккаунта synthetic-bot-preview-paid.\nОдноразовая ссылка действует 5 минут. Она откроет смену пароля, без входа по старому паролю. Не пересылай её другим людям.",
+        "parseMode": null,
+        "buttons": [
+          [
+            {
+              "text": "Восстановить пароль",
+              "kind": "handoff",
+              "url": "https://preview.example.invalid/vpn/cabinet/auth/#SYNTHETIC_HANDOFF_REDACTED"
+            }
+          ],
+          [
+            {
+              "text": "Помощь без входа",
+              "kind": "url",
+              "url": "https://t.me/family_pie_vpn_bot?start=support_vpn"
             }
           ]
         ]

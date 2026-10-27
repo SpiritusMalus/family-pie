@@ -21,7 +21,7 @@ function authFixture(responses,search='',options={}){
  if(options.cabinet)elements.delete('#login-form');
  const document={querySelector:key=>elements.get(key)||null};
  const user={login:'test-only',role:'user',must_change:1},session={user,csrf:'csrf-fresh'};
- const window={FPi18n:{t:x=>x,...(options.lang?{lang:options.lang}:{})}};runInNewContext(accountCode,{window,document,location,URL,URLSearchParams,fetch:async(path,options)=>{
+ const window={FPi18n:{t:x=>x,...(options.lang?{lang:options.lang}:{})}};runInNewContext(accountCode,{AbortSignal,window,document,location,URL,URLSearchParams,fetch:async(path,options)=>{
   calls.push({path,options});const response=responses.shift();assert.ok(response,'Unexpected request '+path);const data=typeof response==='function'?await response():response;
   return {ok:!data.status||data.status===200,status:data.status||200,json:async()=>data.body||session};
  }});
@@ -38,6 +38,15 @@ test('valid temporary password change refreshes CSRF and opens cabinet',async()=
  const f=authFixture([{}, {body:{user:{login:'test-only',role:'user',must_change:1},csrf:'csrf-new'}}, {body:{ok:true,csrf:'csrf-rotated'}}]);await flushAuth();await f.submit('#password-form');
  assert.equal(f.location.href,'/vpn/cabinet/');assert.equal(f.calls[2].options.headers['X-CSRF-Token'],'csrf-new');
  assert.match(f.elements.get('#password-form p').textContent,/После сохранения откроется личный кабинет/);
+});
+test('a verified nonpassword sign-in sets a password without the forgotten password and opens the intended cabinet',async()=>{
+ const body={user:{login:'fixture-recovered',role:'user',must_change:1},csrf:'fresh',authMethod:'email',passwordSetupAllowed:true},f=authFixture([{body},{body},{body:{ok:true}}]);await flushAuth();assert.equal(f.elements.get('#current').required,false);assert.match(f.elements.get('#password-form p').textContent,/Подписка останется/);await f.submit('#password-form');assert.equal(f.calls[2].path,'/vpn/api/password/set');assert.deepEqual(JSON.parse(f.calls[2].options.body),{next:'test-only-password'});assert.equal(f.location.href,'/vpn/cabinet/');
+});
+test('expired recovery verification never silently falls back to asking the forgotten password',async()=>{
+ const body={user:{login:'fixture-recovered',role:'user',must_change:1},csrf:'fresh',authMethod:'email',passwordSetupAllowed:true},f=authFixture([{body},{body:{...body,passwordSetupAllowed:false}}]);await flushAuth();await f.submit('#password-form');assert.equal(f.calls.length,2);assert.equal(f.elements.get('#password-form').hidden,true);assert.match(f.elements.get('#account-message').textContent,/Подтверждение устарело/);
+});
+test('a normal recent password sign-in still asks for the current password when changing it',async()=>{
+ const body={user:{login:'fixture-password',role:'user',must_change:0},csrf:'fresh',authMethod:'password',passwordSetupAllowed:true},f=authFixture([{body},{body},{body:{ok:true}}],'?change=1');await flushAuth();assert.equal(f.elements.get('#current').required,true);await f.submit('#password-form');assert.equal(f.calls[2].path,'/vpn/api/password');assert.ok(JSON.parse(f.calls[2].options.body).current);
 });
 test('session loss during password submit recovers login; rejected current password keeps form',async()=>{
  const f=authFixture([{}, {}, {status:401,body:{error:'Войди в аккаунт'}}]);await flushAuth();await f.submit('#password-form');assert.equal(f.elements.get('#password-form').hidden,true);

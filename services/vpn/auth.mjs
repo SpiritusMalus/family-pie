@@ -91,7 +91,24 @@ export class Accounts {
   return identity?.enabled?{...session,identity}:null;
  }
  logout(token){this.db.prepare('DELETE FROM sessions WHERE token_hash=?').run(sha(token));}
- async setPassword(accountId,sessionHash,next){const proof=this.db.prepare('SELECT * FROM session_auth WHERE token_hash=? AND verified_at>?').get(sessionHash,this.clock()-300000);if(!proof)throw new Error('Повтори вход перед установкой пароля');const hash=await passwordHash(next);this.store.transaction(()=>{this.db.prepare('UPDATE identities SET password_hash=?,password_set=1,must_change=0 WHERE account_id=?').run(hash,accountId);this.db.prepare('DELETE FROM sessions WHERE account_id=?').run(accountId);});return this.newSession(accountId);}
+ passwordSetupState(accountId,sessionHash){
+  const identity=this.identity(accountId),proof=this.db.prepare('SELECT a.method,a.verified_at FROM session_auth a JOIN sessions s USING(token_hash) WHERE s.token_hash=? AND s.account_id=? AND s.expires>?').get(sessionHash,accountId,this.clock());
+  let allowed=Boolean(identity?.enabled&&proof&&proof.verified_at>this.clock()-300000);
+  if(allowed&&identity.must_change){
+   const table={email:'verified_emails',google:'google_identities',passkey:'passkeys',telegram:'telegram_links'}[proof.method];
+   allowed=Boolean(table&&this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?").get(table)&&this.db.prepare(`SELECT 1 FROM ${table} WHERE account_id=?`).get(accountId));
+  }
+  return {authMethod:proof?.method||null,passwordSetupAllowed:allowed};
+ }
+ async setPassword(accountId,sessionHash,next){
+  if(!this.passwordSetupState(accountId,sessionHash).passwordSetupAllowed)throw new Error('Повтори вход подтверждённым способом перед установкой пароля');
+  const hash=await passwordHash(next);
+  this.authMutation(()=>{
+   if(!this.passwordSetupState(accountId,sessionHash).passwordSetupAllowed)throw new Error('Повтори вход подтверждённым способом перед установкой пароля');
+   this.db.prepare('UPDATE identities SET password_hash=?,password_set=1,must_change=0 WHERE account_id=?').run(hash,accountId);
+   this.db.prepare('DELETE FROM sessions WHERE account_id=?').run(accountId);
+  });return this.newSession(accountId);
+ }
  async changePassword(accountId,current,next){
   const old=this.db.prepare('SELECT password_hash FROM identities WHERE account_id=?').get(accountId);
   if(!old||!await checkPassword(current,old.password_hash))throw new Error('Wrong current password');

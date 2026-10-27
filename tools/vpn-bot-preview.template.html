@@ -47,7 +47,7 @@
 const transcript=JSON.parse(document.getElementById('transcript').textContent),metadata=JSON.parse(document.getElementById('metadata').textContent);
 const screens=new Map(transcript.screens.map(screen=>[screen.id,screen]));
 const picker=document.getElementById('mobile-picker'),nav=document.getElementById('scenarios'),message=document.getElementById('message'),keyboard=document.getElementById('keyboard'),status=document.getElementById('status');
-const groups=[['Если подписка уже есть',['paid','devices','install','manual','notifications','muted','help']],['Первое знакомство',['guest','unlinked','binding','terms','sales-unavailable']]];
+const groups=[['Если подписка уже есть',['paid','devices','install','manual','notifications','muted','help','recovery']],['Первое знакомство',['guest','unlinked','binding','terms','sales-unavailable']]];
 let current='paid';
 const avatar=document.querySelector('.brand svg');document.getElementById('avatar').append(avatar.cloneNode(true));
 for(const [label,ids] of groups){const optionGroup=document.createElement('optgroup');optionGroup.label=label;picker.append(optionGroup);for(const id of ids){const option=document.createElement('option');option.value=id;option.textContent=screens.get(id).title;optionGroup.append(option);}const heading=document.createElement('p');heading.className='nav-group';heading.textContent=label;nav.append(heading);for(const id of ids){const button=document.createElement('button');button.type='button';button.textContent=screens.get(id).title;button.dataset.screen=id;button.addEventListener('click',()=>show(id));nav.append(button);}}

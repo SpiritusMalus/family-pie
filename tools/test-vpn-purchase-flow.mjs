@@ -23,7 +23,7 @@ class Element{
  querySelectorAll(selector){const parts=selector.split(' ');return this.all().filter(n=>n.matches(parts.at(-1))&&(parts.length===1||n.parentElement?.matches(parts[0])));}
  querySelector(selector){return this.querySelectorAll(selector)[0]||null;}
 }
-function fixture({url='https://family-spy.ru/vpn/cabinet/?lang=ru#plans?period=180',orders=[],subscription={active:false,payment_required:true,sync_state:'awaiting_payment'},storage=new Map(),account='fixture-account',resume,check,checkout,confirmNewOrder=false,receiptEmail='fixture@example.invalid'}={}){
+function fixture({url='https://family-spy.ru/vpn/cabinet/?lang=ru#plans?period=180',orders=[],subscription={active:false,payment_required:true,sync_state:'awaiting_payment'},storage=new Map(),account='fixture-account',resume,check,checkout,confirmNewOrder=false,receiptEmail='fixture@example.invalid',earlyReady=false}={}){
  const root=new Element('main');root.id='main';const home=new Element('div');home.dataset.screen='home';const panel=new Element('section');panel.className='subscription';const connection=new Element('section');connection.className='cab-section';home.append(panel,connection);root.append(home);
  for(const screen of ['plans','devices','friends','support','news','settings','technical']){const el=new Element('div');el.dataset.screen=screen;const heading=new Element('div');heading.className='cab-head';heading.append(new Element('p'));el.append(heading);if(screen==='devices'){const notice=new Element('div');notice.className='notice';el.append(notice);}root.append(el);}
  const listeners=new Map(),calls=[],location=new URL(url),history={replaceState:(_a,_b,value)=>{location.href=new URL(value,location).href;}},window={FPi18n:{lang:new URL(url).searchParams.get('lang')||'ru',t:x=>x},addEventListener:(event,fn)=>{const list=listeners.get(event)||[];list.push(fn);listeners.set(event,list);},removeEventListener:()=>{},dispatchEvent:event=>listeners.get(event.type)?.forEach(fn=>fn(event)),vpnDevicePlatform:()=> 'macos'};
@@ -41,11 +41,15 @@ function fixture({url='https://family-spy.ru/vpn/cabinet/?lang=ru#plans?period=1
   if(path==='support')return {threads:[]};if(path==='news')return {posts:[]};if(path==='passkeys')return {passkeys:[]};if(path==='google'||path==='email')return {available:false};if(path==='sessions')return {sessions:[]};if(path==='push')return {available:false,devices:[]};throw new Error('Unexpected '+path);
  };
  const confirms=[];const context={window,document,location,history,URLSearchParams,Intl,Event,AbortSignal,Uint8Array,confirm:text=>{confirms.push(text);return typeof confirmNewOrder==='function'?confirmNewOrder():confirmNewOrder;},sessionStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},setInterval:()=>1,clearInterval:()=>{},crypto:{randomUUID:()=>id}};
+ if(earlyReady)window.vpnAccountReady={api,me:{user:{account_id:account},subscription:sub}};
  runInNewContext(returnCode,context);runInNewContext(code,context);
- const ready=listeners.get('vpn-ready')[0]({detail:{api,me:{user:{account_id:account},subscription:sub}}});
+ const ready=earlyReady?new Promise(resolve=>setImmediate(resolve)):listeners.get('vpn-ready')[0]({detail:{api,me:{user:{account_id:account},subscription:sub}}});
  return {root,window,location,storage,calls,confirms,ready,setOrders:value=>allOrders=value,setSubscription:value=>sub=value,query:selector=>root.querySelector(selector),buttons:label=>root.all().filter(n=>n.tagName==='BUTTON'&&n.textContent===label),click:async element=>element.events.get('click')(),dispatch:(type,detail)=>window.dispatchEvent({type,detail})};
 }
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
+test('a fast restored session cannot outrun the cabinet listener or initialize the cabinet twice',async()=>{
+ const f=fixture({earlyReady:true});await f.ready;assert.ok(f.query('[data-days="180"]'));assert.equal(f.calls.filter(c=>c.path==='profile').length,1);f.dispatch('vpn-ready',f.window.vpnAccountReady);await flush();assert.equal(f.calls.filter(c=>c.path==='profile').length,1);assert.equal(f.calls.filter(c=>c.path==='orders').length,1);
+});
 test('selected tariff survives device navigation, subscription navigation and a reload in the same account',async()=>{
  const f=fixture();await f.ready;assert.equal(f.query('[data-days="180"]').dataset.selected,'true');
  f.location.hash='devices';f.location.hash='plans';const reloaded=fixture({url:f.location.href,storage:f.storage});await reloaded.ready;assert.equal(reloaded.query('[data-days="180"]').dataset.selected,'true');assert.match(reloaded.query('[data-screen="plans"]').textContent,/180 дней · 1/);
