@@ -1035,3 +1035,5 @@ Object.assign(window.FP_EN, {
 });
 
 Object.assign(window.FP_EN, {"Повтори новый пароль": "Confirm new password", "Восстанови доступ, чтобы вернуться к своей подписке.": "Recover access to return to your subscription."});
+
+Object.assign(window.FP_EN,{"Загружаем твою подписку…":"Loading your subscription…","Повторить загрузку":"Try loading again"});

@@ -19,6 +19,7 @@ function authFixture(responses,search='',options={}){
  for(const key of ['#login-form','#password-form','#auth-title','#account-message','.demo-label','.auth-layout > div > p','#password-form p','#login','#password','#current','#next','#repeat','#switch-account'])elements.set(key,{hidden:key==='#password-form',value:'test-only-password',dataset:{},listeners:new Map(),addEventListener(name,fn){this.listeners.set(name,fn);},focus(){this.focused=true;}});
  const calls=[],location={search,pathname:options.pathname||'/vpn/cabinet/auth/',hash:options.hash||''};
  if(options.cabinet)elements.delete('#login-form');
+ if(options.loading)for(const key of ['#cabinet-load-state','#cabinet-load-message','#cabinet-load-recovery','#cabinet-load-retry'])elements.set(key,{hidden:true,listeners:new Map(),addEventListener(name,fn){this.listeners.set(name,fn);}});
  const document={querySelector:key=>elements.get(key)||null};
  const user={login:'test-only',role:'user',must_change:1},session={user,csrf:'csrf-fresh'};
  const window={FPi18n:{t:x=>x,...(options.lang?{lang:options.lang}:{})}};runInNewContext(accountCode,{AbortSignal,window,document,location,URL,URLSearchParams,fetch:async(path,options)=>{
@@ -33,6 +34,9 @@ test('expired password form returns to login without attempting a password mutat
  assert.match(f.elements.get('#account-message').textContent,/Сессия завершилась/);assert.equal(f.calls.some(c=>c.path.endsWith('/password')),false);
  for(const key of ['#password','#current','#next','#repeat'])assert.equal(f.elements.get(key).value,'');
  assert.equal(f.elements.get('.demo-label').hidden,false);
+});
+test('a failed restored-session request gives a visible retry and support path instead of a blank cabinet',async()=>{
+ const f=authFixture([{status:503,body:{error:'Сервис временно недоступен'}}],'',{cabinet:true,loading:true});await flushAuth();assert.equal(f.elements.get('#cabinet-load-message').textContent,'Сервис временно недоступен');assert.equal(f.elements.get('#cabinet-load-recovery').hidden,false);assert.ok(f.elements.get('#cabinet-load-retry').listeners.has('click'));assert.equal(f.location.href,undefined);
 });
 test('valid temporary password change refreshes CSRF and opens cabinet',async()=>{
  const f=authFixture([{}, {body:{user:{login:'test-only',role:'user',must_change:1},csrf:'csrf-new'}}, {body:{ok:true,csrf:'csrf-rotated'}}]);await flushAuth();await f.submit('#password-form');
