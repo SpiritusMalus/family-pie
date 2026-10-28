@@ -53,7 +53,7 @@ test('real handlers in sandbox process only approved users, preserve financial i
  await send('PRIVATE_UNALLOWLISTED_MESSAGE',USER+1);await drain();assert.equal(session.store.db.prepare('SELECT count(*) n FROM identities').get().n,0);assert.equal(f.calls.length,2);
  await send('/menu');await drain();const last=()=>f.calls.filter(call=>call.url.endsWith('/sendMessage')).at(-1).body;
  const click=async label=>{const button=last().reply_markup.inline_keyboard.flat().find(button=>button.text===label);assert.ok(button,'Expected real-handler button');await session.acceptUpdates([{update_id:update++,callback_query:{id:'callback-'+update,from:{id:USER,is_bot:false},message:{chat:{id:USER,type:'private'}},data:button.callback_data}}]);await drain();};
- await click('Купить / продлить');await click('Создать аккаунт');await click('Принимаю и продолжаю');await click('30 дней · 1 ⭐');assert.ok(!f.calls.some(call=>call.url.endsWith('/sendInvoice')));await click('Принимаю, перейти к оплате');
+ await click('💳 Купить / продлить');await click('Создать аккаунт');await click('Принимаю и продолжаю');await click('30 дней · 1 ⭐');assert.ok(!f.calls.some(call=>call.url.endsWith('/sendInvoice')));await click('Принимаю, перейти к оплате');
  const invoice=f.calls.find(call=>call.url.endsWith('/sendInvoice')).body;assert.equal(invoice.currency,'XTR');assert.equal(invoice.prices[0].amount,1);
  await session.acceptUpdates([{update_id:update++,pre_checkout_query:{id:'synthetic-precheckout',from:{id:USER},invoice_payload:invoice.payload,currency:'XTR',total_amount:1}}]);
  const payment={currency:'XTR',total_amount:1,invoice_payload:invoice.payload,telegram_payment_charge_id:'SYNTHETIC-CHARGE'};

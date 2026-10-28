@@ -58,9 +58,10 @@ const raw=[],screens=[];let sequence=0;
 const sender={call:async(method,data)=>{raw.push({method,data:structuredClone(data)});return {message_id:raw.length};}};
 const message=(chatId,text)=>telegram.update({update_id:++sequence,message:{message_id:sequence,chat:{type:'private',id:chatId},from:{id:chatId},text}});
 const drain=async()=>{let guard=100;while(await deliverUiOne(ui,sender)||await deliverOne(telegram,sender))assert.ok(--guard>0);};
-const last=()=>raw.filter(row=>row.method==='sendMessage').at(-1);
+const last=()=>raw.filter(row=>['sendMessage','sendPhoto'].includes(row.method)).at(-1);
+const plainLabel=label=>label.replace(/^[^\p{L}\p{N}]+/u,'');
 async function press(chatId,label){
- const button=last().data.reply_markup.inline_keyboard.flat().find(b=>b.text===label);assert.ok(button?.callback_data,'Missing real button '+label);
+ const button=last().data.reply_markup.inline_keyboard.flat().find(b=>plainLabel(b.text)===plainLabel(label));assert.ok(button?.callback_data,'Missing real button '+label);
  telegram.update({update_id:++sequence,callback_query:{id:'synthetic-preview-'+sequence,from:{id:chatId},message:{message_id:1,chat:{type:'private',id:chatId}},data:button.callback_data}});await drain();
 }
 function sanitizedButton(button){
@@ -73,8 +74,9 @@ function sanitizedButton(button){
  return result;
 }
 function snapshot(id,title,trigger){
- const row=last();assert.equal(row.method,'sendMessage');
- screens.push({id,title,trigger,message:{method:row.method,text:row.data.text,parseMode:row.data.parse_mode||null,buttons:row.data.reply_markup?.inline_keyboard?.map(line=>line.map(sanitizedButton))||[]}});
+ const row=last();assert.ok(['sendMessage','sendPhoto'].includes(row.method));
+ const photo=row.method==='sendPhoto'?{photo:'data:image/png;base64,'+Buffer.from(row.data.photo).toString('base64')}:{};
+ screens.push({id,title,trigger,message:{method:row.method,text:row.data.text??row.data.caption,...photo,parseMode:row.data.parse_mode||null,buttons:row.data.reply_markup?.inline_keyboard?.map(line=>line.map(sanitizedButton))||[]}});
 }
 const guest=12001,paidChat=12002;
 message(guest,'/start');await drain();snapshot('guest','Первый запуск','/start');
@@ -89,7 +91,7 @@ store.confirmPayment({id:'synthetic-bot-preview-payment',status:'succeeded',paid
 store.db.prepare("UPDATE managed_subscriptions SET enabled=1,sync_state='synced',entitlement_revision=? WHERE account_id=?").run(store.account(paid.accountId).revision,paid.accountId);
 const session=users.newSession(paid.accountId),sessionHash=users.session(session.token).token_hash,nonce=telegram.issue(paid.accountId,sessionHash);
 telegram.candidate(nonce,String(paidChat),'@synthetic_preview');telegram.confirm(paid.accountId,sessionHash);
-message(paidChat,'/start');await drain();snapshot('paid','Подписка активна','/start');
+message(paidChat,'/menu');await drain();snapshot('paid','Подписка активна','/menu');
 await press(paidChat,'Подключиться');snapshot('devices','Выбор устройства','Подключиться');
 await press(paidChat,'iPhone / iPad');snapshot('install','Установка и импорт','iPhone / iPad');
 await press(paidChat,'Скопировать / вставить вручную');snapshot('manual','Ручное добавление','Скопировать / вставить вручную');

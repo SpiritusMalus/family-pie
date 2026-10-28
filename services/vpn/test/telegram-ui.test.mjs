@@ -24,7 +24,7 @@ async function fixture(t,{path=':memory:',native=true,stars=true,paid=false}={})
  const update=body=>{const update={update_id:++sequence,...body};telegram.update(update);return update;};
  const message=(text,id=CHAT)=>update({message:{message_id:sequence+1,chat:{type:'private',id},from:{id},text}});
  const drain=async()=>{let limit=100;while(await deliverUiOne(ui,client))assert.ok(--limit>0);};
- const last=()=>calls.filter(x=>x.method==='sendMessage').at(-1)?.data;
+ const last=()=>{const data=calls.filter(x=>['sendMessage','sendPhoto'].includes(x.method)).at(-1)?.data;return data&&{...data,text:data.text??data.caption};};
  const callback=(data,{chatId=CHAT,fromId=chatId,type='private'}={})=>update({callback_query:{id:'query-'+(sequence+1),from:{id:fromId},message:{message_id:1,chat:{type,id:chatId}},data}});
  const press=async(label,options)=>{const button=last()?.reply_markup?.inline_keyboard.flat().find(x=>x.text===label);assert.ok(button?.callback_data,'Missing callback '+label);callback(button.callback_data,options);await drain();};
  let account;
@@ -44,6 +44,25 @@ test('native UI defaults off and preserves legacy bot behavior without account c
  const f=await fixture(t,{native:false});f.message('/start');await f.drain();
  assert.equal(f.calls.length,0);assert.match(f.store.db.prepare('SELECT text FROM telegram_outbox').get().text,/привяжи Telegram/);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);
+});
+
+test('plain Start welcomes without creating access while menu and deep links retain their own routes',async t=>{
+ const f=await fixture(t);f.message('/start');await f.drain();
+ const welcome=f.calls.at(-1);assert.equal(welcome.method,'sendPhoto');assert.ok(welcome.data.photo instanceof Uint8Array);
+ assert.ok(welcome.data.caption.length<=1024);assert.equal(welcome.data.parse_mode,'HTML');
+ assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);
+ assert.equal(f.store.db.prepare('SELECT count(*) n FROM orders').get().n,0);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
+ await f.press('🔌 Подключиться');assert.equal(f.calls.at(-1).method,'sendMessage');
+ assert.ok(f.last().reply_markup.inline_keyboard.flat().some(button=>button.text==='Уже есть подписка'));
+ f.message('/menu');await f.drain();assert.equal(f.calls.at(-1).method,'sendMessage');assert.ok(f.last().text.length<welcome.data.caption.length);
+ f.message('/start unknown_payload');await f.drain();assert.equal(f.calls.at(-1).method,'sendMessage');
+ f.message('/start support_vpn');await f.drain();assert.equal(f.calls.at(-1).method,'sendMessage');assert.match(f.last().text,/support@family-pie\.ru/);
+ f.message('/start bind_invalid');await f.drain();assert.equal(f.calls.at(-1).method,'sendMessage');assert.match(f.last().text,/привязки недействительна/);
+ const photoCount=f.calls.filter(call=>call.method==='sendPhoto').length;
+ f.message('Подключиться');await f.drain();assert.ok(f.last().reply_markup.inline_keyboard.flat().some(button=>button.text==='Уже есть подписка'));
+ const messageCount=f.calls.filter(call=>call.method==='sendMessage').length;
+ f.message('🔌 Подключиться');await f.drain();assert.equal(f.calls.filter(call=>call.method==='sendMessage').length,messageCount+1);
+ assert.ok(f.last().reply_markup.inline_keyboard.flat().some(button=>button.text==='Уже есть подписка'));assert.equal(f.calls.filter(call=>call.method==='sendPhoto').length,photoCount);
 });
 
 test('new Telegram buyer explicitly accepts terms, creates one passwordless identity and gets native Stars invoice',async t=>{
@@ -143,7 +162,7 @@ test('support receives free text only after an explicit help action during nativ
  f.store.db.prepare("INSERT INTO telegram_links(account_id,chat_id,generation,bound_at) VALUES(?,9001,'operator',?)").run(owner.accountId,Date.now());
  const support=new TelegramSupport(f.store,{operatorAccountId:owner.accountId,botId:7001});f.telegram.support=support;
  f.message('/start');await f.drain();f.message('private commerce input');assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_support_tickets').get().n,0);
- f.message('/menu');await f.drain();await f.press('Помощь');f.message('Help with my phone');assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_support_tickets').get().n,1);
+ f.message('/menu');await f.drain();await f.press('💬 Помощь');f.message('Help with my phone');assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_support_tickets').get().n,1);
  assert.equal(f.store.db.prepare('SELECT mode FROM telegram_ui_state WHERE chat_id=?').get(String(CHAT)).mode,'support');
  f.message('/menu');await f.drain();f.message('receipt input');assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_support_tickets').get().n,1);
  while(await deliverSupportOne(support,f.client));
