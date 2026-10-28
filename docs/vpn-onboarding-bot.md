@@ -168,17 +168,12 @@ node tools/build-portfolio-site.mjs
 node --test tools/test-customer-site.mjs tools/test-vpn-search.mjs tools/test-customer-retirement.mjs tools/test-i18n.mjs tools/test-home-theme.mjs tools/test-portfolio.mjs tools/test-vpn-shell.mjs tools/test-vpn-payment-return.mjs tools/test-vpn-purchase-flow.mjs tools/test-vpn-telegram-link.mjs tools/test-vpn-telegram-entry.mjs
 node --test services/vpn/test/*.test.mjs
 node --test tools/test-vpn-recovery.mjs
-node tools/build-vpn-bot-preview.mjs
 ```
 
-The self-contained bot review artifact is `docs/preview/bot/index.html`. It is
-generated from actual handlers and an injected sender with fictional accounts;
-buttons illustrate the actual messages and do not operate the production bot.
-Prepared avatar and metadata are review assets; generating them does not change
-BotFather settings. The protected local fixture has separate paid, unpaid, expired,
-legacy-unlimited, preparing and failed-provisioning roles. External merchant,
-Telegram transport, SMTP and panel boundaries are synthetic. Its credentials and
-raw proof are excluded from source publication and preserved separately.
+Bot presentation is reviewed directly in Telegram. The owner rejected a separate
+HTML bot-preview page as noise. Keep the branded media build tool; do not recreate
+a website or explanatory wrapper around the Telegram dialogue. Synthetic handlers
+and service tests remain useful internal checks; they do not prove real delivery.
 
 Recovery acceptance includes a gated legacy account with a verified synthetic email,
 an account without any recovery method, a confirmed gated Telegram account with
