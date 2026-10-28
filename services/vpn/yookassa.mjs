@@ -1,11 +1,10 @@
 // Notifications are hints, never authoritative payment proofs.
-export class ProviderUnavailableError extends Error {
-  constructor(){super('Проверка платежа временно недоступна. Повтори позже.');this.name='ProviderUnavailableError';}
-}
+import {createYooKassaRequest,ProviderUnavailableError} from './yookassa-request.mjs';
+export {ProviderUnavailableError} from './yookassa-request.mjs';
 export class YooKassaReader {
-  constructor({ shopId, secret, testMode = true, request = fetch }) {
+  constructor({ shopId, secret, testMode = true, request = fetch,localAddress }) {
     if (!shopId || !secret) throw new Error('VPN merchant configuration missing');
-    this.shopId = String(shopId); this.secret = secret; this.testMode = testMode; this.request = request;
+    this.shopId = String(shopId); this.secret = secret; this.testMode = testMode; this.request = createYooKassaRequest({localAddress,request});
   }
   async object(type,id) {
     if (!['payments','refunds'].includes(type) || typeof id !== 'string' || !/^[A-Za-z0-9-]{1,128}$/.test(id))

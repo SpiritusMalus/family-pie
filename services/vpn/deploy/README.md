@@ -104,3 +104,16 @@ Support outbox uses explicit accepted/sent/blocked/uncertain states. Timeout/pro
 ## Pricing candidate — 2026-10-21
 
 For the shown preview, `../approved-plans.json` supersedes the historical amounts above with candidate totals of 300/780/1380/2400 RUB for 30/90/180/365 days, yielding exact 300/260/230/200 RUB monthly equivalents with the existing 1/3/6/12 comparison months. Source changes or static deployment do not activate persisted Cabinet plans. Only after explicit owner approval of the shown result, follow the existing primary-only rollout: take a consistent protected Cabinet database/configuration backup, apply the integrated catalog through `Cabinet.setPlans`, reload the API plan map and verify public plans against the catalog. Existing order amounts and idempotent retries, paid rights and provider identifiers must remain unchanged; only new orders use the new prices. No production activation or paid acceptance is established by this preview.
+
+
+## YooKassa HTTPS source address
+
+`VPN_YOOKASSA_LOCAL_ADDRESS` optionally selects an already assigned literal IPv4 or
+IPv6 address for YooKassa REST requests made by the API and its payment reconciler.
+Unset/empty retains the normal transport. The configured adapter accepts only
+`https://api.yookassa.ru/v3/`, preserves TLS certificate checks and caller deadlines,
+bounds responses to1MiB and rejects redirects. It has no alternate-address/proxy
+fallback and changes no OS routes or client configuration. Validate provider reachability
+and authenticated read-only payment metadata before activation. An invalid value
+fails startup without disclosing the value; public auth/plan responses omit it.
+Keep the root-held shop credential and all existing order/grant/provider data.
