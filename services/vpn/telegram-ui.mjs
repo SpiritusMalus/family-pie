@@ -209,11 +209,11 @@ export class TelegramUI {
    return {method:'sendMessage',data:{...body,text:text+'\nПомощь с оплатой: '+SUPPORT_EMAIL+'.',reply_markup:{inline_keyboard:buttons}}};
   }
   let text;
-  const main=()=>{rows.push([button('💳 Купить / продлить','plans')],[button('🔌 Подключиться','devices'),button('📋 Моя подписка','subscription')],[button('💬 Помощь','help'),button('🔔 Напоминания','settings')]);};
+  const main=()=>{rows.push([{...button('💳 Купить / продлить','plans'),style:'success'}],[button('🔌 Подключиться','devices'),button('📋 Моя подписка','subscription')],[button('💬 Помощь','help'),button('🔔 Напоминания','settings')]);};
   const status=()=>!identity?'Подключи существующую подписку или создай аккаунт.':sub?.deleted?'Подписка отключена. Напиши в поддержку.':sub?.allow_unlimited&&sub.unlimited&&sub.enabled?'Бессрочная подписка · без ограничений по устройствам.':sub?.payment_confirmed&&sub.sync_state!=='synced'?'Оплата подтверждена. Подключение готовится. Повторно платить не нужно.':sub?.active?'Подписка активна до '+date(sub.expires_at)+'.\nБез ограничений по устройствам.':sub?.paid_expires_at?'Подписка закончилась '+date(sub.paid_expires_at)+'.':'Активной подписки пока нет.';
   if(job.view==='welcome') {
    text='🌐 <b>Family VPN</b>\n\nИнтернет для тебя и твоих близких.\n\n✨ <b>Что внутри</b>\n<blockquote>Телефон, компьютер и Smart TV\nОдна подписка без лимита устройств\nМаршруты через Нидерланды и Германию\nПодключение по личной ссылке или QR-коду\nПоддержка прямо в Telegram\nНапоминания об окончании подписки</blockquote>\n\n'+(identity?status()+'\n\n':'')+'<i>Выбери действие ниже 👇</i>';
-   main();return {method:'sendPhoto',data:{chat_id:chatId,photo:readFileSync(new URL('./assets/bot-welcome.png',import.meta.url)),caption:text,parse_mode:'HTML',reply_markup:{inline_keyboard:rows}}};
+   main();return {method:'sendAnimation',data:{chat_id:chatId,animation:readFileSync(new URL('./assets/bot-welcome.mp4',import.meta.url)),duration:4,width:1280,height:640,caption:text,parse_mode:'HTML',reply_markup:{inline_keyboard:rows}}};
   }else if(!identity&&['subscription','devices','plans','settings','cabinet','unlink','manual','device','qr','invoice','purchase_terms'].includes(job.view)) {
    text='<b>Family VPN</b>\n\n'+status();rows.push([button('Уже есть подписка','binding')],[button('Создать аккаунт','create')],[button('Помощь','help')]);
   }else if(job.view==='binding') {

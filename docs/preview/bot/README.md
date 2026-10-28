@@ -14,20 +14,20 @@ prices are deliberately absent because this fixture disables payments; approved 
 The support email is the existing published `support@family-pie.ru` contact. Copying
 it does not send a message; inbox delivery and monitoring are not claimed by this preview.
 
-The preview renders native inline controls in a neutral theme. Actual Telegram
-clients control their own button appearance. Sample buttons navigate the captured
+The preview renders native inline controls in a green preview theme. The main action carries
+Telegram’s success (green) style; exact client appearance depends on its theme. Sample buttons navigate the captured
 states; external install/import actions show their destination without opening it.
 This is not a screenshot or acceptance result from Telegram or a physical device.
 
 Files prepared for the owner's publication review:
 
 - `avatar.svg`: the existing Family Spy circle/three-line mark, adapted to a square
-  charcoal/coral avatar with space for Telegram's circular crop.
+  forest/mint avatar with space for Telegram's circular crop.
 - `avatar.png`: deterministic 1024×1024 raster of that vector. Embedded PNG provenance
   identifies the original repository mark; it is not an AI-generated illustration.
 - `metadata.json`: display name, short/full description and the real command list,
   captured through `configureBotMenu` with a local sender, including `/recover` and `/email`.
-  Its status is `prepared-not-applied`; no BotFather or bot metadata API was used.
+  Its status is `synthetic-preview`; generating this file does not read or alter live metadata.
 - `transcript.json`: sanitized evidence and SHA-256 hashes of the handler sources.
 
 Rebuild from the repository root after installing the existing service dependencies:
@@ -44,18 +44,40 @@ payloads stay mode0600 under `.context/recovery/preview/bot/` in the protected l
 context and are not part of this artifact.
 
 The visual extension retains the incumbent Family Spy mark, Golos Text and existing
-black/coral identity. Shared `PRODUCT.md`, `DESIGN.md`, site styles and live bot
+bot-specific forest/mint direction. Shared `PRODUCT.md`, `DESIGN.md`, site styles and live bot
 settings are unchanged by this preview. Real desktop/mobile rendering, owner visual
 approval, physical app import and Telegram payment acceptance are separate checks.
 
 ## Reference-led welcome — 2026-10-27
 
 The owner selected a banner + capabilities + action buttons after inspecting Nur VPN.
-Plain Start uses a 1280×640 banner with the incumbent circle/three-spoke mark and
+Plain Start uses a 1280×640 animated banner with the incumbent circle/three-spoke mark and
 local Golos Text, followed by a compact capabilities list. Regular menu and security
 deep links keep their existing behavior. The banner is bundled in
-`services/vpn/assets/bot-welcome.png`; its editable geometric source is adjacent SVG.
+`services/vpn/assets/bot-welcome.mp4`; its reduced-motion poster and editable geometric source are adjacent PNG/SVG.
 No new trial, referral, location catalogue or speed guarantee is claimed.
 The renderer source is the authority for text and callback actions.
 Pre-Start metadata must be applied and read back separately during an authorized
 bot release; editing metadata.json alone never changes Telegram.
+
+## Green motion — 2026-10-28
+
+The owner selected green and animation for the bot. The four-second silent H.264
+loop keeps the name and mark fixed while a light trace follows the circle.
+The primary purchase/renew action uses the native `success` style without changing
+its callback or commerce behavior. The avatar uses the same green mark.
+
+The preview pauses video outside the viewport and in hidden tabs. A reduced-motion
+preference uses the static poster. Telegram autoplay follows the user’s client
+settings. The MP4 has no audio and fits in about42KB.
+
+Rebuild the source assets with Node, `@napi-rs/canvas` and FFmpeg installed:
+
+```sh
+BOT_MEDIA_MODULES=/path/to/node_modules BOT_MEDIA_FFMPEG=/path/to/ffmpeg node tools/build-vpn-bot-motion-assets.mjs
+node tools/build-vpn-bot-preview.mjs
+```
+
+These optional build tools are not runtime dependencies. No website styles or
+product pages are changed. Live bot metadata/avatar publication and readback are
+recorded separately in the VPN operational journal.
