@@ -1,7 +1,7 @@
 {
   "schema": "family-vpn-bot-preview/v1",
   "syntheticOnly": true,
-  "generatedAt": "2026-10-28T05:28:04.354Z",
+  "generatedAt": "2026-10-28T05:29:31.599Z",
   "fixtureDate": "2026-10-27T12:00:00.000Z",
   "evidence": "Messages captured from TelegramStore.update → TelegramUI → injected local sender. No Telegram API, provider, real profile or device import.",
   "redaction": "Opaque callback, internal account IDs and handoff/reset tokens excluded. Visible text and button labels are exact handler output. Displayed logins and subscription values are synthetic.",
@@ -11,9 +11,9 @@
     "starPrices": []
   },
   "sources": {
-    "services/vpn/telegram-ui.mjs": "3d6524682510ed769b9f95039c4434f980438eb2c384a374db0302c899a68087",
-    "services/vpn/telegram.mjs": "4cf2777c53bd089230277a4f720841a5c9630c2d9ea5de541ff845fb3bb220d0",
-    "services/vpn/telegram-commerce.mjs": "a0b4eda10fbe85bc98749bde3551b845913faf7859baba73b992eca721c7ef13",
+    "services/vpn/telegram-ui.mjs": "ea911e7f28938e9f9a4425b69b9da0098d626e7809d4613058e078585056a902",
+    "services/vpn/telegram.mjs": "0e35a53b5fe380f2ff435651807e02028255541d51f59cb176948b07b0125bc2",
+    "services/vpn/telegram-commerce.mjs": "ea9c372d32120561ac2b337ac7a87aaeee04e8c18cba4b0b333c9c5679fb9a7a",
     "services/vpn/recovery.mjs": "1803700f25456b3cc3199115a669bb32e0a7c48d7d0eb2b4a2a1018a71dbdee6",
     "services/vpn/telegram-support.mjs": "955af1a3e824ad4565d1ad334002d1d4bff0548781b8fcf0f2d3725bdbe8c40a",
     "services/vpn/support-contact.mjs": "24a553bade249b879f51f76ff832fd46423aca8c373e49a4f7d9a9e455a3790d"
