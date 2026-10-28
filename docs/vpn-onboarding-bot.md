@@ -172,8 +172,12 @@ node --test tools/test-vpn-recovery.mjs
 
 Bot presentation is reviewed directly in Telegram. The owner rejected a separate
 HTML bot-preview page as noise. Keep the branded media build tool; do not recreate
-a website or explanatory wrapper around the Telegram dialogue. Synthetic handlers
-and service tests remain useful internal checks; they do not prove real delivery.
+a website or explanatory wrapper around the Telegram dialogue. Keep the animation,
+factual capabilities, current status and action buttons. Omit duplicate branding,
+generic slogans and an obvious action prompt. The support email stays as text;
+no email-copy button is added. Personal VPN-link copying remains available.
+Synthetic handlers and service tests remain useful internal checks; they do not
+prove real delivery.
 
 Recovery acceptance includes a gated legacy account with a verified synthetic email,
 an account without any recovery method, a confirmed gated Telegram account with

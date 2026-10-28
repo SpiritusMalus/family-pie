@@ -1,7 +1,7 @@
 import {createHash, randomBytes, randomUUID} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import QRCode from 'qrcode';
-import {SUPPORT_EMAIL,emailSupportText,supportEmailCopyButton} from './support-contact.mjs';
+import {SUPPORT_EMAIL,emailSupportText} from './support-contact.mjs';
 import {describeStarsPlans} from './telegram-pricing.mjs';
 
 const MINUTE = 60_000, DAY = 86_400_000;
@@ -205,14 +205,13 @@ export class TelegramUI {
   if(job.view==='financial_receipt') {
    const text=payload.invalid?'Не удалось подтвердить платёж. Доступ не изменён.':payload.recovery?'Family VPN. Подписка и способ входа сохранены.':payload.refunded?'Возврат подтверждён. Срок подписки обновлён.':'Оплата подтверждена. Подключение готовится автоматически. Повторно платить не нужно.';
    const buttons=identity?[[{text:'Открыть мой кабинет',url:this.commerce.handoff(chatId,{purpose:'login'})}]]:[];
-   buttons.push([supportEmailCopyButton()]);
-   return {method:'sendMessage',data:{...body,text:text+'\nПомощь с оплатой: '+SUPPORT_EMAIL+'.',reply_markup:{inline_keyboard:buttons}}};
+   return {method:'sendMessage',data:{...body,text:text+'\nПомощь с оплатой: '+SUPPORT_EMAIL+'.',...(buttons.length?{reply_markup:{inline_keyboard:buttons}}:{})}};
   }
   let text;
   const main=()=>{rows.push([{...button('💳 Купить / продлить','plans'),style:'success'}],[button('🔌 Подключиться','devices'),button('📋 Моя подписка','subscription')],[button('💬 Помощь','help'),button('🔔 Напоминания','settings')]);};
   const status=()=>!identity?'Подключи существующую подписку или создай аккаунт.':sub?.deleted?'Подписка отключена. Напиши в поддержку.':sub?.allow_unlimited&&sub.unlimited&&sub.enabled?'Бессрочная подписка · без ограничений по устройствам.':sub?.payment_confirmed&&sub.sync_state!=='synced'?'Оплата подтверждена. Подключение готовится. Повторно платить не нужно.':sub?.active?'Подписка активна до '+date(sub.expires_at)+'.\nБез ограничений по устройствам.':sub?.paid_expires_at?'Подписка закончилась '+date(sub.paid_expires_at)+'.':'Активной подписки пока нет.';
   if(job.view==='welcome') {
-   text='🌐 <b>Family VPN</b>\n\nИнтернет для тебя и твоих близких.\n\n✨ <b>Что внутри</b>\n<blockquote>Телефон, компьютер и Smart TV\nОдна подписка без лимита устройств\nМаршруты через Нидерланды и Германию\nПодключение по личной ссылке или QR-коду\nПоддержка прямо в Telegram\nНапоминания об окончании подписки</blockquote>\n\n'+(identity?status()+'\n\n':'')+'<i>Выбери действие ниже 👇</i>';
+   text='<blockquote>Телефон, компьютер и Smart TV\nОдна подписка без лимита устройств\nМаршруты через Нидерланды и Германию\nПодключение по личной ссылке или QR-коду\nПоддержка прямо в Telegram\nНапоминания об окончании подписки</blockquote>'+(identity?'\n\n'+status():'');
    main();return {method:'sendAnimation',data:{chat_id:chatId,animation:readFileSync(new URL('./assets/bot-welcome.mp4',import.meta.url)),duration:4,width:1280,height:640,caption:text,parse_mode:'HTML',reply_markup:{inline_keyboard:rows}}};
   }else if(!identity&&['subscription','devices','plans','settings','cabinet','unlink','manual','device','qr','invoice','purchase_terms'].includes(job.view)) {
    text='<b>Family VPN</b>\n\n'+status();rows.push([button('Уже есть подписка','binding')],[button('Создать аккаунт','create')],[button('Помощь','help')]);
@@ -275,10 +274,10 @@ export class TelegramUI {
   }else if(job.view==='cabinet') {
    text='Кабинет Family VPN. Ссылка для входа одноразовая. Не пересылай её.';rows.push([{text:'Открыть мой кабинет',url:this.commerce.handoff(chatId,{purpose:'login'})}],home());
   }else if(job.view==='help') {
-   text=(this.telegram.support?.operator()?'Напиши здесь или по email. Ответ на сообщение в Telegram придёт в этот чат. Можно приложить фото или скриншот.\n/cancel — закончить обращение.':'Поддержка в Telegram сейчас недоступна.')+'\n\n'+emailSupportText({html:true});rows.push([supportEmailCopyButton()],home());
+   text=(this.telegram.support?.operator()?'Напиши здесь или по email. Ответ на сообщение в Telegram придёт в этот чат. Можно приложить фото или скриншот.\n/cancel — закончить обращение.':'Поддержка в Telegram сейчас недоступна.')+'\n\n'+emailSupportText({html:true});rows.push(home());
   }else if(job.view==='unlinked') {text='Telegram отвязан. Подписка сохранена. Вернуться можно через кабинет.';rows.push(home());}
-  else if(job.view==='payment_invalid') {text='Не удалось подтвердить платёж. Доступ не изменён. Напиши /paysupport или на '+SUPPORT_EMAIL+'.';rows.push([supportEmailCopyButton()],home());}
-  else if(job.view==='action_unavailable') {text='Действие сейчас недоступно. Открой меню и проверь подписку. Если нужна помощь, напиши здесь или на '+SUPPORT_EMAIL+'.';rows.push([supportEmailCopyButton()],home());}
+  else if(job.view==='payment_invalid') {text='Не удалось подтвердить платёж. Доступ не изменён. Напиши /paysupport или на '+SUPPORT_EMAIL+'.';rows.push(home());}
+  else if(job.view==='action_unavailable') {text='Действие сейчас недоступно. Открой меню и проверь подписку. Если нужна помощь, напиши здесь или на '+SUPPORT_EMAIL+'.';rows.push(home());}
   else {text='Выбери действие кнопками. Чтобы написать человеку, открой «Помощь».';main();}
   return {method:'sendMessage',data:{...body,text,reply_markup:{inline_keyboard:rows},...(job.view==='manual'?{protect_content:true}:{})}};
  }

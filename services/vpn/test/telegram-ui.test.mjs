@@ -52,6 +52,9 @@ test('plain Start welcomes without creating access while menu and deep links ret
  assert.equal(welcome.data.duration,4);assert.equal(welcome.data.width,1280);assert.equal(welcome.data.height,640);
  assert.equal(welcome.data.reply_markup.inline_keyboard[0][0].style,'success');
  assert.ok(welcome.data.caption.length<=1024);assert.equal(welcome.data.parse_mode,'HTML');
+ assert.deepEqual(welcome.data.caption.match(/^<blockquote>([\s\S]*)<\/blockquote>$/)[1].split('\n'),['Телефон, компьютер и Smart TV','Одна подписка без лимита устройств','Маршруты через Нидерланды и Германию','Подключение по личной ссылке или QR-коду','Поддержка прямо в Telegram','Напоминания об окончании подписки']);
+ assert.doesNotMatch(welcome.data.caption,/Family VPN|Что внутри|Интернет для тебя|Выбери действие/);
+ assert.deepEqual(welcome.data.reply_markup.inline_keyboard.flat().map(button=>button.text),['💳 Купить / продлить','🔌 Подключиться','📋 Моя подписка','💬 Помощь','🔔 Напоминания']);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM orders').get().n,0);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
  await f.press('🔌 Подключиться');assert.equal(f.calls.at(-1).method,'sendMessage');
@@ -106,7 +109,7 @@ test('native binding Start is only a candidate until the original website sessio
 });
 
 test('existing paid buyer gets canonical URL, safe fragment handoff, manual copy and private second-device QR without cabinet login',async t=>{
- const f=await fixture(t,{paid:true});f.message('/connect');await f.drain();await f.press('iPhone / iPad');
+ const f=await fixture(t,{paid:true});f.message('/start');await f.drain();assert.match(f.last().text,/<\/blockquote>\n\nПодписка активна до/);f.message('/connect');await f.drain();await f.press('iPhone / iPad');
  assert.match(f.last().text,/Логин от сайта в приложении не нужен/);
  const handoff=f.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='Добавить подписку в приложение').url;
  const url=new URL(handoff);assert.equal(url.pathname,'/vpn/connect/');assert.equal(url.search,'');assert.match(url.hash,/^#token=[A-Za-z0-9_-]{43}&device=ios$/);
@@ -142,7 +145,7 @@ test('/stop mutes reminders without deleting access; Telegram-only identity cann
  assert.match(f.last().text,/вход через Telegram сохранены/);await f.press('Отвязать Telegram');assert.match(f.last().text,/единственный способ/);
  assert.ok(!f.last().reply_markup.inline_keyboard.flat().some(x=>x.text==='Да, отвязать Telegram'));
  f.update({my_chat_member:{chat:{type:'private',id:CHAT},new_chat_member:{status:'kicked'}}});assert.equal(f.commerce.accountForChat(CHAT).account_id,identity.account_id);
- f.message('/start');await f.drain();assert.match(f.last().text,/Family VPN/);assert.equal(f.store.db.prepare('SELECT blocked FROM telegram_ui_state WHERE chat_id=?').get(String(CHAT)).blocked,0);
+ f.message('/start');await f.drain();assert.equal(f.calls.at(-1).method,'sendAnimation');assert.match(f.last().text,/<\/blockquote>\n\nАктивной подписки пока нет/);assert.equal(f.store.db.prepare('SELECT blocked FROM telegram_ui_state WHERE chat_id=?').get(String(CHAT)).blocked,0);
 });
 
 test('explicit unlink with another auth method revokes bot callbacks but preserves paid subscription',async t=>{
@@ -209,8 +212,10 @@ test('late Stars payment and refund remain durable with native navigation and sa
  f.update({message:{chat:{type:'private',id:CHAT},from:{id:CHAT},successful_payment:payment}});await f.drain();
  assert.equal(f.store.subscription(identity.account_id).active,true);assert.match(f.last().text,/Оплата подтверждена/);
  assert.ok(!f.last().reply_markup.inline_keyboard.flat().some(x=>x.callback_data));
+ assert.match(f.last().text,/support@family-pie\.ru/);assert.ok(!f.last().reply_markup.inline_keyboard.flat().some(button=>button.copy_text));
  const before=f.telegram.offset();f.update({message:{chat:{type:'private',id:CHAT},from:{id:CHAT},refunded_payment:payment}});await f.drain();
  assert.ok(f.telegram.offset()>before);assert.equal(f.store.subscription(identity.account_id).active,false);assert.equal(f.store.db.prepare('SELECT reversed FROM grants').get().reversed,1);assert.match(f.last().text,/Возврат подтверждён/);
+ assert.match(f.last().text,/support@family-pie\.ru/);assert.ok(!f.last().reply_markup.inline_keyboard.flat().some(button=>button.copy_text));
  f.message('/stop');await f.drain();assert.equal(f.commerce.accountForChat(CHAT).account_id,identity.account_id);
  f.update({my_chat_member:{chat:{type:'private',id:CHAT},new_chat_member:{status:'kicked'}}});assert.equal(f.commerce.accountForChat(CHAT).account_id,identity.account_id);
 });
@@ -268,9 +273,12 @@ test('uncertain animation upload is held without retrying or sending a fallback 
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
 });
 
-test('native help offers a copyable published email even without a bound account or Telegram operator',async t=>{
+test('native help and financial fallbacks keep published email as text without an email-copy button',async t=>{
  const f=await fixture(t,{stars:false});const before=f.store.db.prepare('SELECT count(*) n FROM identities').get().n;
  f.message('/help');await f.drain();const message=f.last();assert.match(message.text,/support@family-pie\.ru/);assert.match(message.text,/Укажи устройство/);assert.match(message.text,/Не отправляй пароли/);
- const copy=message.reply_markup.inline_keyboard.flat().find(button=>button.copy_text);assert.equal(copy.copy_text.text,'support@family-pie.ru');assert.ok(!message.reply_markup.inline_keyboard.flat().some(button=>button.url?.startsWith('mailto:')));
+ assert.deepEqual(message.reply_markup.inline_keyboard.flat().map(button=>button.text),['← В меню']);assert.ok(!message.reply_markup.inline_keyboard.flat().some(button=>button.copy_text||button.url?.startsWith('mailto:')));
+ for(const view of ['payment_invalid','action_unavailable','financial_receipt']){
+  f.ui.queue(CHAT,'email-text-only:'+view,view);await f.drain();const reply=f.last();assert.match(reply.text,/support@family-pie\.ru/);assert.ok(!(reply.reply_markup?.inline_keyboard||[]).flat().some(button=>button.copy_text||button.text==='Скопировать email'));
+ }
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,before);assert.equal(f.commerce.accountForChat(CHAT),null);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
 });

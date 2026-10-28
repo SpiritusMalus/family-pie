@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto';
-import {SUPPORT_EMAIL,emailSupportText,supportEmailCopyButton} from './support-contact.mjs';
+import {SUPPORT_EMAIL,emailSupportText} from './support-contact.mjs';
 
 const DAY=86_400_000, MINUTE=60_000;
 const positive=x=>Number.isSafeInteger(x)&&x>0;
@@ -177,7 +177,6 @@ export async function deliverSupportOne(support,client) {
  const job=support.next();if(!job||!support.claim(job))return false;
  try {
   const data=job.kind==='copy'?{chat_id:job.chat_id,from_chat_id:job.source_chat_id,message_id:job.source_message_id}:{chat_id:job.chat_id,text:job.text,link_preview_options:{is_disabled:true}};
-  if(job.kind!=='copy'&&job.direction==='notice_customer'&&job.text?.includes(SUPPORT_EMAIL))data.reply_markup={inline_keyboard:[[supportEmailCopyButton()]]};
   const result=await client.call(job.kind==='copy'?'copyMessage':'sendMessage',data);
   support.sent(job,result?.message_id);
  }catch(error){support.failed(job,error);}

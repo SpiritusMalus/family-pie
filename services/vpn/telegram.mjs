@@ -1,5 +1,5 @@
 import {randomBytes,createHash,randomUUID} from 'node:crypto';
-import {emailSupportText,supportEmailCopyButton} from './support-contact.mjs';
+import {emailSupportText} from './support-contact.mjs';
 const DAY=86400_000,hash=x=>createHash('sha256').update(x).digest('hex');
 const CABINET='https://family-spy.ru/vpn/cabinet/';
 const BIND_HELP='Чтобы увидеть свою подписку, привяжи Telegram в кабинете: Настройки → Telegram → Подключить. После запуска бота вернись в кабинет и подтверди привязку.\n'+CABINET+'#settings';
@@ -52,7 +52,7 @@ export class TelegramStore {
  .run(randomUUID(),'recovery:'+updateId,chatId,'Восстановление доступа Family VPN',this.clock(),this.clock());}
  replyEmail(chatId,updateId){this.db.prepare("INSERT OR IGNORE INTO telegram_outbox(id,dedupe,chat_id,stage,text,ready_at,created_at) VALUES(?,?,?,'support_email',?,?,?)")
  .run(randomUUID(),'support-email:'+updateId,chatId,'Email поддержки Family VPN',this.clock(),this.clock());}
- emailReply(){return {text:emailSupportText(),reply_markup:{inline_keyboard:[[supportEmailCopyButton()]]}};}
+ emailReply(){return {text:emailSupportText()};}
  recoveryReply(chatId){
   const support={text:'Помощь без входа',url:'https://t.me/family_pie_vpn_bot?start=support_vpn'};
   const commerce=this.commerce||this.ui?.commerce;
@@ -61,8 +61,8 @@ export class TelegramStore {
    const handoff=commerce.recoveryHandoff(chatId),url=new URL(handoff.url);
    if(url.protocol!=='https:'||url.username||url.password||url.pathname!=='/vpn/cabinet/auth/'||!/^#recovery=[A-Za-z0-9_-]{43}$/.test(url.hash)||commerce.origin&&url.origin!==commerce.origin)throw new Error('Unexpected recovery handoff');
    const account=typeof handoff.login==='string'&&handoff.login.length<=80?' для аккаунта '+handoff.login:'';
-   return {text:'Восстановление пароля'+account+'.\nОдноразовая ссылка действует 5 минут. Она откроет смену пароля, без входа по старому паролю. Не пересылай её другим людям.\n\n'+emailSupportText(),reply_markup:{inline_keyboard:[[{text:'Восстановить пароль',url:url.href}],[support],[supportEmailCopyButton()]]}};
-  }catch(error){return {text:(['INVALID_RECOVERY','INVALID_PAYMENT'].includes(error.code)?RECOVERY_HELP:'Не удалось подготовить ссылку восстановления. Попробуй /recover ещё раз или напиши в поддержку. Подписка и пароль не изменились.')+'\n\n'+emailSupportText(),reply_markup:{inline_keyboard:[[support],[supportEmailCopyButton()]]}};}
+   return {text:'Восстановление пароля'+account+'.\nОдноразовая ссылка действует 5 минут. Она откроет смену пароля, без входа по старому паролю. Не пересылай её другим людям.\n\n'+emailSupportText(),reply_markup:{inline_keyboard:[[{text:'Восстановить пароль',url:url.href}],[support]]}};
+  }catch(error){return {text:(['INVALID_RECOVERY','INVALID_PAYMENT'].includes(error.code)?RECOVERY_HELP:'Не удалось подготовить ссылку восстановления. Попробуй /recover ещё раз или напиши в поддержку. Подписка и пароль не изменились.')+'\n\n'+emailSupportText(),reply_markup:{inline_keyboard:[[support]]}};}
  }
  linkedSubscription(chatId){return this.db.prepare('SELECT s.*,i.enabled AS account_enabled,i.must_change,l.enabled AS notifications FROM telegram_links l JOIN managed_subscriptions s USING(account_id) JOIN identities i USING(account_id) WHERE l.chat_id=?').get(chatId);}
  subscriptionStatus(row){
