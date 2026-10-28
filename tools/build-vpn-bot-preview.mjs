@@ -1,7 +1,6 @@
 // Local, synthetic preview. This program never constructs a Telegram client or makes network calls.
 import {readFileSync,writeFileSync,mkdirSync,chmodSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {createRequire} from 'node:module';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
@@ -21,33 +20,11 @@ chmodSync(privateDir,0o700);
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const sourceMark='<circle cx="16" cy="16" r="14"/><path d="M16 2v28M3.9 9l24.2 14M3.9 23 28.1 9"/>';
 assert.ok(readFileSync(root+'/customer-site/index.html','utf8').includes(sourceMark),'Existing Family Spy mark changed; review avatar adaptation');
-const avatar=`<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-<title id="title">Family VPN</title><desc id="desc">Existing Family Spy six-slice mark, coral on charcoal. Prepared bot avatar; not uploaded.</desc>
-<rect width="512" height="512" fill="#101216"/>
-<g transform="translate(80 80) scale(11)" fill="none" stroke="#ff9d88" stroke-width="1.3">${sourceMark}</g>
-</svg>\n`;
+const avatar=readFileSync(root+'/services/vpn/assets/bot-avatar.svg','utf8');
 writeFileSync(out+'/avatar.svg',avatar);
-// Deterministic rasterization of the same circle/three line primitives, with four subpixel samples.
-const require=createRequire(import.meta.url),{PNG}=require('../services/vpn/node_modules/pngjs');
-const image=new PNG({width:1024,height:1024}),scale=2,stroke=14.3*scale;
-const center=256*scale,radius=154*scale,segments=[[256,102,256,410],[122.9,179,389.1,333],[122.9,333,389.1,179]].map(row=>row.map(v=>v*scale));
-function lineDistance(x,y,[ax,ay,bx,by]){const dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy)));return Math.hypot(x-ax-t*dx,y-ay-t*dy);}
-for(let y=0;y<1024;y++)for(let x=0;x<1024;x++){
- let inside=0;for(const ox of [.25,.75])for(const oy of [.25,.75]){
-  const px=x+ox,py=y+oy,d=Math.abs(Math.hypot(px-center,py-center)-radius);
-  if(Math.min(d,...segments.map(s=>lineDistance(px,py,s)))<=stroke/2)inside++;
- }
- const coverage=inside/4,index=(y*1024+x)*4;
- for(const [channel,background,foreground] of [[0,16,255],[1,18,157],[2,22,136]])image.data[index+channel]=Math.round(background+(foreground-background)*coverage);
- image.data[index+3]=255;
-}
-const raster=PNG.sync.write(image);
-const origin='Origin: deterministic raster of docs/preview/bot/avatar.svg, directly adapting the existing Family Spy mark in customer-site/index.html. Same circle and three line paths; charcoal #101216 and coral #ff9d88. Prepared for review; no upload.';
-const text=Buffer.from('impeccable:prompt\0'+origin),type=Buffer.from('tEXt'),chunk=Buffer.alloc(text.length+12);
-chunk.writeUInt32BE(text.length,0);type.copy(chunk,4);text.copy(chunk,8);
-let crc=0xffffffff;for(const byte of Buffer.concat([type,text])){crc^=byte;for(let bit=0;bit<8;bit++)crc=crc&1?0xedb88320^(crc>>>1):crc>>>1;}
-chunk.writeUInt32BE((crc^0xffffffff)>>>0,chunk.length-4);
-writeFileSync(out+'/avatar.png',Buffer.concat([raster.subarray(0,-12),chunk,raster.subarray(-12)]));
+writeFileSync(out+'/avatar.png',readFileSync(root+'/services/vpn/assets/bot-avatar.png'));
+const avatarBytes=readFileSync(out+'/avatar.png');
+const avatarSize={width:avatarBytes.readUInt32BE(16),height:avatarBytes.readUInt32BE(20)};
 
 const now=Date.UTC(2026,9,27,12),clock=()=>now;
 const plans=JSON.parse(readFileSync(root+'/services/vpn/approved-plans.json','utf8'));
@@ -58,14 +35,14 @@ const raw=[],screens=[];let sequence=0;
 const sender={call:async(method,data)=>{raw.push({method,data:structuredClone(data)});return {message_id:raw.length};}};
 const message=(chatId,text)=>telegram.update({update_id:++sequence,message:{message_id:sequence,chat:{type:'private',id:chatId},from:{id:chatId},text}});
 const drain=async()=>{let guard=100;while(await deliverUiOne(ui,sender)||await deliverOne(telegram,sender))assert.ok(--guard>0);};
-const last=()=>raw.filter(row=>['sendMessage','sendPhoto'].includes(row.method)).at(-1);
+const last=()=>raw.filter(row=>['sendMessage','sendPhoto','sendAnimation'].includes(row.method)).at(-1);
 const plainLabel=label=>label.replace(/^[^\p{L}\p{N}]+/u,'');
 async function press(chatId,label){
  const button=last().data.reply_markup.inline_keyboard.flat().find(b=>plainLabel(b.text)===plainLabel(label));assert.ok(button?.callback_data,'Missing real button '+label);
  telegram.update({update_id:++sequence,callback_query:{id:'synthetic-preview-'+sequence,from:{id:chatId},message:{message_id:1,chat:{type:'private',id:chatId}},data:button.callback_data}});await drain();
 }
 function sanitizedButton(button){
- const result={text:button.text};
+ const result={text:button.text,...(button.style?{style:button.style}:{})};
  if(button.callback_data){
   const row=store.db.prepare('SELECT action,data FROM telegram_ui_callbacks WHERE token_hash=?').get(hash(button.callback_data.slice(2)));
   assert.ok(row);result.kind='callback';result.action=row.action;result.arguments=JSON.parse(row.data);
@@ -74,8 +51,8 @@ function sanitizedButton(button){
  return result;
 }
 function snapshot(id,title,trigger){
- const row=last();assert.ok(['sendMessage','sendPhoto'].includes(row.method));
- const photo=row.method==='sendPhoto'?{photo:'data:image/png;base64,'+Buffer.from(row.data.photo).toString('base64')}:{};
+ const row=last();assert.ok(['sendMessage','sendPhoto','sendAnimation'].includes(row.method));
+ const photo=row.method==='sendPhoto'?{photo:'data:image/png;base64,'+Buffer.from(row.data.photo).toString('base64')}:row.method==='sendAnimation'?{animation:'data:video/mp4;base64,'+Buffer.from(row.data.animation).toString('base64'),poster:'data:image/png;base64,'+readFileSync(root+'/services/vpn/assets/bot-welcome.png').toString('base64')}:{};
  screens.push({id,title,trigger,message:{method:row.method,text:row.data.text??row.data.caption,...photo,parseMode:row.data.parse_mode||null,buttons:row.data.reply_markup?.inline_keyboard?.map(line=>line.map(sanitizedButton))||[]}});
 }
 const guest=12001,paidChat=12002;
@@ -104,7 +81,7 @@ telegram.support=new TelegramSupport(store,{operatorAccountId:operator.accountId
 message(paidChat,'/menu');await drain();await press(paidChat,'Помощь');snapshot('help','Помощь в чате','Помощь');
 message(paidChat,'/recover');await drain();snapshot('recovery','Восстановление пароля','/recover');
 message(paidChat,'/email');await drain();snapshot('email','Email поддержки','/email');
-const sourceFiles=['services/vpn/telegram-ui.mjs','services/vpn/telegram.mjs','services/vpn/telegram-commerce.mjs','services/vpn/recovery.mjs','services/vpn/telegram-support.mjs','services/vpn/support-contact.mjs'];
+const sourceFiles=['services/vpn/telegram-ui.mjs','services/vpn/telegram.mjs','services/vpn/telegram-commerce.mjs','services/vpn/recovery.mjs','services/vpn/telegram-support.mjs','services/vpn/support-contact.mjs','services/vpn/assets/bot-welcome.mp4','services/vpn/assets/bot-welcome.png','services/vpn/assets/bot-avatar.png'];
 const transcript={schema:'family-vpn-bot-preview/v1',syntheticOnly:true,generatedAt:new Date().toISOString(),fixtureDate:new Date(now).toISOString(),
  evidence:'Messages captured from TelegramStore.update → TelegramUI → injected local sender. No Telegram API, provider, real profile or device import.',
  redaction:'Opaque callback, internal account IDs and handoff/reset tokens excluded. Visible text and button labels are exact handler output. Displayed logins and subscription values are synthetic.',
@@ -115,9 +92,9 @@ assert.ok(!JSON.stringify(transcript).includes('u_')&&!JSON.stringify(transcript
 const configured=[];await configureBotMenu({call:async(method,data)=>configured.push({method,data})},{commands:nativeBotCommands});
 const commands=configured.find(row=>row.method==='setMyCommands').data.commands;
 assert.ok(commands.some(row=>row.command==='recover'));
-const metadata={status:'prepared-not-applied',name:botBranding.name,shortDescription:botBranding.shortDescription,description:botBranding.description,language:'ru',supportEmail:SUPPORT_EMAIL,
- avatar:{source:'avatar.svg',render:'avatar.png',width:1024,height:1024,sha256:hash(readFileSync(out+'/avatar.png')),provenance:'Adapted directly from customer-site/index.html .brand svg; same circle and three spokes. Charcoal #101216 / coral #ff9d88.'},
- commands,changesAppliedToTelegram:false,publication:'Owner approval and authorized bot administration required; no BotFather or API calls performed.'};
+const metadata={status:'synthetic-preview',name:botBranding.name,shortDescription:botBranding.shortDescription,description:botBranding.description,language:'ru',supportEmail:SUPPORT_EMAIL,
+ avatar:{source:'avatar.svg',render:'avatar.png',...avatarSize,sha256:hash(readFileSync(out+'/avatar.png')),provenance:'Owner-selected green adaptation of the incumbent Family Spy circle and three spokes. Forest #081410 / mint #63e6a2. Native vector/canvas artwork.'},
+ commands,changesAppliedToTelegram:false,publication:'This generator does not read or alter live Telegram settings; release readback is separate operational evidence.'};
 assert.ok(metadata.name.length<=64&&metadata.shortDescription.length<=120&&metadata.description.length<=512);
 writeFileSync(out+'/metadata.json',JSON.stringify(metadata,null,2)+'\n');
 // Build a self-contained artifact: current local typefaces, avatar and sanitized real transcript are embedded.

@@ -24,7 +24,7 @@ async function fixture(t,{path=':memory:',native=true,stars=true,paid=false}={})
  const update=body=>{const update={update_id:++sequence,...body};telegram.update(update);return update;};
  const message=(text,id=CHAT)=>update({message:{message_id:sequence+1,chat:{type:'private',id},from:{id},text}});
  const drain=async()=>{let limit=100;while(await deliverUiOne(ui,client))assert.ok(--limit>0);};
- const last=()=>{const data=calls.filter(x=>['sendMessage','sendPhoto'].includes(x.method)).at(-1)?.data;return data&&{...data,text:data.text??data.caption};};
+ const last=()=>{const data=calls.filter(x=>['sendMessage','sendPhoto','sendAnimation'].includes(x.method)).at(-1)?.data;return data&&{...data,text:data.text??data.caption};};
  const callback=(data,{chatId=CHAT,fromId=chatId,type='private'}={})=>update({callback_query:{id:'query-'+(sequence+1),from:{id:fromId},message:{message_id:1,chat:{type,id:chatId}},data}});
  const press=async(label,options)=>{const button=last()?.reply_markup?.inline_keyboard.flat().find(x=>x.text===label);assert.ok(button?.callback_data,'Missing callback '+label);callback(button.callback_data,options);await drain();};
  let account;
@@ -48,7 +48,9 @@ test('native UI defaults off and preserves legacy bot behavior without account c
 
 test('plain Start welcomes without creating access while menu and deep links retain their own routes',async t=>{
  const f=await fixture(t);f.message('/start');await f.drain();
- const welcome=f.calls.at(-1);assert.equal(welcome.method,'sendPhoto');assert.ok(welcome.data.photo instanceof Uint8Array);
+ const welcome=f.calls.at(-1);assert.equal(welcome.method,'sendAnimation');assert.ok(welcome.data.animation instanceof Uint8Array);assert.equal(welcome.data.animation.subarray(4,8).toString(),'ftyp');
+ assert.equal(welcome.data.duration,4);assert.equal(welcome.data.width,1280);assert.equal(welcome.data.height,640);
+ assert.equal(welcome.data.reply_markup.inline_keyboard[0][0].style,'success');
  assert.ok(welcome.data.caption.length<=1024);assert.equal(welcome.data.parse_mode,'HTML');
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM orders').get().n,0);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
@@ -58,11 +60,11 @@ test('plain Start welcomes without creating access while menu and deep links ret
  f.message('/start unknown_payload');await f.drain();assert.equal(f.calls.at(-1).method,'sendMessage');
  f.message('/start support_vpn');await f.drain();assert.equal(f.calls.at(-1).method,'sendMessage');assert.match(f.last().text,/support@family-pie\.ru/);
  f.message('/start bind_invalid');await f.drain();assert.equal(f.calls.at(-1).method,'sendMessage');assert.match(f.last().text,/привязки недействительна/);
- const photoCount=f.calls.filter(call=>call.method==='sendPhoto').length;
+ const animationCount=f.calls.filter(call=>call.method==='sendAnimation').length;
  f.message('Подключиться');await f.drain();assert.ok(f.last().reply_markup.inline_keyboard.flat().some(button=>button.text==='Уже есть подписка'));
  const messageCount=f.calls.filter(call=>call.method==='sendMessage').length;
  f.message('🔌 Подключиться');await f.drain();assert.equal(f.calls.filter(call=>call.method==='sendMessage').length,messageCount+1);
- assert.ok(f.last().reply_markup.inline_keyboard.flat().some(button=>button.text==='Уже есть подписка'));assert.equal(f.calls.filter(call=>call.method==='sendPhoto').length,photoCount);
+ assert.ok(f.last().reply_markup.inline_keyboard.flat().some(button=>button.text==='Уже есть подписка'));assert.equal(f.calls.filter(call=>call.method==='sendAnimation').length,animationCount);
 });
 
 test('new Telegram buyer explicitly accepts terms, creates one passwordless identity and gets native Stars invoice',async t=>{
@@ -244,12 +246,26 @@ test('intent/callback state survives reopen; uncertain sends do not replay after
  let count=0;await deliverUiOne(ui,{call:async()=>{count++;throw new Error('uncertain private response');}});ui.recover();await deliverUiOne(ui,{call:async()=>{count++;}});assert.equal(count,1);
 });
 
-test('explicit 429 is retried, callback acknowledgements precede chat backlog and photo uses multipart without URL transport',async t=>{
+test('explicit 429 is retried, callback acknowledgements precede chat backlog and media uses multipart without URL transport',async t=>{
  const f=await fixture(t,{paid:true});f.message('/menu');await f.drain();const token=f.last().reply_markup.inline_keyboard[0][0].callback_data;
  f.message('/status');f.callback(token);assert.equal(f.ui.next().view,'callback_answer');await deliverUiOne(f.ui,{call:async()=>{throw new TelegramApiError(429,1);}});
  f.advance(1001);await f.drain();assert.ok(f.calls.some(x=>x.method==='answerCallbackQuery'));
  let request;const client=new TelegramClient('123456:FICTIONAL_ONLY_TELEGRAM_CREDENTIAL',{request:async(url,options)=>{request={url,options};return {ok:true,json:async()=>({ok:true,result:{message_id:1}})};}});
- await client.call('sendPhoto',{chat_id:CHAT,photo:new Uint8Array([137,80,78,71]),caption:'private QR',protect_content:true});assert.ok(request.options.body instanceof FormData);assert.equal(request.options.headers,undefined);assert.equal(request.options.body.get('photo').name,'subscription.png');
+ await client.call('sendPhoto',{chat_id:CHAT,photo:new Uint8Array([137,80,78,71]),caption:'private QR',protect_content:true});assert.ok(request.options.body instanceof FormData);assert.equal(request.options.headers,undefined);assert.equal(request.options.body.get('photo').name,'subscription.png');assert.equal(request.options.body.get('photo').type,'image/png');
+ const animation=new Uint8Array([0,0,0,24,102,116,121,112]),markup={inline_keyboard:[[{text:'Купить',callback_data:'opaque-test-callback',style:'success'}]]};
+ await client.call('sendAnimation',{chat_id:CHAT,animation,duration:4,width:1280,height:640,caption:'Welcome',parse_mode:'HTML',reply_markup:markup});
+ assert.ok(request.options.body instanceof FormData);assert.equal(request.options.headers,undefined);assert.match(request.url,/\/sendAnimation$/);
+ const media=request.options.body.get('animation');assert.equal(media.name,'welcome.mp4');assert.equal(media.type,'video/mp4');assert.deepEqual(new Uint8Array(await media.arrayBuffer()),animation);
+ for(const [key,value] of Object.entries({chat_id:CHAT,duration:4,width:1280,height:640,caption:'Welcome',parse_mode:'HTML'}))assert.equal(request.options.body.get(key),String(value));
+ assert.deepEqual(JSON.parse(request.options.body.get('reply_markup')),markup);assert.equal(request.options.body.has('photo'),false);assert.equal(request.options.redirect,'error');
+});
+
+test('uncertain animation upload is held without retrying or sending a fallback greeting',async t=>{
+ const f=await fixture(t);f.message('/start');const calls=[];
+ const client=new TelegramClient('123456:FICTIONAL_ONLY_TELEGRAM_CREDENTIAL',{request:async(url,options)=>{calls.push({url,options});throw new Error('Upload delivery unknown');}});
+ await deliverUiOne(f.ui,client);assert.equal(f.store.db.prepare("SELECT state FROM telegram_ui_outbox WHERE view='welcome'").get().state,'uncertain');
+ f.ui.recover();await deliverUiOne(f.ui,client);assert.equal(calls.length,1);assert.match(calls[0].url,/\/sendAnimation$/);assert.ok(calls[0].options.body instanceof FormData);
+ assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
 });
 
 test('native help offers a copyable published email even without a bound account or Telegram operator',async t=>{

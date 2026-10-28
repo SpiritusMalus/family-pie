@@ -1,5 +1,5 @@
 {
-  "status": "prepared-not-applied",
+  "status": "synthetic-preview",
   "name": "Family VPN",
   "shortDescription": "Подключение, подписка и помощь в одном месте.",
   "description": "🌐 Family VPN от Family Spy\n\n📱 Телефон, компьютер и Smart TV\n♾️ Одна подписка без лимита устройств\n🌍 Маршруты через Нидерланды и Германию\n🔗 Личная ссылка, QR-код и инструкции\n💬 Поддержка прямо в Telegram\n🔔 Напоминания об окончании подписки\n\nНажми «Старт», чтобы подключиться, проверить или продлить подписку.",
@@ -10,8 +10,8 @@
     "render": "avatar.png",
     "width": 1024,
     "height": 1024,
-    "sha256": "e513790f5f8fbffe29dbd130f0f8586dc6c02a745494606b2125b60d6dcd7b34",
-    "provenance": "Adapted directly from customer-site/index.html .brand svg; same circle and three spokes. Charcoal #101216 / coral #ff9d88."
+    "sha256": "4bcb8be67acb56e3f3041816e3531dbebd562bb198aa873ef99c2f9c53d1c69f",
+    "provenance": "Owner-selected green adaptation of the incumbent Family Spy circle and three spokes. Forest #081410 / mint #63e6a2. Native vector/canvas artwork."
   },
   "commands": [
     {
@@ -60,5 +60,5 @@
     }
   ],
   "changesAppliedToTelegram": false,
-  "publication": "Owner approval and authorized bot administration required; no BotFather or API calls performed."
+  "publication": "This generator does not read or alter live Telegram settings; release readback is separate operational evidence."
 }

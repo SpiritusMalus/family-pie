@@ -155,9 +155,11 @@ export class TelegramStore {
 export class TelegramApiError extends Error {constructor(code,retryAfter=0){super('Telegram request rejected');this.code=code;this.retryAfter=retryAfter;}}
 export class TelegramClient {
  constructor(token,{request=fetch,environment='production'}={}){if(!/^\d{5,}:[A-Za-z0-9_-]{20,}$/.test(token))throw new Error('Invalid private Telegram credential');if(!['production','test'].includes(environment))throw new Error('Invalid Telegram API environment');this.token=token;this.request=request;Object.defineProperty(this,'environment',{value:environment});}
- async call(method,data={}){if(!['getMe','getWebhookInfo','getUpdates','sendMessage','sendPhoto','copyMessage','answerCallbackQuery','sendInvoice','answerPreCheckoutQuery','refundStarPayment','getStarTransactions','getMyStarBalance','setMyCommands','getMyCommands','setChatMenuButton','getChatMenuButton'].includes(method))throw new Error('Unsupported method');let r;try{
-  let options={headers:{'Content-Type':'application/json'},body:JSON.stringify(data)};
-  if(method==='sendPhoto'&&data.photo instanceof Uint8Array){const form=new FormData();for(const [key,value] of Object.entries(data))form.append(key,key==='photo'?new Blob([value],{type:'image/png'}):typeof value==='object'?JSON.stringify(value):String(value),...(key==='photo'?['subscription.png']:[]));options={body:form};}
+ async call(method,data={}){if(!['getMe','getWebhookInfo','getUpdates','sendMessage','sendPhoto','sendAnimation','copyMessage','answerCallbackQuery','sendInvoice','answerPreCheckoutQuery','refundStarPayment','getStarTransactions','getMyStarBalance','setMyCommands','getMyCommands','setChatMenuButton','getChatMenuButton'].includes(method))throw new Error('Unsupported method');let r;try{
+  let options;
+  const upload=method==='sendPhoto'?{field:'photo',type:'image/png',name:'subscription.png'}:method==='sendAnimation'?{field:'animation',type:'video/mp4',name:'welcome.mp4'}:null;
+  if(upload&&data[upload.field] instanceof Uint8Array){const form=new FormData();for(const [key,value] of Object.entries(data))form.append(key,key===upload.field?new Blob([value],{type:upload.type}):typeof value==='object'?JSON.stringify(value):String(value),...(key===upload.field?[upload.name]:[]));options={body:form};}
+  else options={headers:{'Content-Type':'application/json'},body:JSON.stringify(data)};
   r=await this.request(`https://api.telegram.org/bot${this.token}/${this.environment==='test'?'test/':''}${method}`,{method:'POST',...options,redirect:'error',signal:AbortSignal.timeout(['answerPreCheckoutQuery','answerCallbackQuery'].includes(method)?3000:30000)});
  }catch{throw new Error('Telegram delivery outcome unknown');}let x;try{x=await r.json();}catch{throw new Error('Telegram delivery outcome unknown');}if(!r.ok||x.ok!==true)throw new TelegramApiError(Number(x.error_code)||r.status,Number(x.parameters?.retry_after)||0);return x.result;}
 }
