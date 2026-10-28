@@ -8,6 +8,3 @@ export function emailSupportText({html=false}={}){
  const address=html?'<code>'+SUPPORT_EMAIL+'</code>':SUPPORT_EMAIL;
  return 'Email поддержки: '+address+'\n'+SUPPORT_REQUEST_PROMPT+'\n'+SUPPORT_PRIVACY_NOTE;
 }
-
-// Inline Telegram URL buttons do not support mailto:. The public address can be copied instead.
-export function supportEmailCopyButton(){return {text:'Скопировать email',copy_text:{text:SUPPORT_EMAIL}};}

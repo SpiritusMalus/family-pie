@@ -129,6 +129,7 @@ test('password recovery command bypasses native menu and support context, includ
  f.telegram.update(message(1,'/recover'));assert.equal(issued,0);assert.equal(f.telegram.offset(),2);
  const persisted=JSON.stringify(f.store.db.prepare('SELECT * FROM telegram_outbox').all());assert.doesNotMatch(persisted,/#recovery=|RRRRRR|#telegram=/);
  const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.equal(issued,1);assert.match(calls[0].body.text,/5 минут/);assert.equal(calls[0].body.reply_markup.inline_keyboard[0][0].url,'https://family-spy.ru/vpn/cabinet/auth/#recovery='+token);
+ assert.match(calls[0].body.text,/support@family-pie\.ru/);assert.deepEqual(calls[0].body.reply_markup.inline_keyboard.flat().map(button=>button.text),['Восстановить пароль','Помощь без входа']);assert.ok(!calls[0].body.reply_markup.inline_keyboard.flat().some(button=>button.copy_text));
  assert.equal(f.users.identity(f.user.accountId).must_change,1);assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,1);
  f.telegram.update(message(1,'/recover'));assert.equal(f.count(),1);
 });
@@ -137,7 +138,7 @@ test('recovery aliases require a private same-author chat and unlinked users get
  const f=await fixture(t);let issued=0;f.telegram.commerce={recoveryHandoff:()=>{issued++;const error=new Error('No confirmed binding');error.code='INVALID_RECOVERY';throw error;}};
  const group=message(1,'/recover');group.message.chat.type='group';f.telegram.update(group);
  const spoof=message(2,'/recovery');spoof.message.from.id=1002;f.telegram.update(spoof);assert.equal(f.count(),0);
- f.telegram.update(message(3,'/start recover'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.equal(issued,1);assert.match(calls[0].body.text,/подтверждённой привязки/);assert.match(calls[0].body.text,/Запуск бота сам по себе не подтверждает/);assert.ok(!calls[0].body.reply_markup.inline_keyboard.flat().some(button=>button.url?.includes('#recovery=')));assert.ok(calls[0].body.reply_markup.inline_keyboard.flat().some(button=>button.copy_text?.text==='support@family-pie.ru'));
+ f.telegram.update(message(3,'/start recover'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});assert.equal(issued,1);assert.match(calls[0].body.text,/подтверждённой привязки/);assert.match(calls[0].body.text,/Запуск бота сам по себе не подтверждает/);assert.match(calls[0].body.text,/support@family-pie\.ru/);assert.ok(!calls[0].body.reply_markup.inline_keyboard.flat().some(button=>button.url?.includes('#recovery=')||button.copy_text));assert.deepEqual(calls[0].body.reply_markup.inline_keyboard.flat().map(button=>button.text),['Помощь без входа']);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,1);assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).linked,false);
  f.telegram.update(message(4,'/recovery'));await deliverOne(f.telegram,{call:async()=>{}});assert.equal(issued,2);
 });
@@ -173,7 +174,7 @@ test('email support is available to an unlinked private user before native navig
  const before=f.store.db.prepare('SELECT count(*) n FROM identities').get().n;
  f.telegram.update(message(1,'/email'));const calls=[];await deliverOne(f.telegram,{call:async(method,body)=>calls.push({method,body})});
  assert.equal(calls.length,1);assert.equal(calls[0].method,'sendMessage');assert.match(calls[0].body.text,/support@family-pie\.ru/);assert.match(calls[0].body.text,/Укажи устройство/);assert.match(calls[0].body.text,/Не отправляй пароли/);
- assert.deepEqual(calls[0].body.reply_markup.inline_keyboard,[[{text:'Скопировать email',copy_text:{text:'support@family-pie.ru'}}]]);
+ assert.equal(calls[0].body.reply_markup,undefined);
  assert.doesNotMatch(JSON.stringify(calls[0]),/#recovery=|#telegram=|\/sub\/|vpn_session|mailto:/);assert.equal(f.store.db.prepare('SELECT count(*) n FROM identities').get().n,before);assert.equal(f.telegram.state(f.user.accountId,f.sessionHash).linked,false);
  f.telegram.update(message(1,'/email'));assert.equal(f.count(),1);
 });

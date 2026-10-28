@@ -204,15 +204,16 @@ test('legacy update transaction commits support enqueue with durable offset and 
 });
 
 test('unconfigured operator/bot ID gives contact fallback and never guesses another linked account',async t=>{
- const f=await fixture(t);const support=new TelegramSupport(f.store,{operatorAccountId:f.owner.accountId});f.store.transaction(()=>support.handle(message(1,'hello')));
+ const f=await fixture(t);const support=new TelegramSupport(f.store,{operatorAccountId:f.owner.accountId,clock:f.support.clock});f.store.transaction(()=>support.handle(message(1,'hello')));
  assert.equal(support.operator(),null);assert.ok(f.jobs().some(j=>j.text?.includes('support@family-pie.ru')));assert.equal(f.jobs().filter(j=>j.direction==='operator').length,0);
+ assert.equal(await deliverSupportOne(support,f.client),true);const fallback=f.calls.find(call=>call.method==='sendMessage'&&call.body.chat_id==='1001').body;assert.match(fallback.text,/support@family-pie\.ru/);assert.equal(fallback.reply_markup,undefined);
 });
 
-test('available Telegram support also offers published email and a copy action without routing email requests as tickets',async t=>{
+test('available Telegram support keeps published email as text without routing email requests as tickets',async t=>{
  const f=await fixture(t);f.handle(message(1,'/help'));await f.drain();
  const intro=f.calls.find(call=>call.method==='sendMessage'&&call.body.chat_id==='1001').body;
  assert.match(intro.text,/Ответ поддержки придёт сюда/);assert.match(intro.text,/Можно также обратиться по email/);assert.match(intro.text,/support@family-pie\.ru/);assert.match(intro.text,/номер заказа/);assert.match(intro.text,/Не отправляй пароли/);
- assert.deepEqual(intro.reply_markup.inline_keyboard,[[{text:'Скопировать email',copy_text:{text:'support@family-pie.ru'}}]]);
+ assert.equal(intro.reply_markup,undefined);
  assert.equal(f.handle(message(2,'/email')),false);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_support_tickets').get().n,0);
- assert.doesNotMatch(JSON.stringify(intro.reply_markup),/mailto:|\/sub\/|token|password/);
+ assert.doesNotMatch(JSON.stringify(intro),/copy_text|Скопировать email|mailto:|\/sub\/|token|password/);
 });
