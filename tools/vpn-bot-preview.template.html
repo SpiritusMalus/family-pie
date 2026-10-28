@@ -16,6 +16,11 @@
 @media(max-width:380px){.page{padding-left:14px;padding-right:14px}.page-header{gap:10px}.preview-label{font-size:12px;padding:5px 8px}.brand{font-size:14px;gap:9px}.brand svg{width:34px;height:34px}.message{padding:13px}.bot-button{font-size:12px;padding:10px 6px}}
 @media(prefers-reduced-motion:no-preference){.scenarios button,.bot-button{transition:background-color .16s ease-out,color .16s ease-out}}
 </style>
+<style>
+.message .welcome-image{display:block;width:calc(100% + 36px);height:auto;max-width:none;margin:-17px -18px 18px;border-radius:12px 12px 0 0}.message blockquote{margin:12px 0;padding:12px 14px;background:#1d3838;border-radius:6px;font-size:15px;line-height:1.65}.message i{font-style:italic}
+@media(max-width:760px){.message .welcome-image{width:calc(100% + 30px);margin:-15px -15px 15px}.message blockquote{font-size:14px;padding:10px 12px}}
+@media(max-width:380px){.message .welcome-image{width:calc(100% + 26px);margin:-13px -13px 14px}}
+</style>
 </head>
 <body>
 <a class="skip" href="#sample">К сообщению бота</a>
@@ -27,7 +32,7 @@
   <aside class="context" aria-label="Сценарии предпросмотра">
    <select class="mobile-picker" id="mobile-picker" aria-label="Сценарий предпросмотра"></select>
    <nav class="scenarios" id="scenarios" aria-label="Выбери состояние бота"></nav>
-   <p class="note">Это локальный образец реальных ответов обработчика на тестовых данных. Сообщения в Telegram не отправлялись. Продажи пока выключены.</p>
+   <p class="note">Ответы настоящего обработчика на тестовых данных. Сообщения в Telegram не отправляются. Платежи в этом образце отключены.</p>
   </aside>
   <section class="chat-wrap" id="sample" aria-labelledby="state-title" tabindex="-1">
    <h2 class="state-title" id="state-title">Подписка активна</h2>
@@ -47,8 +52,8 @@
 const transcript=JSON.parse(document.getElementById('transcript').textContent),metadata=JSON.parse(document.getElementById('metadata').textContent);
 const screens=new Map(transcript.screens.map(screen=>[screen.id,screen]));
 const picker=document.getElementById('mobile-picker'),nav=document.getElementById('scenarios'),message=document.getElementById('message'),keyboard=document.getElementById('keyboard'),status=document.getElementById('status');
-const groups=[['Если подписка уже есть',['paid','devices','install','manual','notifications','muted','help','email','recovery']],['Первое знакомство',['guest','unlinked','binding','terms','sales-unavailable']]];
-let current='paid';
+const groups=[['Первое знакомство',['guest','unlinked','binding','terms','sales-unavailable']],['Если подписка уже есть',['paid','devices','install','manual','notifications','muted','help','email','recovery']]];
+let current='guest';
 const avatar=document.querySelector('.brand svg');document.getElementById('avatar').append(avatar.cloneNode(true));
 for(const [label,ids] of groups){const optionGroup=document.createElement('optgroup');optionGroup.label=label;picker.append(optionGroup);for(const id of ids){const option=document.createElement('option');option.value=id;option.textContent=screens.get(id).title;optionGroup.append(option);}const heading=document.createElement('p');heading.className='nav-group';heading.textContent=label;nav.append(heading);for(const id of ids){const button=document.createElement('button');button.type='button';button.textContent=screens.get(id).title;button.dataset.screen=id;button.addEventListener('click',()=>show(id));nav.append(button);}}
 picker.addEventListener('change',()=>show(picker.value));
@@ -68,14 +73,16 @@ function show(id){
  document.querySelectorAll('[data-screen]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.screen===id)));
  picker.value=id;document.getElementById('state-title').textContent=screen.title;document.getElementById('trigger').textContent='Действие: '+screen.trigger;
  const template=document.createElement('template');template.innerHTML=screen.message.text.replaceAll('\n','<br>');
- for(const element of template.content.querySelectorAll('*'))if(!['B','CODE','BR'].includes(element.tagName))element.replaceWith(document.createTextNode(element.textContent));
- message.replaceChildren(template.content);keyboard.replaceChildren();notice('');
+ for(const element of template.content.querySelectorAll('*'))if(!['B','CODE','BR','BLOCKQUOTE','I'].includes(element.tagName))element.replaceWith(document.createTextNode(element.textContent));
+ message.replaceChildren(template.content);
+ if(screen.message.photo){const image=document.createElement('img');image.className='welcome-image';image.src=screen.message.photo;image.alt='Family VPN от Family Spy';image.width=1280;image.height=640;message.prepend(image);}
+ keyboard.replaceChildren();notice('');
  for(const row of screen.message.buttons){const group=document.createElement('div');group.className='button-row';for(const data of row){const button=document.createElement('button');button.type='button';button.className='bot-button';button.textContent=data.text;button.addEventListener('click',()=>act(data));group.append(button);}keyboard.append(group);}
  history.replaceState(null,'','#'+id);
 }
 document.getElementById('short-description').textContent=metadata.shortDescription;document.getElementById('description').textContent=metadata.description;
 for(const command of metadata.commands){const li=document.createElement('li'),code=document.createElement('code'),text=document.createElement('span');code.textContent='/'+command.command;text.textContent=command.description;li.append(code,text);document.getElementById('commands').append(li);}
-show(screens.has(location.hash.slice(1))?location.hash.slice(1):'paid');
+show(screens.has(location.hash.slice(1))?location.hash.slice(1):'guest');
 </script>
 </body>
 </html>

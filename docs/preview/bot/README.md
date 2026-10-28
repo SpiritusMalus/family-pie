@@ -7,10 +7,10 @@ web roots. Opening it or switching sample states does not contact Telegram.
 The transcript contains fourteen states captured from the real `TelegramStore.update`
 → `TelegramUI` → injected synthetic sender: guest, existing-account binding, terms,
 sales unavailable, active subscription, devices, installation/import, manual URL,
-reminders on/off, chat/email support and password recovery. Visible message text and button labels are exact handler
+reminders on/off, chat/email support and password recovery. The guest Start screen includes the bundled Family VPN banner and formatted caption. Other views remain compact text messages. Visible message text and button labels are exact handler
 output. Callback capabilities, internal account IDs and one-time handoff/reset tokens are
 excluded. All shown access and expiry values belong to a synthetic account; Stars
-prices are deliberately absent because sales are disabled and no prices are approved.
+prices are deliberately absent because this fixture disables payments; approved production pricing is a separate live configuration.
 The support email is the existing published `support@family-pie.ru` contact. Copying
 it does not send a message; inbox delivery and monitoring are not claimed by this preview.
 
@@ -47,3 +47,15 @@ The visual extension retains the incumbent Family Spy mark, Golos Text and exist
 black/coral identity. Shared `PRODUCT.md`, `DESIGN.md`, site styles and live bot
 settings are unchanged by this preview. Real desktop/mobile rendering, owner visual
 approval, physical app import and Telegram payment acceptance are separate checks.
+
+## Reference-led welcome — 2026-10-27
+
+The owner selected a banner + capabilities + action buttons after inspecting Nur VPN.
+Plain Start uses a 1280×640 banner with the incumbent circle/three-spoke mark and
+local Golos Text, followed by a compact capabilities list. Regular menu and security
+deep links keep their existing behavior. The banner is bundled in
+`services/vpn/assets/bot-welcome.png`; its editable geometric source is adjacent SVG.
+No new trial, referral, location catalogue or speed guarantee is claimed.
+The renderer source is the authority for text and callback actions.
+Pre-Start metadata must be applied and read back separately during an authorized
+bot release; editing metadata.json alone never changes Telegram.
