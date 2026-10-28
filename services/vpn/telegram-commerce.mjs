@@ -9,7 +9,7 @@ const invalid=message=>{const e=new Error(message);e.code='INVALID_PAYMENT';thro
 const chat=value=>{const id=String(value);if(!/^[1-9][0-9]{0,15}$/.test(id)||!Number.isSafeInteger(Number(id)))invalid('Недопустимый личный чат');return id;};
 const required=(ok,message='Не удалось проверить платёж')=>{if(!ok)invalid(message);};
 // Bump the version whenever this purchase notice or the linked purchase terms change.
-export const TELEGRAM_STARS_TERMS=Object.freeze({version:'2026-10-27.1',notice:'Платёж в Telegram Stars разовый. Автоматических списаний нет. Доступ появится после подтверждения оплаты. Помощь с оплатой и возвратом: /paysupport или '+SUPPORT_EMAIL+'.',termsPath:'/vpn/terms/',privacyPath:'/vpn/privacy/'});
+export const TELEGRAM_STARS_TERMS=Object.freeze({version:'2026-10-27.2',notice:'Платёж в Telegram Stars разовый. Автоматических списаний нет. Доступ появится после подтверждения оплаты. Помощь с оплатой и возвратом: /paysupport или '+SUPPORT_EMAIL+'.',termsPath:'/vpn/terms/',privacyPath:'/vpn/privacy/'});
 const termsSnapshot=JSON.stringify(TELEGRAM_STARS_TERMS),termsHash=digest(termsSnapshot);
 
 // Prices are explicit Stars amounts, never a conversion from the website RUB price.

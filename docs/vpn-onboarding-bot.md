@@ -391,3 +391,42 @@ satisfy that production-readiness gate. Tests use synthetic files/injected respo
 ```sh
 node --test tools/test-vpn-stars-ledger-report.mjs
 ```
+
+
+## Owner-approved Stars rollout — 2026-10-27
+
+The owner approved the shown checkout, explicitly requested payment publication,
+and selected300/800/1500/2700 XTR for30/90/180/365 days. The canonical one-time
+catalogue is `services/vpn/approved-stars-plans.json`. This approval supersedes the
+older preview/price hold above. Website YooKassa totals remain separately
+300/780/1380/2400 RUB. Existing orders retain their saved amount and provider.
+
+Use the established immutable runtime rollout with a fresh quiesced database/config
+backup and compare migration before opening the API. Both unprivileged processes
+must be able to read the nonsecret, root-owned catalogue in the immutable release;
+do not put it in a root0600 credential path. Set the existing Stars enable/approval
+flags and catalogue path explicitly, then reload the API and the single Telegram
+consumer. Preserve all current sessions, account rights, payment records, bot token,
+YooKassa configuration and worker offset. A rollback first disables new Stars sales
+and retains financial processing plus the current database. Never restore an old
+whole database over purchases or credentials created after rollout.
+
+Read-only Bot API identity, empty-webhook and Stars-balance capability checks are
+provider checks, not proof of a completed charge, refund or withdrawal. Offline
+handler/HTTP tests cover exact prices, consent, precheckout-without-grant, successful
+payment replay, provider isolation and refund isolation. Genuine TEST settlement
+was unavailable at login; record that validation limit honestly when publishing.
+The receiving API needs no extra payment-provider token; withdrawal eligibility and
+net proceeds remain separate from receiving Stars. Public terms distinguish both
+payment methods, and the per-purchase consent version is2026-10-27.2.
+
+Operational recovery: if the bot misses an outage window or a refund has an
+uncertain outcome, disable new Stars invoices while keeping the financial consumer
+running. Retain the current database and private incident evidence. Take a consistent
+same-host backup and run the bounded ledger report with the exact bot identity.
+Review its matching order, direction, actor/amount and saved charge/grant consistency;
+partial or absent ledger evidence never authorizes a refund retry or a grant.
+Escalate a confirmed mismatch for a scoped operator repair using the existing shared
+commerce transition and fresh invariants; this report tool has no automatic apply
+mode. Do not mark an order recovered merely because a report was generated, accept
+an unverified screenshot as payment proof, or replay any ambiguous refund.
