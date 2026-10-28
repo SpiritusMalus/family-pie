@@ -139,7 +139,7 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
     if(users.subscription(id).allow_unlimited)return send(res,409,{error:'У тебя бессрочный доступ. Оплачивать продление не нужно'});
     if(!billing.ready())return send(res,503,{error:'Оплата временно недоступна'});
     if(typeof body.email!=='string'||body.email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email))return send(res,400,{error:'Укажи email для чека'});
-    if(!users.db.prepare('SELECT 1 FROM orders WHERE account_id=? AND request_key=?').get(id,body.requestKey)&&users.db.prepare("SELECT count(*) n FROM orders WHERE account_id=? AND state='pending' AND created_at>?").get(id,Date.now()-24*3600000).n>=5)return send(res,429,{error:'Сначала заверши или дождись отмены предыдущих платежей'});
+    if(!users.db.prepare('SELECT 1 FROM orders WHERE account_id=? AND request_key=?').get(id,body.requestKey)&&users.db.prepare("SELECT count(*) n FROM orders WHERE account_id=? AND provider='yookassa' AND currency='RUB' AND state='pending' AND created_at>?").get(id,Date.now()-24*3600000).n>=5)return send(res,429,{error:'Сначала заверши или дождись отмены предыдущих платежей'});
     cabinet.createOrder(id,body.days,body.requestKey,body.promo);return send(res,200,await billing.checkout(id,body.days,body.requestKey,body.email,{lang:body.lang}));
    }
    const orderMatch=path.match(/^\/vpn\/api\/orders\/([a-f0-9-]+)\/(check|resume)$/);if(orderMatch&&req.method==='POST'){
