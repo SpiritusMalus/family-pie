@@ -10,6 +10,7 @@ import {TelegramCommerce} from '../telegram-commerce.mjs';
 import {TelegramUI,deliverUiOne,processTelegramUpdates} from '../telegram-ui.mjs';
 import {TelegramSupport,deliverSupportOne} from '../telegram-support.mjs';
 
+function purchase(commerce,chatId,days,key){const offer=commerce.preparePurchase(chatId,days,key);commerce.acceptPurchase(chatId,offer.token);return commerce.invoice(chatId,days,key,offer.token);}
 const DAY=86_400_000,CHAT=1001;
 async function fixture(t,{path=':memory:',native=true,stars=true,paid=false}={}) {
  let now=Date.UTC(2026,9,27),sequence=0;
@@ -72,6 +73,7 @@ test('new Telegram buyer explicitly accepts terms, creates one passwordless iden
  assert.equal(f.store.db.prepare('SELECT password_set,must_change FROM identities WHERE account_id=?').get(identity.account_id).password_set,0);
  f.callback(accept);await f.drain();assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,1);
  f.message('/renew');await f.drain();await f.press('30 дней · 50 ⭐');
+ assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));assert.match(f.last().text,/Всего: <b>50 ⭐/);await f.press('Принимаю, перейти к оплате');
  const invoice=f.calls.find(x=>x.method==='sendInvoice').data;assert.equal(invoice.currency,'XTR');assert.equal(invoice.prices[0].amount,50);assert.equal(invoice.chat_id,CHAT);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
  assert.ok(!f.calls.some(x=>JSON.stringify(x).includes('happ://')));
@@ -81,6 +83,16 @@ test('Stars prices stay hidden and invoice cannot be sent while sales flags are 
  const f=await fixture(t,{stars:false});f.commerce.ensure(CHAT,{acceptedTerms:true});f.message('/renew');await f.drain();
  assert.match(f.last().text,/пока недоступна/);assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));
  assert.ok(!f.last().reply_markup.inline_keyboard.flat().some(x=>x.text.includes('⭐')));
+});
+
+test('returning paid customer explicitly confirms each selected Stars purchase and forwarded consent cannot send invoices',async t=>{
+ const f=await fixture(t,{paid:true});f.message('/renew');await f.drain();await f.press('30 дней · 50 ⭐');
+ assert.match(f.last().text,/Всего: <b>50 ⭐/);assert.match(f.last().text,/разовый/);assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));assert.doesNotMatch(f.last().text,/2026-10-27\.1/);
+ const accept=f.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='Принимаю, перейти к оплате').callback_data;
+ f.callback(accept,{fromId:1002});await f.drain();assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));assert.equal(f.store.db.prepare('SELECT accepted_at FROM telegram_purchase_consents').get().accepted_at,null);
+ f.callback(accept);await f.drain();assert.equal(f.calls.filter(x=>x.method==='sendInvoice').length,1);f.callback(accept);await f.drain();assert.equal(f.calls.filter(x=>x.method==='sendInvoice').length,1);
+ f.message('/renew');await f.drain();await f.press('30 дней · 50 ⭐');assert.equal(f.calls.filter(x=>x.method==='sendInvoice').length,1);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_purchase_consents WHERE accepted_at IS NULL').get().n,1);
+ f.advance(600001);f.ui.plan();assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_purchase_consents WHERE order_id IS NULL').get().n,0);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_purchase_consents WHERE order_id IS NOT NULL').get().n,1);
 });
 
 test('native binding Start is only a candidate until the original website session confirms ownership',async t=>{
@@ -175,20 +187,20 @@ test('stale commerce actions recover with a message and cannot pin the update of
 });
 
 test('payment grant and durable update offset commit together; duplicates do not add duration twice',async t=>{
- const f=await fixture(t);const identity=f.commerce.ensure(CHAT,{acceptedTerms:true}),invoice=f.commerce.invoice(CHAT,30,'ui-payment-request');
+ const f=await fixture(t);const identity=f.commerce.ensure(CHAT,{acceptedTerms:true}),invoice=purchase(f.commerce,CHAT,30,'ui-payment-request');
  f.update({pre_checkout_query:{id:'ui-precheckout',from:{id:CHAT},invoice_payload:invoice.payload,currency:'XTR',total_amount:50}});await f.drain();assert.equal(f.calls.at(-1).method,'answerPreCheckoutQuery');assert.equal(f.calls.at(-1).data.ok,true);
  const payment={invoice_payload:invoice.payload,currency:'XTR',total_amount:50,telegram_payment_charge_id:'fictional-ui-charge'};
  const body={message:{chat:{type:'private',id:CHAT},from:{id:CHAT},successful_payment:payment}};
  f.update(body);await f.drain();f.update(body);await f.drain();assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,1);
  assert.equal(f.store.subscription(identity.account_id).expiresAt,Date.UTC(2026,9,27)+30*DAY);
- const second=f.commerce.invoice(CHAT,30,'ui-second-request');f.commerce.preCheckout({id:'second-precheckout',from:{id:CHAT},invoice_payload:second.payload,currency:'XTR',total_amount:50});
+ const second=purchase(f.commerce,CHAT,30,'ui-second-request');f.commerce.preCheckout({id:'second-precheckout',from:{id:CHAT},invoice_payload:second.payload,currency:'XTR',total_amount:50});
  const before=f.telegram.offset(),original=f.commerce.successfulPayment.bind(f.commerce);f.commerce.successfulPayment=msg=>{original(msg);throw new Error('isolated operational failure');};
  assert.throws(()=>f.update({message:{chat:{type:'private',id:CHAT},from:{id:CHAT},successful_payment:{...payment,invoice_payload:second.payload,telegram_payment_charge_id:'second-fictional-charge'}}}),/operational failure/);
  assert.equal(f.telegram.offset(),before);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,1);
 });
 
 test('late Stars payment and refund remain durable with native navigation and sales both disabled',async t=>{
- const f=await fixture(t),identity=f.commerce.ensure(CHAT,{acceptedTerms:true}),invoice=f.commerce.invoice(CHAT,30,'ui-flagoff-purchase');
+ const f=await fixture(t),identity=f.commerce.ensure(CHAT,{acceptedTerms:true}),invoice=purchase(f.commerce,CHAT,30,'ui-flagoff-purchase');
  f.commerce.preCheckout({id:'flagoff-precheckout',from:{id:CHAT},invoice_payload:invoice.payload,currency:'XTR',total_amount:50});
  f.ui.enabled=false;f.commerce.enabled=false;
  const payment={invoice_payload:invoice.payload,currency:'XTR',total_amount:50,telegram_payment_charge_id:'flagoff-fictional-charge'};
@@ -214,7 +226,7 @@ test('confirmed non-native Telegram link retains a usable cabinet login when nav
 
 test('worker batch processes later pre-checkout before waiting on an earlier callback acknowledgement',async t=>{
  const f=await fixture(t);f.commerce.ensure(CHAT,{acceptedTerms:true});f.message('/menu');await f.drain();
- const token=f.last().reply_markup.inline_keyboard[0][0].callback_data,invoice=f.commerce.invoice(CHAT,30,'ui-batch-purchase'),calls=[];
+ const token=f.last().reply_markup.inline_keyboard[0][0].callback_data,invoice=purchase(f.commerce,CHAT,30,'ui-batch-purchase'),calls=[];
  await processTelegramUpdates(f.telegram,f.ui,{call:async(method,data)=>{calls.push({method,data});return {};}},[
   {update_id:100,callback_query:{id:'batch-callback',from:{id:CHAT},message:{chat:{type:'private',id:CHAT}},data:token}},
   {update_id:101,pre_checkout_query:{id:'batch-precheckout',from:{id:CHAT},invoice_payload:invoice.payload,currency:'XTR',total_amount:50}}

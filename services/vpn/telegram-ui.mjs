@@ -2,6 +2,7 @@ import {createHash, randomBytes, randomUUID} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import QRCode from 'qrcode';
 import {SUPPORT_EMAIL,emailSupportText,supportEmailCopyButton} from './support-contact.mjs';
+import {describeStarsPlans} from './telegram-pricing.mjs';
 
 const MINUTE = 60_000, DAY = 86_400_000;
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -179,7 +180,9 @@ export class TelegramUI {
   }else if(row.action==='device'&&botDevices[data.device])this.queue(chatId,key,'device',{device:data.device});
   else if(row.action==='manual'&&botDevices[data.device])this.queue(chatId,key,'manual',{device:data.device});
   else if(row.action==='qr')this.queue(chatId,key,'qr');
-  else if(row.action==='invoice'&&Number.isInteger(data.days))this.queue(chatId,key,'invoice',{days:data.days,requestKey:'tg-ui:'+token});
+  else if(row.action==='invoice'&&Number.isInteger(data.days)) {
+   const offer=this.commerce.preparePurchase(chatId,data.days,'tg-ui:'+token);this.queue(chatId,key,'purchase_terms',{consentToken:offer.token});
+  }else if(row.action==='accept_purchase_terms')this.queue(chatId,key,'invoice',this.commerce.acceptPurchase(chatId,data.consentToken));
   else if(['home','subscription','devices','plans','settings','cabinet','binding','unlink'].includes(row.action))this.queue(chatId,key,row.action);
   }catch(error){if(error.code!=='INVALID_PAYMENT')throw error;this.queue(chatId,key,'action_unavailable');}
   return true;
@@ -211,7 +214,7 @@ export class TelegramUI {
   if(job.view==='welcome') {
    text='🌐 <b>Family VPN</b>\n\nИнтернет для тебя и твоих близких.\n\n✨ <b>Что внутри</b>\n<blockquote>Телефон, компьютер и Smart TV\nОдна подписка без лимита устройств\nМаршруты через Нидерланды и Германию\nПодключение по личной ссылке или QR-коду\nПоддержка прямо в Telegram\nНапоминания об окончании подписки</blockquote>\n\n'+(identity?status()+'\n\n':'')+'<i>Выбери действие ниже 👇</i>';
    main();return {method:'sendPhoto',data:{chat_id:chatId,photo:readFileSync(new URL('./assets/bot-welcome.png',import.meta.url)),caption:text,parse_mode:'HTML',reply_markup:{inline_keyboard:rows}}};
-  }else if(!identity&&['subscription','devices','plans','settings','cabinet','unlink','manual','device','qr','invoice'].includes(job.view)) {
+  }else if(!identity&&['subscription','devices','plans','settings','cabinet','unlink','manual','device','qr','invoice','purchase_terms'].includes(job.view)) {
    text='<b>Family VPN</b>\n\n'+status();rows.push([button('Уже есть подписка','binding')],[button('Создать аккаунт','create')],[button('Помощь','help')]);
   }else if(job.view==='binding') {
    text=payload.ok===false?'Ссылка привязки недействительна или уже использована. Создай новую в кабинете.':payload.ok?'Остался один шаг: вернись в кабинет и подтверди, что это твой Telegram. До подтверждения личная подписка здесь не появится.':'Уже покупал на сайте? Войди в кабинет → Настройки → Telegram → Подключить. После Start вернись на сайт и подтверди привязку.';
@@ -244,10 +247,22 @@ export class TelegramUI {
   }else if(job.view==='plans') {
    const catalogue=this.commerce.plans();
    if(sub?.allow_unlimited&&sub.unlimited){text='У тебя бессрочная подписка. Продление не требуется.';rows.push(home());}
-   else if(!catalogue.available){text='Покупка в Telegram пока недоступна. Текущая подписка и помощь остаются здесь.';rows.push([button('Моя подписка','subscription'),button('Помощь','help')],home());}
-   else {text='<b>Выбери срок подписки</b>\n\nОплата в Telegram Stars. Срок добавится к текущей подписке.';for(const plan of catalogue.plans)rows.push([button(plan.days+' дней · '+plan.stars+' ⭐','invoice',{days:plan.days})]);rows.push(home());}
+   else if(!catalogue.available||!catalogue.plans.length){text='Покупка в Telegram пока недоступна. Текущая подписка и помощь остаются здесь.';rows.push([button('Моя подписка','subscription'),button('Помощь','help')],home());}
+   else {
+    const plans=describeStarsPlans(catalogue.plans);
+    text='<b>Выбери срок подписки</b>\n\nОплата в Telegram Stars. Срок добавится к текущей подписке.';
+    if(plans.length>1||plans[0].days!==30){
+     text+='\n\nОдин платёж за весь срок. Цена за 30 дней приведена для сравнения.\n\n'+plans.map(plan=>'<b>'+plan.days+' дней · '+plan.stars+' ⭐ всего</b>\n'+plan.per30Days+' ⭐ за 30 дней'+(plan.savings?' · экономия '+html(plan.savings):'')).join('\n\n');
+     if(plans.some(plan=>plan.savings))text+='\n\nЭкономия относительно тарифа на 30 дней.';
+    }
+    for(const plan of plans)rows.push([button(plan.days+' дней · '+plan.stars+' ⭐','invoice',{days:plan.days})]);rows.push(home());
+   }
+  }else if(job.view==='purchase_terms') {
+   const offer=this.commerce.purchaseTerms(chatId,payload.consentToken);
+   text='<b>Family VPN · '+offer.days+' дней</b>\n\nВсего: <b>'+offer.stars+' ⭐</b>.\n\n'+html(offer.notice)+'\n\nПеред оплатой прими условия сервиса и обработку данных.';
+   rows.push([{text:'Условия сервиса',url:offer.termsUrl},{text:'Обработка данных',url:offer.privacyUrl}],[button('Принимаю, перейти к оплате','accept_purchase_terms',{consentToken:offer.token})],home());
   }else if(job.view==='invoice') {
-   return {method:'sendInvoice',data:this.commerce.invoice(chatId,payload.days,payload.requestKey)};
+   return {method:'sendInvoice',data:this.commerce.invoice(chatId,payload.days,payload.requestKey,payload.consentToken)};
   }else if(job.view==='settings') {
    const enabled=Boolean(this.db.prepare('SELECT enabled FROM telegram_links WHERE account_id=? AND chat_id=?').get(identity.account_id,chatId)?.enabled);
    text='<b>Напоминания</b>\n\n'+(enabled?'Включены: за 3 дня, за сутки и после окончания подписки.':'Выключены. Подписка и вход через Telegram сохранены.')+'\nБессрочной подписке напоминания не нужны.';
@@ -277,7 +292,7 @@ export class TelegramUI {
   return null;
  }
  recover(){this.db.prepare("UPDATE telegram_ui_outbox SET state='uncertain' WHERE state='sending'").run();}
- plan(){this.db.prepare('DELETE FROM telegram_ui_callbacks WHERE expires<=?').run(this.clock());this.db.prepare("DELETE FROM telegram_ui_outbox WHERE created_at<? AND state NOT IN ('pending','sending')").run(this.clock()-DAY);this.db.prepare('DELETE FROM telegram_ui_state WHERE updated_at<?').run(this.clock()-90*DAY);}
+ plan(){this.commerce.prunePurchaseOffers();this.db.prepare('DELETE FROM telegram_ui_callbacks WHERE expires<=?').run(this.clock());this.db.prepare("DELETE FROM telegram_ui_outbox WHERE created_at<? AND state NOT IN ('pending','sending')").run(this.clock()-DAY);this.db.prepare('DELETE FROM telegram_ui_state WHERE updated_at<?').run(this.clock()-90*DAY);}
 }
 
 export async function deliverUiOne(ui,client) {
