@@ -50,7 +50,7 @@ export class TelegramCommerce {
    const linked=this.db.prepare('SELECT account_id FROM telegram_links WHERE chat_id=?').get(id);
    if(linked){const existing=this.accountForChat(id);required(existing,'Сначала восстанови вход в существующий аккаунт');return existing;}
    const identity=this.users.addTelegramInternal();
-   this.db.prepare('INSERT INTO telegram_native_accounts VALUES(?,?,?)').run(identity.account_id,id,this.clock());
+   this.db.prepare('INSERT INTO telegram_native_accounts(account_id,registered_chat,terms_at) VALUES(?,?,?)').run(identity.account_id,id,this.clock());
    this.db.prepare('INSERT INTO telegram_links(account_id,chat_id,enabled,generation,bound_at) VALUES(?,?,1,?,?)').run(identity.account_id,id,randomBytes(16).toString('hex'),this.clock());
    return identity;
   });
@@ -71,7 +71,7 @@ export class TelegramCommerce {
   const link=this.db.prepare('SELECT generation FROM telegram_links WHERE account_id=? AND chat_id=?').get(identity.account_id,id),token=randomBytes(32).toString('base64url');
   this.transaction(()=>{
    this.db.prepare('DELETE FROM telegram_handoffs WHERE expires<=? OR (account_id=? AND purpose=?)').run(this.clock(),identity.account_id,purpose);
-   this.db.prepare('INSERT INTO telegram_handoffs VALUES(?,?,?,?,?,?,?)').run(digest(token),identity.account_id,id,link.generation,purpose,device,this.clock()+300000);
+   this.db.prepare('INSERT INTO telegram_handoffs(token_hash,account_id,chat_id,generation,purpose,device,expires) VALUES(?,?,?,?,?,?,?)').run(digest(token),identity.account_id,id,link.generation,purpose,device,this.clock()+300000);
   });
   return this.origin+(purpose==='import'?'/vpn/connect/#token=':'/vpn/cabinet/auth/#telegram=')+token+'&device='+device;
  }
