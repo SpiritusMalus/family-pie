@@ -9,6 +9,14 @@
   const devices = ['android', 'ios', 'windows', 'macos', 'linux', 'tv'];
   const requested = params.get('device');
   const device = devices.includes(requested) ? requested : 'android';
+  function cabinetDestination(result) {
+    // Only the consumed one-use server intent selects the authenticated destination.
+    // Query/fragment hints remain available solely for the normal-login fallback.
+    const route = result.target === 'plans' && [30, 90, 180, 365].includes(result.period)
+      ? '#plans?period=' + result.period
+      : '#devices?platform=' + (devices.includes(result.device) ? result.device : device);
+    return '/vpn/cabinet/?lang=' + (window.FPi18n?.lang === 'en' ? 'en' : 'ru') + route;
+  }
   const text = value => window.FPi18n?.t(value) || value;
   const message = document.querySelector('#telegram-entry-message') || document.querySelector('#account-message');
   const setMessage = (value, error = false) => {
@@ -97,8 +105,8 @@
         confirm.addEventListener('click', async () => {
           confirm.disabled = true;
           try {
-            await request('login');
-            location.replace('/vpn/cabinet/?lang=' + (window.FPi18n?.lang === 'en' ? 'en' : 'ru') + '#devices?platform=' + device);
+            const result = await request('login');
+            location.replace(cabinetDestination(result));
           } catch (error) { setMessage(failureMessage(error), true); confirm.disabled = false; }
         });
         setMessage('Проверь аккаунт и подтверди вход через Telegram.');

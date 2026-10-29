@@ -5,6 +5,7 @@ import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {VpnStore} from '../store.mjs';
 import {Accounts} from '../auth.mjs';
+import {Cabinet} from '../cabinet.mjs';
 import {TelegramStore,TelegramClient,TelegramApiError} from '../telegram.mjs';
 import {TelegramCommerce} from '../telegram-commerce.mjs';
 import {TelegramUI,deliverUiOne,processTelegramUpdates} from '../telegram-ui.mjs';
@@ -17,6 +18,7 @@ async function fixture(t,{path=':memory:',native=true,stars=true,paid=false}={})
  const clock=()=>now,store=new VpnStore(path,{clock,plans:[{days:30,priceMinor:30000,devices:0}]});
  t.after(()=>store.close());
  const users=new Accounts(store,{clock,publicSubscriptionOrigin:'https://sub.family-spy.ru'});
+ new Cabinet(store).setPlans([{days:30,priceMinor:30000,devices:0}]);
  const telegram=new TelegramStore(store,{clock});
  const commerce=new TelegramCommerce(store,{users,clock,stars:{enabled:stars,approved:stars,plans:[{days:30,stars:50}]}});
  const ui=new TelegramUI(telegram,{commerce,enabled:native,clock});telegram.ui=ui;
@@ -70,34 +72,42 @@ test('plain Start welcomes without creating access while menu and deep links ret
  assert.ok(f.last().reply_markup.inline_keyboard.flat().some(button=>button.text==='Уже есть подписка'));assert.equal(f.calls.filter(call=>call.method==='sendAnimation').length,animationCount);
 });
 
-test('new Telegram buyer explicitly accepts terms, creates one passwordless identity and gets native Stars invoice',async t=>{
+test('new Telegram buyer explicitly accepts delivered terms and reaches RUB website checkout without a payment',async t=>{
  const f=await fixture(t);f.message('/renew');await f.drain();await f.press('Создать аккаунт');
  assert.equal(f.commerce.accountForChat(CHAT),null);assert.match(f.last().text,/условия/);
  const accept=f.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='Принимаю и продолжаю').callback_data;
  f.callback(accept);await f.drain();const identity=f.commerce.accountForChat(CHAT);assert.ok(identity);
  assert.equal(f.store.db.prepare('SELECT password_set,must_change FROM identities WHERE account_id=?').get(identity.account_id).password_set,0);
  f.callback(accept);await f.drain();assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,1);
- f.message('/renew');await f.drain();await f.press('30 дней · 50 ⭐');
- assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));assert.match(f.last().text,/Всего: <b>50 ⭐/);await f.press('Принимаю, перейти к оплате');
- const invoice=f.calls.find(x=>x.method==='sendInvoice').data;assert.equal(invoice.currency,'XTR');assert.equal(invoice.prices[0].amount,50);assert.equal(invoice.chat_id,CHAT);
+ f.message('/renew');await f.drain();await f.press('30 дней · 300 ₽');
+ assert.match(f.last().text,/Всего: <b>300 ₽/);
+ const link=f.last().reply_markup.inline_keyboard.flat().find(button=>button.text==='Перейти на сайт').url;
+ const token=new URLSearchParams(new URL(link).hash.slice(1)).get('telegram');assert.equal(f.commerce.previewLogin(token).period,30);
+ const terms=f.store.db.prepare('SELECT terms_version,terms_hash FROM telegram_native_accounts').get();assert.ok(terms.terms_version);assert.match(terms.terms_hash,/^[a-f0-9]{64}$/);
+ assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));assert.equal(f.store.db.prepare('SELECT count(*) n FROM orders').get().n,0);
  assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,0);
  assert.ok(!f.calls.some(x=>JSON.stringify(x).includes('happ://')));
 });
 
-test('Stars prices stay hidden and invoice cannot be sent while sales flags are disabled',async t=>{
+test('RUB website checkout remains independent of disabled Stars sales',async t=>{
  const f=await fixture(t,{stars:false});f.commerce.ensure(CHAT,{acceptedTerms:true});f.message('/renew');await f.drain();
- assert.match(f.last().text,/пока недоступна/);assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));
+ assert.match(f.last().text,/рублях.*ЮKassa/);assert.ok(f.last().reply_markup.inline_keyboard.flat().some(x=>x.text==='30 дней · 300 ₽'));assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));
  assert.ok(!f.last().reply_markup.inline_keyboard.flat().some(x=>x.text.includes('⭐')));
 });
 
-test('returning paid customer explicitly confirms each selected Stars purchase and forwarded consent cannot send invoices',async t=>{
- const f=await fixture(t,{paid:true});f.message('/renew');await f.drain();await f.press('30 дней · 50 ⭐');
- assert.match(f.last().text,/Всего: <b>50 ⭐/);assert.match(f.last().text,/разовый/);assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));assert.doesNotMatch(f.last().text,/2026-10-27\.1/);
- const accept=f.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='Принимаю, перейти к оплате').callback_data;
- f.callback(accept,{fromId:1002});await f.drain();assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));assert.equal(f.store.db.prepare('SELECT accepted_at FROM telegram_purchase_consents').get().accepted_at,null);
- f.callback(accept);await f.drain();assert.equal(f.calls.filter(x=>x.method==='sendInvoice').length,1);f.callback(accept);await f.drain();assert.equal(f.calls.filter(x=>x.method==='sendInvoice').length,1);
- f.message('/renew');await f.drain();await f.press('30 дней · 50 ⭐');assert.equal(f.calls.filter(x=>x.method==='sendInvoice').length,1);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_purchase_consents WHERE accepted_at IS NULL').get().n,1);
- f.advance(600001);f.ui.plan();assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_purchase_consents WHERE order_id IS NULL').get().n,0);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_purchase_consents WHERE order_id IS NOT NULL').get().n,1);
+test('returning paid customer uses owned RUB checkout; old Stars callbacks and unsent invoice jobs create no new sale',async t=>{
+ const f=await fixture(t,{paid:true});f.message('/renew');await f.drain();
+ const selected=f.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='30 дней · 300 ₽').callback_data;
+ f.callback(selected,{fromId:1002});await f.drain();assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_handoffs').get().n,0);
+ f.callback(selected);await f.drain();assert.match(f.last().text,/Всего: <b>300 ₽/);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_handoffs').get().n,1);
+ f.callback(selected);await f.drain();assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_handoffs').get().n,1);
+ const old=f.ui.button(String(CHAT),'Historical Stars button','invoice',{days:30});f.callback(old.callback_data);await f.drain();assert.match(f.last().text,/Оплата в рублях/);
+ const offer=f.commerce.preparePurchase(CHAT,30,'historical-consent-fixture');f.commerce.acceptPurchase(CHAT,offer.token);const invoice=f.commerce.invoice(CHAT,30,'historical-consent-fixture',offer.token);
+ const before=f.store.db.prepare('SELECT id,days,payment_amount,state FROM orders ORDER BY id').all();
+ f.ui.queue(String(CHAT),'old-invoice-job','invoice',{days:30,requestKey:'historical-consent-fixture',consentToken:offer.token});await f.drain();assert.match(f.last().text,/Оплата в рублях/);
+ f.ui.queue(String(CHAT),'old-consent-job','purchase_terms',{consentToken:offer.token});await f.drain();
+ assert.deepEqual(f.store.db.prepare('SELECT id,days,payment_amount,state FROM orders ORDER BY id').all(),before);assert.equal(f.store.db.prepare('SELECT count(*) n FROM grants').get().n,1);
+ assert.ok(invoice.payload);assert.ok(!f.calls.some(x=>x.method==='sendInvoice'));
 });
 
 test('native binding Start is only a candidate until the original website session confirms ownership',async t=>{
@@ -185,9 +195,9 @@ test('stale commerce actions recover with a message and cannot pin the update of
  const token=f.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='Принимаю и продолжаю').callback_data;
  const disabled=await f.users.add({login:'disabled-native-fixture'});f.store.db.prepare('UPDATE identities SET enabled=0 WHERE account_id=?').run(disabled.accountId);
  f.store.db.prepare("INSERT INTO telegram_links(account_id,chat_id,generation,bound_at) VALUES(?,?,'disabled',?)").run(disabled.accountId,String(CHAT),Date.now());
- const before=f.telegram.offset();f.callback(token);await f.drain();assert.ok(f.telegram.offset()>before);assert.match(f.last().text,/Действие сейчас недоступно/);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);
+ const before=f.telegram.offset();f.callback(token);await f.drain();assert.ok(f.telegram.offset()>before);assert.match(f.last().text,/Подтверждение условий недействительно/);assert.equal(f.store.db.prepare('SELECT count(*) n FROM telegram_native_accounts').get().n,0);
  const active=await fixture(t);active.commerce.ensure(CHAT,{acceptedTerms:true});active.message('/renew');await active.drain();
- const purchase=active.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='30 дней · 50 ⭐').callback_data;active.callback(purchase);active.commerce.enabled=false;await active.drain();
+ const purchase=active.last().reply_markup.inline_keyboard.flat().find(x=>x.text==='30 дней · 300 ₽').callback_data;active.callback(purchase);new Cabinet(active.store).setPlans([]);await active.drain();
  assert.ok(!active.calls.some(x=>x.method==='sendInvoice'));assert.match(active.last().text,/Действие сейчас недоступно/);
 });
 

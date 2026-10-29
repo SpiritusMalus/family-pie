@@ -7,6 +7,7 @@ import {validateStarsPlans,describeStarsPlans} from '../telegram-pricing.mjs';
 import {TelegramCommerce,loadTelegramStarsConfig} from '../telegram-commerce.mjs';
 import {VpnStore} from '../store.mjs';
 import {Accounts} from '../auth.mjs';
+import {Cabinet} from '../cabinet.mjs';
 import {TelegramStore} from '../telegram.mjs';
 import {TelegramUI} from '../telegram-ui.mjs';
 
@@ -17,7 +18,7 @@ function fixture(t,{plans=candidate,enabled=true}={}){
  const store=new VpnStore(':memory:');t.after(()=>store.close());const users=new Accounts(store),telegram=new TelegramStore(store);
  const commerce=new TelegramCommerce(store,{users,stars:{enabled,approved:enabled,plans}});commerce.ensure(1001,{acceptedTerms:true});
  const ui=new TelegramUI(telegram,{commerce,enabled:true});
- return {store,users,commerce,render:()=>ui.render({chat_id:'1001',view:'plans',payload:'{}'}).data};
+ return {store,users,commerce,cabinet:new Cabinet(store),render:()=>ui.render({chat_id:'1001',view:'plans',payload:'{}'}).data};
 }
 
 test('catalogue sorts copied records and requires a strictly improving daily price for every longer listed term',()=>{
@@ -66,21 +67,21 @@ test('catalogue replacement affects new invoices while replayed and persisted or
  assert.throws(()=>new TelegramCommerce(f.store,{users:f.users,stars:{plans:[{days:30,stars:400},{days:90,stars:1200}]}}),/less per day/);assert.deepEqual(f.store.db.prepare('SELECT payment_amount FROM orders ORDER BY payment_amount').all().map(p=>p.payment_amount),[350,400]);
 });
 
-test('native plan view shows real totals and normalized savings while original invoice buttons remain sorted and unchanged',t=>{
+test('main bot does not turn an enabled Stars catalogue into RUB prices or new invoice buttons',t=>{
  const f=fixture(t,{plans:[candidate[3],candidate[1],candidate[0],candidate[2]]}),view=f.render();
- assert.deepEqual(view.reply_markup.inline_keyboard.slice(0,4).map(row=>row[0].text),['30 дней · 350 ⭐','90 дней · 900 ⭐','180 дней · 1600 ⭐','365 дней · 2800 ⭐']);
- for(const text of ['900 ⭐ всего','300 ⭐ за 30 дней','≈ 266,67 ⭐ за 30 дней','экономия ≈ 23,8%','≈ 230,14 ⭐ за 30 дней','экономия ≈ 34,2%'])assert.ok(view.text.includes(text),text);
- assert.match(view.text,/Один платёж за весь срок/);assert.match(view.text,/относительно тарифа на 30 дней/);
- const intents=f.store.db.prepare("SELECT data FROM telegram_ui_callbacks WHERE action='invoice' ORDER BY rowid").all().map(row=>JSON.parse(row.data).days);assert.deepEqual(intents,[30,90,180,365]);
+ assert.match(view.text,/Тарифы сейчас недоступны/);assert.ok(!view.reply_markup.inline_keyboard.flat().some(button=>button.text.includes('⭐')));
+ assert.equal(f.store.db.prepare("SELECT count(*) n FROM telegram_ui_callbacks WHERE action IN ('invoice','checkout')").get().n,0);
+ assert.deepEqual(f.commerce.plans().plans,candidate);assert.equal(f.store.db.prepare('SELECT count(*) n FROM orders').get().n,0);
 });
 
-test('missing base, one-term, empty and disabled views avoid invented savings or active payment choices',t=>{
- const noBase=fixture(t,{plans:[{days:90,stars:900},{days:180,stars:1600}]}).render();assert.match(noBase.text,/≈ 266,67/);assert.doesNotMatch(noBase.text,/экономия|относительно тарифа/);
- const single=fixture(t,{plans:[{days:30,stars:50}]}).render();assert.doesNotMatch(single.text,/экономия|за 30 дней/);assert.equal(single.reply_markup.inline_keyboard[0][0].text,'30 дней · 50 ⭐');
- const longer=fixture(t,{plans:[{days:90,stars:900}]}).render();assert.match(longer.text,/300 ⭐ за 30 дней/);assert.doesNotMatch(longer.text,/экономия/);
- for(const options of [{plans:[]},{enabled:false}]){const view=fixture(t,options).render();assert.match(view.text,/пока недоступна/);assert.ok(!view.reply_markup.inline_keyboard.flat().some(button=>button.text.includes('⭐')));}
+test('persisted RUB choices remain available regardless of empty or disabled Stars catalogue',t=>{
+ for(const options of [{plans:[]},{enabled:false},{plans:[{days:90,stars:900}]}]){
+  const f=fixture(t,options);f.cabinet.setPlans([{days:90,priceMinor:76500,devices:0}]);const view=f.render();
+  assert.equal(view.reply_markup.inline_keyboard[0][0].text,'90 дней · 765 ₽');assert.match(view.text,/на сайте через ЮKassa/);assert.doesNotMatch(view.text,/⭐|экономия|за 30 дней/);
+ }
 });
 
-test('tiny discount comparison is escaped for Telegram HTML without corrupting the displayed inequality',t=>{
- const view=fixture(t,{plans:[{days:30,stars:333334},{days:90,stars:1000000}]}).render();assert.match(view.text,/экономия &lt;0,1%/);assert.doesNotMatch(view.text,/<0,1%/);
+test('legacy Stars comparison remains exact without being injected into the current RUB purchase view',t=>{
+ const f=fixture(t,{plans:[{days:30,stars:333334},{days:90,stars:1000000}]});f.cabinet.setPlans([{days:30,priceMinor:30000,devices:0}]);
+ assert.equal(describeStarsPlans(f.commerce.plans().plans)[1].savings,'<0,1%');assert.doesNotMatch(f.render().text,/0,1%|1000000|Stars|⭐/);
 });

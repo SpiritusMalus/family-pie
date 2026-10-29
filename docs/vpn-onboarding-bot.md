@@ -4,6 +4,33 @@ This change is prepared for rendered-preview review. It is not publication appro
 The website and native bot share account, order, entitlement and provisioning state.
 Website RUB/YooKassa payments and Telegram Stars payments remain separate providers.
 
+## Current checkout direction — 2026-10-28
+
+New bot purchases use the saved website RUB catalogue and open the existing
+YooKassa website checkout. Selecting a term does not create an order or charge.
+The selected term travels in the server-bound, one-use login handoff; successful
+consumption opens only the fixed cabinet plans route. Query parameters cannot
+override the consumed account or term. Expired links retain a bounded ordinary
+sign-in fallback. Historical Stars payment and refund events remain supported.
+
+The bot documents `/renew 30` and the other available terms as keyboard input.
+Registration also accepts the exact displayed consent text after a delivered,
+unexpired notice for the same private actor, guest scope and current legal version.
+Replays, forwarded messages and stale notices cannot create another account.
+
+An optional operator QA lane is off by default. A separate pinned owner, private
+credential and at most three-hour case route genuine Telegram UI updates into an
+initially empty, isolated database. It uses the same handlers and a sole TEST
+30-day/300-RUB plan. Its merchant belongs only to the separate guarded web stage;
+the bot never loads a payment key. Financial events and support remain on their
+existing routes. Configuration failures fence only the pinned QA actor. A QA
+case is not a production sale, and source tests do not prove a live payment or
+physical VPN connection.
+
+Email support remains a plain readable `mailto` link on public and authenticated
+screens. Email-copy controls have been removed; personal VPN-link and invitation
+copying remain available.
+
 ## Customer behavior
 
 The public header includes My account. A confirmed website payment continues to the

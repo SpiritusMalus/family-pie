@@ -5,6 +5,7 @@ import {validateStarsPlans} from './telegram-pricing.mjs';
 import {SUPPORT_EMAIL} from './support-contact.mjs';
 const digest=value=>createHash('sha256').update(value).digest('hex');
 const devices=new Set(['android','ios','windows','macos','linux','tv']);
+const periods=new Set([30,90,180,365]);
 const invalid=message=>{const e=new Error(message);e.code='INVALID_PAYMENT';throw e;};
 const chat=value=>{const id=String(value);if(!/^[1-9][0-9]{0,15}$/.test(id)||!Number.isSafeInteger(Number(id)))invalid('Недопустимый личный чат');return id;};
 const required=(ok,message='Не удалось проверить платёж')=>{if(!ok)invalid(message);};
@@ -35,22 +36,37 @@ export class TelegramCommerce {
    CREATE TABLE IF NOT EXISTS telegram_purchase_consents(token_hash TEXT PRIMARY KEY,account_id TEXT NOT NULL REFERENCES identities(account_id),chat_id TEXT NOT NULL,generation TEXT NOT NULL,request_key TEXT NOT NULL,days INTEGER NOT NULL,stars INTEGER NOT NULL,terms_version TEXT NOT NULL,terms_hash TEXT NOT NULL,terms_json TEXT NOT NULL,expires INTEGER NOT NULL,accepted_at INTEGER,order_id TEXT REFERENCES orders(id));
    CREATE INDEX IF NOT EXISTS telegram_purchase_order ON telegram_purchase_consents(order_id);
    CREATE INDEX IF NOT EXISTS telegram_purchase_pending ON telegram_purchase_consents(account_id,expires);`);
+  for(const [table,name,type] of [['telegram_handoffs','target',"TEXT NOT NULL DEFAULT 'devices'"],['telegram_handoffs','period','INTEGER'],['telegram_native_accounts','terms_version',"TEXT NOT NULL DEFAULT ''"],['telegram_native_accounts','terms_hash',"TEXT NOT NULL DEFAULT ''"]])if(!this.db.prepare('PRAGMA table_info('+table+')').all().some(column=>column.name===name))this.db.exec('ALTER TABLE '+table+' ADD COLUMN '+name+' '+type);
   this.recovery=recovery||new PasswordRecovery(store,users,{origin,clock});
  }
  recoveryHandoff(chatId){return this.recovery.issueTelegram(chatId);}
  transaction(fn){return this.db.isTransaction?fn():this.store.transaction(fn);}
  plans(){return {available:Boolean(this.enabled),plans:[...this.starPlans.values()]};}
+ checkoutPlans(){
+  // The API persists the approved RUB catalogue here. The poller never needs merchant credentials.
+  if(!this.db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='cabinet_config'").get())return {available:false,plans:[]};
+  let plans;try{plans=JSON.parse(this.db.prepare("SELECT value FROM cabinet_config WHERE key='plans'").get()?.value||'[]');}catch{return {available:false,plans:[]};}
+  if(!Array.isArray(plans)||plans.length>4||new Set(plans.map(plan=>plan?.days)).size!==plans.length||plans.some(plan=>!plan||!periods.has(plan.days)||!Number.isSafeInteger(plan.priceMinor)||plan.priceMinor<100||plan.priceMinor>100000000))return {available:false,plans:[]};
+  plans=plans.map(({days,priceMinor})=>({days,priceMinor,devices:0})).sort((a,b)=>a.days-b.days);
+  return {available:plans.length>0,plans};
+ }
+ checkoutPlan(chatId,period){
+  const identity=this.accountForChat(chatId);required(identity?.role==='user','Сначала создай или подключи пользовательский аккаунт');
+  const subscription=this.users.subscription(identity.account_id);required(!subscription.deleted&&!subscription.allow_unlimited,'Для этого аккаунта покупка недоступна');
+  const plan=periods.has(period)&&this.checkoutPlans().plans.find(plan=>plan.days===period);required(plan,'Тариф недоступен. Выбери срок подписки заново');return plan;
+ }
  accountForChat(chatId){
   const id=chat(chatId),row=this.db.prepare('SELECT i.account_id,i.login,i.role,i.must_change,i.enabled FROM telegram_links l JOIN identities i USING(account_id) WHERE l.chat_id=?').get(id);
   return row?.enabled&&!row.must_change?row:null;
  }
- ensure(chatId,{acceptedTerms=false}={}){
+ ensure(chatId,{acceptedTerms=false,termsVersion='',termsHash=''}={}){
   const id=chat(chatId);required(acceptedTerms===true,'Подтверди условия сервиса перед созданием аккаунта');
+  required(typeof termsVersion==='string'&&termsVersion.length<=80&&typeof termsHash==='string'&&(!termsHash||/^[a-f0-9]{64}$/.test(termsHash)),'Не удалось проверить условия сервиса');
   return this.transaction(()=>{
    const linked=this.db.prepare('SELECT account_id FROM telegram_links WHERE chat_id=?').get(id);
    if(linked){const existing=this.accountForChat(id);required(existing,'Сначала восстанови вход в существующий аккаунт');return existing;}
    const identity=this.users.addTelegramInternal();
-   this.db.prepare('INSERT INTO telegram_native_accounts VALUES(?,?,?)').run(identity.account_id,id,this.clock());
+   this.db.prepare('INSERT INTO telegram_native_accounts(account_id,registered_chat,terms_at,terms_version,terms_hash) VALUES(?,?,?,?,?)').run(identity.account_id,id,this.clock(),termsVersion,termsHash);
    this.db.prepare('INSERT INTO telegram_links(account_id,chat_id,enabled,generation,bound_at) VALUES(?,?,1,?,?)').run(identity.account_id,id,randomBytes(16).toString('hex'),this.clock());
    return identity;
   });
@@ -64,25 +80,30 @@ export class TelegramCommerce {
   const sub=this.users.subscription(identity.account_id);
   return {...sub,profile_url:sub.active&&sub.sync_state==='synced'?sub.profile_url:null};
  }
- handoff(chatId,{device='android',purpose='login'}={}){
+ handoff(chatId,{device='android',purpose='login',target='devices',period=null}={}){
   const id=chat(chatId),identity=this.accountForChat(id);required(identity,'Сначала подключи свой аккаунт');
   required(devices.has(device)&&['login','import'].includes(purpose),'Неизвестный способ подключения');
+  required(['devices','plans'].includes(target)&&(target==='plans'?purpose==='login'&&periods.has(period):period===null),'Неизвестный переход в кабинет');
+  if(target==='plans')this.checkoutPlan(id,period);
   if(purpose==='import'){const s=this.subscription(id);required(s?.active&&s.sync_state==='synced'&&s.profile_url,'Подключение пока не готово');}
   const link=this.db.prepare('SELECT generation FROM telegram_links WHERE account_id=? AND chat_id=?').get(identity.account_id,id),token=randomBytes(32).toString('base64url');
   this.transaction(()=>{
    this.db.prepare('DELETE FROM telegram_handoffs WHERE expires<=? OR (account_id=? AND purpose=?)').run(this.clock(),identity.account_id,purpose);
-   this.db.prepare('INSERT INTO telegram_handoffs VALUES(?,?,?,?,?,?,?)').run(digest(token),identity.account_id,id,link.generation,purpose,device,this.clock()+300000);
+   this.db.prepare('INSERT INTO telegram_handoffs(token_hash,account_id,chat_id,generation,purpose,device,expires,target,period) VALUES(?,?,?,?,?,?,?,?,?)').run(digest(token),identity.account_id,id,link.generation,purpose,device,this.clock()+300000,target,period);
   });
-  return this.origin+(purpose==='import'?'/vpn/connect/#token=':'/vpn/cabinet/auth/#telegram=')+token+'&device='+device;
+  const intent=target==='plans'?'?period='+period+'&next='+encodeURIComponent('/vpn/cabinet/#plans?period='+period):'';
+  return this.origin+(purpose==='import'?'/vpn/connect/#token=':'/vpn/cabinet/auth/'+intent+'#telegram=')+token+'&device='+device;
  }
  handoffRecord(token,purpose,accountId=null){
   required(typeof token==='string'&&/^[A-Za-z0-9_-]{43}$/.test(token),'Ссылка недействительна или истекла. Открой новую в боте');
   const row=this.db.prepare('SELECT h.* FROM telegram_handoffs h JOIN telegram_links l ON l.account_id=h.account_id AND l.chat_id=h.chat_id AND l.generation=h.generation WHERE h.token_hash=? AND h.purpose=? AND h.expires>?').get(digest(token),purpose,this.clock());
   required(row&&this.accountForChat(row.chat_id)?.account_id===row.account_id,'Ссылка недействительна или истекла. Открой новую в боте');
+  required(['devices','plans'].includes(row.target)&&(row.target==='plans'?purpose==='login'&&periods.has(row.period):row.period===null),'Неизвестный переход в кабинет');
+  if(row.target==='plans')this.checkoutPlan(row.chat_id,row.period);
   if(purpose==='login'&&accountId&&accountId!==row.account_id){const error=new Error('Сейчас открыт другой аккаунт. Выйди из него перед входом через Telegram');error.code='LOGIN_ACCOUNT_CONFLICT';throw error;}
   return row;
  }
- previewLogin(token,{accountId=null}={}){return this.transaction(()=>{const row=this.handoffRecord(token,'login',accountId);return {login:this.users.identity(row.account_id).login,device:row.device};});}
+ previewLogin(token,{accountId=null}={}){return this.transaction(()=>{const row=this.handoffRecord(token,'login',accountId);return {login:this.users.identity(row.account_id).login,device:row.device,target:row.target,period:row.period};});}
  consume(token,purpose,{accountId=null}={}){
   return this.transaction(()=>{
    const row=this.handoffRecord(token,purpose,accountId);
@@ -92,7 +113,7 @@ export class TelegramCommerce {
     return {profileUrl:s.profile_url,device:row.device,expiresAt:s.expires_at};
    }
    required(purpose==='login');this.db.prepare('DELETE FROM telegram_handoffs WHERE token_hash=?').run(digest(token));
-   return {...this.users.newSession(row.account_id,{method:'telegram'}),device:row.device};
+   return {...this.users.newSession(row.account_id,{method:'telegram'}),device:row.device,target:row.target,period:row.period};
   });
  }
  purchaseAccount(chatId,days,requestKey){
