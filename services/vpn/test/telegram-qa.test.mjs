@@ -9,7 +9,7 @@ import {TelegramStore,deliverOne} from '../telegram.mjs';
 import {TelegramCommerce} from '../telegram-commerce.mjs';
 import {TelegramUI,deliverUiOne} from '../telegram-ui.mjs';
 import {TelegramSupport} from '../telegram-support.mjs';
-import {createTelegramQa,readTelegramQaConfig} from '../telegram-qa.mjs';
+import {createTelegramQa,readTelegramQaConfig,allowsSystemdQaCredential} from '../telegram-qa.mjs';
 
 const OWNER=1001,OTHER=1002,PLANS=[{days:30,priceMinor:30000,devices:0}];
 function fixture(t,{patch={},enabled='1',credentialText,ownerPin=String(OWNER)}={}){
@@ -171,4 +171,53 @@ test('ordinary text, replies, forwarded navigation and precheckout/recovery do n
   f.message(text,{patch:extra});assert.equal(f.store.db.prepare('SELECT mode FROM telegram_ui_state WHERE chat_id=?').get(String(OWNER)).mode,'support');assert.equal(f.counts(f.store).accounts,0);assert.equal(f.counts(f.qa.store).accounts,0);
  }
  f.commerce.preCheckout=()=>({pre_checkout_query_id:'support-finance',ok:false});f.update({pre_checkout_query:{id:'support-finance',from:{id:OWNER}}});assert.equal(f.store.db.prepare('SELECT mode FROM telegram_ui_state WHERE chat_id=?').get(String(OWNER)).mode,'support');
+});
+
+function systemdMetadata(){
+ const credentialDirectory='/run/credentials/family-vpn-telegram.service';
+ const parent={uid:0,gid:0,mode:0o40550,dev:17,ino:10,isDirectory:()=>true,isSymbolicLink:()=>false};
+ const file={uid:0,gid:0,mode:0o100440,dev:17,ino:11,nlink:1,isFile:()=>true,isSymbolicLink:()=>false};
+ return {path:credentialDirectory+'/telegram-qa',credentialDirectory,canonicalDirectory:credentialDirectory,canonicalPath:credentialDirectory+'/telegram-qa',parent,file,current:{...file},parentAfter:{...parent},platform:'linux',mountInfo:'12 8 0:17 / '+credentialDirectory+' ro,nosuid,nodev,noexec,relatime,nosymfollow - tmpfs tmpfs rw,size=1024k,mode=700\n'};
+}
+
+test('systemd root0550/root0440 credentials are accepted only in the exact per-service read-only mount',()=>{
+ const value=systemdMetadata();assert.equal(allowsSystemdQaCredential(value),true);
+ assert.equal(allowsSystemdQaCredential({...value,mountInfo:value.mountInfo.replace(' - tmpfs tmpfs ',' - ramfs ramfs ')}),true);
+ // The manager's backing superblock is writable; the service's mount is read-only.
+ assert.ok(value.mountInfo.includes(' - tmpfs tmpfs rw,'));
+});
+
+test('systemd credential exception rejects wrong namespace, ordinary group-readable files, aliases and non-Linux',()=>{
+ const value=systemdMetadata();
+ for(const change of [
+  {credentialDirectory:undefined},{credentialDirectory:'/tmp/credentials/family-vpn-telegram.service'},
+  {credentialDirectory:'/run/credentials/@system'},{credentialDirectory:'/run/credentials/../family-vpn-telegram.service'},
+  {path:value.credentialDirectory+'/bot-token'},{canonicalPath:'/different/telegram-qa'},
+  {canonicalDirectory:'/different/service'},{platform:'darwin'},
+  {mountInfo:''},{mountInfo:value.mountInfo+value.mountInfo},
+  {mountInfo:value.mountInfo.replace('ro,nosuid','rw,nosuid')},
+  {mountInfo:value.mountInfo.replace('ro,nosuid,','ro,')},
+  {mountInfo:value.mountInfo.replace(' - tmpfs tmpfs ',' - ext4 /dev/sda ')}
+ ])assert.equal(allowsSystemdQaCredential({...value,...change}),false);
+});
+
+test('systemd credential exception rejects changed ownership, other access, writable masks, symlinks and inode swaps',()=>{
+ const value=systemdMetadata();
+ for(const [key,changes] of [
+  ['parent',{uid:1001}],['parent',{gid:1001}],['parent',{mode:0o40551}],['parent',{mode:0o40570}],
+  ['parent',{isSymbolicLink:()=>true}],['file',{uid:1001}],['file',{gid:1001}],
+  ['file',{mode:0o100444}],['file',{mode:0o100460}],['file',{mode:0o100450}],
+  ['file',{isSymbolicLink:()=>true}],['file',{nlink:2}],['file',{dev:18}],
+  ['current',{ino:99}],['current',{mode:0o100660}],['parentAfter',{ino:99}],['parentAfter',{mode:0o40750}]
+ ])assert.equal(allowsSystemdQaCredential({...value,[key]:{...value[key],...changes}}),false);
+});
+
+test('systemd loader context does not relax ordinary credential, QA directory or database permissions',t=>{
+ const f=fixture(t),read=()=>readTelegramQaConfig(f.path,{liveDbPath:f.livePath,ownerId:OWNER,clock:f.clock,credentialDirectory:f.env.CREDENTIALS_DIRECTORY});
+ assert.equal(read().ownerId,OWNER);
+ chmodSync(f.path,0o440);chmodSync(f.env.CREDENTIALS_DIRECTORY,0o550);assert.throws(read);
+ chmodSync(f.path,0o600);chmodSync(f.env.CREDENTIALS_DIRECTORY,0o700);
+ chmodSync(f.qaPath,0o640);assert.throws(read);chmodSync(f.qaPath,0o600);
+ chmodSync(join(f.root,'qa'),0o750);assert.throws(read);chmodSync(join(f.root,'qa'),0o700);
+ assert.equal(read().ownerId,OWNER);
 });

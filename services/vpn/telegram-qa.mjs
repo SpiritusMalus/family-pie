@@ -24,16 +24,41 @@ const privateActor=update=>{
 const navigationText=new Set(['Меню','Моя подписка','Подключиться','Продлить','Купить / продлить','Уведомления','Личный кабинет','💳 Купить / продлить','🔌 Подключиться','📋 Моя подписка','🔔 Напоминания']);
 const navigationCommands=new Set(['/menu','/terms','/privacy','/status','/subscription','/connect','/renew','/plans','/notifications','/disconnect','/cabinet']);
 const privateOwner=stat=>(stat.uid===0||stat.uid===process.getuid?.())&&(stat.mode&0o077)===0;
-function privateFile(path,max=16_384){
- const parent=lstatSync(dirname(path));requireThat(parent.isDirectory()&&!parent.isSymbolicLink()&&privateOwner(parent));
- const before=lstatSync(path);requireThat(before.isFile()&&!before.isSymbolicLink()&&before.nlink===1&&before.size<=max&&privateOwner(before));
+/** The ACL mask of systemd's per-service credential mount is group-readable.
+ * Accept that metadata only for this credential on its exact read-only mount;
+ * the ordinary private-file and QA database permission rules remain unchanged.
+ */
+export function allowsSystemdQaCredential({path,credentialDirectory,canonicalDirectory,canonicalPath,parent,file,current=file,parentAfter=parent,mountInfo,platform=process.platform}){
+ if(platform!=='linux'||typeof credentialDirectory!=='string'||!/^\/run\/credentials\/[A-Za-z0-9][A-Za-z0-9_.@-]{0,200}\.service$/.test(credentialDirectory)||canonicalDirectory!==credentialDirectory||canonicalPath!==path||path!==join(credentialDirectory,'telegram-qa'))return false;
+ const directory=stat=>stat?.isDirectory()&&!stat.isSymbolicLink()&&stat.uid===0&&stat.gid===0&&(stat.mode&0o7777)===0o550;
+ const credential=stat=>stat?.isFile()&&!stat.isSymbolicLink()&&stat.uid===0&&stat.gid===0&&(stat.mode&0o7777)===0o440&&stat.nlink===1;
+ if(!directory(parent)||!directory(parentAfter)||!credential(file)||!credential(current)||parent.dev!==parentAfter.dev||parent.ino!==parentAfter.ino||file.dev!==current.dev||file.ino!==current.ino||file.dev!==parent.dev)return false;
+ if(typeof mountInfo!=='string')return false;
+ const mounts=mountInfo.split('\n').map(line=>line.split(' - ')).filter(parts=>parts.length===2).map(([left,right])=>({fields:left.split(' '),filesystem:right.split(' ')[0]})).filter(row=>row.fields[4]===credentialDirectory);
+ if(mounts.length!==1||!['tmpfs','ramfs'].includes(mounts[0].filesystem))return false;
+ // Per-mount flags (before " - ") control access. The underlying tmpfs may be
+ // writable in systemd's namespace, so its superblock options are not the guard.
+ const options=mounts[0].fields[5]?.split(',')||[];
+ return options.includes('ro')&&!options.includes('rw')&&['nosuid','nodev','noexec'].every(option=>options.includes(option));
+}
+function privateFile(path,max=16_384,{credentialDirectory}={}){
+ const parent=lstatSync(dirname(path)),before=lstatSync(path);
+ requireThat(parent.isDirectory()&&!parent.isSymbolicLink()&&before.isFile()&&!before.isSymbolicLink()&&before.nlink===1&&before.size<=max);
+ const ordinary=privateOwner(parent)&&privateOwner(before);
+ const context=ordinary?null:{path,credentialDirectory,canonicalDirectory:realpathSync(dirname(path)),canonicalPath:realpathSync(path),parent,file:before,mountInfo:process.platform==='linux'?readFileSync('/proc/self/mountinfo','utf8'):''};
+ requireThat(ordinary||allowsSystemdQaCredential(context));
  const fd=openSync(path,constants.O_RDONLY|constants.O_NOFOLLOW);
- try{const current=fstatSync(fd);requireThat(current.dev===before.dev&&current.ino===before.ino&&privateOwner(current));return readFileSync(fd,'utf8');}finally{closeSync(fd);}
+ try{
+  const current=fstatSync(fd),parentAfter=lstatSync(dirname(path));
+  requireThat(current.dev===before.dev&&current.ino===before.ino&&current.size<=max&&parentAfter.dev===parent.dev&&parentAfter.ino===parent.ino);
+  requireThat(ordinary?privateOwner(current)&&privateOwner(parentAfter):allowsSystemdQaCredential({...context,current,parentAfter}));
+  return readFileSync(fd,'utf8');
+ }finally{closeSync(fd);}
 }
 
 /** Credential contains routing/state only. Unknown fields, including merchant secrets, fail closed. */
-export function readTelegramQaConfig(path,{liveDbPath,ownerId,clock=Date.now}={}){
- const value=JSON.parse(privateFile(path)),keys=['schema','caseId','ownerId','expiresAt','dbPath','webOrigin','plans'];
+export function readTelegramQaConfig(path,{liveDbPath,ownerId,clock=Date.now,credentialDirectory}={}){
+ const value=JSON.parse(privateFile(path,16_384,{credentialDirectory})),keys=['schema','caseId','ownerId','expiresAt','dbPath','webOrigin','plans'];
  requireThat(value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).length===keys.length&&Object.keys(value).every(key=>keys.includes(key)));
  requireThat(value.schema===1&&typeof value.caseId==='string'&&/^[a-z0-9][a-z0-9-]{7,63}$/.test(value.caseId)&&positive(ownerId)&&value.ownerId===ownerId);
  requireThat(positive(value.expiresAt)&&value.expiresAt<=clock()+MAX_CASE_MS); // An expired, valid case remains fenced.
@@ -183,7 +208,7 @@ export function createTelegramQa(telegram,productionUi,{env=process.env,clock=te
  if(env.VPN_TELEGRAM_QA_ENABLED!=='1')return null;
  const raw=env.VPN_TELEGRAM_QA_OWNER_ID,ownerId=Number(raw);
  if(typeof raw!=='string'||!/^[1-9][0-9]{0,15}$/.test(raw)||!positive(ownerId)||String(ownerId)!==raw){onStatus('Telegram QA not armed: explicit owner configuration missing or invalid');return null;}
- let config=null;try{requireThat(typeof env.CREDENTIALS_DIRECTORY==='string'&&isAbsolute(env.CREDENTIALS_DIRECTORY));config=readTelegramQaConfig(join(env.CREDENTIALS_DIRECTORY,'telegram-qa'),{liveDbPath:env.VPN_DATABASE_PATH,ownerId,clock});}catch{}
+ let config=null;try{requireThat(typeof env.CREDENTIALS_DIRECTORY==='string'&&isAbsolute(env.CREDENTIALS_DIRECTORY));config=readTelegramQaConfig(join(env.CREDENTIALS_DIRECTORY,'telegram-qa'),{liveDbPath:env.VPN_DATABASE_PATH,ownerId,clock,credentialDirectory:env.CREDENTIALS_DIRECTORY});}catch{}
  const qa=new TelegramQaDispatcher(telegram,productionUi,{config,ownerId,clock,botUsername:env.VPN_TELEGRAM_BOT_USERNAME});
  if(qa.failed)onStatus('Telegram QA fenced for configured owner: private configuration or state unavailable');
  return qa;
