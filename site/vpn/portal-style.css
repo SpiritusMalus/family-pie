@@ -110,3 +110,20 @@ input,textarea,code,.text-body,.is-cabinet main>section p{-webkit-user-select:te
 #recovery-telegram{margin-top:14px}
 .cabinet-load-state{display:none;max-width:1200px;margin:0 auto;padding:40px 32px;font-size:16px}.account-loading .cabinet-load-state{display:block}.cabinet-load-state .cab-actions{margin-top:20px}
 @media(max-width:420px){.setup-progress-nav{gap:0}.setup-progress-nav button{padding:11px 7px;font-size:12px}.password-recovery .btn{width:100%;white-space:normal}.setup-steps>li{padding-left:24px}}
+
+/* Support keeps its three entry points visible and its disclosure explicit. */
+.support-options{display:grid;gap:12px;max-width:640px}
+.support-options>.support-email{min-height:56px}
+.support-options>.support-email>a,.support-options>.support-channel,.support-options .support-disclosure>summary{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:56px;margin:0;padding:16px 20px;border:1px solid var(--line);border-radius:4px;text-decoration:none;font-weight:500;line-height:1.5;background:transparent;color:var(--fg)}
+.support-options>.support-email>a{color:var(--accent)}
+.support-options>.support-email>a:hover,.support-options>.support-channel:hover,.support-options .support-disclosure>summary:hover{background:var(--panel);border-color:var(--muted)}
+.support-options>details.support-disclosure{padding:0;border:0;margin:0;min-width:0}
+.support-options .support-disclosure>summary::after{content:none}
+.support-options .support-disclosure>summary::-webkit-details-marker{display:none}
+.support-disclosure-action{display:flex;align-items:center;gap:12px;flex-shrink:0;color:var(--accent);font-size:14px}
+.support-disclosure-action::after{content:'';width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg)}
+.support-disclosure[open] .support-disclosure-action::after{transform:translateY(2px) rotate(225deg)}
+.support-disclosure:not([open]) .support-close-label,.support-disclosure[open] .support-open-label{display:none}
+.support-disclosure>.panel{background:transparent;border:0;padding:24px 0 0;margin:0}
+.support-disclosure>.panel:has(>h2:only-child){display:none}
+@media(max-width:420px){.support-options>.support-email>a,.support-options>.support-channel,.support-options .support-disclosure>summary{padding:14px 16px}.support-disclosure-action{gap:8px}}
