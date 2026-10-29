@@ -5,11 +5,12 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {VpnStore} from '../store.mjs';
 import {Accounts} from '../auth.mjs';
+import {Cabinet} from '../cabinet.mjs';
 import {TelegramStore,deliverOne} from '../telegram.mjs';
 import {TelegramCommerce} from '../telegram-commerce.mjs';
 import {TelegramUI,deliverUiOne} from '../telegram-ui.mjs';
 import {TelegramSupport} from '../telegram-support.mjs';
-import {createTelegramQa,readTelegramQaConfig,allowsSystemdQaCredential} from '../telegram-qa.mjs';
+import {createTelegramQa,readTelegramQaConfig,allowsSystemdQaCredential,qaLoopbackHandoffUrl} from '../telegram-qa.mjs';
 
 const OWNER=1001,OTHER=1002,PLANS=[{days:30,priceMinor:30000,devices:0}];
 function fixture(t,{patch={},enabled='1',credentialText,ownerPin=String(OWNER)}={}){
@@ -42,7 +43,8 @@ test('same genuine notice and public text register only the allowlisted QA accou
  f.message('/terms');await f.drain();const notice=f.qa.store.db.prepare('SELECT * FROM telegram_registration_notices').get();assert.ok(notice.delivered_at);assert.equal(f.counts(f.qa.store).accounts,0);
  f.message('Принимаю и продолжаю');await f.drain();assert.equal(f.counts(f.qa.store).accounts,1);assert.equal(f.counts(f.store).accounts,0);
  assert.equal(f.qa.store.db.prepare('SELECT registered_chat FROM telegram_native_accounts').get().registered_chat,String(OWNER));
- f.message('/renew 30');await f.drain();const checkout=f.calls.at(-1).data;assert.match(checkout.text,/^TEST · без реальных списаний/);const link=checkout.reply_markup.inline_keyboard.flat().find(x=>x.text==='Перейти на сайт');assert.equal(new URL(link.url).origin,'http://localhost:8352');assert.equal(new URL(link.url).searchParams.get('period'),'30');
+ f.message('/renew 30');await f.drain();const checkout=f.calls.at(-1).data;assert.match(checkout.text,/^TEST · без реальных списаний/);const link=checkout.reply_markup.inline_keyboard.flat().find(x=>x.text==='Перейти на сайт');assert.equal(new URL(link.url).origin,'http://127.0.0.1:8352');assert.equal(new URL(link.url).searchParams.get('period'),'30');
+ assert.equal(f.qa.store.db.prepare('SELECT count(*) n FROM telegram_handoffs').get().n,1);assert.equal(f.qa.commerce.origin,'http://localhost:8352');
  assert.deepEqual(f.counts(f.qa.store),{accounts:1,orders:0,grants:0});assert.ok(!f.calls.some(x=>['sendInvoice','refundStarPayment'].includes(x.method)));
  const durable=JSON.stringify(f.qa.store.db.prepare('SELECT payload FROM telegram_ui_outbox').all());assert.ok(!durable.includes(link.url));
  assert.equal(f.qa.store.db.prepare('SELECT initial_accounts FROM telegram_qa_case').get().initial_accounts,0);
@@ -220,4 +222,34 @@ test('systemd loader context does not relax ordinary credential, QA directory or
  chmodSync(f.qaPath,0o640);assert.throws(read);chmodSync(f.qaPath,0o600);
  chmodSync(join(f.root,'qa'),0o750);assert.throws(read);chmodSync(join(f.root,'qa'),0o700);
  assert.equal(read().ownerId,OWNER);
+});
+
+test('QA bootstrap URL changes hostname only, preserving the complete query and secret fragment exactly',()=>{
+ const query='?period=30&next=%2Fvpn%2Fcabinet%2F%23plans%3Fperiod%3D30',fragment='#telegram=SYNTHETIC_nonce-ONLY_123&device=macos';
+ const original='http://localhost:8352/vpn/cabinet/auth/'+query+fragment,result=qaLoopbackHandoffUrl(original,'http://localhost:8352');
+ assert.equal(result,'http://127.0.0.1:8352/vpn/cabinet/auth/'+query+fragment);assert.equal(new URL(result).search,new URL(original).search);assert.equal(new URL(result).hash,new URL(original).hash);
+});
+
+test('QA URL transport never rewrites foreign origins, other entry paths, credentials or malformed URLs',()=>{
+ for(const url of [
+  'https://family-spy.ru/vpn/cabinet/auth/#telegram=synthetic',
+  'http://foreign.example:8352/vpn/cabinet/auth/#telegram=synthetic',
+  'http://localhost:8353/vpn/cabinet/auth/#telegram=synthetic',
+  'http://user:synthetic@localhost:8352/vpn/cabinet/auth/#telegram=synthetic',
+  'http://localhost:8352@foreign.example/vpn/cabinet/auth/#telegram=synthetic',
+  'http://localhost:8352/vpn/connect/#token=synthetic',
+  'http://localhost:8352/vpn/api/telegram/login',
+  'http://localhost:8352/vpn/cabinet/auth/extra#telegram=synthetic',
+  'http://localhost:8352/vpn/cabinet/auth/../auth/#telegram=synthetic',
+  'http://localhost:8352/vpn/cabinet/auth/?x=bad\n#telegram=synthetic',
+  'not a URL','javascript:synthetic','https://apps.apple.com/example'
+ ])assert.equal(qaLoopbackHandoffUrl(url,'http://localhost:8352'),url);
+ const valid='http://localhost:8352/vpn/cabinet/auth/#telegram=synthetic';assert.equal(qaLoopbackHandoffUrl(valid,'https://family-spy.ru'),valid);assert.equal(qaLoopbackHandoffUrl(null,'http://localhost:8352'),null);
+});
+
+test('ordinary production checkout and QA message body remain unchanged by QA button transport',async t=>{
+ const f=fixture(t);new Cabinet(f.store).setPlans(PLANS);const identity=f.commerce.ensure(OTHER,{acceptedTerms:true});
+ f.message('/renew 30',{actor:OTHER});await f.drain();const live=f.calls.at(-1).data,liveButton=live.reply_markup.inline_keyboard.flat().find(x=>x.text==='Перейти на сайт');assert.equal(new URL(liveButton.url).origin,'https://family-spy.ru');assert.ok(!live.text.startsWith('TEST'));assert.ok(identity.account_id);
+ f.qa.commerce.ensure(OWNER,{acceptedTerms:true});const original=f.qa.commerce.handoff.bind(f.qa.commerce);let calls=0;
+ f.qa.commerce.handoff=(...args)=>{calls++;return original(...args);};f.message('/renew 30');await f.drain();const qa=f.calls.at(-1).data;assert.equal(calls,1);assert.match(qa.text,/TEST/);assert.ok(!qa.text.includes('127.0.0.1'));assert.equal(new URL(qa.reply_markup.inline_keyboard.flat().find(x=>x.text==='Перейти на сайт').url).origin,'http://127.0.0.1:8352');assert.equal(f.qa.store.db.prepare('SELECT count(*) n FROM telegram_handoffs').get().n,1);
 });

@@ -24,6 +24,16 @@ const privateActor=update=>{
 const navigationText=new Set(['Меню','Моя подписка','Подключиться','Продлить','Купить / продлить','Уведомления','Личный кабинет','💳 Купить / продлить','🔌 Подключиться','📋 Моя подписка','🔔 Напоминания']);
 const navigationCommands=new Set(['/menu','/terms','/privacy','/status','/subscription','/connect','/renew','/plans','/notifications','/disconnect','/cabinet']);
 const privateOwner=stat=>(stat.uid===0||stat.uid===process.getuid?.())&&(stat.mode&0o077)===0;
+// Telegram rejects dotless HTTP hosts. The QA shell redirects this exact local
+// bootstrap to localhost before authentication; its API/cookie origin is unchanged.
+export function qaLoopbackHandoffUrl(value,origin){
+ if(origin!=='http://localhost:8352'||typeof value!=='string'||value.split(/[?#]/,1)[0]!==origin+'/vpn/cabinet/auth/')return value;
+ try{
+  const url=new URL(value);
+  if(url.href!==value||url.origin!==origin||url.pathname!=='/vpn/cabinet/auth/'||url.username||url.password)return value;
+  url.hostname='127.0.0.1';return url.href;
+ }catch{return value;}
+}
 /** The ACL mask of systemd's per-service credential mount is group-readable.
  * Accept that metadata only for this credential on its exact read-only mount;
  * the ordinary private-file and QA database permission rules remain unchanged.
@@ -113,6 +123,9 @@ export class TelegramQaDispatcher {
     for(const row of message.data?.reply_markup?.inline_keyboard||[])for(let n=0;n<row.length;n++){
      const button=row[n],data=button.callback_data;
      if(typeof data==='string'&&/^u_[A-Za-z0-9_-]{24}$/.test(data)&&this.store.db.prepare('SELECT action FROM telegram_ui_callbacks WHERE token_hash=?').get(hash(data.slice(2)))?.action==='help')row[n]={text:button.text,url:'https://t.me/'+botUsername+'?start=support_vpn'};
+     else if(typeof button.url==='string'){
+      const url=qaLoopbackHandoffUrl(button.url,config.webOrigin);if(url!==button.url)row[n]={...button,url};
+     }
     }
     return message;
    };
