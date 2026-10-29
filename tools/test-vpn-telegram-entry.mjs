@@ -5,7 +5,7 @@ import {runInNewContext} from 'node:vm';
 
 const source=readFileSync(new URL('../site/vpn/telegram-entry.js',import.meta.url),'utf8');
 const token='a'.repeat(43);
-function fixture({purpose='import',fragment='token='+token+'&device=ios',search='?lang=en',profileUrl='https://example.invalid/sub/fixture',responseDevice,ok=true,status=400,confirmFailure=false,networkFailure=false,deferPreview=false,clipboard=true}={}){
+function fixture({purpose='import',fragment='token='+token+'&device=ios',search='?lang=en',profileUrl='https://example.invalid/sub/fixture',responseDevice,previewResult={},loginResult={},ok=true,status=400,confirmFailure=false,networkFailure=false,deferPreview=false,clipboard=true}={}){
   const element=()=>({hidden:false,dataset:{},children:[],attributes:new Map(),events:new Map(),append(...children){this.children.push(...children);},setAttribute(key,value){this.attributes.set(key,value);},removeAttribute(key){this.attributes.delete(key);},addEventListener(event,fn){this.events.set(event,fn);},focus(){this.focused=true;},scrollIntoView(){this.scrolled=true;}});
   const confirmEvents=new Map(),confirm={addEventListener:(event,fn)=>confirmEvents.set(event,fn)},cancel={},identity={},confirmation={hidden:true,querySelector:selector=>selector==='[data-telegram-account]'?identity:selector==='[data-telegram-cancel]'?cancel:confirm},login={hidden:false},title={hidden:false},methods={hidden:false},authRecovery={hidden:true},demo={hidden:false};
   const events=new Map(),message={dataset:{}},input={focus(){this.focused=true;},select(){this.selected=true;}},add=element(),copy={addEventListener:(event,fn)=>events.set(event,fn)};
@@ -19,7 +19,7 @@ function fixture({purpose='import',fragment='token='+token+'&device=ios',search=
   const history={replaceState:(_a,_b,path)=>{scrubbed.push(path);location.href=new URL(path,location).href;}};
   let destination,finishPreview;
   location.replace=path=>destination=path;
-  runInNewContext(source,{window,document:{documentElement:{dataset:{telegramEntry:purpose}},createElement:element,querySelector:selector=>selector==='#telegram-import'?box:selector==='#telegram-entry-recovery'?recovery:selector==='#telegram-login-confirm'?confirmation:selector==='#login-form'?login:selector==='#auth-title'?title:selector==='.auth-methods'?methods:selector==='#password-recovery'?authRecovery:selector==='.demo-label'?demo:message},location,history,URL,URLSearchParams,AbortSignal,CustomEvent:class{constructor(type){this.type=type;}},navigator:{clipboard:{writeText:async value=>{if(!clipboard)throw Error('blocked');calls.push({copied:value});}}},fetch:async(path,options)=>{calls.push({path,options,hashAtRequest:location.hash});if(networkFailure)throw new TypeError('Synthetic network failure');if(deferPreview&&path.endsWith('/preview'))await new Promise(resolve=>finishPreview=resolve);return {ok:ok&&!(confirmFailure&&path.endsWith('/login')),status,json:async()=>({profileUrl,device:responseDevice,login:'telegram-fixture'})};}});
+  runInNewContext(source,{window,document:{documentElement:{dataset:{telegramEntry:purpose}},createElement:element,querySelector:selector=>selector==='#telegram-import'?box:selector==='#telegram-entry-recovery'?recovery:selector==='#telegram-login-confirm'?confirmation:selector==='#login-form'?login:selector==='#auth-title'?title:selector==='.auth-methods'?methods:selector==='#password-recovery'?authRecovery:selector==='.demo-label'?demo:message},location,history,URL,URLSearchParams,AbortSignal,CustomEvent:class{constructor(type){this.type=type;}},navigator:{clipboard:{writeText:async value=>{if(!clipboard)throw Error('blocked');calls.push({copied:value});}}},fetch:async(path,options)=>{calls.push({path,options,hashAtRequest:location.hash});if(networkFailure)throw new TypeError('Synthetic network failure');if(deferPreview&&path.endsWith('/preview'))await new Promise(resolve=>finishPreview=resolve);return {ok:ok&&!(confirmFailure&&path.endsWith('/login')),status,json:async()=>({profileUrl,device:responseDevice,login:'telegram-fixture',...(path.endsWith('/preview')?previewResult:path.endsWith('/login')?loginResult:{})})};}});
   return {window,location,calls,scrubbed,message,input,add,box,events,confirmEvents,confirmation,identity,cancel,login,title,methods,authRecovery,installed,added,backInstall,backAdd,downloads,deviceLabel,stepLabel,steps,progress,recovery,finishPreview:()=>finishPreview(),get destination(){return destination;}};
 }
 test('one-use import credential is removed before the same-origin no-store request, then kept out of the page URL',async()=>{
@@ -36,6 +36,25 @@ test('denied clipboard keeps the actual manual link selected without false copie
 });
 test('login handoff previews identity without issuing login, then confirms with bounded device and language',async()=>{
   const f=fixture({purpose:'login',fragment:'telegram='+token+'&device='+encodeURIComponent('//evil.example')});assert.equal(await f.window.vpnTelegramEntry,true);assert.equal(f.calls[0].path,'/vpn/api/telegram/login/preview');assert.equal(f.calls[0].hashAtRequest,'');assert.equal(f.destination,undefined);assert.match(f.identity.textContent,/telegram-fixture/);assert.equal(f.confirmation.hidden,false);await f.confirmEvents.get('click')();assert.equal(f.calls[1].path,'/vpn/api/telegram/login');assert.equal(f.destination,'/vpn/cabinet/?lang=en#devices?platform=android');
+});
+test('checkout login uses only the consumed server term after explicit confirmation, with no automatic order or payment',async()=>{
+ for(const period of [30,90,180,365]){
+  const f=fixture({purpose:'login',fragment:'telegram='+token+'&device=ios&target=devices&period=30',search:'?lang=en&period=30&next='+encodeURIComponent('https://evil.invalid/#plans?period=365'),previewResult:{target:'plans',period:period===90?30:90},loginResult:{target:'plans',period,device:'macos'}});
+  assert.equal(await f.window.vpnTelegramEntry,true);assert.equal(f.destination,undefined);assert.equal(f.calls.length,1);
+  await f.confirmEvents.get('click')();assert.equal(f.destination,'/vpn/cabinet/?lang=en#plans?period='+period);
+  assert.deepEqual(f.calls.map(call=>call.path),['/vpn/api/telegram/login/preview','/vpn/api/telegram/login']);
+  for(const call of f.calls){assert.equal(call.hashAtRequest,'');assert.deepEqual(JSON.parse(call.options.body),{token});}
+ }
+});
+test('consumed device intent wins over preview, fragment and query checkout hints',async()=>{
+ const f=fixture({purpose:'login',fragment:'telegram='+token+'&device=ios&target=plans&period=365',search:'?period=180&next='+encodeURIComponent('/vpn/cabinet/#plans?period=180'),previewResult:{target:'plans',period:90},loginResult:{target:'devices',period:null,device:'windows'}});
+ await f.window.vpnTelegramEntry;await f.confirmEvents.get('click')();assert.equal(f.destination,'/vpn/cabinet/?lang=en#devices?platform=windows');assert.equal(f.calls.length,2);
+});
+test('legacy or malformed server intents cannot reflect arbitrary targets or non-catalogue terms into a redirect',async()=>{
+ for(const loginResult of [{},{target:'https://evil.invalid',period:90,device:'macos'},...['90',null,0,31,Infinity,'//evil.invalid',{},[]].map(period=>({target:'plans',period,device:'macos'}))]){
+  const f=fixture({purpose:'login',fragment:'telegram='+token+'&device='+encodeURIComponent('//evil.invalid'),search:'?period=365&next='+encodeURIComponent('https://evil.invalid'),loginResult});
+  await f.window.vpnTelegramEntry;await f.confirmEvents.get('click')();assert.equal(f.destination,'/vpn/cabinet/?lang=en#devices?platform='+(loginResult.device==='macos'?'macos':'android'));assert.equal(f.calls.length,2);
+ }
 });
 test('failed or reused handoffs never redirect and never keep the credential in history',async()=>{
   const f=fixture({purpose:'login',fragment:'telegram='+token,ok:false});assert.equal(await f.window.vpnTelegramEntry,false);assert.equal(f.destination,undefined);assert.equal(f.location.hash,'');assert.match(f.message.textContent,/Ссылка устарела/);

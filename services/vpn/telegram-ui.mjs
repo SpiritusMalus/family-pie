@@ -2,13 +2,17 @@ import {createHash, randomBytes, randomUUID} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import QRCode from 'qrcode';
 import {SUPPORT_EMAIL,emailSupportText} from './support-contact.mjs';
-import {describeStarsPlans} from './telegram-pricing.mjs';
 
 const MINUTE = 60_000, DAY = 86_400_000;
 const digest = value => createHash('sha256').update(value).digest('hex');
 const html = value => String(value).replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const positive = value => Number.isSafeInteger(value) && value > 0;
 const date = value => new Intl.DateTimeFormat('ru-RU', {timeZone:'UTC',dateStyle:'long'}).format(value).replace(/\.$/,'');
+const rub = minor => new Intl.NumberFormat('ru-RU',{style:'currency',currency:'RUB',minimumFractionDigits:0,maximumFractionDigits:2}).format(minor/100).replace(/\u00a0/g,' ');
+// Bump when this notice or its linked registration terms change; old notices never imply new consent.
+const registrationTerms = Object.freeze({version:'2026-10-28.1',notice:'Telegram станет способом входа в сервис. Подписка появится после подтверждённой оплаты. Нажимая кнопку или отправляя «Принимаю и продолжаю», ты принимаешь условия сервиса и обработку данных.',termsPath:'/vpn/terms/',privacyPath:'/vpn/privacy/'});
+const registrationHash = digest(JSON.stringify(registrationTerms));
+const acceptanceLabel = 'Принимаю и продолжаю';
 const commandFor = new Map([
  ['Подключиться','/connect'], ['Моя подписка','/status'], ['Продлить','/renew'],
  ['Купить / продлить','/renew'], ['Помощь','/help'], ['Меню','/menu'],
@@ -55,6 +59,7 @@ export class TelegramUI {
    CREATE TABLE IF NOT EXISTS telegram_ui_callbacks(token_hash TEXT PRIMARY KEY,chat_id TEXT NOT NULL,scope TEXT NOT NULL,action TEXT NOT NULL,data TEXT NOT NULL,expires INTEGER NOT NULL,used INTEGER NOT NULL DEFAULT 0);
    CREATE TABLE IF NOT EXISTS telegram_ui_outbox(id TEXT PRIMARY KEY,dedupe TEXT UNIQUE NOT NULL,chat_id TEXT NOT NULL,scope TEXT NOT NULL,view TEXT NOT NULL,payload TEXT NOT NULL,state TEXT NOT NULL DEFAULT 'pending',ready_at INTEGER NOT NULL,created_at INTEGER NOT NULL);
    CREATE INDEX IF NOT EXISTS telegram_ui_pending ON telegram_ui_outbox(state,ready_at);
+   CREATE TABLE IF NOT EXISTS telegram_registration_notices(chat_id TEXT PRIMARY KEY,scope TEXT NOT NULL,terms_version TEXT NOT NULL,notice_hash TEXT NOT NULL,callback_hash TEXT NOT NULL,job_id TEXT NOT NULL,expires INTEGER NOT NULL,delivered_at INTEGER,message_id INTEGER,accepted_at INTEGER);
   `);
  }
  authority(chatId) {
@@ -64,6 +69,7 @@ export class TelegramUI {
   return link?{identity,scope:identity.account_id+':'+link.generation}:{identity:null,scope:'guest'};
  }
  mode(chatId,mode='menu') {
+  if(mode!=='registration')this.db.prepare('DELETE FROM telegram_registration_notices WHERE chat_id=? AND accepted_at IS NULL').run(chatId);
   this.db.prepare('INSERT INTO telegram_ui_state(chat_id,mode,updated_at) VALUES(?,?,?) ON CONFLICT(chat_id) DO UPDATE SET mode=excluded.mode,blocked=0,updated_at=excluded.updated_at').run(chatId,mode,this.clock());
  }
  queue(chatId,key,view,payload={}) {
@@ -81,6 +87,7 @@ export class TelegramUI {
  cancel(chatId,{keepControl=false}={}) {
   this.db.prepare("UPDATE telegram_ui_outbox SET state='canceled' WHERE chat_id=? AND state='pending'"+(keepControl?" AND view NOT IN ('callback_answer','precheckout')":"")).run(chatId);
   this.db.prepare('DELETE FROM telegram_ui_callbacks WHERE chat_id=?').run(chatId);
+  this.db.prepare('DELETE FROM telegram_registration_notices WHERE chat_id=? AND accepted_at IS NULL').run(chatId);
  }
  mute(chatId,enabled) {
   const {identity}=this.authority(chatId);if(!identity)return;
@@ -89,6 +96,27 @@ export class TelegramUI {
  }
  nativeAccount(chatId) {
   return this.db.prepare('SELECT 1 FROM telegram_native_accounts n JOIN telegram_links l USING(account_id) WHERE l.chat_id=?').get(chatId);
+ }
+ acceptRegistration(chatId,key,callbackHash=null) {
+  return this.commerce.transaction(()=>{
+   const notice=this.db.prepare('SELECT * FROM telegram_registration_notices WHERE chat_id=?').get(chatId),authority=this.authority(chatId);
+   const valid=notice&&!authority.identity&&notice.scope===authority.scope&&notice.terms_version===registrationTerms.version&&notice.notice_hash===registrationHash&&notice.delivered_at!==null&&notice.expires>this.clock()&&notice.accepted_at===null&&this.db.prepare('SELECT mode FROM telegram_ui_state WHERE chat_id=?').get(chatId)?.mode==='registration';
+   if(!valid||callbackHash&&notice.callback_hash!==callbackHash){const error=new Error('Подтверждение условий истекло');error.code='INVALID_PAYMENT';throw error;}
+   const callback=this.db.prepare('SELECT * FROM telegram_ui_callbacks WHERE token_hash=?').get(notice.callback_hash);
+   if(!callback||callback.used||callback.scope!==authority.scope||callback.chat_id!==chatId||callback.expires<=this.clock()){const error=new Error('Подтверждение условий истекло');error.code='INVALID_PAYMENT';throw error;}
+   const intent=JSON.parse(callback.data);
+   if(intent.termsVersion!==registrationTerms.version||intent.noticeHash!==registrationHash){const error=new Error('Условия изменились');error.code='INVALID_PAYMENT';throw error;}
+   this.commerce.ensure(chatId,{acceptedTerms:true,termsVersion:registrationTerms.version,termsHash:registrationHash});
+   this.db.prepare('UPDATE telegram_registration_notices SET accepted_at=? WHERE chat_id=? AND accepted_at IS NULL').run(this.clock(),chatId);
+   this.db.prepare('UPDATE telegram_ui_callbacks SET used=1 WHERE token_hash=?').run(notice.callback_hash);
+   this.mode(chatId);this.queue(chatId,key,intent.days?'checkout':'plans',intent.days?{days:intent.days}:{});return true;
+  });
+ }
+ delivered(job,message,result) {
+  if(job.view!=='terms'||!positive(result?.message_id)||job.scope!==this.authority(job.chat_id).scope)return;
+  const notice=this.db.prepare('SELECT * FROM telegram_registration_notices WHERE chat_id=? AND job_id=? AND accepted_at IS NULL').get(job.chat_id,job.id);
+  if(!notice||notice.terms_version!==registrationTerms.version||notice.notice_hash!==registrationHash||notice.expires<=this.clock())return;
+  this.db.prepare('UPDATE telegram_registration_notices SET delivered_at=?,message_id=? WHERE chat_id=? AND job_id=?').run(this.clock(),result.message_id,job.chat_id,job.id);this.mode(job.chat_id,'registration');
  }
  handle(update) {
   const membership=update.my_chat_member;
@@ -130,6 +158,14 @@ export class TelegramUI {
    const mapped=positive(msg.reply_to_message?.message_id)&&this.db.prepare('SELECT 1 FROM telegram_support_messages WHERE chat_id=? AND message_id=?').get(chatId,msg.reply_to_message.message_id);
    if(operator?.chat_id===chatId||mapped)return false;
   }
+  if(raw===acceptanceLabel) {
+   if(this.db.prepare('SELECT mode FROM telegram_ui_state WHERE chat_id=?').get(chatId)?.mode==='support')return false;
+   try {
+    if(msg.forward_origin||msg.forward_from||msg.forward_date||msg.via_bot||msg.sender_chat||msg.external_reply){const error=new Error('Отправь своё подтверждение');error.code='INVALID_PAYMENT';throw error;}
+    this.acceptRegistration(chatId,key);
+   }catch(error){if(error.code!=='INVALID_PAYMENT')throw error;this.queue(chatId,key,'registration_unavailable');}
+   return true;
+  }
   if(typeof msg.text!=='string') {
    if(this.db.prepare('SELECT mode FROM telegram_ui_state WHERE chat_id=?').get(chatId)?.mode==='menu'){this.queue(chatId,key,'input_help');return true;}
    return false;
@@ -152,6 +188,11 @@ export class TelegramUI {
    this.queue(chatId,key,'binding',{ok});return true;
   }
   if(command==='/stop'){this.mute(chatId,false);this.queue(chatId,key,'settings',{muted:true});return true;}
+  if(['/renew','/plans'].includes(command)&&payload) {
+   const days=/^(30|90|180|365)$/.test(payload)?Number(payload):null;
+   const available=this.commerce.checkoutPlans().plans.some(plan=>plan.days===days);
+   this.queue(chatId,key,available?'checkout':'action_unavailable',available?{days}:{});return true;
+  }
   const view=command==='/start'&&!payload?'welcome':({'/status':'subscription','/subscription':'subscription','/connect':'devices','/renew':'plans','/plans':'plans','/notifications':'settings','/disconnect':'unlink','/cabinet':'cabinet','/terms':'terms','/privacy':'terms'})[command]||'home';
   this.queue(chatId,key,view);return true;
  }
@@ -163,14 +204,15 @@ export class TelegramUI {
   const valid=row&&!row.used&&row.chat_id===chatId&&row.scope===this.authority(chatId).scope&&row.expires>this.clock();
   this.queue(chatId,'ack:'+update.update_id,'callback_answer',{callback_query_id:query.id,text:valid?'':'Кнопка устарела. Открой /menu.',show_alert:!valid});
   if(!valid)return true;
-  this.db.prepare('UPDATE telegram_ui_callbacks SET used=1 WHERE token_hash=?').run(digest(token));
-  const key='ui:'+update.update_id,data=JSON.parse(row.data);this.mode(chatId);
+  const key='ui:'+update.update_id,data=JSON.parse(row.data);
+  if(row.action==='accept_terms') {
+   try{this.acceptRegistration(chatId,key,digest(token));}catch(error){if(error.code!=='INVALID_PAYMENT')throw error;this.queue(chatId,key,'registration_unavailable');}return true;
+  }
+  this.db.prepare('UPDATE telegram_ui_callbacks SET used=1 WHERE token_hash=?').run(digest(token));this.mode(chatId);
   try { if(row.action==='help') {
    this.mode(chatId,'support');this.telegram.support?.activate(chatId,'vpn');this.queue(chatId,key,'help');
-  }else if(row.action==='create')this.queue(chatId,key,'terms');
-  else if(row.action==='accept_terms') {
-   this.commerce.ensure(chatId,{acceptedTerms:true});this.queue(chatId,key,'plans');
-  }else if(row.action==='reminders') {
+  }else if(row.action==='create')this.queue(chatId,key,'terms',this.commerce.checkoutPlans().plans.some(plan=>plan.days===data.days)?{days:data.days}:{});
+  else if(row.action==='reminders') {
    this.mute(chatId,Boolean(data.enabled));this.queue(chatId,key,'settings');
   }else if(row.action==='unlink_confirm') {
    if(this.commerce.canUnlink(chatId)) {
@@ -180,9 +222,9 @@ export class TelegramUI {
   }else if(row.action==='device'&&botDevices[data.device])this.queue(chatId,key,'device',{device:data.device});
   else if(row.action==='manual'&&botDevices[data.device])this.queue(chatId,key,'manual',{device:data.device});
   else if(row.action==='qr')this.queue(chatId,key,'qr');
-  else if(row.action==='invoice'&&Number.isInteger(data.days)) {
-   const offer=this.commerce.preparePurchase(chatId,data.days,'tg-ui:'+token);this.queue(chatId,key,'purchase_terms',{consentToken:offer.token});
-  }else if(row.action==='accept_purchase_terms')this.queue(chatId,key,'invoice',this.commerce.acceptPurchase(chatId,data.consentToken));
+  else if(row.action==='checkout'&&Number.isInteger(data.days)) {
+   this.commerce.checkoutPlan(chatId,data.days);this.queue(chatId,key,'checkout',{days:data.days});
+  }else if(['invoice','accept_purchase_terms'].includes(row.action))this.queue(chatId,key,'plans');
   else if(['home','subscription','devices','plans','settings','cabinet','binding','unlink'].includes(row.action))this.queue(chatId,key,row.action);
   }catch(error){if(error.code!=='INVALID_PAYMENT')throw error;this.queue(chatId,key,'action_unavailable');}
   return true;
@@ -195,6 +237,7 @@ export class TelegramUI {
   return {...sub,profile_url:url.href};
  }
  render(job) {
+  if(['invoice','purchase_terms'].includes(job.view))job={...job,view:'plans'}; // Retire unsent Stars sales, never existing orders or financial events.
   const chatId=job.chat_id,payload=JSON.parse(job.payload),{identity}=this.authority(chatId);
   if(job.view==='callback_answer')return {method:'answerCallbackQuery',data:payload};
   if(job.view==='precheckout')return {method:'answerPreCheckoutQuery',data:payload};
@@ -213,14 +256,21 @@ export class TelegramUI {
   if(job.view==='welcome') {
    text='<blockquote>Телефон, компьютер и Smart TV\nОдна подписка без лимита устройств\nМаршруты через Нидерланды и Германию\nПодключение по личной ссылке или QR-коду\nПоддержка прямо в Telegram\nНапоминания об окончании подписки</blockquote>'+(identity?'\n\n'+status():'');
    main();return {method:'sendAnimation',data:{chat_id:chatId,animation:readFileSync(new URL('./assets/bot-welcome.mp4',import.meta.url)),duration:4,width:1280,height:640,caption:text,parse_mode:'HTML',reply_markup:{inline_keyboard:rows}}};
-  }else if(!identity&&['subscription','devices','plans','settings','cabinet','unlink','manual','device','qr','invoice','purchase_terms'].includes(job.view)) {
-   text='<b>Family VPN</b>\n\n'+status();rows.push([button('Уже есть подписка','binding')],[button('Создать аккаунт','create')],[button('Помощь','help')]);
+  }else if(!identity&&['subscription','devices','plans','settings','cabinet','unlink','manual','device','qr','checkout'].includes(job.view)) {
+   const selected=this.commerce.checkoutPlans().plans.find(plan=>plan.days===payload.days);
+   text='<b>Family VPN</b>\n\n'+(selected?'Выбран срок: '+selected.days+' дней · '+rub(selected.priceMinor)+'.\n\n':'')+status();rows.push([button('Уже есть подписка','binding')],[button('Создать аккаунт','create',selected?{days:selected.days}:{})],[button('Помощь','help')]);
   }else if(job.view==='binding') {
    text=payload.ok===false?'Ссылка привязки недействительна или уже использована. Создай новую в кабинете.':payload.ok?'Остался один шаг: вернись в кабинет и подтверди, что это твой Telegram. До подтверждения личная подписка здесь не появится.':'Уже покупал на сайте? Войди в кабинет → Настройки → Telegram → Подключить. После Start вернись на сайт и подтверди привязку.';
    rows.push([{text:'Открыть кабинет',url:this.origin+'/vpn/cabinet/#settings'}],home());
   }else if(job.view==='terms') {
-   text='<b>Создать аккаунт Family VPN</b>\n\nTelegram станет способом входа в сервис. Подписка появится после подтверждённой оплаты. Нажимая «Принимаю и продолжаю», ты принимаешь условия сервиса и обработку данных.';
-   rows.push([{text:'Условия и конфиденциальность',url:this.origin+'/vpn/terms/'}],[button('Принимаю и продолжаю','accept_terms')],home());
+   if(identity){text='Условия Family VPN и обработка данных.';rows.push([{text:'Условия сервиса',url:this.origin+registrationTerms.termsPath},{text:'Конфиденциальность',url:this.origin+registrationTerms.privacyPath}],home());}
+   else {
+    text='<b>Создать аккаунт Family VPN</b>\n\n'+registrationTerms.notice+'\n\nНажми кнопку или отправь: '+acceptanceLabel;
+    const selected=this.commerce.checkoutPlans().plans.find(plan=>plan.days===payload.days);
+    const accept=button(acceptanceLabel,'accept_terms',{termsVersion:registrationTerms.version,noticeHash:registrationHash,days:selected?.days||null}),callbackHash=digest(accept.callback_data.slice(2));
+    this.db.prepare('INSERT INTO telegram_registration_notices(chat_id,scope,terms_version,notice_hash,callback_hash,job_id,expires) VALUES(?,?,?,?,?,?,?) ON CONFLICT(chat_id) DO UPDATE SET scope=excluded.scope,terms_version=excluded.terms_version,notice_hash=excluded.notice_hash,callback_hash=excluded.callback_hash,job_id=excluded.job_id,expires=excluded.expires,delivered_at=NULL,message_id=NULL,accepted_at=NULL').run(chatId,this.authority(chatId).scope,registrationTerms.version,registrationHash,callbackHash,job.id,this.clock()+10*MINUTE);
+    rows.push([{text:'Условия сервиса',url:this.origin+registrationTerms.termsPath},{text:'Конфиденциальность',url:this.origin+registrationTerms.privacyPath}],[accept],home());
+   }
   }else if(job.view==='home'||job.view==='subscription'||job.view==='paid'||job.view==='refunded') {
    text='<b>Family VPN</b>\n\n'+(job.view==='paid'?'Оплата подтверждена.\n':job.view==='refunded'?'Возврат подтверждён.\n':'')+status();main();
   }else if(job.view==='devices') {
@@ -244,24 +294,18 @@ export class TelegramUI {
    if(ready)return {method:'sendPhoto',qr:ready.profile_url,data:{chat_id:chatId,caption:'QR для подключения другого устройства. Это личный доступ: не публикуй код.',protect_content:true,reply_markup:{inline_keyboard:[home()]}}};
    text=status();rows.push(home());
   }else if(job.view==='plans') {
-   const catalogue=this.commerce.plans();
+   const catalogue=this.commerce.checkoutPlans();
    if(sub?.allow_unlimited&&sub.unlimited){text='У тебя бессрочная подписка. Продление не требуется.';rows.push(home());}
-   else if(!catalogue.available||!catalogue.plans.length){text='Покупка в Telegram пока недоступна. Текущая подписка и помощь остаются здесь.';rows.push([button('Моя подписка','subscription'),button('Помощь','help')],home());}
+   else if(!catalogue.available||!catalogue.plans.length){text='Тарифы сейчас недоступны. Текущая подписка и помощь остаются здесь.';rows.push([button('Моя подписка','subscription'),button('Помощь','help')],home());}
    else {
-    const plans=describeStarsPlans(catalogue.plans);
-    text='<b>Выбери срок подписки</b>\n\nОплата в Telegram Stars. Срок добавится к текущей подписке.';
-    if(plans.length>1||plans[0].days!==30){
-     text+='\n\nОдин платёж за весь срок. Цена за 30 дней приведена для сравнения.\n\n'+plans.map(plan=>'<b>'+plan.days+' дней · '+plan.stars+' ⭐ всего</b>\n'+plan.per30Days+' ⭐ за 30 дней'+(plan.savings?' · экономия '+html(plan.savings):'')).join('\n\n');
-     if(plans.some(plan=>plan.savings))text+='\n\nЭкономия относительно тарифа на 30 дней.';
-    }
-    for(const plan of plans)rows.push([button(plan.days+' дней · '+plan.stars+' ⭐','invoice',{days:plan.days})]);rows.push(home());
+    text='<b>Выбери срок подписки</b>\n\nОплата в рублях на сайте через ЮKassa. Срок добавится к текущей подписке.\n\nВыбери кнопку или отправь /renew и срок: '+catalogue.plans.map(plan=>plan.days).join(', ')+'. Например: /renew '+catalogue.plans[0].days;
+    for(const plan of catalogue.plans)rows.push([button(plan.days+' дней · '+rub(plan.priceMinor),'checkout',{days:plan.days})]);rows.push(home());
    }
-  }else if(job.view==='purchase_terms') {
-   const offer=this.commerce.purchaseTerms(chatId,payload.consentToken);
-   text='<b>Family VPN · '+offer.days+' дней</b>\n\nВсего: <b>'+offer.stars+' ⭐</b>.\n\n'+html(offer.notice)+'\n\nПеред оплатой прими условия сервиса и обработку данных.';
-   rows.push([{text:'Условия сервиса',url:offer.termsUrl},{text:'Обработка данных',url:offer.privacyUrl}],[button('Принимаю, перейти к оплате','accept_purchase_terms',{consentToken:offer.token})],home());
-  }else if(job.view==='invoice') {
-   return {method:'sendInvoice',data:this.commerce.invoice(chatId,payload.days,payload.requestKey,payload.consentToken)};
+  }else if(job.view==='checkout') {
+   const plan=this.commerce.checkoutPlan(chatId,payload.days);
+   const url=this.commerce.handoff(chatId,{purpose:'login',target:'plans',period:plan.days});
+   text='<b>Family VPN · '+plan.days+' дней</b>\n\nВсего: <b>'+rub(plan.priceMinor)+'</b>.\n\nОткрой кабинет, проверь аккаунт и укажи email для чека. Оплата пройдёт на сайте через ЮKassa. После подтверждения откроется настройка VPN.\n\nСсылка для входа одноразовая и действует 5 минут. Не пересылай её.\n'+html(url);
+   rows.push([{text:'Перейти на сайт',url}],[button('← Выбрать срок','plans')],home());
   }else if(job.view==='settings') {
    const enabled=Boolean(this.db.prepare('SELECT enabled FROM telegram_links WHERE account_id=? AND chat_id=?').get(identity.account_id,chatId)?.enabled);
    text='<b>Напоминания</b>\n\n'+(enabled?'Включены: за 3 дня, за сутки и после окончания подписки.':'Выключены. Подписка и вход через Telegram сохранены.')+'\nБессрочной подписке напоминания не нужны.';
@@ -278,6 +322,7 @@ export class TelegramUI {
   }else if(job.view==='unlinked') {text='Telegram отвязан. Подписка сохранена. Вернуться можно через кабинет.';rows.push(home());}
   else if(job.view==='payment_invalid') {text='Не удалось подтвердить платёж. Доступ не изменён. Напиши /paysupport или на '+SUPPORT_EMAIL+'.';rows.push(home());}
   else if(job.view==='action_unavailable') {text='Действие сейчас недоступно. Открой меню и проверь подписку. Если нужна помощь, напиши здесь или на '+SUPPORT_EMAIL+'.';rows.push(home());}
+  else if(job.view==='registration_unavailable') {text='Подтверждение условий недействительно или истекло. Открой /terms и подтверди условия своим сообщением или кнопкой.';rows.push(home());}
   else {text='Выбери действие кнопками. Чтобы написать человеку, открой «Помощь».';main();}
   return {method:'sendMessage',data:{...body,text,reply_markup:{inline_keyboard:rows},...(job.view==='manual'?{protect_content:true}:{})}};
  }
@@ -291,7 +336,7 @@ export class TelegramUI {
   return null;
  }
  recover(){this.db.prepare("UPDATE telegram_ui_outbox SET state='uncertain' WHERE state='sending'").run();}
- plan(){this.commerce.prunePurchaseOffers();this.db.prepare('DELETE FROM telegram_ui_callbacks WHERE expires<=?').run(this.clock());this.db.prepare("DELETE FROM telegram_ui_outbox WHERE created_at<? AND state NOT IN ('pending','sending')").run(this.clock()-DAY);this.db.prepare('DELETE FROM telegram_ui_state WHERE updated_at<?').run(this.clock()-90*DAY);}
+ plan(){this.commerce.prunePurchaseOffers();this.db.prepare('DELETE FROM telegram_ui_callbacks WHERE expires<=?').run(this.clock());this.db.prepare('DELETE FROM telegram_registration_notices WHERE accepted_at IS NULL AND expires<=?').run(this.clock());this.db.prepare("DELETE FROM telegram_ui_outbox WHERE created_at<? AND state NOT IN ('pending','sending')").run(this.clock()-DAY);this.db.prepare('DELETE FROM telegram_ui_state WHERE updated_at<?').run(this.clock()-90*DAY);}
 }
 
 export async function deliverUiOne(ui,client) {
@@ -301,7 +346,7 @@ export async function deliverUiOne(ui,client) {
   const message=ui.render(job);
   if(message.qr)message.data.photo=await QRCode.toBuffer(message.qr,{type:'png',errorCorrectionLevel:'M',margin:2,width:600});
   if(!['precheckout','callback_answer'].includes(job.view)&&job.scope!==ui.authority(job.chat_id).scope){ui.db.prepare("UPDATE telegram_ui_outbox SET state='canceled' WHERE id=?").run(job.id);return true;}
-  await client.call(message.method,message.data);ui.db.prepare("UPDATE telegram_ui_outbox SET state='sent' WHERE id=?").run(job.id);
+  const result=await client.call(message.method,message.data);ui.commerce.transaction(()=>{ui.db.prepare("UPDATE telegram_ui_outbox SET state='sent' WHERE id=?").run(job.id);ui.delivered(job,message,result);});
  }catch(error) {
   if(error.code===429)ui.db.prepare("UPDATE telegram_ui_outbox SET state='pending',ready_at=? WHERE id=?").run(ui.clock()+Math.max(1000,Math.min(Number(error.retryAfter||1)*1000,3_600_000)),job.id);
   else {ui.db.prepare('UPDATE telegram_ui_outbox SET state=? WHERE id=?').run(error.code===403?'blocked':Number.isInteger(error.code)||error.code==='INVALID_PAYMENT'?'failed':'uncertain',job.id);if(error.code==='INVALID_PAYMENT')ui.queue(job.chat_id,'failure:'+job.id,'action_unavailable');if(error.code===403){ui.cancel(job.chat_id);ui.mute(job.chat_id,false);ui.db.prepare('UPDATE telegram_ui_state SET blocked=1 WHERE chat_id=?').run(job.chat_id);}}

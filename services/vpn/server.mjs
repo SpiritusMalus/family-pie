@@ -66,8 +66,8 @@ export function createApp({store,origin='https://family-spy.ru',additionalOrigin
     if(passwordOperations>=1)return send(res,429,{error:'Повтори через несколько секунд'});passwordOperations++;
     try{const options={accountId:users.session(token(req))?.account_id||null};return send(res,200,path.endsWith('/confirm')?await recovery.confirm(body.challengeId,body.code,body.password,options):await recovery.reset(body.token,body.password,options));}finally{passwordOperations--;}
    }
-   if(path==='/vpn/api/telegram/login/preview'&&req.method==='POST')return send(res,200,commerce.previewLogin(body.token,{accountId:users.session(token(req))?.account_id||null}));
-   if(path==='/vpn/api/telegram/login'&&req.method==='POST'){const s=commerce.consume(body.token,'login',{accountId:users.session(token(req))?.account_id||null});cookie(res,s.token);return send(res,200,{user:s.identity,csrf:s.csrf,device:s.device});}
+   if(path==='/vpn/api/telegram/login/preview'&&req.method==='POST'){const s=commerce.previewLogin(body.token,{accountId:users.session(token(req))?.account_id||null});return send(res,200,{login:s.login,device:s.device,target:s.target,period:s.period});}
+   if(path==='/vpn/api/telegram/login'&&req.method==='POST'){const s=commerce.consume(body.token,'login',{accountId:users.session(token(req))?.account_id||null});cookie(res,s.token);return send(res,200,{user:s.identity,csrf:s.csrf,device:s.device,target:s.target,period:s.period});}
    if(path==='/vpn/api/telegram/import'&&req.method==='POST')return send(res,200,commerce.consume(body.token,'import'));
    if(path==='/vpn/api/passkeys/login'&&req.method==='POST'){const s=await passkeys.login(body.challengeId,body.response);cookie(res,s.token);return send(res,200,{user:s.identity,csrf:s.csrf});}
    if(path==='/vpn/api/email/login/request'&&req.method==='POST')return send(res,200,await emailLogin.issue(body.email));
