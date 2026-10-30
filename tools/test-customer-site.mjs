@@ -220,8 +220,10 @@ test('device choice keeps the selected setup route through locale changes',async
  assert.deepEqual(choices.map(choice=>choice.checked),[true,false,false]);
 });
 
-test('homepage keeps real offer actions, device fallback and no-JavaScript details',async()=>{
- const html=await readFile('customer-site/index.html','utf8');
+test('VPN product page keeps real offer actions, device fallback and no-JavaScript details',async t=>{
+ const directory=await mkdtemp(resolve('customer-site/dist-test-vpn-product-'));t.after(()=>rm(directory,{recursive:true,force:true}));
+ await buildCustomerSite(directory);
+ const html=await readFile(resolve(directory,'vpn/index.html'),'utf8');
  const hero=html.slice(html.indexOf('<section id="vpn"'),html.indexOf('<div id="vpn-features"'));
  assert.match(hero,/id="vpn-title"/);assert.match(hero,/href="#vpn-pricing"/);assert.match(hero,/href="\/vpn\/cabinet\/"/);
  assert.doesNotMatch(hero,/data-vpn-plan=|vpn-signal/);
@@ -234,6 +236,27 @@ test('homepage keeps real offer actions, device fallback and no-JavaScript detai
  for(const days of [30,90,180,365])assert.match(html,new RegExp('<details class="vpn-plan" data-vpn-plan="'+days+'" open>'));
  assert.equal((html.match(/class="vpn-plan-summary"/g)||[]).length,4);
  for(const platform of ['android','ios','windows','macos','linux','tv'])assert.ok(html.includes('#devices?platform='+platform));
+});
+
+test('homepage previews products while full VPN details have one destination',async t=>{
+ const directory=await mkdtemp(resolve('customer-site/dist-test-compact-home-'));t.after(()=>rm(directory,{recursive:true,force:true}));
+ await buildCustomerSite(directory);
+ const home=await readFile(resolve(directory,'index.html'),'utf8');
+ const vpn=await readFile(resolve(directory,'vpn/index.html'),'utf8');
+ assert.match(home,/<section id="vpn"/);assert.match(home,/<section id="sufler"/);
+ assert.match(home,/id="vpn-price"/);assert.match(home,/href="\/vpn\/cabinet\/"/);
+ assert.match(home,/<a href="\/vpn\/">Family VPN<\/a>/);
+ assert.match(home,/id="vpn-pricing" href="\/vpn\/#vpn-pricing"/);
+ assert.match(home,/id="vpn-features" href="\/vpn\/#vpn-features"/);
+ assert.doesNotMatch(home,/data-vpn-plan=|class="vpn-benefits|class="vpn-devices|class="device-picker|data-device-setup|class="vpn-more"/);
+ assert.match(home,/<script src="\/home-vpn.js" defer><\/script>/);
+ assert.doesNotMatch(vpn,/src="\/home-vpn.js"/);
+ for(const marker of ['id="vpn-features"','id="vpn-pricing"','class="vpn-devices','id="vpn-questions"'])assert.ok(vpn.includes(marker),marker);
+ const ids=new Set([...home.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
+ for(const m of home.matchAll(/href="#([^"?]+)"/g))assert.ok(ids.has(m[1]),'Broken homepage anchor '+m[1]);
+ const before=await readFile('customer-site/index.html','utf8');
+ const sufler=html=>html.match(/<section id="sufler"[\s\S]*?<\/section>/)?.[0];
+ assert.equal(sufler(home),sufler(before),'Sufler offer stays intact');
 });
 
 test('IndexNow ownership proof is supplied explicitly and excluded from page content and sitemap',async t=>{
