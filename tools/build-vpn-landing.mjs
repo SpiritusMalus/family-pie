@@ -40,3 +40,29 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     .replaceAll('Тарифы на странице VPN','Тарифы в личном кабинете')
     .replaceAll('See plans on the VPN page','See account pricing');
 }
+
+// Keep the complete shared offer on /vpn/ and publish only its introduction at /.
+export function buildStorefrontHome(home) {
+  const start = home.indexOf('<section id="vpn"');
+  const details = home.indexOf('<div id="vpn-features"', start);
+  const end = home.indexOf('</section>', details);
+  if (start < 0 || details < start || end < details || !home.includes('<section id="sufler"')) {
+    throw Error('Missing storefront section for compact home');
+  }
+  let compact = home.slice(0, details) + home.slice(end);
+  const replace = (from, to) => {
+    if (!compact.includes(from)) throw Error('Missing compact home marker: ' + from);
+    compact = compact.replace(from, to);
+  };
+  replace('<a href="#vpn">Family VPN</a>', '<a href="/vpn/">Family VPN</a>');
+  replace('class="button" href="#vpn-pricing"', 'class="button" id="vpn-pricing" href="/vpn/#vpn-pricing"');
+  replace('class="vpn-explore" href="#vpn-features"', 'class="vpn-explore" id="vpn-features" href="/vpn/#vpn-features"');
+  replace('M12 4v16m-5-5 5 5 5-5', 'M7 17 17 7M7 7h10v10');
+  replace('<script src="/customer.js" defer></script>', '<script src="/home-vpn.js" defer></script>\n<script src="/customer.js" defer></script>');
+  compact = compact
+    .replace(/\s*<fieldset class="device-picker">[\s\S]*?<\/fieldset>/, '')
+    .replace(/\s*<a class="device-setup"[\s\S]*?<\/a>/, '')
+    .replace(/STORY:[^\n]+/, 'STORY: Preview VPN and Sufler, then continue directly to the relevant product, plan or account.')
+    .replace(/FORM:[^\n]+/, 'FORM: Two concise product introductions. Full VPN features, tariffs, device setup and FAQ belong to /vpn/.');
+  return compact;
+}

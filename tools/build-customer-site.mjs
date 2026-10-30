@@ -1,7 +1,7 @@
 import {cp, mkdir, readFile, writeFile, rm, readdir} from 'node:fs/promises';
 import {resolve, relative, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {buildVpnLanding} from './build-vpn-landing.mjs';
+import {buildVpnLanding,buildStorefrontHome} from './build-vpn-landing.mjs';
 
 const project = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const customerRedirects = [];
@@ -40,7 +40,7 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
       return path!=='vpn/index.html'&&!/^vpn\/api(\/|$)/.test(path);
     }
   });
-  for (const file of ['index.html','customer.css','customer.js','vpn-search.css']) await cp(resolve(project,'customer-site',file),resolve(output,file));
+  for (const file of ['index.html','customer.css','customer.js','home-vpn.js','vpn-search.css']) await cp(resolve(project,'customer-site',file),resolve(output,file));
   const meta = siteProofs.filter(([,value]) => value).map(([name,value]) => `<meta name="${name}" content="${value}">`).join('');
   if (meta) {
     const home = resolve(output,'index.html');
@@ -81,8 +81,10 @@ export async function buildCustomerSite(output = resolve(project, 'customer-site
     }
   }
   await pages(output);
-  const vpnLanding=buildVpnLanding(await readFile(resolve(output,'index.html'),'utf8'),await readFile(resolve(project,'customer-site/vpn-details.html'),'utf8'));
+  const sharedHome=await readFile(resolve(output,'index.html'),'utf8');
+  const vpnLanding=buildVpnLanding(sharedHome,await readFile(resolve(project,'customer-site/vpn-details.html'),'utf8'));
   await writeFile(resolve(output,'vpn/index.html'),vpnLanding);
+  await writeFile(resolve(output,'index.html'),buildStorefrontHome(sharedHome));
   count++;
   const accountScript=resolve(output,'vpn/account.js');
   await writeFile(accountScript,(await readFile(accountScript,'utf8')).replace("$('.preview-bar').textContent=`Аккаунт: ${me.user.login}. Личный кабинет Family VPN.`;", "$('.preview-bar').replaceChildren(el('span','Аккаунт:'),document.createTextNode(' '+me.user.login+'. '),el('span','Личный кабинет Family VPN.'));") );

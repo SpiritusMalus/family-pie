@@ -4,6 +4,7 @@ import {readFile,mkdtemp,rm} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
+import {runInNewContext} from 'node:vm';
 import {buildCustomerSite} from './build-customer-site.mjs';
 import {buildVpnLanding} from './build-vpn-landing.mjs';
 
@@ -65,4 +66,62 @@ test('public VPN routes serve the landing, canonical aliases preserve queries, p
   const missing=await fetch(base+'/vpn/not-a-real-page');assert.equal(missing.status,404);assert.doesNotMatch(await missing.text(),/id="vpn-title"/);
   const head=await fetch(base+'/vpn/',{method:'HEAD'});assert.equal(head.status,200);assert.equal(await head.text(),'');
   assert.equal((await fetch(base+'/vpn/',{method:'POST'})).status,405);
+});
+
+const homeVpnScript = await readFile(new URL('../customer-site/home-vpn.js',import.meta.url),'utf8');
+function homeAnchorFixture(url) {
+  const initial = new URL(url), replacements = [], listeners = new Map();
+  const location = {
+    pathname:initial.pathname,search:initial.search,hash:initial.hash,
+    replace(value) {
+      replacements.push(value);
+      const next = new URL(value,initial);
+      this.pathname=next.pathname;this.search=next.search;this.hash=next.hash;
+    }
+  };
+  // The real script receives no document, fetch, cookies or storage APIs.
+  runInNewContext(homeVpnScript,{
+    location,window:{addEventListener:(type,listener)=>listeners.set(type,listener)}
+  });
+  return {location,replacements,listeners,hashchange(hash) {
+    location.hash=hash;listeners.get('hashchange')?.();
+  }};
+}
+
+test('legacy homepage VPN anchors: initial links preserve every query field and the exact target fragment',()=>{
+  for(const path of ['/','/index.html'])for(const hash of ['#vpn-features','#vpn-pricing']) {
+    const query='?lang=ru&period=90&return=%2Fvpn%2Fcabinet%2F%23plans&lang=en&extra=a%2Bb';
+    const f=homeAnchorFixture('https://family-spy.ru'+path+query+hash);
+    assert.deepEqual(f.replacements,['/vpn/'+query+hash]);
+    assert.equal(f.location.pathname,'/vpn/');
+    f.hashchange(hash);
+    assert.equal(f.replacements.length,1,'The dedicated destination must not redirect again');
+  }
+  assert.deepEqual(homeAnchorFixture('https://family-spy.ru/#vpn-pricing').replacements,['/vpn/#vpn-pricing']);
+});
+
+test('legacy homepage VPN anchors: later hash changes follow only the two legacy targets',()=>{
+  for(const path of ['/','/index.html'])for(const hash of ['#vpn-features','#vpn-pricing']) {
+    const f=homeAnchorFixture('https://family-spy.ru'+path+'?lang=en#sufler');
+    assert.deepEqual(f.replacements,[]);
+    f.hashchange('#vpn');assert.deepEqual(f.replacements,[]);
+    f.hashchange(hash);assert.deepEqual(f.replacements,['/vpn/?lang=en'+hash]);
+  }
+});
+
+test('legacy homepage VPN anchors: unknown and lookalike fragments stay on the homepage',()=>{
+  for(const hash of ['', '#', '#vpn', '#sufler', '#vpn-questions', '#VPN-features', '#vpn-features/', '#vpn-pricing?period=90', '#vpn-pricing-extra', '#vpn%2Dfeatures', '#https://elsewhere.invalid/']) {
+    const f=homeAnchorFixture('https://family-spy.ru/?lang=ru'+hash);
+    assert.deepEqual(f.replacements,[],hash);
+    f.hashchange(hash);assert.deepEqual(f.replacements,[],hash);
+  }
+});
+
+test('legacy homepage VPN anchors: dedicated, account and unrelated paths never acquire a redirect handler',()=>{
+  for(const path of ['/vpn/','/vpn','/vpn/index.html','/vpn/cabinet/','/vpn/cabinet/auth/','/vpn/api/plans','/sufler/','/other/','/index.html/','/index.htm'])for(const hash of ['#vpn-features','#vpn-pricing']) {
+    const f=homeAnchorFixture('https://family-spy.ru'+path+'?lang=ru'+hash);
+    assert.deepEqual(f.replacements,[],path);
+    assert.equal(f.listeners.size,0,path);
+    f.hashchange(hash);assert.deepEqual(f.replacements,[],path);
+  }
 });
