@@ -3,21 +3,21 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(/vpn/fonts/14b6aebb899c.woff2) format('truetype');
+  src: url(/vpn/fonts/a06d8b959033.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Golos Text';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url(/vpn/fonts/5276ae12340d.woff2) format('truetype');
+  src: url(/vpn/fonts/de389fa058d4.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Golos Text';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url(/vpn/fonts/2ddbbcb0584d.woff2) format('truetype');
+  src: url(/vpn/fonts/9e09f436958d.woff2) format('woff2');
 }
 @font-face {
   font-family: 'Golos Text';
